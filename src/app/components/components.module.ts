@@ -33,8 +33,6 @@ import { NgbdModalContent } from './modal/modal.component';
         NotificationComponent,
         NgbdModalComponent,
         NgbdModalContent
-    ],
-    entryComponents: [NgbdModalContent],
-    exports:[ ComponentsComponent ]
+    ]
 })
 export class ComponentsModule { }

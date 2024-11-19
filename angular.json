@@ -15,7 +15,6 @@
             "index": "src/index.html",
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
-            "polyfills": "src/polyfills.ts",
             "assets": [
               "src/assets",
               "src/favicon.ico"
@@ -51,18 +50,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "pk2-angular:build"
+            "buildTarget": "pk2-angular:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "pk2-angular:build:production"
+              "buildTarget": "pk2-angular:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "pk2-angular:build"
+            "buildTarget": "pk2-angular:build"
           }
         },
         "lint": {
