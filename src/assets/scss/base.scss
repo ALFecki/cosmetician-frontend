@@ -1,0 +1,56 @@
+/*!
+
+ =========================================================
+ * Paper Kit 2 Angular - v1.5.0
+ =========================================================
+
+ * Product Page: https://www.creative-tim.com/product/base-2-angular
+ * Copyright 2020 Creative Tim (https://www.creative-tim.com)
+ * Licensed under MIT (https://github.com/timcreative/base/blob/master/LICENSE.md)
+
+ =========================================================
+
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ */
+
+ @import "base/variables";
+ @import "base/mixins";
+ 
+ @import "base/typography";
+ 
+ // Core CSS
+ @import "base/misc";
+ @import "base/buttons";
+ @import "base/inputs";
+ @import "base/progress-bars";
+ @import "base/sliders";
+ @import "base/alerts";
+ @import "base/labels";
+ @import "base/tooltips-and-popovers";
+ @import "base/sections";
+ @import "base/checkbox-radio";
+ @import "base/navbar";
+ @import "base/images";
+ @import "base/cards";
+ @import "base/footers";
+ 
+ 
+ // Bootstrap Switch
+ @import "base/bootstrap-switch";
+ 
+ // Fancy Stuff
+ @import "base/dropdown";
+ //
+ // icons
+ @import "base/icons";
+ //
+ @import "base/tabs-navs-pagination";
+ @import "base/collapse";
+ @import "base/carousel";
+ @import "base/modal";
+ //
+ @import "base/responsive";
+//  @import "base/plugins/datetimepicker";
+ @import "base/social-buttons";
+ @import "base/examples";
+ 
