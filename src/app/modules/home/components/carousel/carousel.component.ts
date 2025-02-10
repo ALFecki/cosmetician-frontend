@@ -10,12 +10,8 @@ export class CarouselComponent {
   slides = [
     { title: 'Слайд 1', image: 'assets/images/carousel1.jpg' },
     { title: 'Слайд 2', image: 'assets/images/carousel2.jpg' },
-    { title: 'Слайд 3', image: 'assets/images/carousel3.jpg' }
+    { title: 'Слайд 3', image: 'assets/images/carousel3.jpg' },
   ];
-
-  get transform() {
-    return `translateX(-${this.currentIndex * 100}%)`;
-  }
 
   nextSlide() {
     this.currentIndex = (this.currentIndex + 1) % this.slides.length;

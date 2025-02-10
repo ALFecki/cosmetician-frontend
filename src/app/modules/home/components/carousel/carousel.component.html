@@ -1,11 +1,21 @@
-<div class="carousel">
-    <div class="carousel-slides" [style.transform]="transform">
-      <div class="slide" *ngFor="let slide of slides">
-        <img [src]="slide.image" alt="{{ slide.title }}">
-        <div class="caption">{{ slide.title }}</div>
-      </div>
+<div id="homeCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button type="button" *ngFor="let slide of slides; let i = index" data-bs-target="#homeCarousel"
+            [class.active]="i === currentIndex" [class.area-current]="i === currentIndex"></button>
     </div>
-    <button class="prev" (click)="prevSlide()">&#10094;</button>
-    <button class="next" (click)="nextSlide()">&#10095;</button>
-  </div>
-  
+    <div class="carousel-inner w-80">
+        <div class="carousel-item" *ngFor="let slide of slides; let i = index" [class.active]="i === currentIndex">
+            <img class="d-block w-80" [src]="slide.image" alt="{{ slide.title }}">
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev"
+        (click)="prevSlide()">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#homeCarousel" data-bs-slide="next"
+        (click)="nextSlide()">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>

@@ -1,0 +1,33 @@
+.circle-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: background-color 0.3s ease;
+    /* Плавный переход цвета */
+}
+
+.circle-icon img {
+    max-width: 60%;
+    max-height: 60%;
+}
+
+.card {
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    /* Плавный переход для карточки */
+}
+
+.card:hover {
+    transform: scale(1.05);
+    background-color: var(--primary);
+    /* Увеличение карточки при наведении */
+}
+
+.card:hover .circle-icon {
+    background-color: #e0e0e0;
+    /* Цвет фона кружочка при наведении */
+}
