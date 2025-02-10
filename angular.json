@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "cosmetician-frontend": {
+    "proskin-frontend": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,26 +17,29 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/cosmetician-frontend",
+            "outputPath": "dist/proskin-frontend",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
-              "zone.js",
-              "@angular/localize/init"
+              "zone.js"
             ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "src/assets"
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
             ],
             "styles": [
-              "src/styles.scss",
-              "src/assets/scss/base.scss"
+              "src/styles.scss"
             ],
             "scripts": [],
             "server": "src/main.server.ts",
-            "prerender": false,
-            "ssr": false
+            "prerender": true,
+            "ssr": {
+              "entry": "server.ts"
+            }
           },
           "configurations": {
             "production": {
@@ -66,10 +69,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "cosmetician-frontend:build:production"
+              "buildTarget": "proskin-frontend:build:production"
             },
             "development": {
-              "buildTarget": "cosmetician-frontend:build:development"
+              "buildTarget": "proskin-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -82,13 +85,15 @@
           "options": {
             "polyfills": [
               "zone.js",
-              "zone.js/testing",
-              "@angular/localize/init"
+              "zone.js/testing"
             ],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "src/assets"
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
             ],
             "styles": [
               "src/styles.scss"
@@ -100,6 +105,6 @@
     }
   },
   "cli": {
-    "analytics": "2fcdfa4a-002a-4c6a-ac4e-b101c07e9a5b"
+    "analytics": false
   }
 }

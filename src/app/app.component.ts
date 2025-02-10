@@ -1,44 +1,13 @@
-import { Component, ElementRef, Inject, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { NavbarComponent } from './shared/navbar/navbar.component';
-import { filter, Subscription } from 'rxjs';
-import { DOCUMENT } from '@angular/common';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
-  title = 'cosmetician-frontend';
-  @ViewChild(NavbarComponent) navbar!: NavbarComponent;
-
-  constructor(private renderer: Renderer2, private router: Router, @Inject(DOCUMENT,) private document: any, private element: ElementRef) { }
-
-  ngOnInit() {
-    var navbar: HTMLElement = this.element.nativeElement.children[0].children[0];
-    this.renderer.listen('window', 'scroll', (event) => {
-      const number = window.scrollY;
-      if (number > 150 || window.pageYOffset > 150) {
-        // add logic
-        navbar.classList.remove('navbar-transparent');
-      } else {
-        // remove logic
-        navbar.classList.add('navbar-transparent');
-      }
-    });
-    var ua = window.navigator.userAgent;
-    var trident = ua.indexOf('Trident/');
-    if (trident > 0) {
-      // IE 11 => return version number
-      var rv = ua.indexOf('rv:');
-      // var version = parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
-    }
-    // if (version) {
-    //   var body = document.getElementsByTagName('body')[0];
-    //   body.classList.add('ie-background');
-
-    // }
-
-  }
+export class AppComponent {
+  title = 'proskin-frontend';
 }
