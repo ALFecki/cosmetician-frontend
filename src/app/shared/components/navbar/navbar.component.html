@@ -1,9 +1,29 @@
 <nav class="navbar">
-    <div class="logo">ProSkin</div>
+    <div class="logo">
+        ProSkin</div>
     <ul class="nav-links">
-      <li><a routerLink="">Категории</a></li>
-      <li><a routerLink="">Бренды</a></li>
-      <li><a routerLink="">Контакты</a></li>
-      <li><a routerLink="">Доставка и оплата</a></li>
+        <li>
+            <button class="btn btn-nav" routerLink="">Категории</button>
+        </li>
+        <li class="dropdown">
+            <button class="btn btn-nav dropdown-toggle" routerLink="">Бренды</button>
+            <ul class="dropdown-menu">
+                <li>
+                    <button class="btn btn-dropdown" routerLink="">Бренд 1</button>
+                </li>
+                <li>
+                    <button class="btn btn-dropdown" routerLink="">Бренд 2</button>
+                </li>
+                <li>
+                    <button class="btn btn-dropdown" routerLink="">Бренд 3</button>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <button class="btn btn-nav" routerLink="">Контакты</button>
+        </li>
+        <li>
+            <button class="btn btn-nav" routerLink="">Доставка и оплата</button>
+        </li>
     </ul>
-  </nav>  
+</nav>
