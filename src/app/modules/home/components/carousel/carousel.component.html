@@ -1,21 +1,24 @@
-<div id="homeCarousel" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-indicators">
-        <button type="button" *ngFor="let slide of slides; let i = index" data-bs-target="#homeCarousel"
-            [class.active]="i === currentIndex" [class.area-current]="i === currentIndex"></button>
-    </div>
-    <div class="carousel-inner w-80">
-        <div class="carousel-item" *ngFor="let slide of slides; let i = index" [class.active]="i === currentIndex">
-            <img class="d-block w-80" [src]="slide.image" alt="{{ slide.title }}">
+<div id="carouselExample" class="carousel slide" data-ride="carousel">
+    <div class="carousel-inner">
+        <div *ngFor="let slide of slides; let i = index" class="carousel-item fade" [class.active]="i === currentIndex">
+            <img [src]="slide.image" class="d-block w-100" alt="{{ slide.title }}">
+            <div class="carousel-caption d-none d-md-block">
+                <h5>{{ slide.title }}</h5>
+            </div>
         </div>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev"
-        (click)="prevSlide()">
+
+    <ol class="carousel-indicators">
+        <li *ngFor="let slide of slides; let i = index" [class.active]="i === currentIndex" (click)="goToSlide(i)"
+            data-target="#carouselExample" [attr.data-slide-to]="i"></li>
+    </ol>
+
+    <a class="carousel-control-prev" (click)="prevSlide()" role="button" data-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#homeCarousel" data-bs-slide="next"
-        (click)="nextSlide()">
+        <span class="sr-only">Previous</span>
+    </a>
+    <a class="carousel-control-next" (click)="nextSlide()" role="button" data-slide="next">
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-    </button>
+        <span class="sr-only">Next</span>
+    </a>
 </div>
