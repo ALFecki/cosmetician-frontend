@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ProductsComponent } from '../../shared/components/products/products.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-category',
@@ -9,5 +10,11 @@ import { ProductsComponent } from '../../shared/components/products/products.com
   styleUrl: './category.component.scss'
 })
 export class CategoryComponent {
+  categoryId!: string;
 
+  constructor(private route: ActivatedRoute) {
+    this.route.params.subscribe((params) => {
+      this.categoryId = params['id'];
+    });
+  }
 }

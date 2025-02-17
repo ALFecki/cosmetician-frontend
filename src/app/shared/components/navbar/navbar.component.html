@@ -15,7 +15,8 @@
                     <div class="dropdown-menu">
                         <ul class="dropdown-grid">
                             <div *ngFor="let category of categories$ | async">
-                                <li><a class="dropdown-item" href="">{{ category.title }}</a></li>
+                                <li><a class="dropdown-item" href="/category/{{ category.id }}">{{ category.title }}</a>
+                                </li>
                             </div>
                         </ul>
                     </div>

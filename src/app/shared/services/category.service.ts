@@ -18,4 +18,14 @@ export class CategoryService extends DataService<CategoryModel, CreateCategorySc
         throw new Error("Method not implemented.");
     }
 
+    override transformModel(data: any): CategoryModel {
+        return {
+            id: data.id,
+            alias: data.alias,
+            title: data.title,
+            description: data.description,
+            createdAt: new Date(data.createdAt),
+            updatedAt: new Date(data.updatedAt)
+        } as unknown as CategoryModel;
+    }
 }

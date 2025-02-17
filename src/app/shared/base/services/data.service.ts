@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../../environment';
 import { ListResponse, SingleResponse } from '../schemas/base_schema';
+import { Mode } from 'fs';
 
 @Injectable({
     providedIn: 'root'
@@ -23,28 +24,29 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
 
     getByFilterSchema(schema: FilterSchema): Observable<ListResponse<Model>> {
         let params = new HttpParams();
-
+        console.log(schema);
         if (schema) {
             (Object.keys(schema) as Array<keyof FilterSchema>).forEach(key => {
+                console.log(key);
                 if (schema[key] !== null && schema[key] !== undefined && schema[key] !== '') {
                     if (schema[key] instanceof Date) {
-                        params = params.append(String(key), schema[key].toISOString());
+                        params = params.append(String(key).replace(/([A-Z])/g, '_$1').toLowerCase(), schema[key].toISOString());
                     }
                     else if (Array.isArray(schema[key])) {
                         schema[key].forEach((value: any) => {
-                            params = params.append(String(key), value.toString());
+                            params = params.append(String(key).replace(/([A-Z])/g, '_$1').toLowerCase(), value.toString());
                         });
                     }
                     else if (typeof schema[key] === 'boolean') {
-                        params = params.append(String(key), schema[key] ? '1' : '0');
+                        params = params.append(String(key).replace(/([A-Z])/g, '_$1').toLowerCase(), schema[key] ? '1' : '0');
                     }
                     else {
-                        params = params.append(String(key), schema[key].toString());
+                        params = params.append(String(key).replace(/([A-Z])/g, '_$1').toLowerCase(), schema[key].toString());
                     }
                 }
             });
         }
-
+        console.log(params);
         return this.http.get<ListResponse<Model>>(`${this.apiUrl}/${this.endpoint}`, { params });
     }
 
@@ -55,4 +57,22 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
     delete(id: number): Observable<SingleResponse<Model>> {
         return this.http.delete<SingleResponse<Model>>(`${this.apiUrl}/${this.endpoint}/${id}`);
     }
+
+    abstract transformModel(data: any): Model;
+
+    transformList(data: ListResponse<Model>): ListResponse<Model> {
+        return {
+            status: data.status,
+            length: data.length,
+            data: data.data.map(item => this.transformModel(item))
+        };
+    }
+
+    transformSingle(data: SingleResponse<Model>): SingleResponse<Model> {
+        return {
+            status: data.status,
+            data: this.transformModel(data.data)
+        };
+    }
+
 }

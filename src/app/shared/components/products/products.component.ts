@@ -1,5 +1,5 @@
 import { CommonModule, NgFor } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { ProductService } from '../../services/product.service';
 import { ProductModel } from '../../models/product.model';
@@ -11,13 +11,16 @@ import { ProductModel } from '../../models/product.model';
   templateUrl: './products.component.html',
   styleUrl: './products.component.scss'
 })
-export class ProductsComponent {
+export class ProductsComponent implements OnInit {
   products$!: Observable<ProductModel[]>;
   @Input() categoryId!: string;
 
-  constructor(productService: ProductService) {
-    productService.getByFilterSchema({ categoryId: this.categoryId }).subscribe((data) => {
-      this.products$ = of(data.data);
+  constructor(private productService: ProductService) {
+
+  }
+  ngOnInit(): void {
+    this.productService.getByFilterSchema({ categoryId: this.categoryId }).subscribe((data) => {
+      this.products$ = of(this.productService.transformList(data).data);
     });
   }
 }
