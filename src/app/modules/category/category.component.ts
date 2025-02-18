@@ -4,10 +4,10 @@ import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-category',
-  standalone: true,
-  imports: [ProductsComponent],
   templateUrl: './category.component.html',
-  styleUrl: './category.component.scss'
+  styleUrl: './category.component.scss',
+  imports: [ProductsComponent],
+  standalone: true
 })
 export class CategoryComponent {
   categoryId!: string;

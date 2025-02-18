@@ -24,10 +24,8 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
 
     getByFilterSchema(schema: FilterSchema): Observable<ListResponse<Model>> {
         let params = new HttpParams();
-        console.log(schema);
         if (schema) {
             (Object.keys(schema) as Array<keyof FilterSchema>).forEach(key => {
-                console.log(key);
                 if (schema[key] !== null && schema[key] !== undefined && schema[key] !== '') {
                     if (schema[key] instanceof Date) {
                         params = params.append(String(key).replace(/([A-Z])/g, '_$1').toLowerCase(), schema[key].toISOString());
@@ -46,7 +44,6 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
                 }
             });
         }
-        console.log(params);
         return this.http.get<ListResponse<Model>>(`${this.apiUrl}/${this.endpoint}`, { params });
     }
 

@@ -29,7 +29,7 @@
                     <div class="dropdown-menu">
                         <ul class="dropdown-grid">
                             <div *ngFor="let brand of brands$ | async">
-                                <li><a class="dropdown-item" href="">{{ brand.title }}</a></li>
+                                <li><a class="dropdown-item" href="/brand/{{ brand.id }}">{{ brand.title }}</a></li>
                             </div>
                         </ul>
                     </div>

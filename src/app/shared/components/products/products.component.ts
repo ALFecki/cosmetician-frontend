@@ -14,12 +14,13 @@ import { ProductModel } from '../../models/product.model';
 export class ProductsComponent implements OnInit {
   products$!: Observable<ProductModel[]>;
   @Input() categoryId!: string;
+  @Input() brandId!: string;
 
   constructor(private productService: ProductService) {
 
   }
   ngOnInit(): void {
-    this.productService.getByFilterSchema({ categoryId: this.categoryId }).subscribe((data) => {
+    this.productService.getByFilterSchema({ categoryId: this.categoryId, brandId: this.brandId }).subscribe((data) => {
       this.products$ = of(this.productService.transformList(data).data);
     });
   }
