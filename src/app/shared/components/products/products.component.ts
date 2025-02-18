@@ -10,6 +10,10 @@ import { ActivatedRoute, Router } from '@angular/router';
   selector: 'app-products',
   standalone: true,
   imports: [CommonModule, NgbModule],
+  providers: [{
+    provide: 'LOCALE_ID',
+    useValue: 'by-BY'
+  }],
   templateUrl: './products.component.html',
   styleUrl: './products.component.scss'
 })

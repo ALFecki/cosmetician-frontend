@@ -27,7 +27,7 @@
                         <div class="col-md-6">
                             <ul class="list-group">
                                 <li class="list-group-item">
-                                    <strong>Цена:</strong> {{ product.price | currency }}
+                                    <strong>Цена:</strong> {{ product.price | number: '1.2-2' }} р.
                                 </li>
                                 <li class="list-group-item">
                                     <strong>Объем:</strong> {{ product.volume }} мл
@@ -53,17 +53,22 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="mt-3">
-                        <small class="text-muted">
-                            Создано: {{ product.createdAt | date }}
-                            <br>
-                            Обновлено: {{ product.updatedAt | date }}
-                        </small>
+                        <div class="col-md-12 mt-3">
+                            <button class="btn btn-primary" (click)="addToCart(product)">
+                                <i class="bi bi-cart-plus"></i> Добавить в корзину
+                            </button>
+                        </div>
+
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                Создано: {{ product.createdAt | date }}
+                                <br>
+                                Обновлено: {{ product.updatedAt | date }}
+                            </small>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>

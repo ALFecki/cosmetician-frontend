@@ -34,7 +34,7 @@ export class ProductCardComponent {
     });
   }
 
-  addToCart() {
+  addToCart(product: ProductModel) {
     console.log('Добавление в корзину:', this.product);
   }
 }

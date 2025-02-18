@@ -6,7 +6,7 @@
           alt="{{ product.title }}">
         <div class="card-body">
           <h5 class="card-title">{{ product.title }}</h5>
-          <p class="card-text">Цена: {{ product.price | currency:'RUB':'symbol-narrow' }}</p>
+          <p class="card-text">Цена: {{ product.price | number: '1.2-2' }} р.</p>
           <button class="btn btn-primary" (click)="$event.stopPropagation()">Купить</button>
         </div>
       </div>
@@ -50,7 +50,7 @@
 
         <div class="price-section mb-3">
           <h3 class="text-primary">
-            {{ selectedProduct?.price | currency:'RUB':'symbol-narrow' }}
+            {{ selectedProduct?.price | number: '1.2-2' }} р.
           </h3>
         </div>
 
