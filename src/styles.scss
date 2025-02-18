@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+/* Importing Bootstrap SCSS file. */
+@import 'bootstrap/scss/bootstrap';
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -12,7 +15,9 @@
   --black: #000000;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+$bs-font-sans-serif: 'Pacifico', serif;
+$bs-body-font-family: 'Pacifico', serif;
+
 
 body {
   font-family: 'Pacifico', serif;

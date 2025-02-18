@@ -1,12 +1,8 @@
-<!-- <app-products [brandId]="this.brandId"></app-products>
-  -->
-
-  <div *ngIf="brand | async as brandData" class="container mt-4">
+<div *ngIf="brand | async as brandData" class="container mt-4">
     <header class="brand-header text-center mb-4">
         <h1 class="display-4">{{ brandData.title }}</h1>
         <p class="lead">{{ brandData.description }}</p>
-        <img *ngIf="brandData.image" [src]="brandData.image" alt="{{ brandData.title }}"
-            class="img-fluid rounded" />
+        <img *ngIf="brandData.image" [src]="brandData.image" alt="{{ brandData.title }}" class="img-fluid rounded" />
     </header>
 
     <div class="row">

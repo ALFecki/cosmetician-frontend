@@ -1,15 +1,17 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { HomeModule } from './modules/home/home.module';
-import { CommonModule, NgFor } from '@angular/common';
+import { NavbarComponent } from './shared/components/navbar/navbar.component';
+import { RouterOutlet } from '@angular/router';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, NavbarComponent, HomeModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  standalone: true,
+  imports: [
+    NgbModule,
+    RouterOutlet, NavbarComponent, HomeModule]
 })
 export class AppComponent {
   title = 'proskin-frontend';
