@@ -18,7 +18,7 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
         return this.http.get<ListResponse<Model>>(`${this.apiUrl}/${this.endpoint}`);
     }
 
-    getById(id: number): Observable<SingleResponse<Model>> {
+    getById(id: string): Observable<SingleResponse<Model>> {
         return this.http.get<SingleResponse<Model>>(`${this.apiUrl}/${this.endpoint}/${id}`);
     }
 

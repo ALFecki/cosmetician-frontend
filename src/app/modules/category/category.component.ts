@@ -1,20 +1,29 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductsComponent } from '../../shared/components/products/products.component';
 import { ActivatedRoute } from '@angular/router';
+import { CategoryModel } from '../../shared/models/category.model';
+import { CategoryService } from '../../shared/services/category.service';
+import { Observable, of } from 'rxjs';
+import { CommonModule, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-category',
   templateUrl: './category.component.html',
   styleUrl: './category.component.scss',
-  imports: [ProductsComponent],
+  imports: [ProductsComponent, NgIf, CommonModule],
   standalone: true
 })
 export class CategoryComponent {
   categoryId!: string;
+  category!: Observable<CategoryModel>;
 
-  constructor(private route: ActivatedRoute) {
+  constructor(private route: ActivatedRoute, categoryService: CategoryService) {
     this.route.params.subscribe((params) => {
       this.categoryId = params['id'];
     });
+
+    categoryService.getById(this.categoryId).subscribe((data) => {
+      this.category = of(data.data);
+    })
   }
 }
