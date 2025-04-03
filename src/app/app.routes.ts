@@ -3,6 +3,7 @@ import { HomeComponent } from './modules/home/home.component';
 import { CategoryComponent } from './modules/category/category.component';
 import { BrandComponent } from './modules/brand/brand.component';
 import { ProductCardComponent } from './shared/components/product-card/product-card.component';
+import { ProductListComponent } from './modules/product-list/product-list.component';
 
 export const routes: Routes = [
     {
@@ -31,5 +32,9 @@ export const routes: Routes = [
     {
         path: 'product/:id',
         component: ProductCardComponent
+    },
+    {
+        path: 'products',
+        component: ProductListComponent
     }
 ];

@@ -5,6 +5,8 @@ import { Injectable } from "@angular/core";
 import { CreateBrandSchema, FilterBrandSchema, UpdateBrandSchema } from "../schemas/brand.schema";
 import { ListResponse, SingleResponse } from "../base/schemas/base_schema";
 
+
+
 @Injectable({
     providedIn: 'root'
 })

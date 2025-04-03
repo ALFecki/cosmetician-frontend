@@ -3,7 +3,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../../environment';
 import { ListResponse, SingleResponse } from '../schemas/base_schema';
-import { Mode } from 'fs';
 
 @Injectable({
     providedIn: 'root'

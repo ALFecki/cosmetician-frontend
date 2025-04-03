@@ -19,8 +19,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class ProductsComponent implements OnInit {
   products$!: Observable<ProductModel[]>;
-  @Input() categoryId!: string;
-  @Input() brandId!: string;
+  @Input() categoryId: string | undefined;
+  @Input() brandId: string | undefined;
   selectedProduct: ProductModel | null = null;
 
 

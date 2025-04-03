@@ -1,43 +1,111 @@
-<nav class="navbar navbar-expand-lg">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">ProSkin</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        Категории
-                    </a>
-                    <div class="dropdown-menu">
-                        <ul class="dropdown-grid">
-                            <div *ngFor="let category of categories$ | async">
-                                <li><a class="dropdown-item" href="/category/{{ category.id }}">{{ category.title }}</a>
-                                </li>
-                            </div>
-                        </ul>
-                    </div>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        Бренды
-                    </a>
-                    <div class="dropdown-menu">
-                        <ul class="dropdown-grid">
-                            <div *ngFor="let brand of brands$ | async">
-                                <li><a class="dropdown-item" href="/brand/{{ brand.id }}">{{ brand.title }}</a></li>
-                            </div>
-                        </ul>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" aria-disabled="true">Доставка и оплата</a>
-                </li>
-            </ul>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">ProSkin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/products">Каталог</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Категории
+                        </a>
+                        <div class="dropdown-menu">
+                            <ul class="dropdown-grid">
+                                <div *ngFor="let category of categories$ | async">
+                                    <li><a class="dropdown-item" href="/category/{{ category.id }}">{{ category.title }}</a>
+                                    </li>
+                                </div>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Бренды
+                        </a>
+                        <div class="dropdown-menu">
+                            <ul class="dropdown-grid">
+                                <div *ngFor="let brand of brands$ | async">
+                                    <li><a class="dropdown-item" href="/brand/{{ brand.id }}">{{ brand.title }}</a></li>
+                                </div>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-disabled="true">Доставка и оплата</a>
+                    </li>
+                </ul>
+                <!-- Добавленные кнопки авторизации -->
+                <div class="auth-buttons">
+                    <button id="loginBtn" class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        Войти
+                    </button>
+                    <button id="logoutBtn" class="btn btn-outline-danger d-none" type="button">
+                        Выйти
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Модальное окно входа -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Вход в аккаунт</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="login-form">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Пароль</label>
+                            <input type="password" class="form-control" id="password" required>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">Запомнить меня</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Войти</button>
+                        <a href="#" class="btn btn-link">Забыли пароль?</a>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
-</nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Простая имитация входа/выхода
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginForm = document.querySelector('.login-form');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Здесь будет логика входа
+            loginBtn.classList.add('d-none');
+            logoutBtn.classList.remove('d-none');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+            modal.hide();
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            // Здесь будет логика выхода
+            loginBtn.classList.remove('d-none');
+            logoutBtn.classList.add('d-none');
+        });
+    </script>
