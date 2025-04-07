@@ -1,31 +1,33 @@
-import { Observable } from "rxjs";
-import { DataService } from "../base/services/data.service";
-import { CategoryModel } from "../models/category.model";
-import { Injectable } from "@angular/core";
-import { CreateCategorySchema, FilterCategorySchema, UpdateCategorySchema } from "../schemas/category.schema";
-import { SingleResponse } from "../base/schemas/base_schema";
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { SingleResponse } from '../base/schemas/base_schema';
+import { DataService } from '../base/services/data.service';
+import { CategoryModel } from '../models/category.model';
+import { CreateCategorySchema, FilterCategorySchema, UpdateCategorySchema } from '../schemas/category.schema';
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class CategoryService extends DataService<CategoryModel, CreateCategorySchema, UpdateCategorySchema, FilterCategorySchema> {
-    protected override endpoint: string = 'category';
+    protected override endpoint = 'category';
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     override create(data: CreateCategorySchema): Observable<SingleResponse<CategoryModel>> {
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.');
     }
-    override update(data: Partial<Omit<CategoryModel, "id" | "createdAt" | "updatedAt">>): Observable<SingleResponse<CategoryModel>> {
-        throw new Error("Method not implemented.");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    override update(data: Partial<Omit<CategoryModel, 'id' | 'createdAt' | 'updatedAt'>>): Observable<SingleResponse<CategoryModel>> {
+        throw new Error('Method not implemented.');
     }
 
-    override transformModel(data: any): CategoryModel {
+    override transformModel(data: CategoryModel): CategoryModel {
         return {
             id: data.id,
             alias: data.alias,
             title: data.title,
             description: data.description,
             createdAt: new Date(data.createdAt),
-            updatedAt: new Date(data.updatedAt)
+            updatedAt: new Date(data.updatedAt),
         } as unknown as CategoryModel;
     }
 }

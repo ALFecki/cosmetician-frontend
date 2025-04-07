@@ -6,7 +6,7 @@ export interface FilterOptions {
 export interface ListResponse<Model> {
     status: string;
     length: number;
-    data: Array<Model>;
+    data: Model[];
 }
 
 export interface SingleResponse<Model> {
@@ -15,5 +15,5 @@ export interface SingleResponse<Model> {
 }
 
 export interface ErrorResponse {
-    status: string
+    status: string;
 }

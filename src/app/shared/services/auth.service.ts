@@ -1,0 +1,42 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { environment } from '../../../../environment';
+import { LoginData, LoginResponse } from '../models/login.interface';
+
+@Injectable({
+    providedIn: 'root',
+})
+export class AuthService {
+    private csrfToken: BehaviorSubject<string> = new BehaviorSubject<string>('');
+
+    constructor(private http: HttpClient) {}
+
+    login(loginData: LoginData): Observable<unknown> {
+        return this.http.post<LoginResponse>(`${environment.server_url}}/api/login`, loginData).pipe(
+            tap((response: LoginResponse) => {
+                this.csrfToken.next(response.csrf_token);
+            }),
+        );
+    }
+
+    getCsrfToken(): string {
+        return this.csrfToken.value;
+    }
+
+    addCsrfToken(headers: HttpHeaders): HttpHeaders {
+        const token = this.getCsrfToken();
+        if (token) {
+            headers = headers.set('X-CSRF-Token', token);
+        }
+        return headers;
+    }
+
+    logout(): Observable<unknown> {
+        return this.http.post(`${environment.server_url}/api/logout`, {}).pipe(
+            tap(() => {
+                this.csrfToken.next('');
+            }),
+        );
+    }
+}

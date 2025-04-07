@@ -1,5 +1,5 @@
-import { BrandModel } from "./brand.model";
-import { CategoryModel } from "./category.model";
+import { BrandModel } from './brand.model';
+import { CategoryModel } from './category.model';
 
 export interface ProductModel {
     id: string;
@@ -15,7 +15,7 @@ export interface ProductModel {
 
     productScope: string;
     productType: string;
-    country: String;
+    country: string;
     categoryId: string;
     category: CategoryModel;
 
