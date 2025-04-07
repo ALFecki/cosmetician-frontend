@@ -17,7 +17,9 @@
 }
 
 .card {
-    transition: transform 0.3s ease, background-color 0.3s ease;
+    transition:
+        transform 0.3s ease,
+        background-color 0.3s ease;
     /* Плавный переход для карточки */
 }
 

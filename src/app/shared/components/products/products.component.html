@@ -1,71 +1,74 @@
 <div class="container mt-4">
-  <div class="row">
-    <div class="col-md-4" *ngFor="let product of products$ | async">
-      <div class="card mb-4 product-card" (click)="this.openProductDetails(product, productModal)">
-        <img [src]="product.image || 'assets/images/products/no-image.png'" class="card-img-top"
-          alt="{{ product.title }}">
-        <div class="card-body">
-          <h5 class="card-title">{{ product.title }}</h5>
-          <p class="card-text">Цена: {{ product.price | number: '1.2-2' }} р.</p>
-          <button class="btn btn-primary" (click)="$event.stopPropagation()">Купить</button>
+    <div class="row">
+        <div class="col-md-4" *ngFor="let product of products$ | async">
+            <div
+                class="card mb-4 product-card"
+                tabindex="0"
+                role="button"
+                (click)="this.openProductDetails(product, productModal)"
+                (keydown.enter)="this.openProductDetails(product, productModal)"
+                (keydown.space)="this.openProductDetails(product, productModal); $event.preventDefault()"
+            >
+                <img [src]="product.image || 'assets/images/products/no-image.png'" class="card-img-top" alt="{{ product.title }}" />
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.title }}</h5>
+                    <p class="card-text">Цена: {{ product.price | number: '1.2-2' }} р.</p>
+                    <button class="btn btn-primary" (click)="$event.stopPropagation()">Купить</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 
 <!-- Шаблон модального окна -->
 <ng-template #productModal let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title">{{ selectedProduct?.title }}</h4>
-    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
-  </div>
-  <div class="modal-body">
-    <div class="row">
-      <div class="col-md-6">
-        <img [src]="selectedProduct?.image || 'assets/images/products/no-image.png'" class="img-fluid rounded"
-          [alt]="selectedProduct?.title">
-      </div>
-      <div class="col-md-6">
-        <div class="mb-3">
-          <h5 class="text-primary">Характеристики:</h5>
-          <ul class="list-unstyled">
-            <li><strong>Бренд:</strong> {{ selectedProduct?.brand?.title }}</li>
-            <li><strong>Страна:</strong> {{ selectedProduct?.country }}</li>
-            <li><strong>Объем:</strong> {{ selectedProduct?.volume }}мл</li>
-            <li><strong>Тип:</strong> {{ selectedProduct?.productType }}</li>
-            <li><strong>Назначение:</strong> {{ selectedProduct?.productScope }}</li>
-          </ul>
-        </div>
-
-        <div class="mb-3">
-          <h5>Описание:</h5>
-          <p>{{ selectedProduct?.description }}</p>
-        </div>
-
-        <div class="mb-3">
-          <h5>Способ применения:</h5>
-          <p>{{ selectedProduct?.methodOfUse }}</p>
-        </div>
-
-        <div class="price-section mb-3">
-          <h3 class="text-primary">
-            {{ selectedProduct?.price | number: '1.2-2' }} р.
-          </h3>
-        </div>
-
-        <div class="d-grid gap-2">
-          <button class="btn btn-primary btn-lg" (click)="addToCart(selectedProduct)">
-            <i class="bi bi-cart-plus"></i> Добавить в корзину
-          </button>
-          <button class="btn btn-outline-primary" (click)="moreInfo()">
-            Подробнее
-          </button>
-          <button class="btn btn-outline-secondary" (click)="modal.close()">
-            Закрыть
-          </button>
-        </div>
-      </div>
+    <div class="modal-header">
+        <h4 class="modal-title">{{ selectedProduct?.title }}</h4>
+        <button type="button" class="btn-close" (click)="modal.dismiss()"><span class="visually-hidden">Закрыть</span></button>
     </div>
-  </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-6">
+                <img
+                    [src]="selectedProduct?.image || 'assets/images/products/no-image.png'"
+                    class="img-fluid rounded"
+                    [alt]="selectedProduct?.title"
+                />
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <h5 class="text-primary">Характеристики:</h5>
+                    <ul class="list-unstyled">
+                        <li><strong>Бренд:</strong> {{ selectedProduct?.brand?.title }}</li>
+                        <li><strong>Страна:</strong> {{ selectedProduct?.country }}</li>
+                        <li><strong>Объем:</strong> {{ selectedProduct?.volume }}мл</li>
+                        <li><strong>Тип:</strong> {{ selectedProduct?.productType }}</li>
+                        <li><strong>Назначение:</strong> {{ selectedProduct?.productScope }}</li>
+                    </ul>
+                </div>
+
+                <div class="mb-3">
+                    <h5>Описание:</h5>
+                    <p>{{ selectedProduct?.description }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <h5>Способ применения:</h5>
+                    <p>{{ selectedProduct?.methodOfUse }}</p>
+                </div>
+
+                <div class="price-section mb-3">
+                    <h3 class="text-primary">{{ selectedProduct?.price | number: '1.2-2' }} р.</h3>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary btn-lg" (click)="addToCart(selectedProduct)">
+                        <i class="bi bi-cart-plus"></i> Добавить в корзину
+                    </button>
+                    <button class="btn btn-outline-primary" (click)="moreInfo()">Подробнее</button>
+                    <button class="btn btn-outline-secondary" (click)="modal.close()">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </ng-template>

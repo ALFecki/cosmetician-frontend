@@ -27,7 +27,7 @@ export class ProductService extends DataService<ProductModel, CreateProductSchem
         throw new Error('Method not implemented.');
     }
     override update(
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         data: Partial<Omit<ProductModel, 'product' | 'id' | 'brand' | 'createdAt' | 'updatedAt'>>,
     ): Observable<SingleResponse<ProductModel>> {
         throw new Error('Method not implemented.');

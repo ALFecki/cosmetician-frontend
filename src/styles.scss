@@ -3,26 +3,24 @@
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
-
 :root {
-  --primary: #F8D3D3;
-  --secondary: #F2B2B2;
-  --tertiary: #EAB8D1;
-  --beige: #E6D5B8;
-  --light-beige: #F5E1D3;
-  --creamy: #F9E6C1;
-  --white: #FFFFFF;
-  --black: #000000;
+    --primary: #f8d3d3;
+    --secondary: #f2b2b2;
+    --tertiary: #eab8d1;
+    --beige: #e6d5b8;
+    --light-beige: #f5e1d3;
+    --creamy: #f9e6c1;
+    --white: #ffffff;
+    --black: #000000;
 }
 
 $bs-font-sans-serif: 'Pacifico', serif;
 $bs-body-font-family: 'Pacifico', serif;
 
-
 body {
-  font-family: 'Pacifico', serif;
-  font-weight: 400;
-  color: #333;
+    font-family: 'Pacifico', serif;
+    font-weight: 400;
+    color: #333;
 }
 
 h1,
@@ -31,41 +29,41 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Pacifico', serif;
-  font-weight: 700;
-  margin-bottom: 1rem;
+    font-family: 'Pacifico', serif;
+    font-weight: 700;
+    margin-bottom: 1rem;
 }
 
 button {
-  font-family: 'Pacifico', serif;
-  font-weight: 700;
+    font-family: 'Pacifico', serif;
+    font-weight: 700;
 }
 
 p {
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
 }
 
 h1 {
-  font-size: 3rem;
+    font-size: 3rem;
 }
 
 h2 {
-  font-size: 2.5rem;
+    font-size: 2.5rem;
 }
 
 h3 {
-  font-size: 2rem;
+    font-size: 2rem;
 }
 
 h4 {
-  font-size: 1.75rem;
+    font-size: 1.75rem;
 }
 
 h5 {
-  font-size: 1.5rem;
+    font-size: 1.5rem;
 }
 
 h6 {
-  font-size: 1.25rem;
+    font-size: 1.25rem;
 }

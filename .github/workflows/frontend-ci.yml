@@ -1,0 +1,19 @@
+name: Proskin frontend CI
+
+on:
+    pull_request:
+        branches:
+            - main
+    push:
+        branches:
+            - main
+
+jobs:
+    build:
+        uses: ./.github/workflows/build.yml
+
+    format-check:
+        uses: ./.github/workflows/format.yml
+
+    lint:
+        uses: ./.github/workflows/lint.yml

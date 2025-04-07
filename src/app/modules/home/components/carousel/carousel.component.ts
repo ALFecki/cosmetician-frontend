@@ -12,7 +12,7 @@ export class CarouselComponent implements OnInit, OnDestroy {
         { title: 'Слайд 2', image: 'assets/images/carousel2.jpg' },
         { title: 'Слайд 3', image: 'assets/images/carousel3.jpg' },
     ];
-    interval: any;
+    interval: number | undefined;
 
     ngOnInit() {
         this.startAutoSlide();

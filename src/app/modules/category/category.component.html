@@ -2,8 +2,7 @@
     <header class="category-header text-center mb-4">
         <h1 class="display-4">{{ categoryData.title }}</h1>
         <p class="lead">{{ categoryData.description }}</p>
-        <img *ngIf="categoryData.image" [src]="categoryData.image" alt="{{ categoryData.title }}"
-            class="img-fluid rounded" />
+        <img *ngIf="categoryData.image" [src]="categoryData.image" alt="{{ categoryData.title }}" class="img-fluid rounded" />
     </header>
 
     <div class="row">
