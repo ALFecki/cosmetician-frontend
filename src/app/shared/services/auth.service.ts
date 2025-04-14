@@ -13,7 +13,7 @@ export class AuthService {
     constructor(private http: HttpClient) {}
 
     login(loginData: LoginData): Observable<unknown> {
-        return this.http.post<LoginResponse>(`${environment.server_url}}/api/login`, loginData).pipe(
+        return this.http.post<LoginResponse>(`${environment.server_url}/login`, loginData).pipe(
             tap((response: LoginResponse) => {
                 this.csrfToken.next(response.csrf_token);
             }),
@@ -38,5 +38,9 @@ export class AuthService {
                 this.csrfToken.next('');
             }),
         );
+    }
+
+    isLoggedIn(): boolean {
+        return !!this.csrfToken.value;
     }
 }

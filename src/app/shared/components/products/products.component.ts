@@ -1,21 +1,16 @@
-import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, of } from 'rxjs';
 import { ProductModel } from '../../models/product.model';
 import { ProductService } from '../../services/product.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-products',
+    providers: [],
     standalone: true,
-    imports: [CommonModule, NgbModule],
-    providers: [
-        {
-            provide: 'LOCALE_ID',
-            useValue: 'by-BY',
-        },
-    ],
+    imports: [CommonModule],
     templateUrl: './products.component.html',
     styleUrl: './products.component.scss',
 })

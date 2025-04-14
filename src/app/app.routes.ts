@@ -1,14 +1,15 @@
 import { Routes } from '@angular/router';
-import { BrandComponent } from './modules/brand/brand.component';
-import { CategoryComponent } from './modules/category/category.component';
-import { HomeComponent } from './modules/home/home.component';
-import { ProductListComponent } from './modules/product-list/product-list.component';
+import { BrandComponent } from './features/brand/brand.component';
+import { CategoryComponent } from './features/category/category.component';
+import { HomeComponent } from './features/home/home.component';
+import { ProductListComponent } from './features/product-list/product-list.component';
 import { ProductCardComponent } from './shared/components/product-card/product-card.component';
+import { LoginComponent } from './shared/components/login/login.component';
 
 export const routes: Routes = [
     {
         path: '',
-        loadChildren: () => import('./modules/home/home.module').then(m => m.HomeModule),
+        loadChildren: () => import('./features/home/home.module').then(m => m.HomeModule),
         component: HomeComponent,
     },
     // {
@@ -36,5 +37,9 @@ export const routes: Routes = [
     {
         path: 'products',
         component: ProductListComponent,
+    },
+    {
+        path: 'login',
+        component: LoginComponent,
     },
 ];

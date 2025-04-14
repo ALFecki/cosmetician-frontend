@@ -1,0 +1,23 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="loginModalLabel">Вход в аккаунт</h5>
+    <!-- <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button> -->
+    <button type="button" class="btn-close" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <form [formGroup]="loginForm" class="login-form" (ngSubmit)="onSubmit($event)">
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" [formControl]="email" required />
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Пароль</label>
+            <input type="password" class="form-control" id="password" [formControl]="password" required />
+        </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="rememberMe" [formControl]="rememberMe" />
+            <label class="form-check-label" for="rememberMe">Запомнить меня</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Войти</button>
+        <a href="#" class="btn btn-link">Забыли пароль?</a>
+    </form>
+</div>

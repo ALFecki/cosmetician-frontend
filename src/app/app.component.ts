@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { HomeModule } from './modules/home/home.module';
+import { HomeModule } from './features/home/home.module';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
 
 @Component({
