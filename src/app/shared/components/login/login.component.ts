@@ -25,7 +25,7 @@ export class LoginComponent {
         private modalService: NgbModal,
     ) {}
 
-    login() {
+    login(): boolean {
         const loginData = {
             email: this.email.value,
             password: this.password.value,
@@ -33,22 +33,24 @@ export class LoginComponent {
 
         this.authService.login(loginData).subscribe(
             response => {
-                // Handle successful login
                 console.log('Login successful:', response);
+                this.closeLoginModal();
+                return true;
             },
             error => {
-                // Handle login error
                 console.error('Login failed:', error);
+                return false;
             },
         );
+        return false;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onSubmit(event: Event) {
         if (this.loginForm.valid) {
-            this.login();
-        } else {
-            console.error('Form is invalid');
+            if (this.login()) {
+                this.closeLoginModal();
+            }
         }
     }
 
@@ -59,5 +61,9 @@ export class LoginComponent {
             centered: true,
             scrollable: true,
         });
+    }
+
+    closeLoginModal() {
+        this.modalService.dismissAll();
     }
 }

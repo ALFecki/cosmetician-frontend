@@ -12,7 +12,7 @@ export class AuthService {
 
     constructor(private http: HttpClient) {}
 
-    login(loginData: LoginData): Observable<unknown> {
+    login(loginData: LoginData): Observable<LoginResponse> {
         return this.http.post<LoginResponse>(`${environment.server_url}/login`, loginData).pipe(
             tap((response: LoginResponse) => {
                 this.csrfToken.next(response.csrf_token);
