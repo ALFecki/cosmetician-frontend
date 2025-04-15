@@ -13,7 +13,7 @@ export class AuthService {
     constructor(private http: HttpClient) {}
 
     login(loginData: LoginData): Observable<LoginResponse> {
-        return this.http.post<LoginResponse>(`${environment.server_url}/login`, loginData).pipe(
+        return this.http.post<LoginResponse>(`${environment.server_url}/login`, loginData, { withCredentials: true }).pipe(
             tap((response: LoginResponse) => {
                 this.csrfToken.next(response.csrf_token);
             }),
@@ -32,8 +32,16 @@ export class AuthService {
         return headers;
     }
 
+    checkAuth(): Observable<LoginResponse> {
+        return this.http.get<LoginResponse>(`${environment.server_url}/check_auth`, { withCredentials: true }).pipe(
+            tap((response: LoginResponse) => {
+                this.csrfToken.next(response.csrf_token);
+            }),
+        );
+    }
+
     logout(): Observable<unknown> {
-        return this.http.post(`${environment.server_url}/api/logout`, {}).pipe(
+        return this.http.post(`${environment.server_url}/logout`, {}).pipe(
             tap(() => {
                 this.csrfToken.next('');
             }),
