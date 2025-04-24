@@ -17,6 +17,12 @@ export class AuthService {
             tap((response: LoginResponse) => {
                 this.csrfToken.next(response.csrf_token);
             }),
+            // catchError((error: HttpErrorResponse) => {
+            //     console.error('Login error:', error);
+            //     return new Observable<LoginResponse>(observer => {
+            //         observer.error(error);
+            //     });
+            // }),
         );
     }
 
@@ -37,6 +43,12 @@ export class AuthService {
             tap((response: LoginResponse) => {
                 this.csrfToken.next(response.csrf_token);
             }),
+            // catchError((error: HttpErrorResponse) => {
+            //     console.error('Auth check error:', error);
+            //     return new Observable<LoginResponse>(observer => {
+            //         observer.error(error);
+            //     });
+            // }),
         );
     }
 

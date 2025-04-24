@@ -52,6 +52,17 @@
                     <a class="nav-link active" aria-disabled="true">Доставка и оплата</a>
                 </li>
             </ul>
+
+            <div class="cart-button">
+                <button class="btn btn-outline-light position-relative me-2" (click)="navigateToCart()">
+                    <i class="bi bi-cart3"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" *ngIf="itemCount > 0">
+                        {{ itemCount }}
+                        <span class="visually-hidden">товаров в корзине</span>
+                    </span>
+                </button>
+            </div>
+
             <div class="auth-buttons">
                 <!--TODO modal window-->
                 <!-- <button id="loginBtn" class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#loginModal"> -->

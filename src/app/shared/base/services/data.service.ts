@@ -11,7 +11,7 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
     protected apiUrl = environment.server_url;
     protected abstract endpoint: string;
 
-    constructor(private http: HttpClient) {}
+    constructor(protected http: HttpClient) {}
 
     getAll(): Observable<ListResponse<Model>> {
         return this.http.get<ListResponse<Model>>(`${this.apiUrl}/${this.endpoint}`);
@@ -64,9 +64,13 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
         return this.http.get<ListResponse<Model>>(`${this.apiUrl}/${this.endpoint}`, { params });
     }
 
-    abstract create(data: CreateSchema): Observable<SingleResponse<Model>>;
+    create(data: CreateSchema): Observable<SingleResponse<Model>> {
+        return this.http.post<SingleResponse<Model>>(`${this.apiUrl}/${this.endpoint}`, data);
+    }
 
-    abstract update(data: UpdateSchema): Observable<SingleResponse<Model>>;
+    update(data: UpdateSchema): Observable<SingleResponse<Model>> {
+        return this.http.patch<SingleResponse<Model>>(`${this.apiUrl}/${this.endpoint}`, data);
+    }
 
     delete(id: number): Observable<SingleResponse<Model>> {
         return this.http.delete<SingleResponse<Model>>(`${this.apiUrl}/${this.endpoint}/${id}`);

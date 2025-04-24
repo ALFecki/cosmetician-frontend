@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { SingleResponse } from '../base/schemas/base_schema';
 import { DataService } from '../base/services/data.service';
 import { BrandModel } from '../models/brand.model';
 import { CreateBrandSchema, FilterBrandSchema, UpdateBrandSchema } from '../schemas/brand.schema';
@@ -10,15 +8,6 @@ import { CreateBrandSchema, FilterBrandSchema, UpdateBrandSchema } from '../sche
 })
 export class BrandService extends DataService<BrandModel, CreateBrandSchema, UpdateBrandSchema, FilterBrandSchema> {
     protected override endpoint = 'brand';
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    override create(data: CreateBrandSchema): Observable<SingleResponse<BrandModel>> {
-        throw new Error('Method not implemented.');
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    override update(data: Partial<Omit<BrandModel, 'id' | 'createdAt' | 'updatedAt'>>): Observable<SingleResponse<BrandModel>> {
-        throw new Error('Method not implemented.');
-    }
 
     override transformModel(data: BrandModel): BrandModel {
         return {

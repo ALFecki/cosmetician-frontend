@@ -1,0 +1,59 @@
+<div class="container mt-4">
+    <h2 class="mb-4">Корзина</h2>
+
+    <ng-container *ngIf="cartItems$ | async as cartItems">
+        <div *ngIf="cartItems.length === 0" class="alert alert-info">Корзина пуста</div>
+
+        <div *ngIf="cartItems.length > 0" class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Товар</th>
+                                <th>Цена</th>
+                                <th>Количество</th>
+                                <th>Сумма</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of cartItems">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img
+                                            [src]="item.product.image"
+                                            [alt]="item.product.title"
+                                            class="me-3"
+                                            style="width: 50px; height: 50px; object-fit: cover"
+                                        />
+                                        <span>{{ item.product.title }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ item.product.price | currency: 'BYN' : 'symbol-narrow' }}</td>
+                                <td>
+                                    <div class="input-group" style="width: 130px">
+                                        <button class="btn btn-outline-secondary" type="button" (click)="decreaseQuantity(item)">-</button>
+                                        <input type="number" class="form-control text-center" [(ngModel)]="item.quantity" />
+                                        <button class="btn btn-outline-secondary" type="button" (click)="increaseQuantity(item)">+</button>
+                                    </div>
+                                </td>
+                                <td>{{ item.product.price * item.quantity | currency: 'BYN' : 'symbol-narrow' }}</td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" (click)="removeItem(item)">Удалить</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <div class="text-end">
+                        <h5>Итого: {{ totalPrice | currency: 'BYN' : 'symbol-narrow' }}</h5>
+                        <button class="btn btn-primary mt-2" (click)="checkout()">Оформить заказ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</div>
