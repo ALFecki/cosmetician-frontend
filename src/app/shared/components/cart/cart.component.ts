@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
 import { map, Observable } from 'rxjs';
 import { CartModel } from '../../models/cart.model';
 import { ProductModel } from '../../models/product.model';
+import { OrderService } from '../../services/order.service';
 
 @Component({
     selector: 'app-cart',
     standalone: true,
-    imports: [CommonModule, BrowserModule, FormsModule],
+    imports: [CommonModule, FormsModule],
     templateUrl: './cart.component.html',
     styleUrl: './cart.component.scss',
 })
@@ -18,27 +18,31 @@ export class CartComponent {
     cartItems$: Observable<CartModel[]> = new Observable<CartModel[]>();
     totalPrice = 0;
 
+    orderService = inject(OrderService);
+
     constructor() {
-        this.cartItems$ = this.products$.pipe(
-            map((products: ProductModel[]) => {
-                const cartItems: CartModel[] = [];
-                products.forEach((product: ProductModel) => {
-                    const existingItem = cartItems.find(item => item.product.id === product.id);
-                    if (existingItem) {
-                        existingItem.quantity++;
-                        existingItem.totalPrice += product.price;
-                    } else {
-                        cartItems.push({
-                            product: product,
-                            quantity: 1,
-                            totalPrice: product.price,
-                        });
-                    }
-                    this.totalPrice += product.price;
-                });
-                return cartItems;
+        this.cartItems$ = this.orderService.getLastNotCheckedOrder('213c8e05-c675-455d-9560-91ceab35d04e').pipe(
+            map(order => {
+                if (order) {
+                    this.totalPrice = order.totalPrice;
+                    return order.products.map(item => {
+                        console.log('item', item);
+                        console.log('quantity', item.quantity);
+                        return {
+                            product: item.product,
+                            quantity: item.quantity,
+                            totalPrice: item.quantity * item.product.price,
+                        };
+                    });
+                } else {
+                    return [];
+                }
             }),
         );
+
+        this.cartItems$.subscribe(items => {
+            console.log('Cart items:', items);
+        });
     }
 
     increaseQuantity(cartItem: CartModel): void {

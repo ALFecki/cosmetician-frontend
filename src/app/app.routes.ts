@@ -5,6 +5,7 @@ import { HomeComponent } from './features/home/home.component';
 import { ProductListComponent } from './features/product-list/product-list.component';
 import { ProductCardComponent } from './shared/components/product-card/product-card.component';
 import { LoginComponent } from './shared/components/login/login.component';
+import { CartComponent } from './shared/components/cart/cart.component';
 
 export const routes: Routes = [
     {
@@ -41,5 +42,9 @@ export const routes: Routes = [
     {
         path: 'login',
         component: LoginComponent,
+    },
+    {
+        path: 'cart',
+        component: CartComponent,
     },
 ];
