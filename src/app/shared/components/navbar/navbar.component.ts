@@ -49,4 +49,10 @@ export class NavbarComponent {
             scrollable: true,
         });
     }
+
+    logout() {
+        this.authService.logout().subscribe(() => {
+            this.router.navigate(['/']);
+        });
+    }
 }

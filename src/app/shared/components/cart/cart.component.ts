@@ -1,9 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { map, Observable } from 'rxjs';
 import { CartModel } from '../../models/cart.model';
-import { ProductModel } from '../../models/product.model';
 import { OrderService } from '../../services/order.service';
 
 @Component({
@@ -14,14 +13,13 @@ import { OrderService } from '../../services/order.service';
     styleUrl: './cart.component.scss',
 })
 export class CartComponent {
-    @Input() products$: Observable<ProductModel[]> = new Observable<ProductModel[]>();
     cartItems$: Observable<CartModel[]> = new Observable<CartModel[]>();
     totalPrice = 0;
 
     orderService = inject(OrderService);
 
     constructor() {
-        this.cartItems$ = this.orderService.getLastNotCheckedOrder('213c8e05-c675-455d-9560-91ceab35d04e').pipe(
+        this.cartItems$ = this.orderService.getLastNotCheckedOrder().pipe(
             map(order => {
                 if (order) {
                     this.totalPrice = order.totalPrice;

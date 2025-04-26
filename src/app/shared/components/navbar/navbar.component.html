@@ -75,7 +75,7 @@
                 >
                     Войти
                 </button>
-                <button *ngIf="authService.isLoggedIn()" id="logoutBtn" class="btn btn-outline-danger" type="button">Выйти</button>
+                <button *ngIf="authService.isLoggedIn()" id="logoutBtn" class="btn btn-outline-danger" type="button" (click)="logout()">Выйти</button>
             </div>
         </div>
     </div>

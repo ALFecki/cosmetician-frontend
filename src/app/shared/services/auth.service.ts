@@ -32,8 +32,11 @@ export class AuthService {
 
     addCsrfToken(headers: HttpHeaders): HttpHeaders {
         const token = this.getCsrfToken();
+        console.log('Current CSRF Token:', token);
         if (token) {
             headers = headers.set('X-CSRF-Token', token);
+            console.log('CSRF Token added to headers:', token);
+            console.log('Headers:', headers);
         }
         return headers;
     }
@@ -41,6 +44,7 @@ export class AuthService {
     checkAuth(): Observable<LoginResponse> {
         return this.http.get<LoginResponse>(`${environment.server_url}/check_auth`, { withCredentials: true }).pipe(
             tap((response: LoginResponse) => {
+                console.log('Auth check response:', response);
                 this.csrfToken.next(response.csrf_token);
             }),
             // catchError((error: HttpErrorResponse) => {
