@@ -24,8 +24,8 @@ import { SnakeToCamelInterceptor } from './shared/utils/case.interceptor';
             provide: HTTP_INTERCEPTORS,
             useClass: SnakeToCamelInterceptor,
             multi: true,
-        }
-    ]
+        },
+    ],
 })
 export class AppComponent {
     title = 'proskin-frontend';

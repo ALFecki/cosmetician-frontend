@@ -32,9 +32,7 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
 
     addProductToOrder(productId: string): Observable<OrderModel | null> {
         return this.http
-            .post<{ status: boolean; data: OrderModel }>(
-                `${environment.server_url}/${this.endpoint}/attach_product/${productId}`, {}
-            )
+            .post<{ status: boolean; data: OrderModel }>(`${environment.server_url}/${this.endpoint}/attach_product/${productId}`, {})
             .pipe(
                 map(order => {
                     if (order.status) {
@@ -52,7 +50,10 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
 
     getLastNotCheckedOrder(): Observable<OrderModel | null> {
         return this.http
-            .get<{ status: boolean; data: OrderModel }>(`${environment.server_url}/${this.endpoint}/person/last_non_checked`, {withCredentials: true})
+            .get<{
+                status: boolean;
+                data: OrderModel;
+            }>(`${environment.server_url}/${this.endpoint}/person/last_non_checked`, { withCredentials: true })
             .pipe(
                 map(order => {
                     if (order.status) {
@@ -82,6 +83,28 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
             return this.currentOrder;
         }
         return null;
+    }
+
+    async changeBatchQuantities(cartItems: Record<string, number>): Promise<OrderModel | null> {
+        const result = await firstValueFrom(
+            this.http.put<{ status: boolean; data: OrderModel }>(
+                `${environment.server_url}/${this.endpoint}/batch-quantity`,
+                { products: cartItems },
+                { withCredentials: true },
+            ),
+        )
+            .then(order => {
+                if (order.status) {
+                    this.currentOrder = order.data;
+                    return this.currentOrder;
+                } else {
+                    return null;
+                }
+            })
+            .catch(() => {
+                return null;
+            });
+        return result;
     }
 
     async removeProduct(productId: string): Promise<OrderModel | null> {

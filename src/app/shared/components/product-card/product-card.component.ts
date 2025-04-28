@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ProductModel } from '../../models/product.model';
 import { ProductService } from '../../services/product.service';
 import { CommonModule } from '@angular/common';
+import { CartService } from '../../services/cart.service';
 
 @Component({
     selector: 'app-product-card',
@@ -19,6 +20,7 @@ export class ProductCardComponent {
     constructor(
         private route: ActivatedRoute,
         private productService: ProductService,
+        private cartService: CartService,
     ) {
         let productId = '';
         this.route.params.subscribe(params => {
@@ -39,5 +41,6 @@ export class ProductCardComponent {
 
     addToCart(product: ProductModel) {
         console.log('Добавление в корзину:', product);
+        this.cartService.addProductToCart(product.id);
     }
 }

@@ -1,9 +1,8 @@
-import { Injectable, OnDestroy, OnInit } from '@angular/core';
-import { BehaviorSubject, firstValueFrom, map, Observable, Subject } from 'rxjs';
-import { debounceTime } from 'rxjs';
+import { Injectable, OnDestroy } from '@angular/core';
+import { BehaviorSubject, debounceTime, firstValueFrom, map, Observable, Subject } from 'rxjs';
 import { CartModel } from '../models/cart.model';
-import { OrderService } from './order.service';
 import { AuthService } from './auth.service';
+import { OrderService } from './order.service';
 
 @Injectable({
     providedIn: 'root',
@@ -11,14 +10,63 @@ import { AuthService } from './auth.service';
 export class CartService implements OnDestroy {
     private cartItemsSubject = new BehaviorSubject<CartModel[]>([]);
     private totalPriceSubject = new BehaviorSubject<number>(0);
-    private quantitySubject = new Subject<CartModel>();
-    
-    constructor(private authService: AuthService, private orderService: OrderService) {
+    private quantitySubject = new Subject<CartModel[]>();
+    private pendingUpdates: CartModel[] = [];
+
+    constructor(
+        private authService: AuthService,
+        private orderService: OrderService,
+    ) {
         this.loadInitialCart();
 
-        this.quantitySubject.pipe(debounceTime(3000)).subscribe(async cartItem => {
-            await this.processQuantityChange(cartItem);
+        this.quantitySubject.pipe(debounceTime(3000)).subscribe(async cartItems => {
+            await this.processBatchQuantityChanges(cartItems);
         });
+    }
+
+    private async processBatchQuantityChanges(cartItems: CartModel[]): Promise<void> {
+        try {
+            // Группируем изменения по productId
+            const changes = cartItems.reduce(
+                (acc, item) => {
+                    acc[item.product.id] = item.quantity;
+                    return acc;
+                },
+                {} as Record<string, number>,
+            );
+
+            // Отправляем все изменения одним запросом
+            const order = await this.orderService.changeBatchQuantities(changes);
+
+            if (order) {
+                const updatedItems = order.products.map(item => ({
+                    product: item.product,
+                    quantity: item.quantity,
+                    totalPrice: item.quantity * item.product.price,
+                }));
+                this.cartItemsSubject.next(updatedItems);
+                this.totalPriceSubject.next(order.totalPrice);
+            }
+
+            // Очищаем pending updates после успешного обновления
+            this.pendingUpdates = [];
+        } catch (error) {
+            console.error('Error processing batch quantity changes:', error);
+        }
+    }
+
+    private addToPendingUpdates(cartItem: CartModel): void {
+        // Добавляем или обновляем элемент в массиве ожидающих обновлений
+        const existingIndex = this.pendingUpdates.findIndex(item => item.product.id === cartItem.product.id);
+
+        if (existingIndex !== -1) {
+            this.pendingUpdates[existingIndex] = cartItem;
+        } else {
+            this.pendingUpdates.push(cartItem);
+        }
+
+        // Отправляем текущий массив изменений
+        this.quantitySubject.next(this.pendingUpdates);
     }
 
     private async loadInitialCart(): Promise<void> {
@@ -40,26 +88,37 @@ export class CartService implements OnDestroy {
     }
 
     getProductCount(): Observable<number> {
-        return this.cartItemsSubject.pipe(
-            map(items => items.reduce((sum, item) => sum + item.quantity, 0))
-        );
+        return this.cartItemsSubject.pipe(map(items => items.reduce((sum, item) => sum + item.quantity, 0)));
     }
 
     getTotalPrice(): Observable<number> {
         return this.totalPriceSubject.asObservable();
     }
 
-    private async processQuantityChange(cartItem: CartModel): Promise<void> {
-        const order = await this.orderService.changeQuantity(cartItem.product.id, cartItem.quantity);
-        if (order) {
-            const updatedItems = order.products.map(item => ({
-                product: item.product,
-                quantity: item.quantity,
-                totalPrice: item.quantity * item.product.price,
-            }));
-            this.cartItemsSubject.next(updatedItems);
-            this.totalPriceSubject.next(order.totalPrice);
-        }
+    addProductToCart(productId: string): void {
+        this.cartItemsSubject.pipe(map(items => items.find(item => item.product.id === productId))).subscribe(existingItem => {
+            if (existingItem) {
+                this.increaseQuantity(existingItem);
+            }
+        });
+
+        this.orderService.addProductToOrder(productId).subscribe(order => {
+            if (order) {
+                const newItem = order.products.find(item => item.product.id === productId);
+                if (newItem) {
+                    const updatedItems = this.cartItemsSubject.value.concat({
+                        product: newItem.product,
+                        quantity: newItem.quantity,
+                        totalPrice: newItem.quantity * newItem.product.price,
+                    });
+                    this.cartItemsSubject.next(updatedItems);
+                    this.totalPriceSubject.next(order.totalPrice);
+                    this.updateTotalPrice(updatedItems);
+                }
+            } else {
+                console.error('Error adding product to cart');
+            }
+        });
     }
 
     increaseQuantity(cartItem: CartModel): void {
@@ -74,10 +133,10 @@ export class CartService implements OnDestroy {
             }
             return item;
         });
-        
+
         this.cartItemsSubject.next(updatedItems);
         this.updateTotalPrice(updatedItems);
-        this.quantitySubject.next(cartItem);
+        this.addToPendingUpdates(cartItem);
     }
 
     decreaseQuantity(cartItem: CartModel): void {
@@ -97,7 +156,7 @@ export class CartService implements OnDestroy {
 
         this.cartItemsSubject.next(updatedItems);
         this.updateTotalPrice(updatedItems);
-        this.quantitySubject.next(cartItem);
+        this.addToPendingUpdates(cartItem);
     }
 
     async removeProduct(cartItem: CartModel): Promise<void> {

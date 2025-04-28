@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { firstValueFrom, Observable, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { BrandModel } from '../../models/brand.model';
 import { CategoryModel } from '../../models/category.model';
 import { AuthService } from '../../services/auth.service';

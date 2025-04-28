@@ -1,11 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, of } from 'rxjs';
 import { ProductModel } from '../../models/product.model';
+import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
-import { CommonModule } from '@angular/common';
-import { OrderService } from '../../services/order.service';
 
 @Component({
     selector: 'app-products',
@@ -25,7 +25,7 @@ export class ProductsComponent implements OnInit {
         private route: ActivatedRoute,
         private router: Router,
         private productService: ProductService,
-        private orderService: OrderService,
+        private cartService: CartService,
         private modalService: NgbModal,
     ) {}
 
@@ -52,13 +52,7 @@ export class ProductsComponent implements OnInit {
     addToCart(product: ProductModel | null) {
         if (product) {
             console.log('Добавление в корзину:', product);
-            this.orderService.addProductToOrder(product.id).subscribe(order => {
-                if (order) {
-                    console.log('Текущий заказ:', order);
-                } else {
-                    console.error('Ошибка при добавлении товара в корзину');
-                }
-            });
+            this.cartService.addProductToCart(product.id);
         }
     }
 }
