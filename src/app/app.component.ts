@@ -6,6 +6,7 @@ import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { AuthService } from './shared/services/auth.service';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './shared/utils/auth.interceptor';
+import { SnakeToCamelInterceptor } from './shared/utils/case.interceptor';
 
 @Component({
     selector: 'app-root',
@@ -17,6 +18,11 @@ import { AuthInterceptor } from './shared/utils/auth.interceptor';
         {
             provide: HTTP_INTERCEPTORS,
             useClass: AuthInterceptor,
+            multi: true,
+        },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: SnakeToCamelInterceptor,
             multi: true,
         }
     ]

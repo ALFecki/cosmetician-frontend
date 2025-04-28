@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import { catchError, map, Observable, of } from 'rxjs';
+import { catchError, firstValueFrom, map, Observable, of } from 'rxjs';
+import { environment } from '../../../../environment';
 import { DataService } from '../base/services/data.service';
 import { OrderModel } from '../models/order.model';
 import { CreateOrderSchema, FilterOrderSchema, UpdateOrderSchema } from '../schemas/order.schema';
-import { environment } from '../../../../environment';
-import { HttpHeaders } from '@angular/common/http';
 
 @Injectable({
     providedIn: 'root',
@@ -24,21 +23,76 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
         } as unknown as OrderModel;
     }
 
-    getLastNotCheckedOrder(): Observable<OrderModel | null> {
-        return this.http.get<{status: boolean, data: OrderModel}>(`${environment.server_url}/${this.endpoint}/person/last_non_checked`, { headers: new HttpHeaders({"X-Csrf-Token": ""}), withCredentials: true}).pipe(
-            map((order) => {
-                if (order.status) {
-                    this.currentOrder = order.data;
-                    return this.currentOrder;
-                } else {
-                    return null;
-                }
-            }),
-            catchError(() => {
-                return of(null);
-            })
-        );
+    getProductCount(): Observable<number> {
+        if (this.currentOrder) {
+            return of(this.currentOrder.products.length);
+        }
+        return of(0);
     }
 
-    // increaseQuantity(cartItem: OrderModel): void {
+    addProductToOrder(productId: string): Observable<OrderModel | null> {
+        return this.http
+            .post<{ status: boolean; data: OrderModel }>(
+                `${environment.server_url}/${this.endpoint}/attach_product/${productId}`, {}
+            )
+            .pipe(
+                map(order => {
+                    if (order.status) {
+                        this.currentOrder = order.data;
+                        return this.currentOrder;
+                    } else {
+                        return null;
+                    }
+                }),
+                catchError(() => {
+                    return of(null);
+                }),
+            );
+    }
+
+    getLastNotCheckedOrder(): Observable<OrderModel | null> {
+        return this.http
+            .get<{ status: boolean; data: OrderModel }>(`${environment.server_url}/${this.endpoint}/person/last_non_checked`, {withCredentials: true})
+            .pipe(
+                map(order => {
+                    if (order.status) {
+                        this.currentOrder = order.data;
+                        return this.currentOrder;
+                    } else {
+                        return null;
+                    }
+                }),
+                catchError(() => {
+                    return of(null);
+                }),
+            );
+    }
+
+    async changeQuantity(productId: string, quantity: number): Promise<OrderModel | null> {
+        console.log('Current order:', this.currentOrder);
+        if (this.currentOrder) {
+            const cartItem = this.currentOrder.products.find(item => item.product.id === productId);
+            const newOrder = await firstValueFrom(
+                this.http.patch<OrderModel>(
+                    `${environment.server_url}/${this.endpoint}/product/${productId}/quantity/${quantity}`,
+                    cartItem,
+                ),
+            );
+            this.currentOrder = newOrder;
+            return this.currentOrder;
+        }
+        return null;
+    }
+
+    async removeProduct(productId: string): Promise<OrderModel | null> {
+        if (this.currentOrder) {
+            const newOrder = await firstValueFrom(
+                this.http.delete<OrderModel>(`${environment.server_url}/${this.endpoint}/product/${productId}`),
+            );
+            this.currentOrder = newOrder;
+            console.log('Updated order after removing product:', this.currentOrder);
+            return this.currentOrder;
+        }
+        return null;
+    }
 }

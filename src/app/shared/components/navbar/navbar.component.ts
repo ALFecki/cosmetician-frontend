@@ -1,13 +1,15 @@
-import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, of } from 'rxjs';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { firstValueFrom, Observable, of } from 'rxjs';
 import { BrandModel } from '../../models/brand.model';
 import { CategoryModel } from '../../models/category.model';
-import { BrandService } from '../../services/brand.service';
-import { CategoryService } from '../../services/category.service';
 import { AuthService } from '../../services/auth.service';
-import { CommonModule } from '@angular/common';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { BrandService } from '../../services/brand.service';
+import { CartService } from '../../services/cart.service';
+import { CategoryService } from '../../services/category.service';
+import { CartComponent } from '../cart/cart.component';
 import { LoginComponent } from '../login/login.component';
 
 @Component({
@@ -27,6 +29,7 @@ export class NavbarComponent {
         public router: Router,
         private categoryService: CategoryService,
         private brandService: BrandService,
+        private cartService: CartService,
         private readonly modalService: NgbModal,
     ) {
         this.categoryService.getAll().subscribe(data => {
@@ -44,6 +47,19 @@ export class NavbarComponent {
     openLoginModal() {
         this.modalService.dismissAll();
         this.modalService.open(LoginComponent, {
+            size: 'lg',
+            centered: true,
+            scrollable: true,
+        });
+    }
+
+    getProductCount(): Observable<number> {
+        return this.cartService.getProductCount();
+    }
+
+    navigateToCart() {
+        this.modalService.dismissAll();
+        this.modalService.open(CartComponent, {
             size: 'lg',
             centered: true,
             scrollable: true,
