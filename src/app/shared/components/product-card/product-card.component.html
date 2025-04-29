@@ -9,54 +9,125 @@
         {{ error }}
     </div>
 
-    <div *ngIf="!loading && !error && product" class="card">
-        <div class="row g-0">
-            <div class="col-md-4">
-                <img [src]="product.image || 'assets/images/products/no-image.png'" [alt]="product.title" class="img-fluid rounded-start" />
+    <nav aria-label="breadcrumb" *ngIf="product">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a routerLink="/">Главная</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a [routerLink]="['/products']">Каталог</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a [routerLink]="['/brand', product.brand.id]">{{ product.brand.title }}</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a [routerLink]="['/category', product.category.id]">{{ product.category.title }}</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                {{ product.title }}
+            </li>
+        </ol>
+    </nav>
+
+    <div *ngIf="!loading && !error && product" class="card product-main-card p-3">
+        <div class="row g-3 align-items-stretch">
+            <!-- Left: Product Image -->
+            <div class="col-md-4 d-flex align-items-center justify-content-center">
+                <img [src]="product.image || 'assets/images/products/no-image.png'" [alt]="product.title" class="img-fluid product-main-image" />
             </div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <h2 class="card-title">{{ product.title }}</h2>
-                    <div class="badge bg-primary me-2">{{ product.brand.title }}</div>
-                    <div class="badge bg-secondary">{{ product.category.title }}</div>
-
-                    <p class="card-text mt-3">{{ product.description }}</p>
-
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <ul class="list-group">
-                                <li class="list-group-item"><strong>Цена:</strong> {{ product.price | number: '1.2-2' }} р.</li>
-                                <li class="list-group-item"><strong>Объем:</strong> {{ product.volume }} мл</li>
-                                <li class="list-group-item"><strong>Страна:</strong> {{ product.country }}</li>
-                                <li class="list-group-item"><strong>Тип продукта:</strong> {{ product.productType }}</li>
-                                <li class="list-group-item"><strong>Назначение:</strong> {{ product.productScope }}</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Способ применения</h5>
-                                </div>
-                                <div class="card-body">
-                                    <p>{{ product.methodOfUse || 'Не указан' }}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-12 mt-3">
-                            <button class="btn btn-primary" (click)="addToCart(product)">
-                                <i class="bi bi-cart-plus"></i> Добавить в корзину
-                            </button>
-                        </div>
-
-                        <div class="mt-3">
-                            <small class="text-muted">
-                                Создано: {{ product.createdAt | date }}
-                                <br />
-                                Обновлено: {{ product.updatedAt | date }}
-                            </small>
+            <!-- Center: Main Info -->
+            <div class="col-md-5">
+                <h2 class="card-title mb-2">{{ product.title }}</h2>
+                <!-- <div class="mb-2 text-muted">Артикул: <span>{{ product.sku || '—' }}</span></div> -->
+                <div class="mb-2 text-muted">Артикул: <span>{{ '—' }}</span></div>
+                <div class="mb-2 d-flex align-items-center">
+                    <a [routerLink]="['/brand', product.brand.id]" class="brand-link d-flex align-items-center me-3">
+                        <img *ngIf="product.brand.image" [src]="product.brand.image" [alt]="product.brand.title" class="brand-img me-2" />
+                        <span>{{ product.brand.title }}</span>
+                    </a>
+                    <a [routerLink]="['/category', product.category.id]" class="category-link">
+                        {{ product.category.title }}
+                    </a>
+                </div>
+                <div class="mb-2">
+                    <!-- <span class="badge" [ngClass]="product.inStock ? 'bg-success' : 'bg-danger'">
+                        {{ product.inStock ? 'В наличии' : 'Нет в наличии' }}
+                    </span> -->
+                </div>
+                <!-- Characteristics -->
+                <div class="characteristics-list mt-3">
+                    <div *ngFor="let char of visibleCharacteristics">
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">{{ char.label }}</span>
+                            <span class="fw-semibold">{{ char.value }}</span>
                         </div>
                     </div>
+                    <div *ngIf="hiddenCharacteristics.length && !showAllCharacteristics" class="mt-2">
+                        <button class="btn btn-link p-0" (click)="showAllCharacteristics = true">Все характеристики</button>
+                    </div>
+                    <div *ngIf="showAllCharacteristics">
+                        <div *ngFor="let char of hiddenCharacteristics">
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">{{ char.label }}</span>
+                                <span class="fw-semibold">{{ char.value }}</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-link p-0 mt-1" (click)="showAllCharacteristics = false">Скрыть</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Right: Price & Cart -->
+            <div class="col-md-3 d-flex flex-column align-items-center justify-content-center right-panel">
+                <div class="price-block mb-3">
+                    <div class="h4 mb-1">{{ product.price | number: '1.2-2' }} <span class="currency">р.</span></div>
+                    <div class="text-muted small">Объем: {{ product.volume }} мл</div>
+                </div>
+                <!-- <button class="btn btn-primary w-100 mb-2" [disabled]="!product.inStock" (click)="addToCart(product)"> -->
+                <button class="btn btn-primary w-100 mb-2" (click)="addToCart(product)">
+                    <i class="bi bi-cart-plus"></i> Добавить в корзину
+                </button>
+                <div class="text-muted small mt-2">
+                    <div>Создано: {{ product.createdAt | date }}</div>
+                    <div>Обновлено: {{ product.updatedAt | date }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs Section -->
+    <div *ngIf="!loading && !error && product" class="card mt-4">
+        <div class="card-body">
+            <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" [class.active]="activeTab === 'desc'" (click)="activeTab = 'desc'" type="button">Описание</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" [class.active]="activeTab === 'composition'" (click)="activeTab = 'composition'" type="button">Состав</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" [class.active]="activeTab === 'chars'" (click)="activeTab = 'chars'" type="button">Характеристики</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" [class.active]="activeTab === 'use'" (click)="activeTab = 'use'" type="button">Применение</button>
+                </li>
+            </ul>
+            <div class="tab-content mt-3">
+                <div class="tab-pane fade" [class.show]="activeTab === 'desc'" [class.active]="activeTab === 'desc'">
+                    <p>{{ product.description || 'Нет описания' }}</p>
+                </div>
+                <div class="tab-pane fade" [class.show]="activeTab === 'composition'" [class.active]="activeTab === 'composition'">
+                    <p>{{ 'Нет информации о составе' }}</p> <!-- Placeholder for composition data -->
+                </div>
+                <div class="tab-pane fade" [class.show]="activeTab === 'chars'" [class.active]="activeTab === 'chars'">
+                    <div *ngFor="let char of allCharacteristics">
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">{{ char.label }}</span>
+                            <span class="fw-semibold">{{ char.value }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" [class.show]="activeTab === 'use'" [class.active]="activeTab === 'use'">
+                    <p>{{ product.methodOfUse || 'Не указан' }}</p>
                 </div>
             </div>
         </div>

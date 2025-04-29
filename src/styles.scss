@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,600;1,600&display=swap');
 /* Importing Bootstrap SCSS file. */
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap/dist/css/bootstrap.min.css';
@@ -14,11 +15,14 @@
     --black: #000000;
 }
 
-$bs-font-sans-serif: 'Pacifico', serif;
-$bs-body-font-family: 'Pacifico', serif;
+// $bs-font-sans-serif: 'Pacifico', serif;
+// $bs-body-font-family: 'Pacifico', serif;
+$bs-font-sans-serif: 'Montserrat', sans-serif;
+$bs-body-font-family: 'Montserrat', sans-serif;
 
 body {
-    font-family: 'Pacifico', serif;
+    // font-family: 'Pacifico', serif;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 400;
     color: #333;
 }
@@ -29,13 +33,15 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: 'Pacifico', serif;
+    // font-family: 'Pacifico', serif;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 700;
     margin-bottom: 1rem;
 }
 
 button {
-    font-family: 'Pacifico', serif;
+    // font-family: 'Pacifico', serif;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 700;
 }
 

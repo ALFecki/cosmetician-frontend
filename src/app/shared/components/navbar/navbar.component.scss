@@ -1,19 +1,22 @@
 .navbar {
-    background-color: var(--primary);
+    background-color: var(--white);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
 }
 
 .navbar-nav .nav-link {
-    color: var(--white);
+    color: var(--black);
     // -webkit-text-stroke: 1px var(--black);
 }
 
 .navbar-brand {
-    color: var(--white);
+    color: var(--black);
     // -webkit-text-stroke: 1px var(--black);
 }
 
 .dropdown-item {
-    color: var(--white);
+    color: var(--black);
     // -webkit-text-stroke: 1px var(--black);
 }
 
