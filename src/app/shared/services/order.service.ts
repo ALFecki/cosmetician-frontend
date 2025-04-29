@@ -30,22 +30,17 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
         return of(0);
     }
 
-    addProductToOrder(productId: string): Observable<OrderModel | null> {
-        return this.http
-            .post<{ status: boolean; data: OrderModel }>(`${environment.server_url}/${this.endpoint}/attach_product/${productId}`, {})
-            .pipe(
-                map(order => {
-                    if (order.status) {
-                        this.currentOrder = order.data;
-                        return this.currentOrder;
-                    } else {
-                        return null;
-                    }
-                }),
-                catchError(() => {
-                    return of(null);
-                }),
-            );
+    async addProductToOrder(productId: string): Promise<OrderModel | null> {
+        const order = await firstValueFrom(
+            this.http.post<OrderModel>(`${environment.server_url}/${this.endpoint}/attach_product/${productId}`, {}),
+        );
+
+        if (order) {
+            this.currentOrder = order;
+            return this.currentOrder;
+        } else {
+            return null;
+        }
     }
 
     getLastNotCheckedOrder(): Observable<OrderModel | null> {

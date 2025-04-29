@@ -49,10 +49,10 @@ export class ProductsComponent implements OnInit {
         this.router.navigate(['/product', this.selectedProduct?.id]);
     }
 
-    addToCart(product: ProductModel | null) {
+    async addToCart(product: ProductModel | null) {
         if (product) {
             console.log('Добавление в корзину:', product);
-            this.cartService.addProductToCart(product.id);
+            await this.cartService.addProductToCart(product.id);
         }
     }
 }

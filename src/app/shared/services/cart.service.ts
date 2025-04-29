@@ -26,7 +26,6 @@ export class CartService implements OnDestroy {
 
     private async processBatchQuantityChanges(cartItems: CartModel[]): Promise<void> {
         try {
-            // Группируем изменения по productId
             const changes = cartItems.reduce(
                 (acc, item) => {
                     acc[item.product.id] = item.quantity;
@@ -35,7 +34,6 @@ export class CartService implements OnDestroy {
                 {} as Record<string, number>,
             );
 
-            // Отправляем все изменения одним запросом
             const order = await this.orderService.changeBatchQuantities(changes);
 
             if (order) {
@@ -48,7 +46,6 @@ export class CartService implements OnDestroy {
                 this.totalPriceSubject.next(order.totalPrice);
             }
 
-            // Очищаем pending updates после успешного обновления
             this.pendingUpdates = [];
         } catch (error) {
             console.error('Error processing batch quantity changes:', error);
@@ -56,7 +53,6 @@ export class CartService implements OnDestroy {
     }
 
     private addToPendingUpdates(cartItem: CartModel): void {
-        // Добавляем или обновляем элемент в массиве ожидающих обновлений
         const existingIndex = this.pendingUpdates.findIndex(item => item.product.id === cartItem.product.id);
 
         if (existingIndex !== -1) {
@@ -65,7 +61,6 @@ export class CartService implements OnDestroy {
             this.pendingUpdates.push(cartItem);
         }
 
-        // Отправляем текущий массив изменений
         this.quantitySubject.next(this.pendingUpdates);
     }
 
@@ -95,30 +90,20 @@ export class CartService implements OnDestroy {
         return this.totalPriceSubject.asObservable();
     }
 
-    addProductToCart(productId: string): void {
-        this.cartItemsSubject.pipe(map(items => items.find(item => item.product.id === productId))).subscribe(existingItem => {
-            if (existingItem) {
-                this.increaseQuantity(existingItem);
-            }
-        });
-
-        this.orderService.addProductToOrder(productId).subscribe(order => {
-            if (order) {
-                const newItem = order.products.find(item => item.product.id === productId);
-                if (newItem) {
-                    const updatedItems = this.cartItemsSubject.value.concat({
-                        product: newItem.product,
-                        quantity: newItem.quantity,
-                        totalPrice: newItem.quantity * newItem.product.price,
-                    });
-                    this.cartItemsSubject.next(updatedItems);
-                    this.totalPriceSubject.next(order.totalPrice);
-                    this.updateTotalPrice(updatedItems);
-                }
-            } else {
-                console.error('Error adding product to cart');
-            }
-        });
+    async addProductToCart(productId: string): Promise<void> {
+        const order = await this.orderService.addProductToOrder(productId);
+        if (order) {
+            const updatedItems = order.products.map(item => ({
+                product: item.product,
+                quantity: item.quantity,
+                totalPrice: item.quantity * item.product.price,
+            }));
+            this.cartItemsSubject.next(updatedItems);
+            this.totalPriceSubject.next(order.totalPrice);
+            this.updateTotalPrice(updatedItems);
+        } else {
+            console.error('Error adding product to cart');
+        }
     }
 
     increaseQuantity(cartItem: CartModel): void {
@@ -133,6 +118,9 @@ export class CartService implements OnDestroy {
             }
             return item;
         });
+
+        cartItem.quantity += 1;
+        cartItem.totalPrice = cartItem.quantity * cartItem.product.price;
 
         this.cartItemsSubject.next(updatedItems);
         this.updateTotalPrice(updatedItems);
@@ -153,6 +141,9 @@ export class CartService implements OnDestroy {
             }
             return item;
         });
+
+        cartItem.quantity -= 1;
+        cartItem.totalPrice = cartItem.quantity * cartItem.product.price;
 
         this.cartItemsSubject.next(updatedItems);
         this.updateTotalPrice(updatedItems);

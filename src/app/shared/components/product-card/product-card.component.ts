@@ -39,8 +39,8 @@ export class ProductCardComponent {
         });
     }
 
-    addToCart(product: ProductModel) {
+    async addToCart(product: ProductModel) {
         console.log('Добавление в корзину:', product);
-        this.cartService.addProductToCart(product.id);
+        await this.cartService.addProductToCart(product.id);
     }
 }
