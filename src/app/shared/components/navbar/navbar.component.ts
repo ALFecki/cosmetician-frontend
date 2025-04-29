@@ -58,15 +58,23 @@ export class NavbarComponent {
     }
 
     navigateToCart() {
-        this.modalService.dismissAll();
-        this.modalService.open(CartComponent, {
-            size: 'lg',
-            centered: true,
-            scrollable: true,
+        this.authService.checkAuth().subscribe(isAuth => {
+            console.log('isAuth', isAuth);
+            if (isAuth) {
+                this.modalService.dismissAll();
+                this.modalService.open(CartComponent, {
+                    size: 'lg',
+                    centered: true,
+                    scrollable: true,
+                });
+            } else {
+                this.openLoginModal();
+            }
         });
     }
 
-    logout() {
+    async logout() {
+        await this.cartService.syncOrder();
         this.authService.logout().subscribe(() => {
             this.router.navigate(['/']);
         });

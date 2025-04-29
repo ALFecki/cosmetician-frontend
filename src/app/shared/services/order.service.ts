@@ -113,4 +113,14 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
         }
         return null;
     }
+
+    async syncOrder(): Promise<OrderModel | null> {
+        await firstValueFrom(
+            this.http.get(`${environment.server_url}/${this.endpoint}/products/sync`, {
+                withCredentials: true,
+            }),
+        );
+        this.currentOrder = null;
+        return this.currentOrder;
+    }
 }

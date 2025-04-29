@@ -20,11 +20,32 @@
 $bs-font-sans-serif: 'Montserrat', sans-serif;
 $bs-body-font-family: 'Montserrat', sans-serif;
 
+html,
+body {
+    overflow-y: scroll;
+    height: 100%;
+}
+
+html {
+    overflow: hidden;
+    height: 100%;
+}
+
+.modal-open {
+    overflow: auto;
+}
+
 body {
     // font-family: 'Pacifico', serif;
     font-family: 'Montserrat', sans-serif;
     font-weight: 400;
     color: #333;
+    overflow: auto;
+    height: 100%;
+}
+
+body.modal-open {
+    padding-right: 0 !important;
 }
 
 h1,

@@ -1,53 +1,57 @@
 <footer class="footer-main py-4 mt-5">
-  <div class="container">
-    <div class="row">
-      <!-- Компания -->
-      <div class="col-6 col-md-2 mb-3">
-        <h6 class="footer-title">Компания</h6>
-        <ul class="list-unstyled">
-          <li><a routerLink="/about" class="footer-link">О нас</a></li>
-          <li><a routerLink="/delivery" class="footer-link">Доставка и оплата</a></li>
-        </ul>
-      </div>
-      <!-- Категории -->
-      <div class="col-6 col-md-3 mb-3">
-        <h6 class="footer-title">Категории</h6>
-        <ul class="list-unstyled">
-          <li *ngFor="let cat of categories$ | async"><a [routerLink]="['/category', cat.id]" class="footer-link">{{ cat.title }}</a></li>
-        </ul>
-      </div>
-      <!-- Бренды -->
-      <div class="col-6 col-md-3 mb-3">
-        <h6 class="footer-title">Бренды</h6>
-        <ul class="list-unstyled">
-          <li *ngFor="let brand of brands$ | async"><a [routerLink]="['/brand', brand.id]" class="footer-link">{{ brand.title }}</a></li>
-        </ul>
-      </div>
-      <!-- Контакты -->
-      <div class="col-6 col-md-2 mb-3">
-        <h6 class="footer-title">Контакты</h6>
-        <ul class="list-unstyled">
-          <li><a href="tel:+79999999999" class="footer-link">+7 (999) 999-99-99</a></li>
-          <li><a href="mailto:info&#64;cosmetician.ru" class="footer-link">info&#64;cosmetician.ru</a></li>
-        </ul>
-      </div>
-      <!-- Соцсети и политика -->
-      <div class="col-12 col-md-2 d-flex flex-column align-items-end justify-content-between">
-        <div class="mb-2">
-          <a routerLink="/privacy-policy" class="footer-link privacy-link me-3">Политика конфиденциальности</a>
+    <div class="container">
+        <div class="row">
+            <!-- Компания -->
+            <div class="col-6 col-md-2 mb-3">
+                <h6 class="footer-title">Компания</h6>
+                <ul class="list-unstyled">
+                    <li><a routerLink="/about" class="footer-link">О нас</a></li>
+                    <li><a routerLink="/delivery" class="footer-link">Доставка и оплата</a></li>
+                </ul>
+            </div>
+            <!-- Категории -->
+            <div class="col-6 col-md-3 mb-3">
+                <h6 class="footer-title">Категории</h6>
+                <ul class="list-unstyled">
+                    <li *ngFor="let cat of categories$ | async">
+                        <a [routerLink]="['/category', cat.id]" class="footer-link">{{ cat.title }}</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Бренды -->
+            <div class="col-6 col-md-3 mb-3">
+                <h6 class="footer-title">Бренды</h6>
+                <ul class="list-unstyled">
+                    <li *ngFor="let brand of brands$ | async">
+                        <a [routerLink]="['/brand', brand.id]" class="footer-link">{{ brand.title }}</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Контакты -->
+            <div class="col-6 col-md-2 mb-3">
+                <h6 class="footer-title">Контакты</h6>
+                <ul class="list-unstyled">
+                    <li><a href="tel:+79999999999" class="footer-link">+7 (999) 999-99-99</a></li>
+                    <li><a href="mailto:info&#64;cosmetician.ru" class="footer-link">info&#64;cosmetician.ru</a></li>
+                </ul>
+            </div>
+            <!-- Соцсети и политика -->
+            <div class="col-12 col-md-2 d-flex flex-column align-items-end justify-content-between">
+                <div class="mb-2">
+                    <a routerLink="/privacy-policy" class="footer-link privacy-link me-3">Политика конфиденциальности</a>
+                </div>
+                <div class="footer-socials">
+                    <a href="https://t.me/yourtelegram" target="_blank" class="footer-social me-2" aria-label="Telegram">
+                        <i class="bi bi-telegram"></i>
+                    </a>
+                    <a href="viber://chat?number=%2B79999999999" target="_blank" class="footer-social me-2" aria-label="Viber">
+                        <i class="bi bi-viber"></i>
+                    </a>
+                    <a href="https://instagram.com/yourinstagram" target="_blank" class="footer-social" aria-label="Instagram">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="footer-socials">
-          <a href="https://t.me/yourtelegram" target="_blank" class="footer-social me-2" aria-label="Telegram">
-            <i class="bi bi-telegram"></i>
-          </a>
-          <a href="viber://chat?number=%2B79999999999" target="_blank" class="footer-social me-2" aria-label="Viber">
-            <i class="bi bi-viber"></i>
-          </a>
-          <a href="https://instagram.com/yourinstagram" target="_blank" class="footer-social" aria-label="Instagram">
-            <i class="bi bi-instagram"></i>
-          </a>
-        </div>
-      </div>
     </div>
-  </div>
 </footer>

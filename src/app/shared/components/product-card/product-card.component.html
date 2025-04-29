@@ -33,13 +33,19 @@
         <div class="row g-3 align-items-stretch">
             <!-- Left: Product Image -->
             <div class="col-md-4 d-flex align-items-center justify-content-center">
-                <img [src]="product.image || 'assets/images/products/no-image.png'" [alt]="product.title" class="img-fluid product-main-image" />
+                <img
+                    [src]="product.image || 'assets/images/products/no-image.png'"
+                    [alt]="product.title"
+                    class="img-fluid product-main-image"
+                />
             </div>
             <!-- Center: Main Info -->
             <div class="col-md-5">
                 <h2 class="card-title mb-2">{{ product.title }}</h2>
                 <!-- <div class="mb-2 text-muted">Артикул: <span>{{ product.sku || '—' }}</span></div> -->
-                <div class="mb-2 text-muted">Артикул: <span>{{ '—' }}</span></div>
+                <div class="mb-2 text-muted">
+                    Артикул: <span>{{ '—' }}</span>
+                </div>
                 <div class="mb-2 d-flex align-items-center">
                     <a [routerLink]="['/brand', product.brand.id]" class="brand-link d-flex align-items-center me-3">
                         <img *ngIf="product.brand.image" [src]="product.brand.image" [alt]="product.brand.title" class="brand-img me-2" />
@@ -99,16 +105,24 @@
         <div class="card-body">
             <ul class="nav nav-tabs" id="productTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" [class.active]="activeTab === 'desc'" (click)="activeTab = 'desc'" type="button">Описание</button>
+                    <button class="nav-link" [class.active]="activeTab === 'desc'" (click)="activeTab = 'desc'" type="button">
+                        Описание
+                    </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" [class.active]="activeTab === 'composition'" (click)="activeTab = 'composition'" type="button">Состав</button>
+                    <button class="nav-link" [class.active]="activeTab === 'composition'" (click)="activeTab = 'composition'" type="button">
+                        Состав
+                    </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" [class.active]="activeTab === 'chars'" (click)="activeTab = 'chars'" type="button">Характеристики</button>
+                    <button class="nav-link" [class.active]="activeTab === 'chars'" (click)="activeTab = 'chars'" type="button">
+                        Характеристики
+                    </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" [class.active]="activeTab === 'use'" (click)="activeTab = 'use'" type="button">Применение</button>
+                    <button class="nav-link" [class.active]="activeTab === 'use'" (click)="activeTab = 'use'" type="button">
+                        Применение
+                    </button>
                 </li>
             </ul>
             <div class="tab-content mt-3">
@@ -116,7 +130,8 @@
                     <p>{{ product.description || 'Нет описания' }}</p>
                 </div>
                 <div class="tab-pane fade" [class.show]="activeTab === 'composition'" [class.active]="activeTab === 'composition'">
-                    <p>{{ 'Нет информации о составе' }}</p> <!-- Placeholder for composition data -->
+                    <p>{{ 'Нет информации о составе' }}</p>
+                    <!-- Placeholder for composition data -->
                 </div>
                 <div class="tab-pane fade" [class.show]="activeTab === 'chars'" [class.active]="activeTab === 'chars'">
                     <div *ngFor="let char of allCharacteristics">

@@ -1,7 +1,7 @@
 import { CommonModule, NgIf } from '@angular/common';
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, of } from 'rxjs';
+import { catchError, map, Observable, of, tap } from 'rxjs';
 import { ProductsComponent } from '../../shared/components/products/products.component';
 import { CategoryModel } from '../../shared/models/category.model';
 import { CategoryService } from '../../shared/services/category.service';
@@ -16,6 +16,8 @@ import { CategoryService } from '../../shared/services/category.service';
 export class CategoryComponent {
     categoryId!: string;
     category!: Observable<CategoryModel>;
+    loading = true;
+    error = '';
 
     constructor(
         private route: ActivatedRoute,
@@ -25,8 +27,15 @@ export class CategoryComponent {
             this.categoryId = params['id'];
         });
 
-        categoryService.getById(this.categoryId).subscribe(data => {
-            this.category = of(data.data);
-        });
+        this.loading = true;
+        this.category = categoryService.getById(this.categoryId).pipe(
+            map(response => response.data),
+            tap(() => (this.loading = false)),
+            catchError(() => {
+                this.error = 'Ошибка при загрузке категории';
+                this.loading = false;
+                return of({} as CategoryModel);
+            }),
+        );
     }
 }

@@ -1,6 +1,6 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, of, tap } from 'rxjs';
 import { environment } from '../../../../environment';
 import { LoginData, LoginResponse } from '../models/login.interface';
 
@@ -9,6 +9,8 @@ import { LoginData, LoginResponse } from '../models/login.interface';
 })
 export class AuthService {
     private csrfToken: BehaviorSubject<string> = new BehaviorSubject<string>('');
+    private onLogin: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    private onLogout: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
     constructor(private http: HttpClient) {}
 
@@ -16,6 +18,7 @@ export class AuthService {
         return this.http.post<LoginResponse>(`${environment.server_url}/login`, loginData, { withCredentials: true }).pipe(
             tap((response: LoginResponse) => {
                 this.csrfToken.next(response.csrf_token);
+                this.onLogin.next(true);
             }),
             // catchError((error: HttpErrorResponse) => {
             //     console.error('Login error:', error);
@@ -41,27 +44,34 @@ export class AuthService {
         return headers;
     }
 
-    checkAuth(): Observable<LoginResponse> {
+    checkAuth(): Observable<LoginResponse | null> {
         return this.http.get<LoginResponse>(`${environment.server_url}/check_auth`, { withCredentials: true }).pipe(
             tap((response: LoginResponse) => {
                 console.log('Auth check response:', response);
                 this.csrfToken.next(response.csrf_token);
             }),
-            // catchError((error: HttpErrorResponse) => {
-            //     console.error('Auth check error:', error);
-            //     return new Observable<LoginResponse>(observer => {
-            //         observer.error(error);
-            //     });
-            // }),
+            catchError((error: HttpErrorResponse) => {
+                console.error('Auth check error:', error);
+                return of(null);
+            }),
         );
     }
 
     logout(): Observable<unknown> {
-        return this.http.post(`${environment.server_url}/logout`, {}).pipe(
+        return this.http.post(`${environment.server_url}/logout`, {}, { withCredentials: true }).pipe(
             tap(() => {
                 this.csrfToken.next('');
+                this.onLogout.next(true);
             }),
         );
+    }
+
+    getLoginStatus(): Observable<boolean> {
+        return this.onLogin.asObservable();
+    }
+
+    getLogoutStatus(): Observable<boolean> {
+        return this.onLogout.asObservable();
     }
 
     isLoggedIn(): boolean {

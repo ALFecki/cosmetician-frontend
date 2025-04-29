@@ -17,6 +17,12 @@ export class CartService implements OnDestroy {
         private authService: AuthService,
         private orderService: OrderService,
     ) {
+        this.authService.getLoginStatus().subscribe(isLoggedIn => {
+            if (isLoggedIn) {
+                this.loadInitialCart();
+            }
+        });
+
         this.loadInitialCart();
 
         this.quantitySubject.pipe(debounceTime(3000)).subscribe(async cartItems => {
@@ -166,6 +172,12 @@ export class CartService implements OnDestroy {
     private updateTotalPrice(items: CartModel[]): void {
         const total = items.reduce((sum, item) => sum + item.totalPrice, 0);
         this.totalPriceSubject.next(total);
+    }
+
+    async syncOrder(): Promise<void> {
+        await this.orderService.syncOrder();
+        this.cartItemsSubject.next([]);
+        this.totalPriceSubject.next(0);
     }
 
     ngOnDestroy(): void {
