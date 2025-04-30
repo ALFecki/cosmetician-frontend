@@ -33,8 +33,7 @@ export class CartComponent {
         this.cartService.removeProduct(cartItem);
     }
 
-    checkout(): void {
-        console.log('Checkout process initiated');
-        throw new Error('Method not implemented.');
+    async checkout(): Promise<void> {
+        await this.cartService.checkout();
     }
 }

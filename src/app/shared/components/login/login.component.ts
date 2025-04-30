@@ -1,9 +1,9 @@
-import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { LoginData } from '../../models/login.interface';
+import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { LoginData, RegistrationData } from '../../models/login.interface';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-login',
@@ -19,6 +19,20 @@ export class LoginComponent {
     email = new FormControl('');
     password = new FormControl('');
     rememberMe = new FormControl(false);
+
+    // Registration form controls
+    registrationForm: FormGroup = new FormGroup({
+        firstName: new FormControl('', [Validators.required]),
+        secondName: new FormControl('', [Validators.required]),
+        surname: new FormControl('', [Validators.required]),
+        email: new FormControl('', [Validators.required, Validators.email]),
+        password: new FormControl('', [Validators.required, Validators.minLength(6)]),
+        confirmPassword: new FormControl('', [Validators.required]),
+    });
+
+    @ViewChild('registerModal') registerModal!: TemplateRef<unknown>;
+
+    registrationError: string | null = null;
 
     constructor(
         private authService: AuthService,
@@ -65,5 +79,52 @@ export class LoginComponent {
 
     closeLoginModal() {
         this.modalService.dismissAll();
+    }
+
+    openRegisterModal(content: unknown) {
+        this.registrationForm.reset();
+        this.registrationError = null;
+        this.modalService.open(content, {
+            size: 'lg',
+            centered: true,
+            scrollable: true,
+        });
+    }
+
+    closeRegisterModal() {
+        this.modalService.dismissAll();
+    }
+
+    register() {
+        if (this.registrationForm.invalid) {
+            return;
+        }
+        const registrationData = {
+            email: this.registrationForm.get('email')?.value,
+            password: this.registrationForm.get('password')?.value,
+            firstName: this.registrationForm.get('firstName')?.value,
+            secondName: this.registrationForm.get('secondName')?.value,
+            surname: this.registrationForm.get('surname')?.value,
+            confirmPassword: this.registrationForm.get('confirmPassword')?.value,
+        } as RegistrationData;
+
+        if (registrationData.password !== registrationData.confirmPassword) {
+            this.registrationError = 'Пароли не совпадают';
+            return;
+        }
+
+        this.authService.register(registrationData).subscribe(
+            response => {
+                console.log('Registration successful:', response);
+                this.closeRegisterModal();
+            },
+            error => {
+                console.error('Registration failed:', error);
+                this.registrationError = 'Ошибка регистрации';
+            },
+        );
+        
+        this.registrationError = null;
+        this.closeRegisterModal();
     }
 }

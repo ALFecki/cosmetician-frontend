@@ -3,6 +3,15 @@ export interface LoginData {
     password: string;
 }
 
+export interface RegistrationData {
+    firstName: string;
+    secondName: string;
+    surname: string | null;
+    email: string;
+    password: string;
+    confirmPassword: string;
+}
+
 export interface LoginResponse {
     csrf_token: string;
 }

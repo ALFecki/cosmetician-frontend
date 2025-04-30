@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, Observable, of, tap } from 'rxjs';
 import { environment } from '../../../../environment';
-import { LoginData, LoginResponse } from '../models/login.interface';
+import { LoginData, LoginResponse, RegistrationData } from '../models/login.interface';
 
 @Injectable({
     providedIn: 'root',
@@ -28,6 +28,20 @@ export class AuthService {
             // }),
         );
     }
+
+    register(registrationData: RegistrationData): Observable<LoginResponse | null> {
+        return this.http.post<LoginResponse>(`${environment.server_url}/person`, registrationData, { withCredentials: true }).pipe(
+            tap((response: LoginResponse) => {
+                this.csrfToken.next(response.csrf_token);
+                this.onLogin.next(true);
+            }),
+            catchError((error: HttpErrorResponse) => {
+                console.error('Registration error:', error);
+                return of(null);
+            }),
+        );
+    }
+    
 
     getCsrfToken(): string {
         return this.csrfToken.value;

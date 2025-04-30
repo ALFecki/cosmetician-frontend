@@ -180,6 +180,17 @@ export class CartService implements OnDestroy {
         this.totalPriceSubject.next(0);
     }
 
+    async checkout(): Promise<void> {
+        const order = await this.orderService.checkout();
+        if (order) {
+            this.cartItemsSubject.next([]);
+            this.totalPriceSubject.next(0);
+            this.pendingUpdates = [];
+        } else {
+            console.error('Error during checkout');
+        }
+    }
+
     ngOnDestroy(): void {
         this.quantitySubject.complete();
         this.cartItemsSubject.complete();

@@ -26,5 +26,60 @@
         </div>
         <button type="submit" class="btn btn-primary">Войти</button>
         <a href="#" class="btn btn-link">Забыли пароль?</a>
+        <a href="#" class="btn btn-link" (click)="openRegisterModal(registerModal); $event.preventDefault()">Зарегистрироваться</a>
     </form>
 </div>
+
+<ng-template #registerModal>
+    <div class="modal-header">
+        <h5 class="modal-title">Регистрация</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeRegisterModal()"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="registrationForm" (ngSubmit)="register()">
+            <div class="mb-3">
+                <label for="firstName" class="form-label">Имя</label>
+                <input type="text" class="form-control" id="firstName" formControlName="firstName" required />
+            </div>
+            <div class="error-message" *ngIf="registrationForm.get('firstName')?.invalid && (registrationForm.get('firstName')?.dirty || registrationForm.get('firstName')?.touched)">
+                <div *ngIf="registrationForm.get('firstName')?.errors?.['required']">Имя обязательно.</div>
+            </div>
+            <div class="mb-3">
+                <label for="secondName" class="form-label">Фамилия</label>
+                <input type="text" class="form-control" id="secondName" formControlName="secondName" required />
+            </div>
+            <div class="error-message" *ngIf="registrationForm.get('secondName')?.invalid && (registrationForm.get('secondName')?.dirty || registrationForm.get('secondName')?.touched)">
+                <div *ngIf="registrationForm.get('secondName')?.errors?.['required']">Фамилия обязательна.</div>
+            </div>
+            <div class="mb-3">
+                <label for="surname" class="form-label">Отчество</label>
+                <input type="text" class="form-control" id="surname" formControlName="surname" />
+            </div>
+            <div class="mb-3">
+                <label for="regEmail" class="form-label">Email</label>
+                <input type="email" class="form-control" id="regEmail" formControlName="email" required email />
+            </div>
+            <div class="error-message" *ngIf="registrationForm.get('email')?.invalid && (registrationForm.get('email')?.dirty || registrationForm.get('email')?.touched)">
+                <div *ngIf="registrationForm.get('email')?.errors?.['required']">Email обязателен.</div>
+                <div *ngIf="registrationForm.get('email')?.errors?.['email']">Некорректный email.</div>
+            </div>
+            <div class="mb-3">
+                <label for="regPassword" class="form-label">Пароль</label>
+                <input type="password" class="form-control" id="regPassword" formControlName="password" required minlength="6" />
+            </div>
+            <div class="error-message" *ngIf="registrationForm.get('password')?.invalid && (registrationForm.get('password')?.dirty || registrationForm.get('password')?.touched)">
+                <div *ngIf="registrationForm.get('password')?.errors?.['required']">Пароль обязателен.</div>
+                <div *ngIf="registrationForm.get('password')?.errors?.['minlength']">Пароль должен содержать минимум 6 символов.</div>
+            </div>
+            <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Подтвердите пароль</label>
+                <input type="password" class="form-control" id="confirmPassword" formControlName="confirmPassword" required />
+            </div>
+            <div class="error-message" *ngIf="registrationForm.get('confirmPassword')?.invalid && (registrationForm.get('confirmPassword')?.dirty || registrationForm.get('confirmPassword')?.touched)">
+                <div *ngIf="registrationForm.get('confirmPassword')?.errors?.['required']">Подтверждение пароля обязательно.</div>
+            </div>
+            <div class="error-message" *ngIf="registrationError">{{ registrationError }}</div>
+            <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+        </form>
+    </div>
+</ng-template>

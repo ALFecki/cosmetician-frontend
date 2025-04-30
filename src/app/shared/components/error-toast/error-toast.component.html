@@ -1,0 +1,6 @@
+<div class="error-toast-container" *ngIf="errorToastService.visible">
+    <div class="error-toast">
+        <span class="error-toast-message">{{ errorToastService.message }}</span>
+        <button class="btn-close" (click)="errorToastService.hide()" aria-label="Закрыть"></button>
+    </div>
+</div>

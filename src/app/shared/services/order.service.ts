@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { catchError, firstValueFrom, map, Observable, of } from 'rxjs';
 import { environment } from '../../../../environment';
 import { DataService } from '../base/services/data.service';
 import { OrderModel } from '../models/order.model';
 import { CreateOrderSchema, FilterOrderSchema, UpdateOrderSchema } from '../schemas/order.schema';
+import { ErrorToastService } from './error-toast.service';
 
 @Injectable({
     providedIn: 'root',
@@ -11,6 +12,7 @@ import { CreateOrderSchema, FilterOrderSchema, UpdateOrderSchema } from '../sche
 export class OrderService extends DataService<OrderModel, CreateOrderSchema, UpdateOrderSchema, FilterOrderSchema> {
     protected override endpoint = 'order';
     currentOrder: OrderModel | null = null;
+    errorToastService: ErrorToastService = inject(ErrorToastService);
 
     override transformModel(data: OrderModel): OrderModel {
         return {
@@ -59,6 +61,7 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
                     }
                 }),
                 catchError(() => {
+                    this.errorToastService.show('Ошибка получения последнего заказа');
                     return of(null);
                 }),
             );
@@ -121,6 +124,14 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
             }),
         );
         this.currentOrder = null;
+        return this.currentOrder;
+    }
+
+    async checkout(): Promise<OrderModel | null> {
+        const order = await firstValueFrom(
+            this.http.get<OrderModel>(`${environment.server_url}/${this.endpoint}/person/checkout`, { withCredentials: true }),
+        );
+        this.currentOrder = order;
         return this.currentOrder;
     }
 }
