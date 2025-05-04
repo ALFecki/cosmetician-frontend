@@ -13,8 +13,34 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
 
     constructor(protected http: HttpClient) {}
 
-    getAll(): Observable<ListResponse<Model>> {
-        return this.http.get<ListResponse<Model>>(`${this.apiUrl}/${this.endpoint}`);
+    getAll(filter: FilterSchema | null = null): Observable<ListResponse<Model>> {
+        let params = new HttpParams();
+        if (filter) {
+            (Object.keys(filter) as (keyof FilterSchema)[]).forEach(key => {
+                if (filter[key] !== null && filter[key] !== undefined && filter[key] !== '') {
+                    if (filter[key] instanceof Date) {
+                        params = params.append(
+                            String(key),
+                            filter[key].toISOString(),
+                        );
+                    } else if (Array.isArray(filter[key])) {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        filter[key].forEach((value: any) => {
+                            params = params.append(
+                                String(key),
+                                value.toString(),
+                            );
+                        });
+                    }  else {
+                        params = params.append(
+                            String(key),
+                            filter[key].toString(),
+                        );
+                    }
+                }
+            });
+        }
+        return this.http.get<ListResponse<Model>>(`${this.apiUrl}/${this.endpoint}`, { params });
     }
 
     getById(id: string): Observable<SingleResponse<Model>> {

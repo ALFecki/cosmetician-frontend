@@ -9,6 +9,8 @@ import { CategoryService } from '../../services/category.service';
 import { PersonSevice } from '../../services/person.service';
 import { ProductService } from '../../services/product.service';
 import { GenericTableComponent } from '../generic-table/generic-table.component';
+import { FilterBrandSchema } from '../../schemas/brand.schema';
+import { FilterCategorySchema } from '../../schemas/category.schema';
 
 interface ModelConfig {
     key: string;
@@ -263,8 +265,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
         const observables: Record<string, Observable<any>> = {};
 
         if (this.currentModel === 'products') {
-            observables['categories'] = this.categoryService.getAll();
-            observables['brands'] = this.brandService.getAll();
+            observables['categories'] = this.categoryService.getAll({ includeDeleted: true } as FilterCategorySchema);
+            observables['brands'] = this.brandService.getAll({ includeDeleted: true } as FilterBrandSchema);
         }
 
         // If we need additional data for select fields
@@ -299,7 +301,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
     loadMainData() {
         const service = this.currentModelConfig.service;
 
-        service.getAll().subscribe(
+        service.getAll({ includeDeleted: true }).subscribe(
             (response: any) => {
                 this.currentModelData = response.data;
                 this.filteredData = [...this.currentModelData];
