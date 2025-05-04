@@ -1,7 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { SingleResponse } from '../base/schemas/base_schema';
 import { DataService } from '../base/services/data.service';
 import { ProductModel } from '../models/product.model';
 import { CreateProductSchema, FilterProductSchema, UpdateProductSchema } from '../schemas/product.schema';
@@ -22,21 +20,9 @@ export class ProductService extends DataService<ProductModel, CreateProductSchem
         super(http);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    override create(data: CreateProductSchema): Observable<SingleResponse<ProductModel>> {
-        throw new Error('Method not implemented.');
-    }
-    override update(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        data: Partial<Omit<ProductModel, 'product' | 'id' | 'brand' | 'createdAt' | 'updatedAt'>>,
-    ): Observable<SingleResponse<ProductModel>> {
-        throw new Error('Method not implemented.');
-    }
-
     override transformModel(data: ProductModel): ProductModel {
         return {
             id: data.id,
-            alias: data.alias,
             title: data.title,
             description: data.description,
             price: data.price,

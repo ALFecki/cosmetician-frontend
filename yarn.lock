@@ -7644,6 +7644,13 @@ ngrok@*:
   optionalDependencies:
     hpagent "^0.1.2"
 
+ngx-bootstrap-icons@^1.9.3:
+  version "1.9.3"
+  resolved "https://registry.yarnpkg.com/ngx-bootstrap-icons/-/ngx-bootstrap-icons-1.9.3.tgz#c8e84a16d1b492c33baf939c1b893d6a613cf9fe"
+  integrity sha512-UsFqJ/cn0u5W39hVMIDbm+ze1dCF9fDV839scqeimi70Efcmg41zOx6GgR6i2gWAVFR0OBso1cdqb4E75XhTSw==
+  dependencies:
+    tslib "^2.3.0"
+
 nice-napi@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/nice-napi/-/nice-napi-1.0.2.tgz#dc0ab5a1eac20ce548802fc5686eaa6bc654927b"

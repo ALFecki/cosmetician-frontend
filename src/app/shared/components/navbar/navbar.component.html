@@ -51,6 +51,10 @@
                 <li class="nav-item">
                     <a class="nav-link active" aria-disabled="true">Доставка и оплата</a>
                 </li>
+                <!-- Admin Panel Link (visible only for admins) -->
+                <li class="nav-item" *ngIf="authService.isAdmin()">
+                    <a class="nav-link active" href="/admin">Админ панель</a>
+                </li>
             </ul>
 
             <div class="cart-button">

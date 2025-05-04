@@ -1,0 +1,16 @@
+<div class="admin-panel">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div *ngFor="let key of form?.controls | keyvalue">
+            <label [for]="key.key">{{ key.key }}</label>
+            <input
+                [id]="key.key"
+                class="form-control mb-2"
+                [formControlName]="key.key"
+                [type]="modelType(key.key)"
+            />
+        </div>
+        <button class="btn btn-primary mt-2" type="submit">Сохранить</button>
+        <div *ngIf="success" class="alert alert-success mt-2">{{ success }}</div>
+        <div *ngIf="error" class="alert alert-danger mt-2">{{ error }}</div>
+    </form>
+</div>

@@ -3,7 +3,6 @@ import { CategoryModel } from './category.model';
 
 export interface ProductModel {
     id: string;
-    alias: string;
     title: string;
     description: string;
     image: string;

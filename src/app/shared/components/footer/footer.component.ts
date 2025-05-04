@@ -6,11 +6,12 @@ import { BrandModel } from '../../models/brand.model';
 import { CategoryModel } from '../../models/category.model';
 import { BrandService } from '../../services/brand.service';
 import { CategoryService } from '../../services/category.service';
+import { IconsModule } from '../../base/icons/icons.module';
 
 @Component({
     selector: 'app-footer',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, IconsModule],
     templateUrl: './footer.component.html',
     styleUrl: './footer.component.scss',
 })

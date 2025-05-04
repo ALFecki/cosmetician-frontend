@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { environment } from '../../../../../environment';
 import { ListResponse, SingleResponse } from '../schemas/base_schema';
 
@@ -64,15 +64,44 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
         return this.http.get<ListResponse<Model>>(`${this.apiUrl}/${this.endpoint}`, { params });
     }
 
-    create(data: CreateSchema): Observable<SingleResponse<Model>> {
-        return this.http.post<SingleResponse<Model>>(`${this.apiUrl}/${this.endpoint}`, data);
+    protected async uploadImage(file: File): Promise<string> {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await firstValueFrom(
+            this.http.post<{ status: string; data: { path: string } }>(`${this.apiUrl}/upload/image`, formData),
+        );
+
+        return response.data.path;
     }
 
-    update(data: UpdateSchema): Observable<SingleResponse<Model>> {
-        return this.http.patch<SingleResponse<Model>>(`${this.apiUrl}/${this.endpoint}`, data);
+    async create(data: CreateSchema): Promise<SingleResponse<Model>> {
+        const processedData = { ...(data as CreateSchema) };
+        console.log('Processed data:', processedData);
+
+        for (const key in processedData) {
+            if (key.includes('image') && processedData[key] instanceof File) {
+                processedData[key] =
+                    `${environment.server_url}/images/${await this.uploadImage(processedData[key])}` as (typeof processedData)[typeof key];
+            }
+        }
+
+        return firstValueFrom(this.http.post<SingleResponse<Model>>(`${this.apiUrl}/${this.endpoint}`, processedData));
     }
 
-    delete(id: number): Observable<SingleResponse<Model>> {
+    async update(id: string, data: UpdateSchema): Promise<Observable<SingleResponse<Model>>> {
+        const processedData = { ...(data as UpdateSchema) };
+
+        for (const key in processedData) {
+            if (key.includes('image') && processedData[key] instanceof File) {
+                processedData[key] = (await this.uploadImage(processedData[key])) as (typeof processedData)[typeof key];
+            }
+        }
+
+        return this.http.patch<SingleResponse<Model>>(`${this.apiUrl}/${this.endpoint}/${id}`, processedData);
+    }
+
+    delete(id: string): Observable<SingleResponse<Model>> {
         return this.http.delete<SingleResponse<Model>>(`${this.apiUrl}/${this.endpoint}/${id}`);
     }
 

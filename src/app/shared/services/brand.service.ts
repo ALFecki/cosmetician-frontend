@@ -12,7 +12,6 @@ export class BrandService extends DataService<BrandModel, CreateBrandSchema, Upd
     override transformModel(data: BrandModel): BrandModel {
         return {
             id: data.id,
-            alias: data.alias,
             title: data.title,
             description: data.description,
             createdAt: new Date(data.createdAt),

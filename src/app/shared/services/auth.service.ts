@@ -1,8 +1,8 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
 import { environment } from '../../../../environment';
-import { LoginData, LoginResponse, RegistrationData } from '../models/login.interface';
+import { Claims, LoginData, LoginResponse, RegistrationData } from '../models/login.interface';
 
 @Injectable({
     providedIn: 'root',
@@ -11,6 +11,7 @@ export class AuthService {
     private csrfToken: BehaviorSubject<string> = new BehaviorSubject<string>('');
     private onLogin: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     private onLogout: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    private userClaims: BehaviorSubject<Claims | null> = new BehaviorSubject<Claims | null>(null);
 
     constructor(private http: HttpClient) {}
 
@@ -41,7 +42,6 @@ export class AuthService {
             }),
         );
     }
-    
 
     getCsrfToken(): string {
         return this.csrfToken.value;
@@ -63,6 +63,7 @@ export class AuthService {
             tap((response: LoginResponse) => {
                 console.log('Auth check response:', response);
                 this.csrfToken.next(response.csrf_token);
+                this.userClaims.next(response as Claims);
             }),
             catchError((error: HttpErrorResponse) => {
                 console.error('Auth check error:', error);
@@ -90,5 +91,19 @@ export class AuthService {
 
     isLoggedIn(): boolean {
         return !!this.csrfToken.value;
+    }
+
+    isAdmin(): boolean {
+        const claims = this.userClaims.getValue();
+        return this.isLoggedIn() && !!claims && (claims.is_admin || claims.is_moderator);
+    }
+
+    isAdmin$(): Observable<boolean> {
+        return this.checkAuth().pipe(
+            map(claims => {
+                if (!claims) return false;
+                return claims.is_admin === true;
+            }),
+        );
     }
 }

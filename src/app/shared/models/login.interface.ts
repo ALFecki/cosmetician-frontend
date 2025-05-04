@@ -14,6 +14,8 @@ export interface RegistrationData {
 
 export interface LoginResponse {
     csrf_token: string;
+    is_admin: boolean;
+    is_moderator: boolean;
 }
 
 export interface Claims {
