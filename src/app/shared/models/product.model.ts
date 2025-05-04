@@ -4,6 +4,7 @@ import { CategoryModel } from './category.model';
 export interface ProductModel {
     id: string;
     title: string;
+    fullTitle: string;
     description: string;
     image: string;
     price: number;

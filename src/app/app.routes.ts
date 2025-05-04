@@ -1,11 +1,5 @@
 import { Routes } from '@angular/router';
-import { BrandComponent } from './features/brand/brand.component';
-import { CategoryComponent } from './features/category/category.component';
 import { HomeComponent } from './features/home/home.component';
-import { ProductListComponent } from './features/product-list/product-list.component';
-import { CartComponent } from './shared/components/cart/cart.component';
-import { LoginComponent } from './shared/components/login/login.component';
-import { ProductCardComponent } from './shared/components/product-card/product-card.component';
 import { AdminGuard } from './shared/guards/admin.guard';
 import { AuthGuard } from './shared/utils/auth.guard';
 
@@ -27,27 +21,27 @@ export const routes: Routes = [
 
     {
         path: 'category/:id',
-        component: CategoryComponent,
+        loadComponent: () => import('./features/category/category.component').then(m => m.CategoryComponent),
     },
     {
         path: 'brand/:id',
-        component: BrandComponent,
+        loadComponent: () => import('./features/brand/brand.component').then(m => m.BrandComponent),
     },
     {
         path: 'product/:id',
-        component: ProductCardComponent,
+        loadComponent: () => import('./shared/components/product-card/product-card.component').then(m => m.ProductCardComponent),
     },
     {
         path: 'products',
-        component: ProductListComponent,
+        loadComponent: () => import('./features/product-list/product-list.component').then(m => m.ProductListComponent),
     },
     {
         path: 'login',
-        component: LoginComponent,
+        loadComponent: () => import('./shared/components/login/login.component').then(m => m.LoginComponent),
     },
     {
         path: 'cart',
-        component: CartComponent,
+        loadComponent: () => import('./shared/components/cart/cart.component').then(m => m.CartComponent),
         canActivate: [AuthGuard],
     },
     {

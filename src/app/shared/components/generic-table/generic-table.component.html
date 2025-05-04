@@ -38,13 +38,21 @@
         
         <td class="text-end">
           <div class="btn-group">
-            <button type="button" class="btn btn-sm btn-outline-primary" (click)="onEdit(item)">
-              <!-- <i class="bi bi-pencil"></i> -->
+            <button type="button" title="Редактировать" class="btn btn-sm btn-outline-primary" (click)="onEdit(item)">
                <i-bs name="pencil"></i-bs>
             </button>
-            <button type="button" class="btn btn-sm btn-outline-danger" (click)="onDelete(item)">
+            <button type="button" title="Удалить с возможностью восстановления" class="btn btn-sm btn-outline-danger" (click)="onDelete(item)">
+              <i-bs name="trash2"></i-bs>
+            </button>
+
+            <button type="button" title="Удалить полностью" class="btn btn-sm btn-outline-danger" (click)="onCascadeDelete(item) ">
               <i-bs name="trash"></i-bs>
             </button>
+
+            <button *ngIf="item.isDeleted" type="button" title="Восстановить" class="btn btn-sm btn-outline-success" (click)="onRestore(item)">
+              <i-bs name="arrow-counterclockwise"></i-bs>
+            </button>
+
           </div>
         </td>
       </tr>

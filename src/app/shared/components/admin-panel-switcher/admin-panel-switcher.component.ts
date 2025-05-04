@@ -46,22 +46,20 @@ export class AdminPanelSwitcherComponent implements OnInit {
     currentModelData: any[] = [];
     filteredData: any[] = [];
 
-    // Form related properties
     itemForm!: FormGroup;
     isEditMode = false;
     selectedItemId: string | null = null;
     saving = false;
     deleting = false;
+    cascadeDeleting = false;
+    restoring = false;
 
-    // UI state
     loading = false;
     error: string | null = null;
     searchText = '';
 
-    // Model configurations
     private modelConfigs: Record<string, ModelConfig> = {};
 
-    // File upload related properties
     filePreviewUrls: Record<string, string> = {};
     selectedFiles: Record<string, File> = {};
 
@@ -91,6 +89,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
             service: this.productService,
             fields: [
                 { key: 'title', label: 'Название', type: 'text', required: true },
+                { key: 'fullTitle', label: 'Полное название', type: 'text', required: false },
                 { key: 'description', label: 'Описание', type: 'textarea', required: true },
                 { key: 'image', label: 'Изображение', type: 'image', required: false },
                 { key: 'price', label: 'Цена', type: 'number', required: true },
@@ -108,6 +107,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'id', title: 'ID' },
                 { key: 'image', title: 'Изображение', type: 'image' },
                 { key: 'title', title: 'Название' },
+                { key: 'fullTitle', title: 'Полное название' },
+                { key: 'description', title: 'Описание' },
                 { key: 'volume', title: 'Объем' },
                 { key: 'price', title: 'Цена', type: 'number' },
                 { key: 'category.title', title: 'Категория' },
@@ -386,6 +387,12 @@ export class AdminPanelSwitcherComponent implements OnInit {
         this.modalService.open(this.deleteModal);
     }
 
+    openCascadeDeleteModal(item: any) {
+        this.selectedItemId = item.id;
+        this.cascadeDeleting = true;
+        this.modalService.open(this.deleteModal);
+    }
+
     resetFileUploads() {
         this.filePreviewUrls = {};
         this.selectedFiles = {};
@@ -475,8 +482,24 @@ export class AdminPanelSwitcherComponent implements OnInit {
     deleteItem() {
         if (!this.selectedItemId) return;
 
-        this.deleting = true;
         const service = this.currentModelConfig.service;
+        
+        if (this.cascadeDeleting) {
+            service.deleteCascade(this.selectedItemId).subscribe(
+                () => {
+                    this.cascadeDeleting = false;
+                    this.modalService.dismissAll();
+                    this.loadData();
+                },
+                (error: any) => {
+                    console.error('Error deleting item:', error);
+                    this.cascadeDeleting = false;
+                }
+            );
+            return;
+        }
+
+        this.deleting = true;
 
         service.delete(this.selectedItemId).subscribe(
             () => {

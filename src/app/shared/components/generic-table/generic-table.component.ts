@@ -18,6 +18,8 @@ export class GenericTableComponent {
 
     @Output() editItem = new EventEmitter<any>();
     @Output() deleteItem = new EventEmitter<any>();
+    @Output() cascadeDeleteItem = new EventEmitter<any>();
+    @Output() restoreItem = new EventEmitter<any>();
 
     getNestedProperty(obj: any, path: string): any {
         return path.split('.').reduce((o, p) => (o ? o[p] : undefined), obj);
@@ -30,4 +32,13 @@ export class GenericTableComponent {
     onDelete(item: any) {
         this.deleteItem.emit(item);
     }
+
+    onCascadeDelete(item: any) {
+        this.cascadeDeleteItem.emit(item);
+    }
+
+    onRestore(item: any) {
+        this.restoreItem.emit(item);
+    }
+    
 }

@@ -31,7 +31,6 @@
 
     <div *ngIf="!loading && !error && product" class="card product-main-card p-3">
         <div class="row g-3 align-items-stretch">
-            <!-- Left: Product Image -->
             <div class="col-md-4 d-flex align-items-center justify-content-center">
                 <img
                     [src]="product.image || 'assets/images/products/no-image.png'"
@@ -39,7 +38,6 @@
                     class="img-fluid product-main-image"
                 />
             </div>
-            <!-- Center: Main Info -->
             <div class="col-md-5">
                 <h2 class="card-title mb-2">{{ product.title }}</h2>
                 <!-- <div class="mb-2 text-muted">Артикул: <span>{{ product.sku || '—' }}</span></div> -->
@@ -60,7 +58,6 @@
                         {{ product.inStock ? 'В наличии' : 'Нет в наличии' }}
                     </span> -->
                 </div>
-                <!-- Characteristics -->
                 <div class="characteristics-list mt-3">
                     <div *ngFor="let char of visibleCharacteristics">
                         <div class="d-flex justify-content-between">
@@ -82,7 +79,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Right: Price & Cart -->
             <div class="col-md-3 d-flex flex-column align-items-center justify-content-center right-panel">
                 <div class="price-block mb-3">
                     <div class="h4 mb-1">{{ product.price | number: '1.2-2' }} <span class="currency">р.</span></div>
@@ -100,7 +96,6 @@
         </div>
     </div>
 
-    <!-- Tabs Section -->
     <div *ngIf="!loading && !error && product" class="card mt-4">
         <div class="card-body">
             <ul class="nav nav-tabs" id="productTabs" role="tablist">
@@ -131,7 +126,6 @@
                 </div>
                 <div class="tab-pane fade" [class.show]="activeTab === 'composition'" [class.active]="activeTab === 'composition'">
                     <p>{{ 'Нет информации о составе' }}</p>
-                    <!-- Placeholder for composition data -->
                 </div>
                 <div class="tab-pane fade" [class.show]="activeTab === 'chars'" [class.active]="activeTab === 'chars'">
                     <div *ngFor="let char of allCharacteristics">
