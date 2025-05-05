@@ -43,7 +43,7 @@
                     <h5 class="text-primary">Характеристики:</h5>
                     <ul class="list-unstyled">
                         <li><strong>Бренд:</strong> {{ selectedProduct?.brand?.title }}</li>
-                        <li><strong>Страна:</strong> {{ selectedProduct?.country }}</li>
+                        <li><strong>Страна:</strong> {{ getCountryNames(selectedProduct) }}</li>
                         <li><strong>Объем:</strong> {{ selectedProduct?.volume }}мл</li>
                         <li><strong>Тип:</strong> {{ selectedProduct?.productType }}</li>
                         <li><strong>Назначение:</strong> {{ selectedProduct?.productScope }}</li>

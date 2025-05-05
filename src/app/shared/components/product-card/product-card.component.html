@@ -21,7 +21,7 @@
                 <a [routerLink]="['/brand', product.brand.id]">{{ product.brand.title }}</a>
             </li>
             <li class="breadcrumb-item">
-                <a [routerLink]="['/category', product.category.id]">{{ product.category.title }}</a>
+                <a [routerLink]="['/category', product.categories[0].id]">{{ product.categories[0].title }}</a>
             </li>
             <li class="breadcrumb-item active" aria-current="page">
                 {{ product.title }}
@@ -49,9 +49,12 @@
                         <img *ngIf="product.brand.image" [src]="product.brand.image" [alt]="product.brand.title" class="brand-img me-2" />
                         <span>{{ product.brand.title }}</span>
                     </a>
-                    <a [routerLink]="['/category', product.category.id]" class="category-link">
-                        {{ product.category.title }}
+                    <div *ngFor="let category of product.categories">
+                    <a [routerLink]="['/category', category.id]" class="category-link">
+                        {{ category.title }}&nbsp;
                     </a>
+                    
+                    </div>
                 </div>
                 <div class="mb-2">
                     <!-- <span class="badge" [ngClass]="product.inStock ? 'bg-success' : 'bg-danger'">

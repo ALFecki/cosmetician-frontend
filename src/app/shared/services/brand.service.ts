@@ -8,14 +8,4 @@ import { CreateBrandSchema, FilterBrandSchema, UpdateBrandSchema } from '../sche
 })
 export class BrandService extends DataService<BrandModel, CreateBrandSchema, UpdateBrandSchema, FilterBrandSchema> {
     protected override endpoint = 'brand';
-
-    override transformModel(data: BrandModel): BrandModel {
-        return {
-            id: data.id,
-            title: data.title,
-            description: data.description,
-            createdAt: new Date(data.createdAt),
-            updatedAt: new Date(data.updatedAt),
-        } as unknown as BrandModel;
-    }
 }

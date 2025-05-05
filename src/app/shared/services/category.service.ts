@@ -8,14 +8,4 @@ import { CreateCategorySchema, FilterCategorySchema, UpdateCategorySchema } from
 })
 export class CategoryService extends DataService<CategoryModel, CreateCategorySchema, UpdateCategorySchema, FilterCategorySchema> {
     protected override endpoint = 'category';
-
-    override transformModel(data: CategoryModel): CategoryModel {
-        return {
-            id: data.id,
-            title: data.title,
-            description: data.description,
-            createdAt: new Date(data.createdAt),
-            updatedAt: new Date(data.updatedAt),
-        } as unknown as CategoryModel;
-    }
 }

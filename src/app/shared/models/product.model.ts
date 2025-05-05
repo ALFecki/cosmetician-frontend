@@ -1,5 +1,6 @@
 import { BrandModel } from './brand.model';
 import { CategoryModel } from './category.model';
+import { CountryModel } from './country.model';
 
 export interface ProductModel {
     id: string;
@@ -15,9 +16,10 @@ export interface ProductModel {
 
     productScope: string;
     productType: string;
-    country: string;
+    countries: CountryModel[];
     categoryId: string;
-    category: CategoryModel;
+    categories: CategoryModel[];
+    
 
     createdAt: Date;
     updatedAt: Date;

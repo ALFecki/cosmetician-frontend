@@ -19,17 +19,4 @@ export class ProductService extends DataService<ProductModel, CreateProductSchem
     ) {
         super(http);
     }
-
-    override transformModel(data: ProductModel): ProductModel {
-        return {
-            id: data.id,
-            title: data.title,
-            description: data.description,
-            price: data.price,
-            brand: this.brandService.transformModel(data.brand),
-            category: this.categoryService.transformModel(data.category),
-            createdAt: new Date(data.createdAt),
-            updatedAt: new Date(data.updatedAt),
-        } as unknown as ProductModel;
-    }
 }

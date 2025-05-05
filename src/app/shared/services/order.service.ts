@@ -13,18 +13,7 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
     protected override endpoint = 'order';
     currentOrder: OrderModel | null = null;
     errorToastService: ErrorToastService = inject(ErrorToastService);
-
-    override transformModel(data: OrderModel): OrderModel {
-        return {
-            id: data.id,
-            personId: data.personId,
-            totalPrice: data.totalPrice,
-            status: data.status,
-            createdAt: new Date(data.createdAt),
-            updatedAt: new Date(data.updatedAt),
-        } as unknown as OrderModel;
-    }
-
+    
     getProductCount(): Observable<number> {
         if (this.currentOrder) {
             return of(this.currentOrder.products.length);

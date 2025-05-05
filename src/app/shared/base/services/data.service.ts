@@ -134,22 +134,4 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
     deleteCascade(id: string): Observable<SingleResponse<Model>> {
         return this.http.delete<SingleResponse<Model>>(`${this.apiUrl}/${this.endpoint}/cascade/${id}`);
     }
-
-    abstract transformModel(data: unknown): Model;
-
-    transformList(data: ListResponse<Model>): ListResponse<Model> {
-        return {
-            status: data.status,
-            length: data.length,
-            data: data.data
-            // data: data.data.map(item => this.transformModel(item)),
-        };
-    }
-
-    transformSingle(data: SingleResponse<Model>): SingleResponse<Model> {
-        return {
-            status: data.status,
-            data: this.transformModel(data.data),
-        };
-    }
 }

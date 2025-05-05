@@ -6,6 +6,7 @@ import { Observable, of } from 'rxjs';
 import { ProductModel } from '../../models/product.model';
 import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
+import { CountryModel } from '../../models/country.model';
 
 @Component({
     selector: 'app-products',
@@ -31,7 +32,7 @@ export class ProductsComponent implements OnInit {
 
     ngOnInit(): void {
         this.productService.getByFilterSchema({ categoryId: this.categoryId, brandId: this.brandId }).subscribe(data => {
-            this.products$ = of(this.productService.transformList(data).data);
+            this.products$ = of(data.data);
         });
     }
 
@@ -42,6 +43,10 @@ export class ProductsComponent implements OnInit {
             centered: true,
             scrollable: true,
         });
+    }
+
+    getCountryNames(product: ProductModel | null): string {
+        return product?.countries?.map((country: CountryModel) => country.name).join(', ') || '';
     }
 
     moreInfo() {

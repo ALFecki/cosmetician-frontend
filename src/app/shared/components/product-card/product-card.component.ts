@@ -56,9 +56,9 @@ export class ProductCardComponent implements OnInit {
         // Compose characteristics array
         this.allCharacteristics = [
             { label: 'Бренд', value: this.product.brand?.title || '—' },
-            { label: 'Категория', value: this.product.category?.title || '—' },
+            { label: 'Категория', value: this.product.categories?.map(category => category.title).join(', ') || '—' },
             { label: 'Объем', value: this.product.volume ? this.product.volume + ' мл' : '—' },
-            { label: 'Страна', value: this.product.country || '—' },
+            { label: 'Страна', value: this.product.countries.map(country => country.name).join(', ') || '—' },
             { label: 'Тип продукта', value: this.product.productType || '—' },
             { label: 'Назначение', value: this.product.productScope || '—' },
             // { label: 'Артикул', value: this.product.sku || '—' },
