@@ -18,6 +18,14 @@
             </div>
         </div>
     </div>
+
+    <app-pagination
+        [totalItems]="(totalItems$ | async) ?? 0"
+        [itemsPerPage]="itemsPerPage"
+        [currentPage]="currentPage"
+        (pageChange)="onPageChange($event)"
+        (itemsPerPageChange)="onItemsPerPageChange($event)"
+    ></app-pagination>
 </div>
 
 <ng-template #productModal let-modal>

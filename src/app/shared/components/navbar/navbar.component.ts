@@ -33,12 +33,8 @@ export class NavbarComponent {
         private cartService: CartService,
         private readonly modalService: NgbModal,
     ) {
-        this.categoryService.getAll().subscribe(data => {
-            this.categories$ = of(data.data);
-        });
-        this.brandService.getAll().subscribe(data => {
-            this.brands$ = of(data.data);
-        });
+        this.categories$ = this.categoryService.getCategoriesList();
+        this.brands$ = this.brandService.getBrandsList();
     }
 
     toggleMenu() {

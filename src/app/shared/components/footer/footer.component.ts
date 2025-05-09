@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
+import { IconsModule } from '../../base/icons/icons.module';
 import { BrandModel } from '../../models/brand.model';
 import { CategoryModel } from '../../models/category.model';
 import { BrandService } from '../../services/brand.service';
 import { CategoryService } from '../../services/category.service';
-import { IconsModule } from '../../base/icons/icons.module';
 
 @Component({
     selector: 'app-footer',
@@ -16,18 +16,15 @@ import { IconsModule } from '../../base/icons/icons.module';
     styleUrl: './footer.component.scss',
 })
 export class FooterComponent {
-    categories$!: Observable<CategoryModel[]>;
-    brands$!: Observable<BrandModel[]>;
+    categories$: Observable<CategoryModel[]>;
+    brands$: Observable<BrandModel[]>;
 
     constructor(
         private categoryService: CategoryService,
         private brandService: BrandService,
     ) {
-        this.categoryService.getAll().subscribe(data => {
-            this.categories$ = of(data.data);
-        });
-        this.brandService.getAll().subscribe(data => {
-            this.brands$ = of(data.data);
-        });
+        // Use the cached list observables directly
+        this.categories$ = this.categoryService.getCategoriesList();
+        this.brands$ = this.brandService.getBrandsList();
     }
 }

@@ -45,33 +45,25 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
                 if (schema[key] !== null && schema[key] !== undefined && schema[key] !== '') {
                     if (schema[key] instanceof Date) {
                         params = params.append(
-                            String(key)
-                                .replace(/([A-Z])/g, '_$1')
-                                .toLowerCase(),
+                            String(key),
                             schema[key].toISOString(),
                         );
                     } else if (Array.isArray(schema[key])) {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         schema[key].forEach((value: any) => {
                             params = params.append(
-                                String(key)
-                                    .replace(/([A-Z])/g, '_$1')
-                                    .toLowerCase(),
+                                String(key),
                                 value.toString(),
                             );
                         });
                     } else if (typeof schema[key] === 'boolean') {
                         params = params.append(
-                            String(key)
-                                .replace(/([A-Z])/g, '_$1')
-                                .toLowerCase(),
+                            String(key),
                             schema[key] ? '1' : '0',
                         );
                     } else {
                         params = params.append(
-                            String(key)
-                                .replace(/([A-Z])/g, '_$1')
-                                .toLowerCase(),
+                            String(key),
                             schema[key].toString(),
                         );
                     }
