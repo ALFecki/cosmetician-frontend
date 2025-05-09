@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ProductModel } from '../../models/product.model';
 import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
+import { AuthGuard } from '../../guards/auth.guard';
 
 @Component({
     selector: 'app-product-card',
@@ -28,8 +29,10 @@ export class ProductCardComponent implements OnInit {
 
     constructor(
         private route: ActivatedRoute,
+        private router: Router,
         private productService: ProductService,
         private cartService: CartService,
+        private authGuard: AuthGuard,
     ) {}
 
     ngOnInit() {
@@ -69,7 +72,11 @@ export class ProductCardComponent implements OnInit {
     }
 
     async addToCart(product: ProductModel) {
-        console.log('Добавление в корзину:', product);
-        await this.cartService.addProductToCart(product.id);
+        this.authGuard.canActivate(this.route.snapshot, this.router.routerState.snapshot).subscribe(async canActivate => {
+            if (canActivate) {
+                console.log('User is authenticated, adding product to cart');
+                await this.cartService.addProductToCart(product.id);
+            }
+        });
     }
 }

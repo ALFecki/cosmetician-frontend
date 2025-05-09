@@ -9,11 +9,7 @@
                 (keydown.enter)="this.openProductDetails(product, productModal)"
                 (keydown.space)="this.openProductDetails(product, productModal); $event.preventDefault()"
             >
-                <img 
-                    [src]="product.image || 'assets/images/products/no-image.png'" 
-                    class="card-img-top" 
-                    alt="{{ product.title }}" 
-                />
+                <img [src]="product.image || 'assets/images/products/no-image.png'" class="card-img-top" alt="{{ product.title }}" />
                 <div class="card-body">
                     <h5 class="card-title">{{ product.title }}</h5>
                     <p class="card-text">Цена: {{ product.price | number: '1.2-2' }} р.</p>

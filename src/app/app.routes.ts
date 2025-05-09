@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './features/home/home.component';
 import { AdminGuard } from './shared/guards/admin.guard';
-import { AuthGuard } from './shared/utils/auth.guard';
+import { AuthGuard } from './shared/guards/auth.guard';
 
 export const routes: Routes = [
     {

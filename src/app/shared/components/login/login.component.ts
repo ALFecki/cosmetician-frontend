@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LoginData, RegistrationData } from '../../models/login.interface';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
     selector: 'app-login',
@@ -14,7 +16,8 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LoginComponent {
     @Input() loginForm: FormGroup = new FormGroup({});
-    @ViewChild('loginModal') loginModal!: TemplateRef<unknown>;
+
+    returnUrl: string | null = null;
 
     email = new FormControl('');
     password = new FormControl('');
@@ -37,7 +40,12 @@ export class LoginComponent {
     constructor(
         private authService: AuthService,
         private modalService: NgbModal,
-    ) {}
+        private route: ActivatedRoute,
+        private toastService: ToastService,
+        private router: Router,
+    ) {
+        this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+    }
 
     login(): boolean {
         const loginData = {
@@ -48,7 +56,11 @@ export class LoginComponent {
         this.authService.login(loginData).subscribe(
             response => {
                 console.log('Login successful:', response);
+                this.toastService.show('Успешный вход', 'success');
                 this.closeLoginModal();
+                if (this.returnUrl) {
+                    this.router.navigate([this.returnUrl]);
+                }
                 return true;
             },
             error => {
@@ -123,7 +135,7 @@ export class LoginComponent {
                 this.registrationError = 'Ошибка регистрации';
             },
         );
-        
+
         this.registrationError = null;
         this.closeRegisterModal();
     }

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Observable, of } from 'rxjs';
+import { catchError, Observable, of, Subscription, tap } from 'rxjs';
 import { BrandModel } from '../../models/brand.model';
 import { CategoryModel } from '../../models/category.model';
 import { AuthService } from '../../services/auth.service';
@@ -24,6 +24,7 @@ export class NavbarComponent {
     categories$!: Observable<CategoryModel[]>;
     brands$!: Observable<BrandModel[]>;
     authService: AuthService = inject(AuthService);
+    authSubscribtion: Subscription | null = null;
 
     constructor(
         public router: Router,
@@ -58,19 +59,27 @@ export class NavbarComponent {
     }
 
     navigateToCart() {
-        this.authService.checkAuth().subscribe(isAuth => {
-            console.log('isAuth', isAuth);
-            if (isAuth) {
-                this.modalService.dismissAll();
-                this.modalService.open(CartComponent, {
-                    size: 'lg',
-                    centered: true,
-                    scrollable: true,
-                });
-            } else {
-                this.openLoginModal();
-            }
-        });
+        this.authSubscribtion = this.authService
+            .checkAuth()
+            .pipe(
+                tap(isAuth => {
+                    if (isAuth) {
+                        this.modalService.dismissAll();
+                        this.modalService.open(CartComponent, {
+                            size: 'lg',
+                            centered: true,
+                            scrollable: true,
+                        });
+                    } else {
+                        this.openLoginModal();
+                    }
+                }),
+                catchError(() => {
+                    this.openLoginModal();
+                    return of(false);
+                }),
+            )
+            .subscribe();
     }
 
     async logout() {
@@ -78,5 +87,8 @@ export class NavbarComponent {
         this.authService.logout().subscribe(() => {
             this.router.navigate(['/']);
         });
+        if (this.authSubscribtion) {
+            this.authSubscribtion.unsubscribe();
+        }
     }
 }

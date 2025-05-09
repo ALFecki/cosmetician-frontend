@@ -1,0 +1,10 @@
+<div class="error-toast-container" *ngIf="toastService.visible">
+    <div class="error-toast" [ngClass]="toastService.type">
+        <span class="toast-icon" *ngIf="toastService.type === 'success'">✔️</span>
+        <span class="toast-icon" *ngIf="toastService.type === 'error'">❌</span>
+        <span class="toast-icon" *ngIf="toastService.type === 'warning'">⚠️</span>
+        <span class="toast-icon" *ngIf="toastService.type === 'info'">ℹ️</span>
+        <span class="error-toast-message">{{ toastService.message }}</span>
+        <button class="btn-close" (click)="toastService.hide()" aria-label="Закрыть"></button>
+    </div>
+</div>

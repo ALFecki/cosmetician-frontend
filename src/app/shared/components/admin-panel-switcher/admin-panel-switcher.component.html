@@ -1,136 +1,153 @@
 <div class="admin-panel-switcher">
-  <h1 class="mb-4">Панель администратора</h1>
+    <h1 class="mb-4">Панель администратора</h1>
 
-  <ul class="nav nav-tabs" role="tablist">
-    <li class="nav-item" role="presentation" *ngFor="let model of availableModels">
-      <button class="nav-link" [class.active]="currentModel === model.key" 
-        (click)="switchModel(model.key)" type="button">
-        {{ model.title }}
-      </button>
-    </li>
-  </ul>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation" *ngFor="let model of availableModels">
+            <button class="nav-link" [class.active]="currentModel === model.key" (click)="switchModel(model.key)" type="button">
+                {{ model.title }}
+            </button>
+        </li>
+    </ul>
 
-  <div class="admin-actions">
-    <div class="search-box">
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="Поиск..." 
-          [(ngModel)]="searchText" (input)="onSearchChange()">
-        <button class="btn btn-outline-secondary" type="button" *ngIf="searchText"
-          (click)="clearSearch()">✖</button>
-      </div>
-    </div>
-    <button class="btn btn-primary" (click)="openAddModal()">
-      <i class="bi bi-plus-lg"></i> Добавить {{ getCurrentModelTitle() }}
-    </button>
-  </div>
-
-  <div class="table-container">
-    <div *ngIf="loading" class="text-center p-5">
-      <div class="spinner-border" role="status">
-        <span class="visually-hidden">Загрузка...</span>
-      </div>
+    <div class="admin-actions">
+        <div class="search-box">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Поиск..." [(ngModel)]="searchText" (input)="onSearchChange()" />
+                <button class="btn btn-outline-secondary" type="button" *ngIf="searchText" (click)="clearSearch()">✖</button>
+            </div>
+        </div>
+        <button class="btn btn-primary" (click)="openAddModal()">
+            <i class="bi bi-plus-lg"></i> Добавить {{ getCurrentModelTitle() }}
+        </button>
     </div>
 
-    <div *ngIf="error" class="alert alert-danger m-3" role="alert">
-      {{ error }}
-    </div>
+    <div class="table-container">
+        <div *ngIf="loading" class="text-center p-5">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+        </div>
 
-    <app-generic-table
-      *ngIf="!loading && currentModelData.length > 0"
-      [data]="currentModelData"
-      [columns]="currentModelColumns"
-      [key]="currentModel"
-      (editItem)="editItem($event)"
-      (deleteItem)="openDeleteModal($event)"
-      (cascadeDeleteItem)="openCascadeDeleteModal($event)">
-    </app-generic-table>
+        <div *ngIf="error" class="alert alert-danger m-3" role="alert">
+            {{ error }}
+        </div>
 
-    <div *ngIf="!loading && currentModelData.length === 0" class="p-5 text-center text-muted">
-      Нет данных для отображения
+        <app-generic-table
+            *ngIf="!loading && currentModelData.length > 0"
+            [data]="currentModelData"
+            [columns]="currentModelColumns"
+            [key]="currentModel"
+            (editItem)="editItem($event)"
+            (deleteItem)="openDeleteModal($event)"
+            (cascadeDeleteItem)="openCascadeDeleteModal($event)"
+        >
+        </app-generic-table>
+
+        <div *ngIf="!loading && currentModelData.length === 0" class="p-5 text-center text-muted">Нет данных для отображения</div>
     </div>
-  </div>
 </div>
 
 <ng-template #itemModal let-modal>
-  <div class="modal-header">
-    <h5 class="modal-title">{{ isEditMode ? 'Редактировать' : 'Добавить' }} {{ getCurrentModelTitle() }}</h5>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
-  </div>
-  <div class="modal-body">
-    <form [formGroup]="itemForm" (ngSubmit)="saveItem()">
-      <div class="mb-3" *ngFor="let field of currentModelFields">
-        <label [for]="field.key" class="form-label">{{ field.label }}</label>
-        
-        <input *ngIf="field.type === 'text' || field.type === 'number' || field.type === 'email'"
-          [type]="field.type" class="form-control" [id]="field.key"
-          [formControlName]="field.key">
-          
-        <textarea *ngIf="field.type === 'textarea'" class="form-control" 
-          [id]="field.key" [formControlName]="field.key" rows="3"></textarea>
-          
-        <select *ngIf="field.type === 'select'" class="form-select" 
-          [id]="field.key" [formControlName]="field.key">
-          <option value="">Выберите...</option>
-          <option *ngFor="let option of field.options" [value]="option.id">{{ option.title || option.name }}</option>
-        </select>
+    <div class="modal-header">
+        <h5 class="modal-title">{{ isEditMode ? 'Редактировать' : 'Добавить' }} {{ getCurrentModelTitle() }}</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="itemForm" (ngSubmit)="saveItem()">
+            <div class="mb-3" *ngFor="let field of currentModelFields">
+                <label [for]="field.key" class="form-label">{{ field.label }}</label>
 
-        <div *ngIf="field.type === 'file' || field.type === 'image'" class="mb-3">
-          <input type="file" class="form-control" 
-            [id]="field.key" (change)="onFileSelected($event, field.key)"
-            accept="image/*">
-          
-          <div *ngIf="field.type === 'image'" class="d-flex align-items-center mt-2">
-            <div *ngIf="itemForm.get(field.key)?.value && !filePreviewUrls[field.key]" class="me-3">
-              <p class="mb-1 text-muted small">Текущее изображение:</p>
-              <img [src]="itemForm.get(field.key)?.value" class="img-thumbnail" 
-                style="max-height: 100px; max-width: 200px" [alt]="field.label">
-            </div>
-            
-            <div *ngIf="filePreviewUrls[field.key]" class="me-3">
-              <p class="mb-1 text-muted small">Новое изображение:</p>
-              <img [src]="filePreviewUrls[field.key]" class="img-thumbnail" 
-                style="max-height: 100px; max-width: 200px" [alt]="'Новое ' + field.label">
-              <div class="mt-1">
-                <button type="button" class="btn btn-sm btn-outline-danger" 
-                  (click)="cancelFileSelection(field.key)">Отменить</button>
-              </div>
-            </div>
-          </div>
-        </div>
+                <input
+                    *ngIf="field.type === 'text' || field.type === 'number' || field.type === 'email'"
+                    [type]="field.type"
+                    class="form-control"
+                    [id]="field.key"
+                    [formControlName]="field.key"
+                />
 
-        <div *ngIf="itemForm.get(field.key)?.invalid && itemForm.get(field.key)?.touched" class="error-message">
-          <div *ngIf="itemForm.get(field.key)?.errors?.['required']">Это поле обязательно</div>
-          <div *ngIf="itemForm.get(field.key)?.errors?.['email']">Введите корректный email</div>
-          <div *ngIf="itemForm.get(field.key)?.errors?.['minlength']">
-            Минимальная длина: {{ itemForm.get(field.key)?.errors?.['minlength'].requiredLength }} символов
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Отмена</button>
-    <button type="button" class="btn btn-primary" (click)="saveItem()" [disabled]="itemForm.invalid || saving">
-      <span *ngIf="saving" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-      {{ isEditMode ? 'Сохранить' : 'Добавить' }}
-    </button>
-  </div>
+                <textarea
+                    *ngIf="field.type === 'textarea'"
+                    class="form-control"
+                    [id]="field.key"
+                    [formControlName]="field.key"
+                    rows="3"
+                ></textarea>
+
+                <select *ngIf="field.type === 'select'" class="form-select" [id]="field.key" [formControlName]="field.key">
+                    <option value="">Выберите...</option>
+                    <option *ngFor="let option of field.options" [value]="option.id">{{ option.title || option.name }}</option>
+                </select>
+
+                <div *ngIf="field.type === 'file' || field.type === 'image'" class="mb-3">
+                    <input
+                        type="file"
+                        class="form-control"
+                        [id]="field.key"
+                        (change)="onFileSelected($event, field.key)"
+                        accept="image/*"
+                    />
+
+                    <div *ngIf="field.type === 'image'" class="d-flex align-items-center mt-2">
+                        <div *ngIf="itemForm.get(field.key)?.value && !filePreviewUrls[field.key]" class="me-3">
+                            <p class="mb-1 text-muted small">Текущее изображение:</p>
+                            <img
+                                [src]="itemForm.get(field.key)?.value"
+                                class="img-thumbnail"
+                                style="max-height: 100px; max-width: 200px"
+                                [alt]="field.label"
+                            />
+                        </div>
+
+                        <div *ngIf="filePreviewUrls[field.key]" class="me-3">
+                            <p class="mb-1 text-muted small">Новое изображение:</p>
+                            <img
+                                [src]="filePreviewUrls[field.key]"
+                                class="img-thumbnail"
+                                style="max-height: 100px; max-width: 200px"
+                                [alt]="'Новое ' + field.label"
+                            />
+                            <div class="mt-1">
+                                <button type="button" class="btn btn-sm btn-outline-danger" (click)="cancelFileSelection(field.key)">
+                                    Отменить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="itemForm.get(field.key)?.invalid && itemForm.get(field.key)?.touched" class="error-message">
+                    <div *ngIf="itemForm.get(field.key)?.errors?.['required']">Это поле обязательно</div>
+                    <div *ngIf="itemForm.get(field.key)?.errors?.['email']">Введите корректный email</div>
+                    <div *ngIf="itemForm.get(field.key)?.errors?.['minlength']">
+                        Минимальная длина: {{ itemForm.get(field.key)?.errors?.['minlength'].requiredLength }} символов
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Отмена</button>
+        <button type="button" class="btn btn-primary" (click)="saveItem()" [disabled]="itemForm.invalid || saving">
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            {{ isEditMode ? 'Сохранить' : 'Добавить' }}
+        </button>
+    </div>
 </ng-template>
 
 <ng-template #deleteModal let-modal>
-  <div class="modal-header">
-    <h5 class="modal-title">Подтверждение удаления</h5>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
-  </div>
-  <div class="modal-body">
-    <p>Вы уверены, что хотите удалить этот элемент?</p>
-    <p *ngIf="cascadeDeleting" class="text-danger">Это действие нельзя отменить.</p>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Отмена</button>
-    <button type="button" class="btn btn-danger" (click)="deleteItem()" [disabled]="deleting">
-      <span *ngIf="deleting" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-      Удалить
-    </button>
-  </div>
+    <div class="modal-header">
+        <h5 class="modal-title">Подтверждение удаления</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+        <p>Вы уверены, что хотите удалить этот элемент?</p>
+        <p *ngIf="cascadeDeleting" class="text-danger">Это действие нельзя отменить.</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Отмена</button>
+        <button type="button" class="btn btn-danger" (click)="deleteItem()" [disabled]="deleting">
+            <span *ngIf="deleting" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            Удалить
+        </button>
+    </div>
 </ng-template>

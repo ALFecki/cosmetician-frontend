@@ -19,7 +19,6 @@ export interface ProductModel {
     countries: CountryModel[];
     categoryId: string;
     categories: CategoryModel[];
-    
 
     createdAt: Date;
     updatedAt: Date;

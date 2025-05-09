@@ -7,6 +7,7 @@ import { ProductModel } from '../../models/product.model';
 import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
 import { CountryModel } from '../../models/country.model';
+import { AuthGuard } from '../../guards/auth.guard';
 
 @Component({
     selector: 'app-products',
@@ -28,6 +29,7 @@ export class ProductsComponent implements OnInit {
         private productService: ProductService,
         private cartService: CartService,
         private modalService: NgbModal,
+        private authGuard: AuthGuard,
     ) {}
 
     ngOnInit(): void {
@@ -56,8 +58,11 @@ export class ProductsComponent implements OnInit {
 
     async addToCart(product: ProductModel | null) {
         if (product) {
-            console.log('Добавление в корзину:', product);
-            await this.cartService.addProductToCart(product.id);
+            this.authGuard.canActivate(this.route.snapshot, this.router.routerState.snapshot).subscribe(async isAuthenticated => {
+                if (isAuthenticated) {
+                    await this.cartService.addProductToCart(product.id);
+                }
+            });
         }
     }
 }

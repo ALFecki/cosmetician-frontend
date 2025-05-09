@@ -25,7 +25,7 @@ interface ModelConfig {
     }[];
     columns: {
         key: string;
-        title: string;  
+        title: string;
         type?: 'text' | 'number' | 'image' | 'date' | 'boolean';
     }[];
 }
@@ -93,7 +93,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'description', label: 'Описание', type: 'textarea', required: true },
                 { key: 'image', label: 'Изображение', type: 'image', required: false },
                 { key: 'price', label: 'Цена', type: 'number', required: true },
-                { key: 'volume', label: 'Объем', required: true, type: 'number'},
+                { key: 'volume', label: 'Объем', required: true, type: 'number' },
                 { key: 'categoryId', label: 'Категория', type: 'select', required: true },
                 { key: 'brandId', label: 'Бренд', type: 'select', required: true },
                 // { key: 'amount', label: 'Количество', type: 'number', required: true },
@@ -231,6 +231,10 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'updatedAt', title: 'Дата обновления', type: 'date' },
             ],
         };
+
+        // this.modelConfigs['countries'] = {
+        //     key: 'countries',
+        //     title: 'Страны',
     }
 
     get currentModelConfig(): ModelConfig {
@@ -270,12 +274,10 @@ export class AdminPanelSwitcherComponent implements OnInit {
             observables['brands'] = this.brandService.getAll({ includeDeleted: true } as FilterBrandSchema);
         }
 
-        // If we need additional data for select fields
         if (Object.keys(observables).length > 0) {
             forkJoin(observables)
                 .pipe(
                     tap(results => {
-                        // Update options for select fields
                         this.currentModelConfig.fields.forEach(field => {
                             if (field.type === 'select') {
                                 if (field.key === 'categoryId' && results['categories']) {
@@ -443,7 +445,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
             const value = this.itemForm.value[key];
             console.log(`Key: ${key}, Value: ${value}`);
             if (value !== null && value !== undefined) {
-                
                 if (typeof value === 'object' && !Array.isArray(value)) {
                     formData[key] = JSON.stringify(value);
                 } else {
@@ -465,7 +466,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
         const operation = this.isEditMode ? service.update(this.selectedItemId, formData, true) : service.create(formData, true);
         console.log('Operation:', operation);
-        
+
         await operation
             .then(() => {
                 this.saving = false;
@@ -483,7 +484,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
         if (!this.selectedItemId) return;
 
         const service = this.currentModelConfig.service;
-        
+
         if (this.cascadeDeleting) {
             service.deleteCascade(this.selectedItemId).subscribe(
                 () => {
@@ -494,7 +495,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 (error: any) => {
                     console.error('Error deleting item:', error);
                     this.cascadeDeleting = false;
-                }
+                },
             );
             return;
         }

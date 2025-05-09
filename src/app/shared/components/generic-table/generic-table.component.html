@@ -1,61 +1,82 @@
 <div class="table-responsive">
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th *ngFor="let column of columns">{{ column.title }}</th>
-        <th class="text-end">Действия</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let item of data">
-        <td *ngFor="let column of columns">
-          <ng-container [ngSwitch]="column.type">
-            <ng-container *ngSwitchCase="'image'">
-              <img *ngIf="getNestedProperty(item, column.key)" [src]="getNestedProperty(item, column.key)" 
-                class="table-thumbnail" [alt]="getNestedProperty(item, column.key)" />
-              <span *ngIf="!getNestedProperty(item, column.key)">—</span>
-            </ng-container>
-            
-            <ng-container *ngSwitchCase="'date'">
-              {{ getNestedProperty(item, column.key) | date:'dd.MM.yyyy' }}
-            </ng-container>
-            
-            <ng-container *ngSwitchCase="'number'">
-              {{ getNestedProperty(item, column.key) | number:'1.2-2' }}
-            </ng-container>
-            
-            <ng-container *ngSwitchCase="'boolean'">
-              <span *ngIf="getNestedProperty(item, column.key) === true">Да</span>
-              <span *ngIf="getNestedProperty(item, column.key) === false">Нет</span>
-              <span *ngIf="getNestedProperty(item, column.key) === null || getNestedProperty(item, column.key) === undefined">—</span>
-            </ng-container>
-            
-            <ng-container *ngSwitchDefault>
-              {{ getNestedProperty(item, column.key) || '—' }}
-            </ng-container>
-          </ng-container>
-        </td>
-        
-        <td class="text-end">
-          <div class="btn-group">
-            <button type="button" title="Редактировать" class="btn btn-sm btn-outline-primary" (click)="onEdit(item)">
-               <i-bs name="pencil"></i-bs>
-            </button>
-            <button type="button" title="Удалить с возможностью восстановления" class="btn btn-sm btn-outline-danger" (click)="onDelete(item)">
-              <i-bs name="trash2"></i-bs>
-            </button>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th *ngFor="let column of columns">{{ column.title }}</th>
+                <th class="text-end">Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of data">
+                <td *ngFor="let column of columns">
+                    <ng-container [ngSwitch]="column.type">
+                        <ng-container *ngSwitchCase="'image'">
+                            <img
+                                *ngIf="getNestedProperty(item, column.key)"
+                                [src]="getNestedProperty(item, column.key)"
+                                class="table-thumbnail"
+                                [alt]="getNestedProperty(item, column.key)"
+                            />
+                            <span *ngIf="!getNestedProperty(item, column.key)">—</span>
+                        </ng-container>
 
-            <button type="button" title="Удалить полностью" class="btn btn-sm btn-outline-danger" (click)="onCascadeDelete(item) ">
-              <i-bs name="trash"></i-bs>
-            </button>
+                        <ng-container *ngSwitchCase="'date'">
+                            {{ getNestedProperty(item, column.key) | date: 'dd.MM.yyyy' }}
+                        </ng-container>
 
-            <button *ngIf="item.isDeleted" type="button" title="Восстановить" class="btn btn-sm btn-outline-success" (click)="onRestore(item)">
-              <i-bs name="arrow-counterclockwise"></i-bs>
-            </button>
+                        <ng-container *ngSwitchCase="'number'">
+                            {{ getNestedProperty(item, column.key) | number: '1.2-2' }}
+                        </ng-container>
 
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+                        <ng-container *ngSwitchCase="'boolean'">
+                            <span *ngIf="getNestedProperty(item, column.key) === true">Да</span>
+                            <span *ngIf="getNestedProperty(item, column.key) === false">Нет</span>
+                            <span *ngIf="getNestedProperty(item, column.key) === null || getNestedProperty(item, column.key) === undefined"
+                                >—</span
+                            >
+                        </ng-container>
+
+                        <ng-container *ngSwitchDefault>
+                            {{ getNestedProperty(item, column.key) || '—' }}
+                        </ng-container>
+                    </ng-container>
+                </td>
+
+                <td class="text-end">
+                    <div class="btn-group">
+                        <button type="button" title="Редактировать" class="btn btn-sm btn-outline-primary" (click)="onEdit(item)">
+                            <i-bs name="pencil"></i-bs>
+                        </button>
+                        <button
+                            type="button"
+                            title="Удалить с возможностью восстановления"
+                            class="btn btn-sm btn-outline-danger"
+                            (click)="onDelete(item)"
+                        >
+                            <i-bs name="trash2"></i-bs>
+                        </button>
+
+                        <button
+                            type="button"
+                            title="Удалить полностью"
+                            class="btn btn-sm btn-outline-danger"
+                            (click)="onCascadeDelete(item)"
+                        >
+                            <i-bs name="trash"></i-bs>
+                        </button>
+
+                        <button
+                            *ngIf="item.isDeleted"
+                            type="button"
+                            title="Восстановить"
+                            class="btn btn-sm btn-outline-success"
+                            (click)="onRestore(item)"
+                        >
+                            <i-bs name="arrow-counterclockwise"></i-bs>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>

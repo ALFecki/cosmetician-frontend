@@ -4,7 +4,7 @@ import { environment } from '../../../../environment';
 import { DataService } from '../base/services/data.service';
 import { OrderModel } from '../models/order.model';
 import { CreateOrderSchema, FilterOrderSchema, UpdateOrderSchema } from '../schemas/order.schema';
-import { ErrorToastService } from './error-toast.service';
+import { ToastService } from './toast.service';
 
 @Injectable({
     providedIn: 'root',
@@ -12,8 +12,8 @@ import { ErrorToastService } from './error-toast.service';
 export class OrderService extends DataService<OrderModel, CreateOrderSchema, UpdateOrderSchema, FilterOrderSchema> {
     protected override endpoint = 'order';
     currentOrder: OrderModel | null = null;
-    errorToastService: ErrorToastService = inject(ErrorToastService);
-    
+    toastService: ToastService = inject(ToastService);
+
     getProductCount(): Observable<number> {
         if (this.currentOrder) {
             return of(this.currentOrder.products.length);
@@ -28,6 +28,7 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
 
         if (order) {
             this.currentOrder = order;
+            this.toastService.show('Товар добавлен в заказ', 'success');
             return this.currentOrder;
         } else {
             return null;
@@ -50,7 +51,7 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
                     }
                 }),
                 catchError(() => {
-                    this.errorToastService.show('Ошибка получения последнего заказа');
+                    this.toastService.show('Ошибка получения последнего заказа', 'error');
                     return of(null);
                 }),
             );
@@ -67,6 +68,7 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
                 ),
             );
             this.currentOrder = newOrder;
+            this.toastService.show('Количество товара изменено', 'success');
             return this.currentOrder;
         }
         return null;
@@ -101,6 +103,7 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
             );
             this.currentOrder = newOrder;
             console.log('Updated order after removing product:', this.currentOrder);
+            this.toastService.show('Товар удален из заказа', 'success');
             return this.currentOrder;
         }
         return null;
@@ -121,6 +124,7 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
             this.http.get<OrderModel>(`${environment.server_url}/${this.endpoint}/person/checkout`, { withCredentials: true }),
         );
         this.currentOrder = order;
+        this.toastService.show('Заказ успешно оформлен', 'success');
         return this.currentOrder;
     }
 }

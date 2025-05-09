@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, debounceTime, firstValueFrom, map, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, debounceTime, map, Observable, Subject } from 'rxjs';
 import { CartModel } from '../models/cart.model';
 import { AuthService } from './auth.service';
 import { OrderService } from './order.service';
@@ -49,7 +49,7 @@ export class CartService implements OnDestroy {
                     totalPrice: item.quantity * item.product.price,
                 }));
                 this.cartItemsSubject.next(updatedItems);
-                this.totalPriceSubject.next(order.totalPrice);
+                this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
             }
 
             this.pendingUpdates = [];
@@ -71,17 +71,26 @@ export class CartService implements OnDestroy {
     }
 
     private async loadInitialCart(): Promise<void> {
-        await firstValueFrom(this.authService.checkAuth());
-        const order = await this.orderService.getLastNotCheckedOrder().toPromise();
-        if (order) {
-            const items = order.products.map(item => ({
-                product: item.product,
-                quantity: item.quantity,
-                totalPrice: item.quantity * item.product.price,
-            }));
-            this.cartItemsSubject.next(items);
-            this.totalPriceSubject.next(order.totalPrice);
-        }
+        this.authService.checkAuth().subscribe(
+            async isAuthenticated => {
+                if (isAuthenticated) {
+                    const order = await this.orderService.getLastNotCheckedOrder().toPromise();
+                    if (order) {
+                        const items = order.products.map(item => ({
+                            product: item.product,
+                            quantity: item.quantity,
+                            totalPrice: item.quantity * item.product.price,
+                        }));
+                        this.cartItemsSubject.next(items);
+                        this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
+                    }
+                }
+            },
+            error => {
+                console.error('Error loading initial cart: ', error);
+                return [];
+            },
+        );
     }
 
     getCartItems(): Observable<CartModel[]> {
@@ -105,7 +114,7 @@ export class CartService implements OnDestroy {
                 totalPrice: item.quantity * item.product.price,
             }));
             this.cartItemsSubject.next(updatedItems);
-            this.totalPriceSubject.next(order.totalPrice);
+            this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
             this.updateTotalPrice(updatedItems);
         } else {
             console.error('Error adding product to cart');
@@ -165,12 +174,12 @@ export class CartService implements OnDestroy {
                 totalPrice: item.quantity * item.product.price,
             }));
             this.cartItemsSubject.next(updatedItems);
-            this.totalPriceSubject.next(order.totalPrice);
+            this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
         }
     }
 
     private updateTotalPrice(items: CartModel[]): void {
-        const total = items.reduce((sum, item) => sum + item.totalPrice, 0);
+        const total = Number(items.reduce((sum, item) => sum + item.totalPrice, 0).toFixed(2));
         this.totalPriceSubject.next(total);
     }
 

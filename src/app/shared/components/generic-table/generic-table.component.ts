@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IconsModule } from '../../base/icons/icons.module';
 
-
 @Component({
     selector: 'app-generic-table',
     standalone: true,
@@ -40,5 +39,4 @@ export class GenericTableComponent {
     onRestore(item: any) {
         this.restoreItem.emit(item);
     }
-    
 }

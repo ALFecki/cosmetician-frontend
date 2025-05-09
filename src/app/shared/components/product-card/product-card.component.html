@@ -50,10 +50,7 @@
                         <span>{{ product.brand.title }}</span>
                     </a>
                     <div *ngFor="let category of product.categories">
-                    <a [routerLink]="['/category', category.id]" class="category-link">
-                        {{ category.title }}&nbsp;
-                    </a>
-                    
+                        <a [routerLink]="['/category', category.id]" class="category-link"> {{ category.title }}&nbsp; </a>
                     </div>
                 </div>
                 <div class="mb-2">

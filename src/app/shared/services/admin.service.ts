@@ -8,7 +8,7 @@ import { environment } from '../../../../environment';
     providedIn: 'root',
 })
 export class AdminService {
-    private apiUrl = `${environment.apiUrl}/admin`;
+    private apiUrl = `${environment.server_url}/admin`;
 
     constructor(private http: HttpClient) {}
 
@@ -32,8 +32,7 @@ export class AdminService {
         return this.http.delete<void>(`${this.apiUrl}/users/${id}`);
     }
 
-    // Additional admin methods can be added here
-    getStatistics(): Observable<any> {
-        return this.http.get<any>(`${this.apiUrl}/statistics`);
-    }
+    // getStatistics(): Observable<any> {
+    //     return this.http.get<any>(`${this.apiUrl}/statistics`);
+    // }
 }
