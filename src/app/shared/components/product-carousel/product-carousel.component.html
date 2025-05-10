@@ -1,0 +1,36 @@
+<div class="container my-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="section-title">Популярные товары</h2>
+  </div>
+
+  <div class="position-relative">
+    <div class="product-carousel" #productCarousel>
+      <div class="product-card-wrapper" *ngFor="let product of products">
+        <div class="card product-card h-100" tabindex="0" role="button"
+            (click)="openProductDetails(product)"
+            (keydown.enter)="openProductDetails(product)"
+            (keydown.space)="openProductDetails(product); $event.preventDefault()">
+          <img [src]="product.image || 'assets/images/products/no-image.png'" class="card-img-top" alt="{{ product.title }}" />
+          <div class="card-body">
+            <h5 class="card-title">{{ product.title }}</h5>
+            <p class="card-text">Цена: {{ product.price }} р.</p>
+            <button class="btn btn-primary" (click)="$event.stopPropagation(); addToCart(product)">Купить</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <button class="btn btn-outline-secondary carousel-control-prev position-absolute" type="button" (click)="scrollLeft()" 
+            style="left: -20px; top: 50%; transform: translateY(-50%); z-index: 10;">
+      <!-- <i-bs class="chevron-left"></i-bs> -->
+    </button>
+    <button class="btn btn-outline-primary carousel-control-next position-absolute" type="button" (click)="scrollRight()" 
+            style="right: -20px; top: 50%; transform: translateY(-50%); z-index: 10;">
+        <!-- <i-bs class="chevron-right"></i-bs> -->
+    </button>
+  </div>
+
+  <div class="text-center mt-4">
+    <button (click)="openCatalog()" class="btn btn-outline-primary">Показать больше</button>
+  </div>
+</div>

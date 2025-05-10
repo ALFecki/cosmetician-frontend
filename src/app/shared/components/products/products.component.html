@@ -1,31 +1,48 @@
 <div class="container mt-4">
     <div class="row">
-        <div class="col-md-4" *ngFor="let product of products$ | async">
-            <div
-                class="card mb-4 product-card"
-                tabindex="0"
-                role="button"
-                (click)="this.openProductDetails(product, productModal)"
-                (keydown.enter)="this.openProductDetails(product, productModal)"
-                (keydown.space)="this.openProductDetails(product, productModal); $event.preventDefault()"
-            >
-                <img [src]="product.image || 'assets/images/products/no-image.png'" class="card-img-top" alt="{{ product.title }}" />
-                <div class="card-body">
-                    <h5 class="card-title">{{ product.title }}</h5>
-                    <p class="card-text">Цена: {{ product.price | number: '1.2-2' }} р.</p>
-                    <button class="btn btn-primary" (click)="$event.stopPropagation(); addToCart(product)">Купить</button>
+        <!-- Left Sidebar - Product Filters -->
+        <div class="col-md-3">
+            <app-product-filter 
+                [initialFilters]="filterOptions"
+                (filterChange)="onFilterChange($event)">
+            </app-product-filter>
+        </div>
+        
+        <!-- Right Content - Product Cards -->
+        <div class="col-md-9">
+            <div class="row">
+                <div class="col-md-4" *ngFor="let product of products$ | async">
+                    <div
+                        class="card mb-4 product-card"
+                        tabindex="0"
+                        role="button"
+                        (click)="this.openProductDetails(product, productModal)"
+                        (keydown.enter)="this.openProductDetails(product, productModal)"
+                        (keydown.space)="this.openProductDetails(product, productModal); $event.preventDefault()"
+                    >
+                        <img [src]="product.image || 'assets/images/products/no-image.png'" class="card-img-top" alt="{{ product.title }}" />
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.title }}</h5>
+                            <p class="card-text">Цена: {{ product.price | number: '1.2-2' }} р.</p>
+                            <button class="btn btn-primary" (click)="$event.stopPropagation(); addToCart(product)">Купить</button>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <div class="text-center my-4" *ngIf="(products$ | async)?.length === 0">
+                <p>По вашему запросу ничего не найдено</p>
+            </div>
+
+            <app-pagination
+                [totalItems]="(totalItems$ | async) ?? 0"
+                [itemsPerPage]="itemsPerPage"
+                [currentPage]="currentPage"
+                (pageChange)="onPageChange($event)"
+                (itemsPerPageChange)="onItemsPerPageChange($event)"
+            ></app-pagination>
         </div>
     </div>
-
-    <app-pagination
-        [totalItems]="(totalItems$ | async) ?? 0"
-        [itemsPerPage]="itemsPerPage"
-        [currentPage]="currentPage"
-        (pageChange)="onPageChange($event)"
-        (itemsPerPageChange)="onItemsPerPageChange($event)"
-    ></app-pagination>
 </div>
 
 <ng-template #productModal let-modal>

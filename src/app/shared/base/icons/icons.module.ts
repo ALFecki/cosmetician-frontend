@@ -1,6 +1,6 @@
 // icons.module.ts
 import { NgModule } from '@angular/core';
-import { arrowCounterclockwise, instagram, NgxBootstrapIconsModule, pencil, telegram, trash, trash2 } from 'ngx-bootstrap-icons';
+import { arrowCounterclockwise, chevronLeft, chevronRight, instagram, NgxBootstrapIconsModule, pencil, telegram, trash, trash2 } from 'ngx-bootstrap-icons';
 
 const icons = {
     pencil,
@@ -9,6 +9,8 @@ const icons = {
     instagram,
     telegram,
     arrowCounterclockwise,
+    chevronLeft,
+    chevronRight
 };
 
 @NgModule({

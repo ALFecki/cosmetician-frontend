@@ -6,15 +6,17 @@ import { Observable, of } from 'rxjs';
 import { AuthGuard } from '../../guards/auth.guard';
 import { CountryModel } from '../../models/country.model';
 import { ProductModel } from '../../models/product.model';
+import { FilterProductSchema } from '../../schemas/product.schema';
 import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
 import { PaginationComponent } from '../pagination/pagination.component';
+import { ProductFilterComponent } from '../product-filter/product-filter.component';
 
 @Component({
     selector: 'app-products',
     providers: [],
     standalone: true,
-    imports: [CommonModule, PaginationComponent],
+    imports: [CommonModule, PaginationComponent, ProductFilterComponent],
     templateUrl: './products.component.html',
     styleUrl: './products.component.scss',
 })
@@ -27,6 +29,7 @@ export class ProductsComponent implements OnInit {
     itemsPerPage = 10;
     currentPage = 1;
     totalItems$: Observable<number> = of(0);
+    filterOptions: FilterProductSchema = {};
 
     constructor(
         private route: ActivatedRoute,
@@ -38,24 +41,33 @@ export class ProductsComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        //         this.productService.getByFilterSchema({
-        //     categoryId: [this.categoryId].filter((id): id is string => typeof id === 'string'),
-        //     brandId: [this.brandId].filter((id): id is string => typeof id === 'string')
-        // }).subscribe(data => {
-        //     this.products$ = of(data.data);
-        // });
-        this.productService.getByFilterSchema({ categoryId: this.categoryId, brandId: this.brandId }).subscribe(data => {
-            this.products$ = of(data.data);
-            this.totalItems$ = of(data.length);
-        });
+        // Initialize filter options based on input props
+        if (this.categoryId) {
+            this.filterOptions.categoryId = [this.categoryId];
+        }
+        if (this.brandId) {
+            this.filterOptions.brandId = [this.brandId];
+        }
+        this.loadProducts();
     }
 
     loadProducts(): void {
         this.productService
-            .getByFilterSchema({ categoryId: this.categoryId, brandId: this.brandId, page: this.currentPage, limit: this.itemsPerPage })
+            .getAll({
+                ...this.filterOptions,
+                page: this.currentPage,
+                limit: this.itemsPerPage,
+            })
             .subscribe(data => {
                 this.products$ = of(data.data);
+                this.totalItems$ = of(data.length);
             });
+    }
+
+    onFilterChange(filterData: FilterProductSchema): void {
+        this.filterOptions = { ...filterData };
+        this.currentPage = 1; // Reset to first page when filter changes
+        this.loadProducts();
     }
 
     onPageChange(page: number): void {

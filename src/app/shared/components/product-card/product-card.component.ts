@@ -5,11 +5,12 @@ import { ProductModel } from '../../models/product.model';
 import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
 import { AuthGuard } from '../../guards/auth.guard';
+import { ProductCarouselComponent } from '../product-carousel/product-carousel.component';
 
 @Component({
     selector: 'app-product-card',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, ProductCarouselComponent],
     templateUrl: './product-card.component.html',
     styleUrl: './product-card.component.scss',
 })
@@ -18,10 +19,8 @@ export class ProductCardComponent implements OnInit {
     loading = true;
     error = '';
 
-    // Tabs
     activeTab = 'desc';
 
-    // Characteristics
     allCharacteristics: { label: string; value: string }[] = [];
     visibleCharacteristics: { label: string; value: string }[] = [];
     hiddenCharacteristics: { label: string; value: string }[] = [];
@@ -56,7 +55,6 @@ export class ProductCardComponent implements OnInit {
 
     prepareCharacteristics() {
         if (!this.product) return;
-        // Compose characteristics array
         this.allCharacteristics = [
             { label: 'Бренд', value: this.product.brand?.title || '—' },
             { label: 'Категория', value: this.product.categories?.map(category => category.title).join(', ') || '—' },
@@ -65,7 +63,6 @@ export class ProductCardComponent implements OnInit {
             { label: 'Тип продукта', value: this.product.productType || '—' },
             { label: 'Назначение', value: this.product.productScope || '—' },
             // { label: 'Артикул', value: this.product.sku || '—' },
-            // Add more as needed
         ].filter(c => c.value && c.value !== '—');
         this.visibleCharacteristics = this.allCharacteristics.slice(0, 4);
         this.hiddenCharacteristics = this.allCharacteristics.slice(4);

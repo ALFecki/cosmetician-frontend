@@ -1,0 +1,45 @@
+.product-carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  padding: 10px 0;
+  -ms-overflow-style: none;  /* Hide scrollbar in IE and Edge */
+  scrollbar-width: none;  /* Hide scrollbar in Firefox */
+  
+  &::-webkit-scrollbar {
+    display: none; /* Hide scrollbar in Chrome/Safari/Opera */
+  }
+}
+
+.product-card-wrapper {
+  flex: 0 0 auto;
+  width: 280px;
+  padding: 0 10px;
+  scroll-snap-align: start;
+}
+
+.product-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.section-title {
+  position: relative;
+  font-weight: 600;
+  
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background-color: var(--bs-primary);
+  }
+}
