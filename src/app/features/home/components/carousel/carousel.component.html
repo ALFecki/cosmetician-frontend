@@ -1,33 +1,42 @@
-<!-- eslint-disable @angular-eslint/template/elements-content -->
-<div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+<div id="carouselExample" class="carousel slide" (mouseenter)="pauseCarousel()" (mouseleave)="resumeCarousel()">
     <div class="carousel-inner">
         <div *ngFor="let slide of slides; let i = index" class="carousel-item" [class.active]="i === currentIndex">
-            <div class="image-container">
-                <img [src]="slide.image" class="d-block w-100" alt="{{ slide.title }}" />
-                <div class="overlay">
+            <ng-container *ngFor="let piece of puzzlePieces">
+                <div class="puzzle-piece">
+                    <div class="puzzle-inner">
+                        <img [src]="slide.image" alt="{{ slide.title }}" />
+                    </div>
+                </div>
+            </ng-container>
+            <div class="overlay">
+                <div class="slide-content">
                     <h2 class="slide-title">{{ slide.title }}</h2>
+                    <button class="btn btn-shop">Смотреть каталог</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="carousel-controls">
-        <button class="carousel-control carousel-control-prev" (click)="prevSlide()" tabindex="0">
-            <span class="control-icon">←</span>
-        </button>
+    <button class="carousel-control carousel-control-prev" (click)="prevSlide()" tabindex="0" aria-label="Предыдущий слайд">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+    </button>
 
-        <div class="carousel-indicators">
-            <button
-                *ngFor="let slide of slides; let i = index"
-                class="indicator"
-                [class.active]="i === currentIndex"
-                (click)="goToSlide(i)"
-                tabindex="0"
-            ></button>
-        </div>
+    <button class="carousel-control carousel-control-next" (click)="nextSlide()" tabindex="0" aria-label="Следующий слайд">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+    </button>
 
-        <button class="carousel-control carousel-control-next" (click)="nextSlide()" tabindex="0">
-            <span class="control-icon">→</span>
-        </button>
+    <div class="carousel-indicators">
+        <button
+            *ngFor="let slide of slides; let i = index"
+            class="indicator"
+            [class.active]="i === currentIndex"
+            (click)="goToSlide(i)"
+            tabindex="0"
+            [attr.aria-label]="'Перейти к слайду ' + (i + 1)"
+        ></button>
     </div>
 </div>

@@ -6,10 +6,11 @@ import { ProductCarouselComponent } from '../../shared/components/product-carous
 import { BenefitsComponent } from './components/benefits/benefits.component';
 import { CarouselComponent } from './components/carousel/carousel.component';
 import { HomeComponent } from './home.component';
+import { BrandsComponent } from './components/brands/brands.component';
 
 @NgModule({
     declarations: [HomeComponent, CarouselComponent, BenefitsComponent],
-    imports: [CommonModule, RouterModule, IconsModule, ProductCarouselComponent],
+    imports: [CommonModule, RouterModule, IconsModule, ProductCarouselComponent, BrandsComponent],
     exports: [HomeComponent, CarouselComponent, BenefitsComponent],
 })
 export class HomeModule {}

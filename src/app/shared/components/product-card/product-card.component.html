@@ -1,4 +1,4 @@
-<div class="container mt-4">
+<div class="container-fluid mt-4">
     <div *ngIf="loading" class="text-center">
         <div class="spinner-border" role="status">
             <span class="visually-hidden">Загрузка...</span>
@@ -29,22 +29,21 @@
         </ol>
     </nav>
 
-    <div *ngIf="!loading && !error && product" class="card product-main-card p-3">
-        <div class="row g-3 align-items-stretch">
-            <div class="col-md-4 d-flex align-items-center justify-content-center">
+    <div *ngIf="!loading && !error && product" class="card product-main-card p-4">
+        <div class="row g-4 align-items-stretch">
+            <div class="col-md-5 d-flex align-items-center justify-content-center">
                 <img
                     [src]="product.image || 'assets/images/products/no-image.png'"
                     [alt]="product.title"
                     class="img-fluid product-main-image"
                 />
             </div>
-            <div class="col-md-5">
-                <h2 class="card-title mb-2">{{ product.title }}</h2>
-                <!-- <div class="mb-2 text-muted">Артикул: <span>{{ product.sku || '—' }}</span></div> -->
-                <div class="mb-2 text-muted">
+            <div class="col-md-4">
+                <h2 class="card-title mb-3">{{ product.title }}</h2>
+                <div class="mb-3 text-muted">
                     Артикул: <span>{{ '—' }}</span>
                 </div>
-                <div class="mb-2 d-flex align-items-center">
+                <div class="mb-3 d-flex align-items-center">
                     <a [routerLink]="['/brand', product.brand.id]" class="brand-link d-flex align-items-center me-3">
                         <img *ngIf="product.brand.image" [src]="product.brand.image" [alt]="product.brand.title" class="brand-img me-2" />
                         <span>{{ product.brand.title }}</span>
@@ -53,14 +52,9 @@
                         <a [routerLink]="['/category', category.id]" class="category-link"> {{ category.title }}&nbsp; </a>
                     </div>
                 </div>
-                <div class="mb-2">
-                    <!-- <span class="badge" [ngClass]="product.inStock ? 'bg-success' : 'bg-danger'">
-                        {{ product.inStock ? 'В наличии' : 'Нет в наличии' }}
-                    </span> -->
-                </div>
-                <div class="characteristics-list mt-3">
+                <div class="characteristics-list mt-4">
                     <div *ngFor="let char of visibleCharacteristics">
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted">{{ char.label }}</span>
                             <span class="fw-semibold">{{ char.value }}</span>
                         </div>
@@ -70,7 +64,7 @@
                     </div>
                     <div *ngIf="showAllCharacteristics">
                         <div *ngFor="let char of hiddenCharacteristics">
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">{{ char.label }}</span>
                                 <span class="fw-semibold">{{ char.value }}</span>
                             </div>
@@ -79,18 +73,55 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 d-flex flex-column align-items-center justify-content-center right-panel">
-                <div class="price-block mb-3">
-                    <div class="h4 mb-1">{{ product.price | number: '1.2-2' }} <span class="currency">р.</span></div>
-                    <div class="text-muted small">Объем: {{ product.volume }} мл</div>
-                </div>
-                <!-- <button class="btn btn-primary w-100 mb-2" [disabled]="!product.inStock" (click)="addToCart(product)"> -->
-                <button class="btn btn-primary w-100 mb-2" (click)="addToCart(product)">
-                    <i class="bi bi-cart-plus"></i> Добавить в корзину
-                </button>
-                <div class="text-muted small mt-2">
-                    <div>Создано: {{ product.createdAt | date }}</div>
-                    <div>Обновлено: {{ product.updatedAt | date }}</div>
+            <div class="col-md-3">
+                <div class="right-panel d-flex flex-column">
+                    <div class="price-block mb-3">
+                        <div class="h3 mb-1">{{ product.price | number: '1.2-2' }} <span class="currency">р.</span></div>
+                        <div class="text-muted small">Объем: {{ product.volume }} мл</div>
+                    </div>
+                    <button class="btn btn-primary w-100 mb-3" (click)="addToCart(product)">
+                        <i class="bi bi-cart-plus"></i> Добавить в корзину
+                    </button>
+                    
+                    <div class="features mt-3">
+                        <div class="feature-item">
+                            <i class="bi bi-truck"></i>
+                            <span>Быстрая доставка</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bi bi-shield-check"></i>
+                            <span>Гарантия качества</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bi bi-arrow-repeat"></i>
+                            <span>Возврат в течение 14 дней</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bi bi-credit-card"></i>
+                            <span>Удобная оплата</span>
+                        </div>
+                    </div>
+                    
+                    <div class="consultation-box">
+                        <h5>Нужна консультация?</h5>
+                        <div class="contact-item">
+                            <i class="bi bi-telephone"></i>
+                            <span>+375 (29) 598-77-52</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="bi bi-envelope"></i>
+                            <span>{{ "info@cosmetician.ru" }}</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="bi bi-clock"></i>
+                            <span>Пн-Пт: 9:00 - 19:00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-muted small mt-auto pt-2">
+                        <div>Создано: {{ product.createdAt | date }}</div>
+                        <div>Обновлено: {{ product.updatedAt | date }}</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -129,7 +160,7 @@
                 </div>
                 <div class="tab-pane fade" [class.show]="activeTab === 'chars'" [class.active]="activeTab === 'chars'">
                     <div *ngFor="let char of allCharacteristics">
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted">{{ char.label }}</span>
                             <span class="fw-semibold">{{ char.value }}</span>
                         </div>
