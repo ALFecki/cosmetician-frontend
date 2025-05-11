@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
 import { environment } from '../../../../environment';
 import { Claims, LoginData, LoginResponse, RegistrationData } from '../models/login.interface';
+import { PersonModel } from '../models/person.model';
 
 @Injectable({
     providedIn: 'root',
@@ -12,12 +13,13 @@ export class AuthService {
     private onLogin: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     private onLogout: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     private userClaims: BehaviorSubject<Claims | null> = new BehaviorSubject<Claims | null>(null);
+    private currentUser: BehaviorSubject<PersonModel | null> = new BehaviorSubject<PersonModel | null>(null);
 
     constructor(private http: HttpClient) {}
 
-    login(loginData: LoginData): Observable<LoginResponse> {
-        return this.http.post<LoginResponse>(`${environment.server_url}/login`, loginData, { withCredentials: true }).pipe(
-            tap((response: LoginResponse) => {
+    login(loginData: LoginData): Observable<Claims> {
+        return this.http.post<Claims>(`${environment.server_url}/login`, loginData, { withCredentials: true }).pipe(
+            tap((response: Claims) => {
                 this.csrfToken.next(response.csrf_token);
                 this.onLogin.next(true);
             }),
@@ -33,7 +35,7 @@ export class AuthService {
     register(registrationData: RegistrationData): Observable<LoginResponse | null> {
         return this.http.post<LoginResponse>(`${environment.server_url}/person`, registrationData, { withCredentials: true }).pipe(
             tap((response: LoginResponse) => {
-                this.csrfToken.next(response.csrf_token);
+                this.csrfToken.next(response.claims.csrf_token);
                 this.onLogin.next(true);
             }),
             catchError((error: HttpErrorResponse) => {
@@ -59,14 +61,19 @@ export class AuthService {
         return this.http.get<LoginResponse>(`${environment.server_url}/check_auth`, { withCredentials: true }).pipe(
             tap((response: LoginResponse) => {
                 // console.log('Auth check response:', response);
-                this.csrfToken.next(response.csrf_token);
-                this.userClaims.next(response as Claims);
+                this.csrfToken.next(response.claims.csrf_token);
+                this.userClaims.next(response.claims as Claims);
+                this.currentUser.next(response.user);
             }),
             catchError(() => {
                 // console.error('Auth check error:', error);
                 return of(null);
             }),
         );
+    }
+
+    getCurrentUser(): Observable<PersonModel | null> {
+        return this.currentUser.asObservable();
     }
 
     logout(): Observable<unknown> {
@@ -99,7 +106,7 @@ export class AuthService {
         return this.checkAuth().pipe(
             map(claims => {
                 if (!claims) return false;
-                return claims.is_admin === true;
+                return claims.claims.is_admin === true;
             }),
         );
     }

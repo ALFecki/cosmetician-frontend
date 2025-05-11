@@ -1,3 +1,5 @@
+import { PersonModel } from "./person.model";
+
 export interface LoginData {
     email: string;
     password: string;
@@ -13,9 +15,8 @@ export interface RegistrationData {
 }
 
 export interface LoginResponse {
-    csrf_token: string;
-    is_admin: boolean;
-    is_moderator: boolean;
+    claims: Claims;
+    user: PersonModel;
 }
 
 export interface Claims {

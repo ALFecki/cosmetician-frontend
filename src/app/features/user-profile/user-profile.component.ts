@@ -1,0 +1,100 @@
+import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../../shared/services/auth.service';
+import { ToastService } from '../../shared/services/toast.service';
+import { PersonModel } from '../../shared/models/person.model';
+import { PersonSevice } from '../../shared/services/person.service';
+import { BehaviorSubject } from 'rxjs';
+
+@Component({
+    selector: 'app-user-profile',
+    templateUrl: './user-profile.component.html',
+    styleUrl: './user-profile.component.scss',
+    standalone: true,
+    imports: [CommonModule, ReactiveFormsModule],
+})
+export class UserProfileComponent implements OnInit {
+    profileForm!: FormGroup;
+    currentUser: BehaviorSubject<PersonModel | null> = new BehaviorSubject<PersonModel | null>(null);
+    loading = false;
+    error: string | null = null;
+    success: string | null = null;
+
+    constructor(
+        private authService: AuthService,
+        private personService: PersonSevice,
+        private fb: FormBuilder,
+        private router: Router,
+        private toastService: ToastService,
+    ) {}
+
+    ngOnInit(): void {
+        this.authService.getCurrentUser().subscribe(
+            user => {
+                this.currentUser.next(user);
+                if (!user) {
+                    this.router.navigate(['/']);
+                }
+            },
+            error => {
+                this.error = 'Не удалось загрузить информацию о пользователе: ' + (error.message || 'Неизвестная ошибка');
+                this.loading = false;
+            },
+        );
+
+        if (!this.currentUser.value) {
+            this.router.navigate(['/']);
+            return;
+        }
+
+        this.initForm();
+    }
+
+    private initForm(): void {
+        this.profileForm = this.fb.group({
+            firstName: [this.currentUser.value?.firstName, Validators.required],
+            secondName: [this.currentUser.value?.secondName, Validators.required],
+            surname: [this.currentUser.value?.surname],
+            email: [{ value: this.currentUser.value?.email, disabled: true }, [Validators.required, Validators.email]],
+            phone: [this.currentUser.value?.phone],
+        });
+    }
+
+    async onSubmit(): Promise<void> {
+        if (this.profileForm.invalid) {
+            return;
+        }
+
+        this.loading = true;
+        this.error = null;
+        this.success = null;
+
+        const updatedUser = {
+            ...this.currentUser.value,
+            ...this.profileForm.value,
+            email: this.currentUser.value?.email, // Keep original email
+        };
+
+        (await this.personService.update(this.currentUser.value!.id, updatedUser)).subscribe(
+            user => {
+                this.loading = false;
+                this.currentUser.next(user.data);
+                this.success = 'Профиль успешно обновлен';
+                this.toastService.show('Профиль успешно обновлен', 'success');
+            },
+            error => {
+                this.loading = false;
+                this.error = 'Ошибка при обновлении профиля: ' + (error.message || 'Неизвестная ошибка');
+                this.toastService.show('Ошибка при обновлении профиля', 'error');
+            },
+        );
+    }
+
+    logout(): void {
+        this.authService.logout().subscribe(() => {
+            this.router.navigate(['/']);
+        });
+    }
+}

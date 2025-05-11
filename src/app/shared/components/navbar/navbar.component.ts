@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { catchError, Observable, of, Subscription, tap } from 'rxjs';
 import { BrandModel } from '../../models/brand.model';
@@ -11,13 +11,14 @@ import { CartService } from '../../services/cart.service';
 import { CategoryService } from '../../services/category.service';
 import { CartComponent } from '../cart/cart.component';
 import { LoginComponent } from '../login/login.component';
+import { PersonModel } from '../../models/person.model';
 
 @Component({
     selector: 'app-navbar',
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.scss',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, RouterModule],
 })
 export class NavbarComponent {
     isMenuOpen = false;
@@ -25,6 +26,7 @@ export class NavbarComponent {
     brands$!: Observable<BrandModel[]>;
     authService: AuthService = inject(AuthService);
     authSubscribtion: Subscription | null = null;
+    currentUser: PersonModel | null = null;
 
     constructor(
         public router: Router,
@@ -35,6 +37,11 @@ export class NavbarComponent {
     ) {
         this.categories$ = this.categoryService.getCategoriesList();
         this.brands$ = this.brandService.getBrandsList();
+        this.authService.getCurrentUser().subscribe(user => {
+            if (user) {
+                this.currentUser = user;
+            }
+        });
     }
 
     toggleMenu() {
@@ -54,12 +61,19 @@ export class NavbarComponent {
         return this.cartService.getProductCount();
     }
 
+    getUserDisplayName(): string {
+        if (this.currentUser) {
+            return `${this.currentUser.firstName} ${this.currentUser.secondName}`;
+        }
+        return 'Гость';
+    }
+
     navigateToCart() {
         this.authSubscribtion = this.authService
             .checkAuth()
             .pipe(
-                tap(isAuth => {
-                    if (isAuth) {
+                tap(user => {
+                    if (user) {
                         this.modalService.dismissAll();
                         this.modalService.open(CartComponent, {
                             size: 'lg',

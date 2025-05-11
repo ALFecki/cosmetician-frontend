@@ -49,4 +49,20 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/admin.component').then(m => m.AdminComponent),
         canActivate: [AuthGuard, AdminGuard],
     },
+    {
+        path: 'profile',
+        loadComponent: () => import('./features/user-profile/user-profile.component').then(m => m.UserProfileComponent),
+        canActivate: [AuthGuard],
+    },
+    {
+        path: 'orders',
+        loadComponent: () => import('./features/order-history/order-history.component').then(m => m.OrderHistoryComponent),
+        canActivate: [AuthGuard],
+    },
+    {
+        path: 'order/:id',
+        loadComponent: () => import('./features/order-details/order-details.component').then(m => m.OrderDetailsComponent),
+        canActivate: [AuthGuard],
+    },
+    { path: '**', redirectTo: '' },
 ];

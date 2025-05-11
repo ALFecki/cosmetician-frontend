@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, firstValueFrom, map, Observable, of } from 'rxjs';
 import { environment } from '../../../../environment';
@@ -13,6 +14,10 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
     protected override endpoint = 'order';
     currentOrder: OrderModel | null = null;
     toastService: ToastService = inject(ToastService);
+
+    constructor(private httpClient: HttpClient) {
+        super(httpClient);
+    }
 
     getProductCount(): Observable<number> {
         if (this.currentOrder) {
@@ -126,5 +131,18 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
         this.currentOrder = order;
         this.toastService.show('Заказ успешно оформлен', 'success');
         return this.currentOrder;
+    }
+
+    getUserOrders(): Observable<OrderModel[]> {
+        return this.getAll({ personId: this.currentOrder?.personId }).pipe(
+            map(response => {
+                if (response.status) {
+                    return response.data;
+                } else {
+                    this.toastService.show('Ошибка получения заказов', 'error');
+                    return [];
+                }
+            }),
+        );
     }
 }

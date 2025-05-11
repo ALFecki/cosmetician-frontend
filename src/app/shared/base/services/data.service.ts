@@ -22,8 +22,8 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
                     if (filter[key] instanceof Date) {
                         params = params.append(String(key), filter[key].toISOString());
                     } else if (Array.isArray(filter[key])) {
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         console.log('Array filter:', filter[key]);
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const values = filter[key] as any[];
                         params = params.append(String(key), values.join(','));
                     } else {
