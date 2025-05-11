@@ -1,6 +1,6 @@
 :root {
-    --soft-pink: #FFD6E0;
-    --light-beige: #F5F0E6;
+    --soft-pink: #ffd6e0;
+    --light-beige: #f5f0e6;
 }
 
 .product-card {
@@ -15,7 +15,8 @@
     height: 100%;
     width: 100%;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
         transform: translateY(-5px);
         box-shadow: 0 5px 15px rgba(253, 204, 217, 0.3);
         border-color: var(--soft-pink);
@@ -26,7 +27,7 @@
         object-fit: contain;
         width: 100%;
     }
-    
+
     .card-body {
         display: flex;
         flex-direction: column;
@@ -49,7 +50,7 @@
         margin-bottom: 10px;
         width: 100%;
     }
-    
+
     .btn-primary {
         background-color: var(--soft-pink);
         border-color: var(--soft-pink);
@@ -57,15 +58,14 @@
         margin-top: auto; /* Push button to bottom */
         align-self: flex-start; /* Align button to the left */
         width: auto; /* Let button size to its content */
-        
+
         &:hover {
-            background-color: darken(#FFD6E0, 5%);
-            border-color: darken(#FFD6E0, 5%);
+            background-color: darken(#ffd6e0, 5%);
+            border-color: darken(#ffd6e0, 5%);
         }
     }
 }
 
-/* Ensure card columns have equal height and width */
 .row {
     display: flex;
     flex-wrap: wrap;
@@ -78,10 +78,80 @@
     max-width: 33.333333%;
 }
 
-.modal-body img {
-    max-height: 500px;
-    width: 100%;
-    object-fit: contain;
+.modal-header {
+    border-bottom: none;
+    padding: 1.5rem 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .modal-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.75rem;
+        position: relative;
+        text-align: center;
+        padding-bottom: 10px;
+
+        &:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 2px;
+            background-color: var(--secondary);
+        }
+    }
+
+    .btn-close {
+        position: absolute;
+        right: 1.5rem;
+        top: 1.5rem;
+        &:focus {
+            box-shadow: none;
+        }
+    }
+}
+
+.modal-body {
+    padding: 1.5rem;
+
+    img {
+        max-height: 500px;
+        width: 100%;
+        object-fit: contain;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    h5 {
+        color: var(--secondary);
+        margin-top: 1rem;
+        font-weight: 600;
+
+        &.text-primary {
+            color: var(--secondary) !important;
+        }
+    }
+
+    .list-unstyled {
+        margin-bottom: 1.5rem;
+
+        li {
+            margin-bottom: 0.5rem;
+
+            strong {
+                color: #555;
+            }
+        }
+    }
+
+    p {
+        color: #666;
+        line-height: 1.6;
+    }
 }
 
 .price-section {
@@ -89,4 +159,62 @@
     border-bottom: 1px solid var(--light-beige);
     padding: 1rem 0;
     margin: 1rem 0;
+
+    h3 {
+        color: var(--secondary);
+        font-weight: 600;
+        margin-bottom: 0;
+
+        &.text-primary {
+            color: var(--secondary) !important;
+        }
+    }
+}
+
+.btn-primary,
+.btn-lg {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 0.75rem 1.25rem;
+    transition: all 0.2s;
+
+    &:hover {
+        background-color: var(--tertiary);
+        border-color: var(--tertiary);
+    }
+}
+
+.btn-outline-primary {
+    border-color: var(--secondary);
+    color: var(--secondary);
+    border-radius: 8px;
+    font-weight: 500;
+
+    &:hover {
+        background-color: var(--secondary);
+        color: #fff;
+    }
+}
+
+.btn-outline-secondary {
+    border-color: #ccc;
+    color: #666;
+    border-radius: 8px;
+    font-weight: 500;
+
+    &:hover {
+        background-color: #f3f3f3;
+        color: #333;
+        border-color: #bbb;
+    }
+}
+
+// Add a slight background color to the product modal for better aesthetics
+::ng-deep .product-modal .modal-content {
+    background-color: var(--light-beige);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }

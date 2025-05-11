@@ -82,7 +82,7 @@
                     <button class="btn btn-primary w-100 mb-3" (click)="addToCart(product)">
                         <i class="bi bi-cart-plus"></i> Добавить в корзину
                     </button>
-                    
+
                     <div class="features mt-3">
                         <div class="feature-item">
                             <i class="bi bi-truck"></i>
@@ -101,7 +101,7 @@
                             <span>Удобная оплата</span>
                         </div>
                     </div>
-                    
+
                     <div class="consultation-box">
                         <h5>Нужна консультация?</h5>
                         <div class="contact-item">
@@ -110,14 +110,14 @@
                         </div>
                         <div class="contact-item">
                             <i class="bi bi-envelope"></i>
-                            <span>{{ "info@cosmetician.ru" }}</span>
+                            <span>{{ 'info@cosmetician.ru' }}</span>
                         </div>
                         <div class="contact-item">
                             <i class="bi bi-clock"></i>
                             <span>Пн-Пт: 9:00 - 19:00</span>
                         </div>
                     </div>
-                    
+
                     <div class="text-muted small mt-auto pt-2">
                         <div>Создано: {{ product.createdAt | date }}</div>
                         <div>Обновлено: {{ product.updatedAt | date }}</div>
@@ -175,4 +175,3 @@
 </div>
 
 <app-product-carousel></app-product-carousel>
-

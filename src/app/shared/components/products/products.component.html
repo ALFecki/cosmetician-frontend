@@ -2,12 +2,9 @@
     <div class="row">
         <!-- Left Sidebar - Product Filters -->
         <div class="col-md-3">
-            <app-product-filter 
-                [initialFilters]="filterOptions"
-                (filterChange)="onFilterChange($event)">
-            </app-product-filter>
+            <app-product-filter [initialFilters]="filterOptions" (filterChange)="onFilterChange($event)"> </app-product-filter>
         </div>
-        
+
         <!-- Right Content - Product Cards -->
         <div class="col-md-9">
             <div class="row">
@@ -20,7 +17,11 @@
                         (keydown.enter)="this.openProductDetails(product, productModal)"
                         (keydown.space)="this.openProductDetails(product, productModal); $event.preventDefault()"
                     >
-                        <img [src]="product.image || 'assets/images/products/no-image.png'" class="card-img-top" alt="{{ product.title }}" />
+                        <img
+                            [src]="product.image || 'assets/images/products/no-image.png'"
+                            class="card-img-top"
+                            alt="{{ product.title }}"
+                        />
                         <div class="card-body">
                             <h5 class="card-title">{{ product.title }}</h5>
                             <p class="card-text">Цена: {{ product.price | number: '1.2-2' }} р.</p>
@@ -61,7 +62,7 @@
             </div>
             <div class="col-md-6">
                 <div class="mb-3">
-                    <h5 class="text-primary">Характеристики:</h5>
+                    <h5>Характеристики:</h5>
                     <ul class="list-unstyled">
                         <li><strong>Бренд:</strong> {{ selectedProduct?.brand?.title }}</li>
                         <li><strong>Страна:</strong> {{ getCountryNames(selectedProduct) }}</li>
@@ -82,7 +83,7 @@
                 </div>
 
                 <div class="price-section mb-3">
-                    <h3 class="text-primary">{{ selectedProduct?.price | number: '1.2-2' }} р.</h3>
+                    <h3>{{ selectedProduct?.price | number: '1.2-2' }} р.</h3>
                 </div>
 
                 <div class="d-grid gap-2">

@@ -86,6 +86,8 @@ export class LoginComponent {
             size: 'lg',
             centered: true,
             scrollable: true,
+            // Add windowClass to ensure our styling applies to the modal window
+            windowClass: 'cosmetician-modal',
         });
     }
 
@@ -100,6 +102,8 @@ export class LoginComponent {
             size: 'lg',
             centered: true,
             scrollable: true,
+            // Add windowClass to ensure our styling applies to the modal window
+            windowClass: 'cosmetician-modal',
         });
     }
 

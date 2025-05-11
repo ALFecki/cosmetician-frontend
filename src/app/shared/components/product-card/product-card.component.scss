@@ -67,18 +67,18 @@
 
 .nav-tabs {
     border-bottom: none;
-    
+
     .nav-link {
         border: none;
         color: #666;
         padding-bottom: 10px;
         position: relative;
-        
+
         &.active {
             color: #333;
             background: transparent;
             font-weight: 500;
-            
+
             &:after {
                 content: '';
                 position: absolute;
@@ -89,7 +89,7 @@
                 background-color: var(--soft-pink);
             }
         }
-        
+
         &:hover:not(.active) {
             color: #333;
         }
@@ -105,7 +105,7 @@
     color: var(--soft-pink);
     text-decoration: underline;
     &:hover {
-        color: darken(#FFD6E0, 15%);
+        color: darken(#ffd6e0, 15%);
     }
 }
 
@@ -123,10 +123,10 @@
     background-color: var(--soft-pink);
     border-color: var(--soft-pink);
     color: #333;
-    
+
     &:hover {
-        background-color: darken(#FFD6E0, 5%);
-        border-color: darken(#FFD6E0, 5%);
+        background-color: darken(#ffd6e0, 5%);
+        border-color: darken(#ffd6e0, 5%);
         color: #333;
     }
 }
@@ -136,7 +136,7 @@
     align-items: center;
     margin-bottom: 10px;
     font-size: 0.9rem;
-    
+
     i {
         color: var(--soft-pink);
         margin-right: 8px;
@@ -151,15 +151,15 @@
     background-color: white;
     margin-top: 20px;
     text-align: center;
-    
+
     h5 {
         color: #333;
         margin-bottom: 10px;
     }
-    
+
     .contact-item {
         margin-bottom: 5px;
-        
+
         i {
             color: var(--soft-pink);
             margin-right: 8px;

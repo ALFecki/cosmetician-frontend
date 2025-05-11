@@ -1,0 +1,62 @@
+.profile-sidebar {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: none;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.profile-avatar {
+    color: var(--tertiary);
+    margin: 1rem 0;
+}
+
+.card-title {
+    color: var(--black);
+    font-weight: 600;
+}
+
+.card-body {
+    background-color: var(--white);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.list-group-item {
+    padding: 0.75rem 1.25rem;
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+    background-color: var(--white);
+    color: var(--black);
+}
+
+.list-group-item.active {
+    background-color: var(--light-beige);
+    color: var(--black);
+    border-left-color: var(--soft-pink);
+    font-weight: 500;
+}
+
+.list-group-item:hover:not(.active) {
+    background-color: var(--light-beige);
+    border-left-color: var(--primary);
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.text-danger:hover {
+    background-color: rgba(220, 53, 69, 0.05) !important;
+    border-left-color: #dc3545 !important;
+}
+
+.bi {
+    color: var(--tertiary);
+}
+
+.active .bi {
+    color: var(--soft-pink);
+}
+
+.text-danger .bi {
+    color: #dc3545;
+}

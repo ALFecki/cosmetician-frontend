@@ -1,5 +1,125 @@
 .error-message {
-    color: red;
+    color: #dc3545;
     font-size: 0.8em;
     margin-top: 5px;
+}
+
+.modal-content {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    border-bottom: none;
+    padding: 1.5rem 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .modal-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.75rem;
+        position: relative;
+        text-align: center;
+        padding-bottom: 10px;
+
+        &:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 2px;
+            background-color: var(--secondary); // Using store's secondary color
+        }
+    }
+
+    .btn-close {
+        position: absolute;
+        right: 1.5rem;
+        top: 1.5rem;
+        &:focus {
+            box-shadow: none;
+        }
+    }
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.login-form,
+form {
+    max-width: 400px;
+    margin: 0 auto;
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #555;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 0.75rem;
+        border: 1px solid #e0e0e0;
+        margin-bottom: 0.5rem;
+
+        &:focus {
+            box-shadow: 0 0 0 0.2rem rgba(242, 178, 178, 0.15); // Using secondary color with opacity
+            border-color: var(--secondary); // Using secondary color for border
+        }
+    }
+
+    .form-check {
+        margin-top: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-weight: 500;
+        margin-bottom: 1rem;
+        background-color: var(--secondary); // Using secondary color for button
+        border-color: var(--secondary); // Using secondary color for border
+
+        &:hover {
+            background-color: var(--tertiary); // Using tertiary color for hover
+            border-color: var(--tertiary); // Using tertiary color for border
+        }
+    }
+
+    .btn-link {
+        display: block;
+        text-align: center;
+        text-decoration: none;
+        color: var(--tertiary); // Using tertiary color for links
+
+        &:hover {
+            color: var(--secondary); // Using secondary color for hover
+            text-decoration: underline;
+        }
+    }
+}
+
+.register-links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+// Added styling for registration modal title
+.modal-header .modal-title#registerModalLabel {
+    &:after {
+        background-color: var(--secondary); // Using store's secondary color
+    }
+}
+
+// Add a slight background color to the modal for better aesthetics
+::ng-deep .cosmetician-modal .modal-content {
+    background-color: var(--light-beige);
 }

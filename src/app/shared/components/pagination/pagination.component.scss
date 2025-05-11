@@ -1,27 +1,27 @@
 .pagination-container {
-  margin: 20px 0;
-  
-  .items-per-page {
-    select {
-      min-width: 70px;
+    margin: 20px 0;
+
+    .items-per-page {
+        select {
+            min-width: 70px;
+        }
     }
-  }
-  
-  .pagination {
-    margin-bottom: 0;
-  }
-  
-  .pagination-info {
-    color: #6c757d;
-    font-size: 0.875rem;
-  }
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 10px;
-    
+
+    .pagination {
+        margin-bottom: 0;
+    }
+
     .pagination-info {
-      order: -1;
+        color: #6c757d;
+        font-size: 0.875rem;
     }
-  }
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 10px;
+
+        .pagination-info {
+            order: -1;
+        }
+    }
 }

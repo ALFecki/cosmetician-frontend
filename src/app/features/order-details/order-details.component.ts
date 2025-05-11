@@ -1,20 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { ProfileSidebarComponent } from '../../shared/components/profile-sidebar/profile-sidebar.component';
 import { OrderModel } from '../../shared/models/order.model';
+import { PersonModel } from '../../shared/models/person.model';
 import { AuthService } from '../../shared/services/auth.service';
 import { OrderService } from '../../shared/services/order.service';
 import { ToastService } from '../../shared/services/toast.service';
-import { PersonModel } from '../../shared/models/person.model';
-import { BehaviorSubject } from 'rxjs';
 
 @Component({
     selector: 'app-order-details',
     templateUrl: './order-details.component.html',
     styleUrl: './order-details.component.scss',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, ProfileSidebarComponent],
 })
 export class OrderDetailsComponent implements OnInit {
     order: BehaviorSubject<OrderModel | null> = new BehaviorSubject<OrderModel | null>(null);
@@ -129,7 +130,7 @@ export class OrderDetailsComponent implements OnInit {
     //     const status = this.order.status.toLowerCase();
     //     return status !== 'completed' && status !== 'cancelled' && status !== 'shipped';
     // }
-        
+
     logout(): void {
         this.authService.logout().subscribe(() => {
             this.router.navigate(['/']);

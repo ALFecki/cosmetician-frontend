@@ -2,18 +2,19 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../shared/services/auth.service';
-import { ToastService } from '../../shared/services/toast.service';
-import { PersonModel } from '../../shared/models/person.model';
-import { PersonSevice } from '../../shared/services/person.service';
 import { BehaviorSubject } from 'rxjs';
+import { ProfileSidebarComponent } from '../../shared/components/profile-sidebar/profile-sidebar.component';
+import { PersonModel } from '../../shared/models/person.model';
+import { AuthService } from '../../shared/services/auth.service';
+import { PersonSevice } from '../../shared/services/person.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
     selector: 'app-user-profile',
     templateUrl: './user-profile.component.html',
     styleUrl: './user-profile.component.scss',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, ProfileSidebarComponent],
 })
 export class UserProfileComponent implements OnInit {
     profileForm!: FormGroup;

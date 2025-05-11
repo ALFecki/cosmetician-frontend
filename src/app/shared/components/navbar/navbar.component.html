@@ -24,11 +24,16 @@
                     <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Категории
                     </a>
-                    <div class="dropdown-menu">
+                    <div class="dropdown-menu animate__animated animate__fadeIn">
                         <ul class="dropdown-grid">
-                            <div *ngFor="let category of categories$ | async">
+                            <div *ngFor="let category of categories$ | async; let i = index" class="dropdown-item-container">
                                 <li>
-                                    <a class="dropdown-item" href="/category/{{ category.id }}">{{ category.title }}</a>
+                                    <a
+                                        class="dropdown-item animate__animated animate__fadeInRight"
+                                        [style.animation-delay]="i * 50 + 'ms'"
+                                        href="/category/{{ category.id }}"
+                                        >{{ category.title }}</a
+                                    >
                                 </li>
                             </div>
                         </ul>
@@ -38,11 +43,16 @@
                     <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Бренды
                     </a>
-                    <div class="dropdown-menu">
+                    <div class="dropdown-menu animate__animated animate__fadeIn">
                         <ul class="dropdown-grid">
-                            <div *ngFor="let brand of brands$ | async">
+                            <div *ngFor="let brand of brands$ | async; let i = index" class="dropdown-item-container">
                                 <li>
-                                    <a class="dropdown-item" href="/brand/{{ brand.id }}">{{ brand.title }}</a>
+                                    <a
+                                        class="dropdown-item animate__animated animate__fadeInRight"
+                                        [style.animation-delay]="i * 50 + 'ms'"
+                                        href="/brand/{{ brand.id }}"
+                                        >{{ brand.title }}</a
+                                    >
                                 </li>
                             </div>
                         </ul>
@@ -71,37 +81,39 @@
                 </button>
             </div>
 
-            <!-- User Account Dropdown -->
             <div class="dropdown user-dropdown me-2">
-                <button 
-                    class="btn btn-outline-primary dropdown-toggle" 
-                    type="button" 
-                    id="userDropdown" 
-                    data-bs-toggle="dropdown" 
+                <button
+                    class="btn btn-circle user-icon-btn"
+                    type="button"
+                    id="userDropdown"
+                    data-bs-toggle="dropdown"
                     aria-expanded="false"
                 >
-                    <i class="bi bi-person-circle me-1"></i>
-                    <span *ngIf="authService.isLoggedIn()">{{ getUserDisplayName() }}</span>
-                    <span *ngIf="!authService.isLoggedIn()">Личный кабинет</span>
+                    <i class="fa fa-user"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                <ul class="dropdown-menu dropdown-menu-end user-menu" aria-labelledby="userDropdown">
+                    <li *ngIf="authService.isLoggedIn()" class="user-header">
+                        <div class="user-info">
+                            <i class="fa fa-user-circle user-avatar"></i>
+                            <span class="user-name">{{ getUserDisplayName() }}</span>
+                        </div>
+                    </li>
+                    <li *ngIf="authService.isLoggedIn()">
+                        <hr class="dropdown-divider" />
+                    </li>
                     <li *ngIf="!authService.isLoggedIn()">
                         <a class="dropdown-item" href="#" (click)="$event.preventDefault(); openLoginModal()">
                             <i class="bi bi-box-arrow-in-right me-2"></i>Войти
                         </a>
                     </li>
                     <li *ngIf="authService.isLoggedIn()">
-                        <a class="dropdown-item" routerLink="/profile">
-                            <i class="bi bi-person me-2"></i>Личный кабинет
-                        </a>
+                        <a class="dropdown-item" routerLink="/profile"> <i class="bi bi-person me-2"></i>Личный кабинет </a>
                     </li>
                     <li *ngIf="authService.isLoggedIn()">
-                        <a class="dropdown-item" routerLink="/orders">
-                            <i class="bi bi-list-ul me-2"></i>История заказов
-                        </a>
+                        <a class="dropdown-item" routerLink="/orders"> <i class="bi bi-list-ul me-2"></i>История заказов </a>
                     </li>
                     <li *ngIf="authService.isLoggedIn()">
-                        <hr class="dropdown-divider">
+                        <hr class="dropdown-divider" />
                     </li>
                     <li *ngIf="authService.isLoggedIn()">
                         <a class="dropdown-item text-danger" href="#" (click)="$event.preventDefault(); logout()">

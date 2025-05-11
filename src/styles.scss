@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,600;1,600&display=swap');
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap/dist/css/bootstrap.min.css';
-
+@import 'animate.css';
 
 :root {
     --primary: #f8d3d3;
@@ -13,8 +13,8 @@
     --creamy: #f9e6c1;
     --white: #ffffff;
     --black: #000000;
-    --soft-pink: #FFD6E0;
-    --light-beige: #F5F0E6;
+    --soft-pink: #ffd6e0;
+    --light-beige: #f5f0e6;
 }
 
 $bs-font-sans-serif: 'Montserrat', sans-serif;
@@ -113,4 +113,48 @@ h6 {
     color: #dc3545;
     font-size: 0.875rem;
     margin-top: 0.25rem;
+}
+
+.dropdown-menu.animate__animated {
+    animation-duration: 0.3s;
+}
+
+.dropdown-item.animate__animated {
+    animation-duration: 0.4s;
+}
+
+.dropdown-item-container {
+    overflow: hidden;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translate3d(20px, 0, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+.animate__animated {
+    animation-fill-mode: both;
+}
+
+.animate__fadeIn {
+    animation-name: fadeIn;
+}
+
+.animate__fadeInRight {
+    animation-name: fadeInRight;
 }

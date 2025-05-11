@@ -87,6 +87,7 @@ export class ProductsComponent implements OnInit {
             size: 'lg',
             centered: true,
             scrollable: true,
+            windowClass: 'product-modal', // Add this class for custom styling
         });
     }
 

@@ -2,17 +2,18 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { AuthService } from '../../shared/services/auth.service';
-import { OrderService } from '../../shared/services/order.service';
+import { ProfileSidebarComponent } from '../../shared/components/profile-sidebar/profile-sidebar.component';
 import { OrderModel } from '../../shared/models/order.model';
 import { PersonModel } from '../../shared/models/person.model';
+import { AuthService } from '../../shared/services/auth.service';
+import { OrderService } from '../../shared/services/order.service';
 
 @Component({
     selector: 'app-order-history',
     templateUrl: './order-history.component.html',
     styleUrl: './order-history.component.scss',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, ProfileSidebarComponent],
 })
 export class OrderHistoryComponent implements OnInit {
     orders$!: Observable<OrderModel[]>;
