@@ -9,7 +9,20 @@ import {
     telegram,
     trash,
     trash2,
-    checkCircleFill
+    checkCircleFill,
+    grid,
+    houseDoor,
+    tags,
+    award,
+    truck,
+    gear,
+    bagHeart,
+    person,
+    listUl,
+    heart,
+    boxArrowInRight,
+    xLg,
+    arrowLeft,
 } from 'ngx-bootstrap-icons';
 
 const icons = {
@@ -21,7 +34,20 @@ const icons = {
     arrowCounterclockwise,
     chevronLeft,
     chevronRight,
-    checkCircleFill
+    checkCircleFill,
+    grid,
+    houseDoor,
+    tags,
+    award,
+    truck,
+    gear,
+    bagHeart,
+    person,
+    listUl,
+    heart,
+    boxArrowInRight,
+    xLg,
+    arrowLeft,
 };
 
 @NgModule({

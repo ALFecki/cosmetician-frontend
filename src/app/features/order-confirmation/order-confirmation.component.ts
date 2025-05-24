@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { BehaviorSubject} from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { OrderProductModel } from '../../shared/models/order.model';
 import { AuthService } from '../../shared/services/auth.service';
 import { OrderService } from '../../shared/services/order.service';
@@ -52,10 +52,8 @@ export class OrderConfirmationComponent implements OnInit {
         if (currentOrder) {
             this.cartItems$.next(currentOrder.products);
             this.totalPrice$.next(Number(currentOrder.totalPrice.toFixed(2)));
-
         }
     }
-        
 
     ngOnInit(): void {
         if (!this.authService.isLoggedIn()) {

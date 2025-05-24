@@ -158,3 +158,23 @@ h6 {
 .animate__fadeInRight {
     animation-name: fadeInRight;
 }
+
+// Cart Modal Styles
+.cart-modal-window {
+    .modal-content {
+        border-radius: 20px;
+        border: 2px solid var(--soft-pink);
+        overflow: hidden;
+    }
+
+    .modal-dialog {
+        max-width: 600px;
+    }
+}
+
+@media (max-width: 768px) {
+    .cart-modal-window .modal-dialog {
+        max-width: 95%;
+        margin: 1rem auto;
+    }
+}

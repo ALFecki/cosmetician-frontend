@@ -165,6 +165,10 @@ export class CartService implements OnDestroy {
         this.addToPendingUpdates(cartItem);
     }
 
+    async updateQuantity(productId: string, quantity: number): Promise<void> {
+        throw new Error('Method not implemented.');
+    }
+
     async removeProduct(cartItem: CartModel): Promise<void> {
         const order = await this.orderService.removeProduct(cartItem.product.id);
         if (order) {

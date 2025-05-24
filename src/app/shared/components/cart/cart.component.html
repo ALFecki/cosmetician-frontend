@@ -1,59 +1,116 @@
-<div class="container mt-4">
-    <h2 class="mb-4">Корзина</h2>
+<div class="cart-container">
+    <div class="container">
+        <div class="cart-header">
+            <h2>
+                <i class="bi bi-bag-heart me-2"></i>
+                Корзина
+            </h2>
+            <p class="cart-subtitle">Управляйте товарами в вашей корзине</p>
+        </div>
 
-    <ng-container *ngIf="cartItems$ | async as cartItems">
-        <div *ngIf="cartItems.length === 0" class="alert alert-info">Корзина пуста</div>
+        <ng-container *ngIf="cartItems$ | async as cartItems">
+            <!-- Empty Cart State -->
+            <div *ngIf="cartItems.length === 0" class="empty-cart-section">
+                <i class="bi bi-bag-x empty-cart-icon"></i>
+                <h3>Ваша корзина пуста</h3>
+                <p>Добавьте товары в корзину, чтобы оформить заказ</p>
+                <a routerLink="/products" class="btn btn-primary">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Перейти к покупкам
+                </a>
+            </div>
 
-        <div *ngIf="cartItems.length > 0" class="card">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Товар</th>
-                                <th>Цена</th>
-                                <th>Количество</th>
-                                <th>Сумма</th>
-                                <th>Действия</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let item of cartItems">
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <img
-                                            [src]="item.product.image"
-                                            [alt]="item.product.title"
-                                            class="me-3"
-                                            style="width: 50px; height: 50px; object-fit: cover"
-                                        />
-                                        <span>{{ item.product.title }}</span>
-                                    </div>
-                                </td>
-                                <td>{{ item.product.price | currency: 'BYN' : 'symbol-narrow' }}</td>
-                                <td>
-                                    <div class="input-group" style="width: 130px">
-                                        <button class="btn btn-outline-secondary" type="button" (click)="decreaseQuantity(item)">-</button>
-                                        <input type="number" class="form-control text-center" [(ngModel)]="item.quantity" />
-                                        <button class="btn btn-outline-secondary" type="button" (click)="increaseQuantity(item)">+</button>
-                                    </div>
-                                </td>
-                                <td>{{ item.product.price * item.quantity | currency: 'BYN' : 'symbol-narrow' }}</td>
-                                <td>
-                                    <button class="btn btn-danger btn-sm" (click)="removeProduct(item)">Удалить</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <!-- Cart with Items -->
+            <div *ngIf="cartItems.length > 0" class="row">
+                <div class="col-lg-8 mb-4">
+                    <div class="cart-content">
+                        <div class="cart-items-section">
+                            <h3 class="section-title">
+                                <i class="bi bi-list-ul"></i>
+                                Товары в корзине ({{ cartItems.length }})
+                            </h3>
+
+                            <div class="cart-item" *ngFor="let item of cartItems">
+                                <img
+                                    [src]="item.product.image || 'assets/images/products/no-image.png'"
+                                    [alt]="item.product.title"
+                                    class="item-image"
+                                />
+
+                                <div class="item-details">
+                                    <a [routerLink]="['/product', item.product.id]" class="item-title">
+                                        {{ item.product.title }}
+                                    </a>
+                                    <div class="item-volume">{{ item.product.volume || '-' }} мл</div>
+                                    <div class="item-price">{{ item.product.price | number: '1.2-2' }} р. за шт.</div>
+                                </div>
+
+                                <div class="quantity-controls">
+                                    <button
+                                        class="quantity-btn"
+                                        type="button"
+                                        (click)="decreaseQuantity(item)"
+                                        [disabled]="item.quantity <= 1"
+                                    >
+                                        -
+                                    </button>
+                                    <input
+                                        type="number"
+                                        class="quantity-input"
+                                        [(ngModel)]="item.quantity"
+                                        (change)="decreaseQuantity(item)"
+                                        min="1"
+                                        max="99"
+                                    />
+                                    <button class="quantity-btn" type="button" (click)="increaseQuantity(item)">+</button>
+                                </div>
+
+                                <div class="item-total">{{ item.product.price * item.quantity | number: '1.2-2' }} р.</div>
+
+                                <button class="remove-btn" type="button" (click)="removeProduct(item)" title="Удалить товар">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="d-flex justify-content-end">
-                    <div class="text-end">
-                        <h5>Итого: {{ this.totalPrice$ | async }}</h5>
-                        <button class="btn btn-primary mt-2" (click)="goToOrderConfirmation()">Оформить заказ</button>
+                <div class="col-lg-4">
+                    <div class="cart-content">
+                        <div class="cart-summary">
+                            <h3 class="summary-title">
+                                <i class="bi bi-calculator"></i>
+                                Итого
+                            </h3>
+
+                            <div class="summary-row">
+                                <span class="summary-label">Товары ({{ getCartItemsCount() | async }}):</span>
+                                <span class="summary-value">{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
+                            </div>
+
+                            <div class="summary-row">
+                                <span class="summary-label">Доставка:</span>
+                                <span class="summary-value">Рассчитается при оформлении</span>
+                            </div>
+
+                            <div class="summary-row">
+                                <span class="summary-label">К оплате:</span>
+                                <span class="summary-value total-value">{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
+                            </div>
+
+                            <button class="btn checkout-btn" (click)="goToOrderConfirmation()">
+                                <i class="bi bi-credit-card"></i>
+                                Оформить заказ
+                            </button>
+
+                            <a routerLink="/products" class="continue-shopping">
+                                <i class="bi bi-arrow-left"></i>
+                                Продолжить покупки
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </ng-container>
+        </ng-container>
+    </div>
 </div>

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component} from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { CartModel } from '../../models/cart.model';
 import { AuthService } from '../../services/auth.service';
@@ -12,12 +12,11 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 @Component({
     selector: 'app-cart',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, RouterModule],
     templateUrl: './cart.component.html',
     styleUrl: './cart.component.scss',
 })
-export class CartComponent{
-
+export class CartComponent {
     cartItems$: Observable<CartModel[]> = new Observable<CartModel[]>();
     totalPrice$: Observable<number> = of(0);
 
@@ -42,6 +41,10 @@ export class CartComponent{
 
     removeProduct(cartItem: CartModel): void {
         this.cartService.removeProduct(cartItem);
+    }
+
+    getCartItemsCount(): Observable<number> {
+        return this.cartService.getProductCount();
     }
 
     async checkout(): Promise<void> {

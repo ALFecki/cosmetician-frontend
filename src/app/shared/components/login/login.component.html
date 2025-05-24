@@ -212,24 +212,30 @@
         <form [formGroup]="verificationForm" (ngSubmit)="verifyEmail()">
             <div class="mb-4">
                 <label for="verificationCode" class="form-label">Код подтверждения</label>
-                <input 
-                    type="text" 
-                    class="form-control" 
-                    id="verificationCode" 
+                <input
+                    type="text"
+                    class="form-control"
+                    id="verificationCode"
                     formControlName="code"
                     placeholder="Введите код подтверждения"
                     autocomplete="off"
                 />
-                <div class="error-message" *ngIf="verificationForm.get('code')?.invalid && (verificationForm.get('code')?.dirty || verificationForm.get('code')?.touched)">
+                <div
+                    class="error-message"
+                    *ngIf="
+                        verificationForm.get('code')?.invalid &&
+                        (verificationForm.get('code')?.dirty || verificationForm.get('code')?.touched)
+                    "
+                >
                     <div *ngIf="verificationForm.get('code')?.errors?.['required']">Код подтверждения обязателен.</div>
-                    <div *ngIf="verificationForm.get('code')?.errors?.['minlength']">Код подтверждения должен содержать минимум 4 символа.</div>
+                    <div *ngIf="verificationForm.get('code')?.errors?.['minlength']">
+                        Код подтверждения должен содержать минимум 4 символа.
+                    </div>
                 </div>
             </div>
 
             <div class="d-flex justify-content-between align-items-center">
-                <button type="button" class="btn btn-link" (click)="resendVerificationCode()">
-                    Отправить код повторно
-                </button>
+                <button type="button" class="btn btn-link" (click)="resendVerificationCode()">Отправить код повторно</button>
                 <button type="submit" class="btn btn-primary" [disabled]="isVerifying">
                     <span *ngIf="isVerifying" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                     {{ isVerifying ? 'Проверка...' : 'Подтвердить' }}

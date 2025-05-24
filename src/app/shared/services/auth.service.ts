@@ -115,31 +115,29 @@ export class AuthService {
      * Verify email with confirmation code
      */
     verifyEmail(email: string, code: string): Observable<any> {
-        return this.http.post<any>(`${environment.server_url}/verify-email`, { email, code })
-            .pipe(
-                tap(response => {
-                    console.log('Email verification successful:', response);
-                }),
-                catchError(error => {
-                    console.error('Email verification failed:', error);
-                    return throwError(() => error);
-                })
-            );
+        return this.http.post<any>(`${environment.server_url}/verify-email`, { email, code }).pipe(
+            tap(response => {
+                console.log('Email verification successful:', response);
+            }),
+            catchError(error => {
+                console.error('Email verification failed:', error);
+                return throwError(() => error);
+            }),
+        );
     }
 
     /**
      * Resend verification code
      */
     resendVerificationCode(email: string): Observable<any> {
-        return this.http.post<any>(`${environment.server_url}/resend-verification`, { email })
-            .pipe(
-                tap(response => {
-                    console.log('Verification code resent successfully');
-                }),
-                catchError(error => {
-                    console.error('Failed to resend verification code:', error);
-                    return throwError(() => error);
-                })
-            );
+        return this.http.post<any>(`${environment.server_url}/resend-verification`, { email }).pipe(
+            tap(response => {
+                console.log('Verification code resent successfully');
+            }),
+            catchError(error => {
+                console.error('Failed to resend verification code:', error);
+                return throwError(() => error);
+            }),
+        );
     }
 }

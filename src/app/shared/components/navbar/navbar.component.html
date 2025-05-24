@@ -15,13 +15,20 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="/">Главная</a>
+                    <a class="nav-link active" aria-current="page" href="/">
+                        <i-bs name="house-door"></i-bs>
+                        Главная
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="/products">Каталог</a>
+                    <a class="nav-link active" href="/products">
+                        <i-bs name="grid"></i-bs>
+                        Каталог
+                    </a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i-bs name="tags"></i-bs>
                         Категории
                     </a>
                     <div class="dropdown-menu animate__animated animate__fadeIn">
@@ -32,8 +39,10 @@
                                         class="dropdown-item animate__animated animate__fadeInRight"
                                         [style.animation-delay]="i * 50 + 'ms'"
                                         href="/category/{{ category.id }}"
-                                        >{{ category.title }}</a
                                     >
+                                        <i class="bi bi-dot me-2" style="color: var(--secondary); font-size: 1.2rem"></i>
+                                        {{ category.title }}
+                                    </a>
                                 </li>
                             </div>
                         </ul>
@@ -41,6 +50,7 @@
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i-bs name="award"></i-bs>
                         Бренды
                     </a>
                     <div class="dropdown-menu animate__animated animate__fadeIn">
@@ -51,28 +61,40 @@
                                         class="dropdown-item animate__animated animate__fadeInRight"
                                         [style.animation-delay]="i * 50 + 'ms'"
                                         href="/brand/{{ brand.id }}"
-                                        >{{ brand.title }}</a
                                     >
+                                        <img
+                                            [src]="brand.image || 'assets/images/products/no-image.png'"
+                                            [alt]="brand.title"
+                                            class="brand-logo-small"
+                                            onerror="this.src='assets/images/products/no-image.png'"
+                                        />
+                                        {{ brand.title }}
+                                    </a>
                                 </li>
                             </div>
                         </ul>
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" aria-disabled="true">Доставка и оплата</a>
+                    <a class="nav-link active" aria-disabled="true">
+                        <i-bs name="truck"></i-bs>
+                        Доставка и оплата
+                    </a>
                 </li>
-                <!-- Admin Panel Link (visible only for admins) -->
                 <li class="nav-item" *ngIf="authService.isAdmin()">
-                    <a class="nav-link active" href="/admin">Админ панель</a>
+                    <a class="nav-link active" href="/admin">
+                        <i-bs name="gear"></i-bs>
+                        Админ панель
+                    </a>
                 </li>
             </ul>
 
             <div class="cart-button">
-                <button class="btn btn-outline-light position-relative me-2" (click)="navigateToCart()">
-                    <img src="assets/icons/cart.png" alt="Корзина" class="cart-icon" style="width: 20px; height: 20px; margin-right: 5px" />
-                    <i class="bi bi-cart3"></i>
+                <button class="btn position-relative me-3" (click)="navigateToCart()">
+                    <i-bs name="bag-heart"></i-bs>
+                    Корзина
                     <span
-                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill"
                         *ngIf="(getProductCount() | async) ?? 0 > 0"
                     >
                         {{ getProductCount() | async }}
@@ -81,14 +103,8 @@
                 </button>
             </div>
 
-            <div class="dropdown user-dropdown me-2">
-                <button
-                    class="btn btn-circle user-icon-btn"
-                    type="button"
-                    id="userDropdown"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                >
+            <div class="dropdown user-dropdown">
+                <button class="btn user-icon-btn" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-user"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end user-menu" aria-labelledby="userDropdown">
@@ -107,10 +123,13 @@
                         </a>
                     </li>
                     <li *ngIf="authService.isLoggedIn()">
-                        <a class="dropdown-item" routerLink="/profile"> <i class="bi bi-person me-2"></i>Личный кабинет </a>
+                        <a class="dropdown-item" routerLink="/profile"> <i-bs name="person"></i-bs>Личный кабинет </a>
                     </li>
                     <li *ngIf="authService.isLoggedIn()">
-                        <a class="dropdown-item" routerLink="/orders"> <i class="bi bi-list-ul me-2"></i>История заказов </a>
+                        <a class="dropdown-item" routerLink="/orders"> <i-bs name="list-ul"></i-bs>История заказов </a>
+                    </li>
+                    <li *ngIf="authService.isLoggedIn()">
+                        <a class="dropdown-item" routerLink="/favorites"> <i-bs name="heart"></i-bs>Избранное </a>
                     </li>
                     <li *ngIf="authService.isLoggedIn()">
                         <hr class="dropdown-divider" />

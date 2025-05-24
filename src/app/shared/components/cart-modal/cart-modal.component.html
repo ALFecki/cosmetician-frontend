@@ -1,0 +1,91 @@
+<div class="modal-cart-container">
+    <div class="modal-header">
+        <h4 class="modal-title">
+            Корзина
+            <span class="cart-count" *ngIf="((getTotalItemsCount() | async) || 0) > 0">{{ getTotalItemsCount() | async }}</span>
+        </h4>
+        <button type="button" class="btn-close" (click)="activeModal.dismiss()">
+            <i-bs name="x-lg"></i-bs>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <ng-container *ngIf="cartItems$ | async as cartItems">
+            <div *ngIf="cartItems.length === 0" class="empty-cart-modal">
+                <h4>Корзина пуста</h4>
+                <p>Добавьте товары для оформления заказа</p>
+                <button class="btn btn-primary" (click)="continueShopping()">
+                    <i-bs name="arrow-left"></i-bs>
+                    К покупкам
+                </button>
+            </div>
+
+            <div *ngIf="cartItems.length > 0" class="cart-items-container">
+                <div class="cart-item-modal" *ngFor="let item of cartItems; trackBy: trackByProductId">
+                    <img
+                        [src]="item.product.image || 'assets/images/products/no-image.png'"
+                        [alt]="item.product.title"
+                        class="item-image-modal"
+                    />
+
+                    <div class="item-details-modal">
+                        <a [routerLink]="['/product', item.product.id]" class="item-title-modal" (click)="activeModal.close()">
+                            {{ item.product.title }}
+                        </a>
+                        <div class="item-volume-modal">{{ item.product.volume || '-' }} мл</div>
+                        <div class="item-price-modal">{{ item.product.price | number: '1.2-2' }} р.</div>
+                    </div>
+
+                    <div class="quantity-controls-modal">
+                        <button class="quantity-btn-modal" type="button" (click)="decreaseQuantity(item)" [disabled]="item.quantity <= 1">
+                            -
+                        </button>
+                        <input
+                            type="number"
+                            class="quantity-input-modal"
+                            [(ngModel)]="item.quantity"
+                            (change)="updateQuantity(item, $event)"
+                            min="1"
+                            max="99"
+                        />
+                        <button class="quantity-btn-modal" type="button" (click)="increaseQuantity(item)">+</button>
+                    </div>
+
+                    <div class="item-total-modal">{{ item.product.price * item.quantity | number: '1.2-2' }} р.</div>
+
+                    <button class="remove-btn-modal" type="button" (click)="removeProduct(item)" title="Удалить">
+                        <i-bs name="trash"></i-bs>
+                    </button>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+
+    <div class="modal-footer" *ngIf="(cartItems$ | async)!.length > 0">
+        <div class="cart-summary-modal">
+            <div class="summary-row-modal">
+                <span class="summary-label-modal">Товары:</span>
+                <span class="summary-value-modal">{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
+            </div>
+            <div class="summary-row-modal total-row">
+                <span class="summary-label-modal">Итого:</span>
+                <span class="summary-value-modal">{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn btn-outline-secondary" (click)="continueShopping()">
+                <i class="bi bi-arrow-left me-1"></i>
+                Продолжить
+            </button>
+            <button class="btn btn-secondary" (click)="goToCart()">
+                <i class="bi bi-bag me-1"></i>
+                В корзину
+            </button>
+            <button class="btn btn-primary" (click)="goToOrderConfirmation()">
+                <i class="bi bi-credit-card me-1"></i>
+                Заказать
+            </button>
+        </div>
+    </div>
+</div>

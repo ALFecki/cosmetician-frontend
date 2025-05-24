@@ -1,27 +1,29 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, HostListener, inject, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { catchError, Observable, of, Subscription, tap } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
+import { IconsModule } from '../../base/icons/icons.module';
 import { BrandModel } from '../../models/brand.model';
 import { CategoryModel } from '../../models/category.model';
+import { PersonModel } from '../../models/person.model';
 import { AuthService } from '../../services/auth.service';
 import { BrandService } from '../../services/brand.service';
 import { CartService } from '../../services/cart.service';
 import { CategoryService } from '../../services/category.service';
-import { CartComponent } from '../cart/cart.component';
+import { CartModalComponent } from '../cart-modal/cart-modal.component';
 import { LoginComponent } from '../login/login.component';
-import { PersonModel } from '../../models/person.model';
 
 @Component({
     selector: 'app-navbar',
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.scss',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, IconsModule],
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnDestroy, OnInit {
     isMenuOpen = false;
+    isScrolled = false;
     categories$!: Observable<CategoryModel[]>;
     brands$!: Observable<BrandModel[]>;
     authService: AuthService = inject(AuthService);
@@ -42,6 +44,23 @@ export class NavbarComponent {
                 this.currentUser = user;
             }
         });
+    }
+
+    ngOnInit() {
+        this.authSubscribtion = this.authService.getCurrentUser().subscribe(user => {
+            this.currentUser = user;
+        });
+    }
+
+    ngOnDestroy() {
+        if (this.authSubscribtion) {
+            this.authSubscribtion.unsubscribe();
+        }
+    }
+
+    @HostListener('window:scroll', ['$event'])
+    onWindowScroll() {
+        this.isScrolled = window.scrollY > 50;
     }
 
     toggleMenu() {
@@ -68,28 +87,13 @@ export class NavbarComponent {
         return 'Гость';
     }
 
-    navigateToCart() {
-        this.authSubscribtion = this.authService
-            .checkAuth()
-            .pipe(
-                tap(user => {
-                    if (user) {
-                        this.modalService.dismissAll();
-                        this.modalService.open(CartComponent, {
-                            size: 'lg',
-                            centered: true,
-                            scrollable: true,
-                        });
-                    } else {
-                        this.openLoginModal();
-                    }
-                }),
-                catchError(() => {
-                    this.openLoginModal();
-                    return of(false);
-                }),
-            )
-            .subscribe();
+    navigateToCart(): void {
+        this.modalService.open(CartModalComponent, {
+            size: 'lg',
+            centered: true,
+            backdrop: 'static',
+            windowClass: 'cart-modal-window',
+        });
     }
 
     async logout() {

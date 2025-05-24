@@ -1,0 +1,77 @@
+import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { CartModel } from '../../models/cart.model';
+import { CartService } from '../../services/cart.service';
+import { IconsModule } from '../../base/icons/icons.module';
+
+@Component({
+    selector: 'app-cart-modal',
+    templateUrl: './cart-modal.component.html',
+    styleUrls: ['./cart-modal.component.scss'],
+    standalone: true,
+    imports: [CommonModule, RouterModule, NgbModalModule, FormsModule, IconsModule],
+})
+export class CartModalComponent implements OnInit {
+    cartItems$: Observable<CartModel[]> = new Observable<CartModel[]>();
+    totalPrice$: Observable<number> = new Observable<number>();
+
+    constructor(
+        private cartService: CartService,
+        private router: Router,
+        public activeModal: NgbActiveModal,
+    ) {}
+
+    ngOnInit(): void {
+        this.cartItems$ = this.cartService.getCartItems();
+        this.totalPrice$ = this.cartService.getTotalPrice();
+    }
+
+    increaseQuantity(item: CartModel): void {
+        this.cartService.increaseQuantity(item);
+    }
+
+    decreaseQuantity(item: CartModel): void {
+        if (item.quantity > 1) {
+            this.cartService.decreaseQuantity(item);
+        }
+    }
+
+    updateQuantity(item: CartModel, event: any): void {
+        const quantity = parseInt(event.target.value);
+        if (quantity > 0) {
+            this.cartService.updateQuantity(item.product.id, quantity);
+        }
+    }
+
+    removeProduct(item: CartModel): void {
+        this.cartService.removeProduct(item);
+    }
+
+    getTotalItemsCount(): Observable<number> {
+        return this.cartService.getProductCount();
+    }
+
+    goToCart(): void {
+        this.activeModal.close();
+        this.router.navigate(['/cart']);
+    }
+
+    goToOrderConfirmation(): void {
+        this.activeModal.close();
+        this.router.navigate(['/order-confirmation']);
+    }
+
+    continueShopping(): void {
+        this.activeModal.close();
+        this.router.navigate(['/products']);
+    }
+
+    trackByProductId(index: number, item: CartModel): string {
+        return item.product.id;
+    }
+}
