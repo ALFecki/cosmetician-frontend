@@ -8,6 +8,7 @@ import { PersonModel } from '../../shared/models/person.model';
 import { AuthService } from '../../shared/services/auth.service';
 import { PersonSevice } from '../../shared/services/person.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { UpdatePersonSchema } from '../../shared/schemas/person.schema';
 
 @Component({
     selector: 'app-user-profile',
@@ -72,8 +73,13 @@ export class UserProfileComponent implements OnInit {
         this.error = null;
         this.success = null;
 
-        const updatedUser = {
-            ...this.currentUser.value,
+        // const updatedUser = {
+        //     ...this.currentUser.value,
+        //     ...this.profileForm.value,
+        //     email: this.currentUser.value?.email, // Keep original email
+        // };
+
+        const updatedUser: UpdatePersonSchema = {
             ...this.profileForm.value,
             email: this.currentUser.value?.email, // Keep original email
         };

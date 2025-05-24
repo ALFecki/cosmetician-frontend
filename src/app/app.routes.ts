@@ -64,5 +64,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/order-details/order-details.component').then(m => m.OrderDetailsComponent),
         canActivate: [AuthGuard],
     },
+    {
+        path: 'order-confirmation',
+        loadComponent: () => import('./features/order-confirmation/order-confirmation.component').then(m => m.OrderConfirmationComponent),
+        canActivate: [AuthGuard],
+    },
     { path: '**', redirectTo: '' },
 ];

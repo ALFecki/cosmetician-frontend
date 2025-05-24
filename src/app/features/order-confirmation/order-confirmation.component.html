@@ -1,0 +1,273 @@
+<div class="container my-5">
+    <div *ngIf="loading" class="text-center my-5">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+
+    <div *ngIf="!loading" class="order-confirmation-page">
+        <div class="page-header mb-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h1 class="page-title">
+                        <!-- <i-bs name="check-circle-fill" class="text-success me-3"></i-bs> -->
+                        Подтверждение заказа
+                    </h1>
+                    <p class="page-subtitle">Проверьте данные и подтвердите заказ</p>
+                </div>
+                <button class="btn btn-outline-secondary" (click)="goBackToCart()">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Вернуться в корзину
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4 order-lg-2 mb-4">
+                <div class="order-summary-sticky">
+                    <div class="order-summary-card">
+                        <h4 class="summary-title">
+                            <i class="bi bi-bag-check me-2"></i>
+                            Ваш заказ
+                        </h4>
+                        
+                        <div class="order-items" *ngIf="cartItems$ | async as cartItems">
+                            <div class="order-item" *ngFor="let item of cartItems">
+                                <img 
+                                    [src]="item.product.image || 'assets/images/products/no-image.png'" 
+                                    [alt]="item.product.title"
+                                    class="item-image"
+                                />
+                                <div class="item-details">
+                                     <a type="button" class="item-title" [routerLink]="['/product', item.product.id]">
+                                        {{ item.product.title }}
+                                    </a>
+                                    
+
+                                    <div class="item-quantity">{{ item.quantity }} шт. × {{ item.product.price | number: '1.2-2' }} р.</div>
+                                </div>
+                                <div class="item-total">{{ item.product.price * item.quantity | number: '1.2-2' }} р.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="order-totals">
+                            <div class="total-row">
+                                <span>Сумма товаров:</span>
+                                <span>{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
+                            </div>
+                            <div class="total-row">
+                                <span>Доставка:</span>
+                                <span>{{ getDeliveryPrice() | number: '1.2-2' }} р.</span>
+                            </div>
+                            <div class="total-row final-total">
+                                <span>К оплате:</span>
+                                <span>{{ getTotalWithDelivery() | number: '1.2-2' }} р.</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8 order-lg-1">
+                <form [formGroup]="confirmationForm" (ngSubmit)="confirmOrder()">
+                    <div class="form-section mb-4">
+                        <h3 class="section-title">
+                            <i class="bi bi-person me-2"></i>
+                            Личные данные
+                        </h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName" class="form-label">Имя *</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="firstName"
+                                    formControlName="firstName"
+                                    [class.is-invalid]="getFieldError('firstName')"
+                                />
+                                <div class="invalid-feedback" *ngIf="getFieldError('firstName')">
+                                    {{ getFieldError('firstName') }}
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName" class="form-label">Фамилия *</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="lastName"
+                                    formControlName="lastName"
+                                    [class.is-invalid]="getFieldError('lastName')"
+                                />
+                                <div class="invalid-feedback" *ngIf="getFieldError('lastName')">
+                                    {{ getFieldError('lastName') }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email *</label>
+                                <input 
+                                    type="email" 
+                                    class="form-control" 
+                                    id="email"
+                                    formControlName="email"
+                                    [class.is-invalid]="getFieldError('email')"
+                                />
+                                <div class="invalid-feedback" *ngIf="getFieldError('email')">
+                                    {{ getFieldError('email') }}
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Телефон *</label>
+                                <input 
+                                    type="tel" 
+                                    class="form-control" 
+                                    id="phone"
+                                    formControlName="phone"
+                                    placeholder="+375 (29) 999-99-99"
+                                    [class.is-invalid]="getFieldError('phone')"
+                                />
+                                <div class="invalid-feedback" *ngIf="getFieldError('phone')">
+                                    {{ getFieldError('phone') }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section mb-4">
+                        <h3 class="section-title">
+                            <i class="bi bi-truck me-2"></i>
+                            Доставка
+                        </h3>
+                        
+                        <div class="delivery-methods mb-3">
+                            <label class="form-check delivery-option" for="standard">
+                                <input class="form-check-input" type="radio" value="standard" id="standard" formControlName="deliveryMethod">
+                                <div class="option-content">
+                                    <div class="option-title">Стандартная доставка</div>
+                                    <div class="option-description">3-5 рабочих дней • 5 р.</div>
+                                </div>
+                            </label>
+                            <label class="form-check delivery-option" for="express">
+                                <input class="form-check-input" type="radio" value="express" id="express" formControlName="deliveryMethod">
+                                <div class="option-content">
+                                    <div class="option-title">Экспресс доставка</div>
+                                    <div class="option-description">1-2 рабочих дня • 15 р.</div>
+                                </div>
+                            </label>
+                            <label class="form-check delivery-option" for="pickup">
+                                <input class="form-check-input" type="radio" value="pickup" id="pickup" formControlName="deliveryMethod">
+                                <div class="option-content">
+                                    <div class="option-title">Самовывоз</div>
+                                    <div class="option-description">Бесплатно</div>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div *ngIf="confirmationForm.get('deliveryMethod')?.value !== 'pickup'">
+                            <div class="mb-3">
+                                <label for="address" class="form-label">Адрес доставки *</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="address"
+                                    formControlName="address"
+                                    placeholder="Улица, дом, квартира"
+                                    [class.is-invalid]="getFieldError('address')"
+                                />
+                                <div class="invalid-feedback" *ngIf="getFieldError('address')">
+                                    {{ getFieldError('address') }}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-8 mb-3">
+                                    <label for="city" class="form-label">Город *</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        id="city"
+                                        formControlName="city"
+                                        [class.is-invalid]="getFieldError('city')"
+                                    />
+                                    <div class="invalid-feedback" *ngIf="getFieldError('city')">
+                                        {{ getFieldError('city') }}
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="postalCode" class="form-label">Индекс *</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        id="postalCode"
+                                        formControlName="postalCode"
+                                        placeholder="220000"
+                                        [class.is-invalid]="getFieldError('postalCode')"
+                                    />
+                                    <div class="invalid-feedback" *ngIf="getFieldError('postalCode')">
+                                        {{ getFieldError('postalCode') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section mb-4">
+                        <h3 class="section-title">
+                            <i class="bi bi-credit-card me-2"></i>
+                            Способ оплаты
+                        </h3>
+                        
+                        <div class="payment-methods">
+                            <div class="form-check payment-option">
+                                <input class="form-check-input" type="radio" value="card" id="card" formControlName="paymentMethod">
+                                <label class="form-check-label" for="card">
+                                    <i class="bi bi-credit-card me-2"></i>
+                                    Банковская карта
+                                </label>
+                            </div>
+                            <div class="form-check payment-option">
+                                <input class="form-check-input" type="radio" value="cash" id="cash" formControlName="paymentMethod">
+                                <label class="form-check-label" for="cash">
+                                    <i class="bi bi-cash me-2"></i>
+                                    Наличные при получении
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comments -->
+                    <div class="form-section mb-4">
+                        <h3 class="section-title">
+                            <i class="bi bi-chat-text me-2"></i>
+                            Дополнительно
+                        </h3>
+                        <label for="comments" class="form-label">Комментарий к заказу</label>
+                        <textarea 
+                            class="form-control" 
+                            id="comments"
+                            formControlName="comments"
+                            rows="3"
+                            placeholder="Дополнительные пожелания к заказу..."
+                        ></textarea>
+                    </div>
+                </form>
+
+                
+                        <button 
+                            type="button" 
+                            class="btn btn-primary btn-lg w-100 mt-3" 
+                            (click)="confirmOrder()"
+                            [disabled]="isSubmitting || confirmationForm.invalid"
+                        >
+                            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            <i class="bi bi-check-lg me-2" *ngIf="!isSubmitting"></i>
+                            {{ isSubmitting ? 'Оформляем заказ...' : 'Подтвердить заказ' }}
+                        </button>
+            </div>
+        </div>
+    </div>
+</div>

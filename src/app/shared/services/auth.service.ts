@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { environment } from '../../../../environment';
 import { Claims, LoginData, LoginResponse, RegistrationData } from '../models/login.interface';
 import { PersonModel } from '../models/person.model';
@@ -33,7 +33,7 @@ export class AuthService {
     }
 
     register(registrationData: RegistrationData): Observable<LoginResponse | null> {
-        return this.http.post<LoginResponse>(`${environment.server_url}/person`, registrationData, { withCredentials: true }).pipe(
+        return this.http.post<LoginResponse>(`${environment.server_url}/register`, registrationData, { withCredentials: true }).pipe(
             tap((response: LoginResponse) => {
                 this.csrfToken.next(response.claims.csrf_token);
                 this.onLogin.next(true);
@@ -109,5 +109,37 @@ export class AuthService {
                 return claims.claims.is_admin === true;
             }),
         );
+    }
+
+    /**
+     * Verify email with confirmation code
+     */
+    verifyEmail(email: string, code: string): Observable<any> {
+        return this.http.post<any>(`${environment.server_url}/verify-email`, { email, code })
+            .pipe(
+                tap(response => {
+                    console.log('Email verification successful:', response);
+                }),
+                catchError(error => {
+                    console.error('Email verification failed:', error);
+                    return throwError(() => error);
+                })
+            );
+    }
+
+    /**
+     * Resend verification code
+     */
+    resendVerificationCode(email: string): Observable<any> {
+        return this.http.post<any>(`${environment.server_url}/resend-verification`, { email })
+            .pipe(
+                tap(response => {
+                    console.log('Verification code resent successfully');
+                }),
+                catchError(error => {
+                    console.error('Failed to resend verification code:', error);
+                    return throwError(() => error);
+                })
+            );
     }
 }

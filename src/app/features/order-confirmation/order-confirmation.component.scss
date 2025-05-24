@@ -1,0 +1,336 @@
+.order-confirmation-page {
+    min-height: 80vh;
+}
+
+.page-header {
+    border-bottom: 3px solid #ffd6e0;
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    color: #333;
+    font-weight: 700;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    
+    i {
+        color: #28a745;
+    }
+}
+
+.page-subtitle {
+    color: #6c757d;
+    font-size: 1.125rem;
+    margin-bottom: 0;
+}
+
+.order-summary-sticky {
+    position: sticky;
+    top: 2rem;
+}
+
+.order-summary-card {
+    background: linear-gradient(135deg, #fff5f7 0%, #ffffff 100%);
+    border: 2px solid #ffd6e0;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(233, 30, 99, 0.1);
+}
+
+.summary-title {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #ffd6e0;
+    
+    i {
+        color: #e91e63;
+    }
+}
+
+.order-items {
+    margin-bottom: 1.5rem;
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f0f0f0;
+    
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.item-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-right: 1rem;
+    border: 2px solid #ffd6e0;
+}
+
+.item-details {
+    flex: 1;
+}
+
+.item-title {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+}
+
+.item-quantity {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.item-total {
+    font-weight: 700;
+    color: #e91e63;
+    font-size: 1rem;
+}
+
+.order-totals {
+    border-top: 2px solid #f0f0f0;
+    padding-top: 1.5rem;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    
+    &.final-total {
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: #e91e63;
+        border-top: 2px solid #ffd6e0;
+        padding-top: 1rem;
+        margin-top: 1rem;
+    }
+}
+
+.form-section {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    border: 2px solid #f0f0f0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    
+    &:hover {
+        border-color: #ffd6e0;
+        box-shadow: 0 8px 32px rgba(233, 30, 99, 0.1);
+    }
+}
+
+.section-title {
+    color: #333;
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #ffd6e0;
+    
+    i {
+        color: #e91e63;
+    }
+}
+
+.form-control {
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    
+    &:focus {
+        border-color: #ffd6e0;
+        box-shadow: 0 0 0 0.2rem rgba(255, 214, 224, 0.25);
+    }
+    
+    &.is-invalid {
+        border-color: #dc3545;
+        
+        &:focus {
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+    }
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.delivery-option, .payment-option {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    overflow: hidden;
+    
+    .form-check-input {
+        margin-top: 0.25rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
+        position: relative;
+        margin-left: 0;
+    }
+    
+    &:hover {
+        border-color: #ffd6e0;
+        background: #fff5f7;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(233, 30, 99, 0.1);
+    }
+    
+    .form-check-input:checked ~ .option-content,
+    .form-check-input:checked ~ .form-check-label {
+        color: #e91e63;
+    }
+    
+    .form-check-input:checked {
+        background-color: #e91e63;
+        border-color: #e91e63;
+    }
+    
+    &:has(.form-check-input:checked) {
+        border-color: #e91e63;
+        background: #fff5f7;
+        box-shadow: 0 4px 16px rgba(233, 30, 99, 0.15);
+    }
+}
+
+.option-content {
+    width: 100%;
+    flex: 1;
+}
+
+.option-title {
+    font-weight: 600;
+    color: #333;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.option-description {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.payment-option {
+    .form-check-label {
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+        font-size: 1.1rem;
+        width: 100%;
+        flex: 1;
+        margin-bottom: 0;
+    }
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #e91e63 0%, #f06292 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    
+    &:hover:not(:disabled) {
+        background: linear-gradient(135deg, #c2185b 0%, #e91e63 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(233, 30, 99, 0.3);
+    }
+    
+    &:disabled {
+        background: #6c757d;
+        transform: none;
+        box-shadow: none;
+    }
+}
+
+.btn-outline-secondary {
+    border: 2px solid #6c757d;
+    color: #6c757d;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    
+    &:hover {
+        background: #6c757d;
+        color: white;
+        transform: translateY(-1px);
+    }
+}
+
+.invalid-feedback {
+    font-size: 0.875rem;
+    color: #dc3545;
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+@media (max-width: 992px) {
+    .order-summary-sticky {
+        position: relative;
+        top: auto;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .form-section {
+        padding: 1.5rem;
+    }
+    
+    .order-summary-card {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        .d-flex {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 1rem;
+        }
+    }
+    
+    .page-title {
+        font-size: 1.75rem;
+    }
+    
+    .form-section {
+        padding: 1rem;
+    }
+    
+    .order-summary-card {
+        padding: 1rem;
+    }
+    
+    .delivery-option, .payment-option {
+        padding: 1rem;
+    }
+}

@@ -48,7 +48,7 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
             }>(`${environment.server_url}/${this.endpoint}/person/last_non_checked`, { withCredentials: true })
             .pipe(
                 map(order => {
-                    if (order.status) {
+                    if (order.status && order.data) {
                         this.currentOrder = order.data;
                         return this.currentOrder;
                     } else {
@@ -125,12 +125,23 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
     }
 
     async checkout(): Promise<OrderModel | null> {
-        const order = await firstValueFrom(
-            this.http.get<OrderModel>(`${environment.server_url}/${this.endpoint}/person/checkout`, { withCredentials: true }),
-        );
-        this.currentOrder = order;
-        this.toastService.show('Заказ успешно оформлен', 'success');
-        return this.currentOrder;
+        try {
+            const order = await firstValueFrom(
+                this.http.get<OrderModel>(`${environment.server_url}/${this.endpoint}/person/checkout`, {
+                    withCredentials: true,
+                }),
+            );
+
+            if (order) {
+                this.currentOrder = null; // Clear current order after checkout
+                this.toastService.show('Заказ успешно оформлен', 'success');
+                return order;
+            }
+            return null;
+        } catch (error) {
+            this.toastService.show('Ошибка при оформлении заказа', 'error');
+            throw error;
+        }
     }
 
     getUserOrders(): Observable<OrderModel[]> {
