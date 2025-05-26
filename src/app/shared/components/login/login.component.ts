@@ -35,21 +35,12 @@ export class LoginComponent {
         confirmPassword: new FormControl('', [Validators.required]),
     });
 
-    // Verification code form control
-    verificationForm: FormGroup = new FormGroup({
-        code: new FormControl('', [Validators.required, Validators.minLength(4), Validators.maxLength(6)]),
-    });
-
     @ViewChild('registerModal') registerModal!: TemplateRef<unknown>;
-    @ViewChild('verificationModal') verificationModal!: TemplateRef<unknown>;
 
     registrationError: string | null = null;
     loginError: string | null = null;
-    verificationError: string | null = null;
     isLoggingIn = false;
     isRegistering = false;
-    isVerifying = false;
-    registeredEmail: string = '';
 
     constructor(
         private authService: AuthService,
@@ -193,93 +184,17 @@ export class LoginComponent {
             .subscribe({
                 next: response => {
                     console.log('Registration successful:', response);
-                    this.toastService.show('На ваш email отправлен код подтверждения', 'success');
-                    this.isRegistering = false;
-                    this.registeredEmail = registrationData.email;
-                    this.closeRegisterModal();
-                    // Open verification modal
-                    this.openVerificationModal(this.verificationModal);
+                    this.toastService.show('Регистрация успешно завершена!', 'success');
+                    // this.closeRegisterModal();
+
+                    // Optional: Automatically log in after registration
+                    // this.email.setValue(registrationData.email);
+                    // this.password.setValue(registrationData.password);
+                    // this.login();
                 },
                 complete: () => {
                     this.isRegistering = false;
                 },
             });
-    }
-
-    openVerificationModal(content: unknown) {
-        this.verificationForm.reset();
-        this.verificationError = null;
-        this.modalService.open(content, {
-            size: 'md',
-            centered: true,
-            scrollable: true,
-            windowClass: 'cosmetician-modal',
-        });
-    }
-
-    closeVerificationModal() {
-        this.modalService.dismissAll();
-    }
-
-    verifyEmail() {
-        if (this.verificationForm.invalid) {
-            this.verificationForm.markAllAsTouched();
-            return;
-        }
-
-        if (this.isVerifying) return;
-
-        this.verificationError = null;
-        this.isVerifying = true;
-
-        const code = this.verificationForm.get('code')?.value;
-
-        this.authService.verifyEmail(this.registeredEmail, code).subscribe({
-            next: response => {
-                console.log('Verification successful:', response);
-                this.toastService.show('Регистрация успешно завершена!', 'success');
-                this.closeVerificationModal();
-                
-                // Optional: Automatically log in after verification
-                this.email.setValue(this.registeredEmail);
-                // You may want to navigate to login page instead of auto-login
-                // this.router.navigate(['/login']);
-            },
-            error: error => {
-                console.error('Verification failed:', error);
-                
-                if (error.status === 400) {
-                    this.verificationError = 'Неверный код подтверждения';
-                } else if (error.status === 404) {
-                    this.verificationError = 'Код подтверждения не найден или истек срок действия';
-                } else if (error.status === 0) {
-                    this.verificationError = 'Не удалось подключиться к серверу';
-                } else {
-                    this.verificationError = `Ошибка верификации: ${error.message || 'Неизвестная ошибка'}`;
-                }
-                
-                this.isVerifying = false;
-            },
-            complete: () => {
-                this.isVerifying = false;
-            }
-        });
-    }
-
-    resendVerificationCode() {
-        if (!this.registeredEmail) {
-            this.verificationError = 'Email не найден';
-            return;
-        }
-
-        this.authService.resendVerificationCode(this.registeredEmail).subscribe({
-            next: () => {
-                this.toastService.show('Новый код подтверждения отправлен на ваш email', 'success');
-            },
-            error: error => {
-                console.error('Failed to resend code:', error);
-                this.verificationError = 'Не удалось отправить код подтверждения';
-            }
-        });
     }
 }
