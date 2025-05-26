@@ -16,7 +16,6 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
     getAll(filter: FilterSchema | null = null): Observable<ListResponse<Model>> {
         let params = new HttpParams();
         if (filter) {
-            console.log('Filter:', filter);
             (Object.keys(filter) as (keyof FilterSchema)[]).forEach(key => {
                 if (filter[key] !== null && filter[key] !== undefined && filter[key] !== '') {
                     if (filter[key] instanceof Date) {

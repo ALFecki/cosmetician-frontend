@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { IconsModule } from '../../shared/base/icons/icons.module';
 import { OrderProductModel } from '../../shared/models/order.model';
+import { PersonModel } from '../../shared/models/person.model';
 import { AuthService } from '../../shared/services/auth.service';
 import { OrderService } from '../../shared/services/order.service';
 import { ToastService } from '../../shared/services/toast.service';
-import { IconsModule } from '../../shared/base/icons/icons.module';
 
 @Component({
     selector: 'app-order-confirmation',
@@ -17,31 +18,51 @@ import { IconsModule } from '../../shared/base/icons/icons.module';
     imports: [CommonModule, ReactiveFormsModule, RouterModule, IconsModule],
 })
 export class OrderConfirmationComponent implements OnInit {
-    private fb = inject(FormBuilder);
-    private orderService = inject(OrderService);
-    private authService = inject(AuthService);
-    private toastService = inject(ToastService);
-    private router = inject(Router);
-
     confirmationForm: FormGroup;
     isSubmitting = false;
-    currentUser$ = this.authService.getCurrentUser();
+    currentUser$: Observable<PersonModel | null> = new Observable<PersonModel | null>();
     cartItems$: BehaviorSubject<OrderProductModel[]> = new BehaviorSubject<OrderProductModel[]>([]);
     totalPrice$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
     loading = true;
 
-    constructor() {
-        this.confirmationForm = this.fb.group({
+    constructor(
+        private formBuilder: FormBuilder,
+        private orderService: OrderService,
+        private authService: AuthService,
+        private toastService: ToastService,
+        private router: Router,
+    ) {
+        this.currentUser$ = this.authService.getCurrentUser();
+
+        this.confirmationForm = this.formBuilder.group({
             firstName: ['', [Validators.required, Validators.minLength(2)]],
             lastName: ['', [Validators.required, Validators.minLength(2)]],
             email: ['', [Validators.required, Validators.email]],
-            phone: ['', [Validators.required, Validators.pattern(/^\+?[1-9]\d{1,14}$/)]],
-            address: ['', [Validators.required, Validators.minLength(10)]],
-            city: ['', [Validators.required, Validators.minLength(2)]],
-            postalCode: ['', [Validators.required, Validators.pattern(/^\d{5,6}$/)]],
-            deliveryMethod: ['standard', Validators.required],
+            phone: ['', [Validators.required, Validators.pattern(/^\+?[0-9]\d{1,14}$/)]],
+            address: [''],
+            city: [''],
+            postalCode: [''],
+            deliveryMethod: ['pickup', Validators.required],
             paymentMethod: ['card', Validators.required],
             comments: [''],
+        });
+
+        this.confirmationForm.get('deliveryMethod')?.valueChanges.subscribe(value => {
+            if (value === 'express' || value === 'standard') {
+                this.confirmationForm.get('address')?.setValidators([Validators.required, Validators.minLength(10)]);
+                this.confirmationForm.get('city')?.setValidators([Validators.required, Validators.minLength(2)]);
+                this.confirmationForm.get('postalCode')?.setValidators([Validators.required, Validators.pattern(/^\d{5,6}$/)]);
+            } else {
+                this.confirmationForm.get('address')?.clearValidators();
+                this.confirmationForm.get('address')?.setValue('');
+                this.confirmationForm.get('city')?.clearValidators();
+                this.confirmationForm.get('city')?.setValue('');
+                this.confirmationForm.get('postalCode')?.clearValidators();
+                this.confirmationForm.get('postalCode')?.setValue('');
+            }
+            this.confirmationForm.get('address')?.updateValueAndValidity();
+            this.confirmationForm.get('city')?.updateValueAndValidity();
+            this.confirmationForm.get('postalCode')?.updateValueAndValidity();
         });
 
         this.loadCartItems();

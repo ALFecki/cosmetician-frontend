@@ -22,40 +22,41 @@
 
             <div *ngIf="cartItems.length > 0" class="cart-items-container">
                 <div class="cart-item-modal" *ngFor="let item of cartItems; trackBy: trackByProductId">
-                    <img
-                        [src]="item.product.image || 'assets/images/products/no-image.png'"
-                        [alt]="item.product.title"
-                        class="item-image-modal"
-                    />
-
-                    <div class="item-details-modal">
-                        <a [routerLink]="['/product', item.product.id]" class="item-title-modal" (click)="activeModal.close()">
-                            {{ item.product.title }}
-                        </a>
-                        <div class="item-volume-modal">{{ item.product.volume || '-' }} мл</div>
-                        <div class="item-price-modal">{{ item.product.price | number: '1.2-2' }} р.</div>
-                    </div>
-
-                    <div class="quantity-controls-modal">
-                        <button class="quantity-btn-modal" type="button" (click)="decreaseQuantity(item)" [disabled]="item.quantity <= 1">
-                            -
-                        </button>
-                        <input
-                            type="number"
-                            class="quantity-input-modal"
-                            [(ngModel)]="item.quantity"
-                            (change)="updateQuantity(item, $event)"
-                            min="1"
-                            max="99"
+                    <div class="item-info-row">
+                        <img
+                            [src]="item.product.image || 'assets/images/products/no-image.png'"
+                            [alt]="item.product.title"
+                            class="item-image-modal"
                         />
-                        <button class="quantity-btn-modal" type="button" (click)="increaseQuantity(item)">+</button>
+                        <div class="item-details-modal">
+                            <a [routerLink]="['/product', item.product.id]" class="item-title-modal" (click)="activeModal.close()">
+                                {{ item.product.title }}
+                            </a>
+                            <div class="item-volume-modal">{{ item.product.volume || '-' }} мл</div>
+                            <div class="item-price-modal">{{ item.product.price | number: '1.2-2' }} р.</div>
+                        </div>
+                        <button class="remove-btn-modal" type="button" (click)="removeProduct(item)" title="Удалить">
+                            <i-bs name="trash"></i-bs>
+                        </button>
                     </div>
 
-                    <div class="item-total-modal">{{ item.product.price * item.quantity | number: '1.2-2' }} р.</div>
-
-                    <button class="remove-btn-modal" type="button" (click)="removeProduct(item)" title="Удалить">
-                        <i-bs name="trash"></i-bs>
-                    </button>
+                    <div class="item-controls-row">
+                        <div class="quantity-controls-modal">
+                            <button class="quantity-btn-modal" type="button" (click)="decreaseQuantity(item)" [disabled]="item.quantity <= 1">
+                                -
+                            </button>
+                            <input
+                                type="number"
+                                class="quantity-input-modal"
+                                [(ngModel)]="item.quantity"
+                                (change)="updateQuantity(item, $event)"
+                                min="1"
+                                max="99"
+                            />
+                            <button class="quantity-btn-modal" type="button" (click)="increaseQuantity(item)">+</button>
+                        </div>
+                        <div class="item-total-modal">{{ item.product.price * item.quantity | number: '1.2-2' }} р.</div>
+                    </div>
                 </div>
             </div>
         </ng-container>
@@ -64,26 +65,32 @@
     <div class="modal-footer" *ngIf="(cartItems$ | async)!.length > 0">
         <div class="cart-summary-modal">
             <div class="summary-row-modal">
-                <span class="summary-label-modal">Товары:</span>
+                <span class="summary-label-modal">Товары: </span>
                 <span class="summary-value-modal">{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
             </div>
+                                        <div class="summary-row-modal">
+                                <span class="summary-label-modal">Доставка:</span>
+                                <span class="summary-value-modal">Рассчитается при оформлении</span>
+                            </div>
             <div class="summary-row-modal total-row">
-                <span class="summary-label-modal">Итого:</span>
-                <span class="summary-value-modal">{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
+                <span class="summary-label-modal">Итого: </span>
+                <span class="summary-value-modal total-price">{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
             </div>
         </div>
 
         <div class="modal-actions">
-            <button class="btn btn-outline-secondary" (click)="continueShopping()">
-                <i class="bi bi-arrow-left me-1"></i>
-                Продолжить
-            </button>
-            <button class="btn btn-secondary" (click)="goToCart()">
-                <i class="bi bi-bag me-1"></i>
-                В корзину
-            </button>
-            <button class="btn btn-primary" (click)="goToOrderConfirmation()">
-                <i class="bi bi-credit-card me-1"></i>
+            <div class="action-row">
+                <button class="btn btn-outline-secondary" (click)="continueShopping()">
+                    <i class="bi bi-arrow-left"></i>
+                    <span class="btn-text">Продолжить</span>
+                </button>
+                <button class="btn btn-secondary" (click)="goToCart()">
+                    <i class="bi bi-bag"></i>
+                    <span class="btn-text">В корзину</span>
+                </button>
+            </div>
+            <button class="btn btn-primary checkout-btn" (click)="goToOrderConfirmation()">
+                <i class="bi bi-credit-card"></i>
                 Заказать
             </button>
         </div>

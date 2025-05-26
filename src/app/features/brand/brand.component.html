@@ -1,13 +1,64 @@
-<div *ngIf="brand | async as brandData" class="container mt-4">
-    <header class="brand-header text-center mb-4">
-        <img *ngIf="brandData.image" [src]="brandData.image" alt="{{ brandData.title }}" class="img-fluid rounded" />
-        <h1 class="display-4">{{ brandData.title }}</h1>
-        <p class="lead">{{ brandData.description }}</p>
-    </header>
+<div class="container mt-4">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+            <p class="mt-3 text-muted">Загружаем информацию о бренде...</p>
+        </div>
+    </div>
 
-    <div class="row">
-        <div class="col">
-            <app-products [brandId]="this.brandId"></app-products>
+    <!-- Error State -->
+    <div *ngIf="error" class="error-container">
+        <div class="text-center">
+            <i class="bi bi-exclamation-triangle error-icon"></i>
+            <h3>Ошибка загрузки</h3>
+            <p class="text-muted">{{ error }}</p>
+            <button class="btn btn-primary" (click)="loadBrand()">
+                <i class="bi bi-arrow-clockwise me-2"></i>
+                Попробовать снова
+            </button>
+        </div>
+    </div>
+
+    <!-- Brand Content -->
+    <div *ngIf="!loading && !error && (brand$ | async) as brandData">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a routerLink="/">Главная</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a routerLink="/products">Каталог</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    {{ brandData.title }}
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Brand Header -->
+        <header class="brand-header text-center">
+            <img 
+                *ngIf="brandData.image" 
+                [src]="brandData.image" 
+                [alt]="brandData.title" 
+                class="brand-image"
+                onerror="this.style.display='none'"
+            />
+            <h1 class="brand-title">{{ brandData.title }}</h1>
+            <p class="brand-description" *ngIf="brandData.description">
+                {{ brandData.description }}
+            </p>
+        </header>
+
+        <!-- Products Section -->
+        <div class="row">
+            <div class="col">
+                <app-products [brandId]="brandId"></app-products>
+            </div>
         </div>
     </div>
 </div>

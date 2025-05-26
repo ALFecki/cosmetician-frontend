@@ -20,10 +20,11 @@ export class BrandsComponent implements OnInit {
 
     ngOnInit(): void {
         this.loading = true;
-        this.brandService.getAll().subscribe({
-            next: response => {
+        // Use the cached brands list method
+        this.brandService.getBrandsList().subscribe({
+            next: brands => {
                 // Get just the first 4 brands to display
-                this.brands = response.data.slice(0, 4);
+                this.brands = brands.slice(0, 4);
                 this.loading = false;
             },
             error: error => {

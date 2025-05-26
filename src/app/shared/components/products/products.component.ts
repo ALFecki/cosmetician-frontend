@@ -26,6 +26,7 @@ export class ProductsComponent implements OnInit {
     @Input() brandId: string | undefined;
     selectedProduct: ProductModel | null = null;
 
+    activeTab = 'description';
     itemsPerPage = 10;
     currentPage = 1;
     totalItems$: Observable<number> = of(0);
@@ -48,6 +49,12 @@ export class ProductsComponent implements OnInit {
         if (this.brandId) {
             this.filterOptions.brandId = [this.brandId];
         }
+        this.loadProducts();
+    }
+
+    resetFilters(): void {
+        this.filterOptions = {};
+        this.currentPage = 1;
         this.loadProducts();
     }
 

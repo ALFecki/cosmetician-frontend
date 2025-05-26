@@ -8,11 +8,12 @@ import { AuthService } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
 import { ToastService } from '../../services/toast.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { IconsModule } from '../../base/icons/icons.module';
 
 @Component({
     selector: 'app-cart',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule],
+    imports: [CommonModule, FormsModule, RouterModule, IconsModule],
     templateUrl: './cart.component.html',
     styleUrl: './cart.component.scss',
 })

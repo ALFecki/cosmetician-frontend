@@ -239,7 +239,7 @@ export class LoginComponent {
                 console.log('Verification successful:', response);
                 this.toastService.show('Регистрация успешно завершена!', 'success');
                 this.closeVerificationModal();
-
+                
                 // Optional: Automatically log in after verification
                 this.email.setValue(this.registeredEmail);
                 // You may want to navigate to login page instead of auto-login
@@ -247,7 +247,7 @@ export class LoginComponent {
             },
             error: error => {
                 console.error('Verification failed:', error);
-
+                
                 if (error.status === 400) {
                     this.verificationError = 'Неверный код подтверждения';
                 } else if (error.status === 404) {
@@ -257,12 +257,12 @@ export class LoginComponent {
                 } else {
                     this.verificationError = `Ошибка верификации: ${error.message || 'Неизвестная ошибка'}`;
                 }
-
+                
                 this.isVerifying = false;
             },
             complete: () => {
                 this.isVerifying = false;
-            },
+            }
         });
     }
 
@@ -279,7 +279,7 @@ export class LoginComponent {
             error: error => {
                 console.error('Failed to resend code:', error);
                 this.verificationError = 'Не удалось отправить код подтверждения';
-            },
+            }
         });
     }
 }

@@ -119,17 +119,17 @@
                     </li>
                     <li *ngIf="!authService.isLoggedIn()">
                         <a class="dropdown-item" href="#" (click)="$event.preventDefault(); openLoginModal()">
-                            <i class="bi bi-box-arrow-in-right me-2"></i>Войти
+                            <i-bs name="box-arrow-in-right" class="me-2"></i-bs>Войти
                         </a>
                     </li>
                     <li *ngIf="authService.isLoggedIn()">
-                        <a class="dropdown-item" routerLink="/profile"> <i-bs name="person"></i-bs>Личный кабинет </a>
+                        <a class="dropdown-item" routerLink="/profile"> <i-bs name="person" class="me-2"></i-bs>Личный кабинет </a>
                     </li>
                     <li *ngIf="authService.isLoggedIn()">
-                        <a class="dropdown-item" routerLink="/orders"> <i-bs name="list-ul"></i-bs>История заказов </a>
+                        <a class="dropdown-item" routerLink="/orders"> <i-bs name="list-ul" class="me-2"></i-bs>История заказов </a>
                     </li>
                     <li *ngIf="authService.isLoggedIn()">
-                        <a class="dropdown-item" routerLink="/favorites"> <i-bs name="heart"></i-bs>Избранное </a>
+                        <a class="dropdown-item" routerLink="/favorites"> <i-bs name="heart" class="me-2"></i-bs>Избранное </a>
                     </li>
                     <li *ngIf="authService.isLoggedIn()">
                         <hr class="dropdown-divider" />

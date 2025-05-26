@@ -87,13 +87,21 @@ export class NavbarComponent implements OnDestroy, OnInit {
         return 'Гость';
     }
 
+    private isMobile(): boolean {
+        return window.innerWidth <= 768;
+    }
+
     navigateToCart(): void {
-        this.modalService.open(CartModalComponent, {
-            size: 'lg',
-            centered: true,
-            backdrop: 'static',
-            windowClass: 'cart-modal-window',
-        });
+        if (this.isMobile()) {
+            this.router.navigate(['/cart']);
+        } else {
+            this.modalService.open(CartModalComponent, {
+                size: 'lg',
+                centered: true,
+                backdrop: 'static',
+                windowClass: 'cart-modal-window',
+            });
+        }
     }
 
     async logout() {

@@ -9,7 +9,6 @@
         </div>
 
         <ng-container *ngIf="cartItems$ | async as cartItems">
-            <!-- Empty Cart State -->
             <div *ngIf="cartItems.length === 0" class="empty-cart-section">
                 <i class="bi bi-bag-x empty-cart-icon"></i>
                 <h3>Ваша корзина пуста</h3>
@@ -20,14 +19,13 @@
                 </a>
             </div>
 
-            <!-- Cart with Items -->
             <div *ngIf="cartItems.length > 0" class="row">
                 <div class="col-lg-8 mb-4">
                     <div class="cart-content">
                         <div class="cart-items-section">
                             <h3 class="section-title">
                                 <i class="bi bi-list-ul"></i>
-                                Товары в корзине ({{ cartItems.length }})
+                                Товары в корзине ({{ getCartItemsCount() | async }})
                             </h3>
 
                             <div class="cart-item" *ngFor="let item of cartItems">
@@ -68,7 +66,7 @@
                                 <div class="item-total">{{ item.product.price * item.quantity | number: '1.2-2' }} р.</div>
 
                                 <button class="remove-btn" type="button" (click)="removeProduct(item)" title="Удалить товар">
-                                    <i class="bi bi-trash"></i>
+                                    <i-bs name="trash"></i-bs>
                                 </button>
                             </div>
                         </div>

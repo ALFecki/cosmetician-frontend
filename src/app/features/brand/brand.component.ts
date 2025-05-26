@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, of } from 'rxjs';
+import { ProductsComponent } from '../../shared/components/products/products.component';
 import { BrandModel } from '../../shared/models/brand.model';
 import { BrandService } from '../../shared/services/brand.service';
-import { ProductsComponent } from '../../shared/components/products/products.component';
-import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-brand',
@@ -13,20 +13,38 @@ import { CommonModule } from '@angular/common';
     templateUrl: './brand.component.html',
     styleUrl: './brand.component.scss',
 })
-export class BrandComponent {
+export class BrandComponent implements OnInit {
     brandId!: string;
-    brand!: Observable<BrandModel>;
+    brand$!: Observable<BrandModel>;
+    loading = true;
+    error = '';
 
     constructor(
         private route: ActivatedRoute,
-        brandService: BrandService,
-    ) {
+        private brandService: BrandService,
+    ) {}
+
+    ngOnInit(): void {
         this.route.params.subscribe(params => {
             this.brandId = params['id'];
+            this.loadBrand();
         });
+    }
 
-        brandService.getById(this.brandId).subscribe(data => {
-            this.brand = of(data.data);
+    loadBrand(): void {
+        this.loading = true;
+        this.error = '';
+
+        this.brandService.getById(this.brandId).subscribe({
+            next: response => {
+                this.brand$ = of(response.data);
+                this.loading = false;
+            },
+            error: error => {
+                console.error('Error loading brand:', error);
+                this.error = 'Не удалось загрузить информацию о бренде';
+                this.loading = false;
+            },
         });
     }
 }

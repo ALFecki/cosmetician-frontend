@@ -5,14 +5,17 @@
 @import 'animate.css';
 
 :root {
-    --primary: #f8d3d3;
-    --secondary: #f2b2b2;
+    // --primary: #f8d3d3;
+    --primary: #e91e63;
+    // --secondary: #f2b2b2;
+    --secondary: #f06292;
     --tertiary: #eab8d1;
     --beige: #e6d5b8;
     --light-beige: #f5e1d3;
     --creamy: #f9e6c1;
     --white: #ffffff;
     --black: #000000;
+    --red: #dc3545;
     --soft-pink: #ffd6e0;
     --light-beige: #f5f0e6;
 }
@@ -159,7 +162,6 @@ h6 {
     animation-name: fadeInRight;
 }
 
-// Cart Modal Styles
 .cart-modal-window {
     .modal-content {
         border-radius: 20px;

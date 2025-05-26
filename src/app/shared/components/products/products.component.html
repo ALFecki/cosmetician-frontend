@@ -1,97 +1,234 @@
-<div class="container mt-4">
-    <div class="row">
-        <!-- Left Sidebar - Product Filters -->
-        <div class="col-md-3">
-            <app-product-filter [initialFilters]="filterOptions" (filterChange)="onFilterChange($event)"> </app-product-filter>
+<div class="catalog-hero" *ngIf="!categoryId && !brandId">
+    <div class="container">
+        <div class="hero-content text-center">
+            <h1 class="hero-title">Каталог косметики</h1>
+            <p class="hero-subtitle">Откройте для себя мир красоты с нашей премиальной косметикой</p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">500+</span>
+                    <span class="stat-label">товаров</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">50+</span>
+                    <span class="stat-label">брендов</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">качество</span>
+                </div>
+            </div>
         </div>
+    </div>
+    <div class="hero-decoration"></div>
+</div>
 
-        <!-- Right Content - Product Cards -->
-        <div class="col-md-9">
-            <div class="row">
-                <div class="col-md-4" *ngFor="let product of products$ | async">
-                    <div
-                        class="card mb-4 product-card"
-                        tabindex="0"
-                        role="button"
-                        (click)="this.openProductDetails(product, productModal)"
-                        (keydown.enter)="this.openProductDetails(product, productModal)"
-                        (keydown.space)="this.openProductDetails(product, productModal); $event.preventDefault()"
-                    >
-                        <img
-                            [src]="product.image || 'assets/images/products/no-image.png'"
-                            class="card-img-top"
-                            alt="{{ product.title }}"
-                        />
-                        <div class="card-body">
-                            <h5 class="card-title">{{ product.title }}</h5>
-                            <p class="card-text">Цена: {{ product.price | number: '1.2-2' }} р.</p>
-                            <button class="btn btn-primary" (click)="$event.stopPropagation(); addToCart(product)">Купить</button>
-                        </div>
-                    </div>
+<div class="catalog-container">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Left Sidebar - Product Filters -->
+            <div class="col-lg-3">
+                <div class="filters-sticky">
+                    <app-product-filter [initialFilters]="filterOptions" (filterChange)="onFilterChange($event)"></app-product-filter>
                 </div>
             </div>
 
-            <div class="text-center my-4" *ngIf="(products$ | async)?.length === 0">
-                <p>По вашему запросу ничего не найдено</p>
-            </div>
+            <!-- Right Content - Product Cards -->
+            <div class="col-lg-9">
+                <!-- Results Header -->
+                <div class="results-header">
+                    <div class="results-info">
+                        <h2 class="results-title">
+                            <i class="bi bi-grid-3x3-gap-fill me-2"></i>
+                            Наши товары
+                        </h2>
+                        <p class="results-count" *ngIf="(totalItems$ | async) as total">
+                            Найдено <strong>{{ total }}</strong> {{ total === 1 ? 'товар' : (total < 5 ? 'товара' : 'товаров') }}
+                        </p>
+                    </div>
+                </div>
 
-            <app-pagination
-                [totalItems]="(totalItems$ | async) ?? 0"
-                [itemsPerPage]="itemsPerPage"
-                [currentPage]="currentPage"
-                (pageChange)="onPageChange($event)"
-                (itemsPerPageChange)="onItemsPerPageChange($event)"
-            ></app-pagination>
+                <!-- Products Grid -->
+                <div class="products-grid" *ngIf="(products$ | async) as products">
+                    <div class="product-card-wrapper" *ngFor="let product of products">
+                        <div
+                            class="card product-card"
+                            tabindex="0"
+                            role="button"
+                            (click)="this.openProductDetails(product, productModal)"
+                            (keydown.enter)="this.openProductDetails(product, productModal)"
+                            (keydown.space)="this.openProductDetails(product, productModal); $event.preventDefault()"
+                        >
+                            <div class="card-image-container">
+                                <img
+                                    [src]="product.image || 'assets/images/products/no-image.png'"
+                                    class="card-img-top"
+                                    alt="{{ product.title }}"
+                                />
+                                <div class="card-badge" *ngIf="product.brand">
+                                    {{ product.brand.title }}
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ product.title }}</h5>
+                                <div class="card-details">
+                                    <span class="product-volume" *ngIf="product.volume">{{ product.volume }}мл</span>
+                                    <span class="product-type" *ngIf="product.productType">{{ product.productType }}</span>
+                                </div>
+                                <div class="price-section">
+                                    <span class="price">{{ product.price | number: '1.2-2' }} р.</span>
+                                </div>
+                                <button class="btn btn-primary add-to-cart-btn" (click)="$event.stopPropagation(); addToCart(product)">
+                                    <i class="bi bi-bag-plus me-2"></i>
+                                    Купить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state text-center" *ngIf="(products$ | async)?.length === 0">
+                    <div class="empty-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h3 class="empty-title">Товары не найдены</h3>
+                    <p class="empty-text">Попробуйте изменить параметры поиска или сбросить фильтры</p>
+                    <button class="btn btn-outline-primary" (click)="resetFilters()">
+                        <i class="bi bi-arrow-clockwise me-2"></i>
+                        Сбросить фильтры
+                    </button>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-wrapper" *ngIf="((products$ | async)?.length ?? 0) > 0">
+                    <app-pagination
+                        [totalItems]="(totalItems$ | async) ?? 0"
+                        [itemsPerPage]="itemsPerPage"
+                        [currentPage]="currentPage"
+                        (pageChange)="onPageChange($event)"
+                        (itemsPerPageChange)="onItemsPerPageChange($event)"
+                    ></app-pagination>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <ng-template #productModal let-modal>
     <div class="modal-header">
-        <h4 class="modal-title">{{ selectedProduct?.title }}</h4>
-        <button type="button" class="btn-close" (click)="modal.dismiss()"><span class="visually-hidden">Закрыть</span></button>
+        <div class="modal-header-content">
+            <h4 class="modal-title">{{ selectedProduct?.title }}</h4>
+            <div class="modal-price">
+                <span class="price-label">Цена:</span>
+                <span class="price-value">{{ selectedProduct?.price | number: '1.2-2' }} р.</span>
+            </div>
+        </div>
+        <button type="button" class="btn-close" (click)="modal.dismiss()" aria-label="Закрыть">
+            <i class="bi bi-x-lg"></i>
+        </button>
     </div>
     <div class="modal-body">
-        <div class="row">
-            <div class="col-md-6">
+        <div class="row g-3">
+            <div class="col-md-5">
                 <img
                     [src]="selectedProduct?.image || 'assets/images/products/no-image.png'"
-                    class="img-fluid rounded"
+                    class="modal-product-image"
                     [alt]="selectedProduct?.title"
                 />
             </div>
-            <div class="col-md-6">
-                <div class="mb-3">
-                    <h5>Характеристики:</h5>
-                    <ul class="list-unstyled">
-                        <li><strong>Бренд:</strong> {{ selectedProduct?.brand?.title }}</li>
-                        <li><strong>Страна:</strong> {{ getCountryNames(selectedProduct) }}</li>
-                        <li><strong>Объем:</strong> {{ selectedProduct?.volume }}мл</li>
-                        <li><strong>Тип:</strong> {{ selectedProduct?.productType }}</li>
-                        <li><strong>Назначение:</strong> {{ selectedProduct?.productScope }}</li>
-                    </ul>
+            <div class="col-md-7 modal-product-details">
+                <!-- Compact Characteristics -->
+                <div class="characteristics-compact">
+                    <h6><i class="bi bi-info-circle me-2"></i>Характеристики</h6>
+                    <div class="characteristics-grid">
+                        <div class="char-item">
+                            <span class="char-label">Бренд:</span>
+                            <span class="char-value">{{ selectedProduct?.brand?.title || '—' }}</span>
+                        </div>
+                        <div class="char-item">
+                            <span class="char-label">Страна:</span>
+                            <span class="char-value">{{ getCountryNames(selectedProduct) || '—' }}</span>
+                        </div>
+                        <div class="char-item">
+                            <span class="char-label">Объем:</span>
+                            <span class="char-value">{{ selectedProduct?.volume ? selectedProduct?.volume + ' мл' : '—' }}</span>
+                        </div>
+                        <div class="char-item">
+                            <span class="char-label">Тип:</span>
+                            <span class="char-value">{{ selectedProduct?.productType || '—' }}</span>
+                        </div>
+                        <div class="char-item">
+                            <span class="char-label">Назначение:</span>
+                            <span class="char-value">{{ selectedProduct?.productScope || '—' }}</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <h5>Описание:</h5>
-                    <p>{{ selectedProduct?.description }}</p>
+                <!-- Tabs for Description and Usage -->
+                <div class="info-tabs" *ngIf="selectedProduct?.description || selectedProduct?.methodOfUse">
+                    <div class="tab-buttons">
+                        <button 
+                            class="tab-btn" 
+                            [class.active]="activeTab === 'description'"
+                            (click)="activeTab = 'description'"
+                            *ngIf="selectedProduct?.description"
+                        >
+                            <i class="bi bi-card-text me-1"></i>
+                            Описание
+                        </button>
+                        <button 
+                            class="tab-btn" 
+                            [class.active]="activeTab === 'composition'"
+                            (click)="activeTab = 'composition'"
+                        >
+                            <i class="bi bi-list-ul me-1"></i>
+                            Состав
+                        </button>
+                        <button 
+                            class="tab-btn" 
+                            [class.active]="activeTab === 'usage'"
+                            (click)="activeTab = 'usage'"
+                            *ngIf="selectedProduct?.methodOfUse"
+                        >
+                            <i class="bi bi-clipboard-check me-1"></i>
+                            Применение
+                        </button>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-pane" [class.show]="activeTab === 'description'" [class.active]="activeTab === 'description'" *ngIf="activeTab === 'description' && selectedProduct?.description">
+                            <p>{{ selectedProduct?.description }}</p>
+                        </div>
+                        <div class="tab-pane" [class.show]="activeTab === 'composition'" [class.active]="activeTab === 'composition'" *ngIf="activeTab === 'composition'">
+                            <p>Нет информации о составе</p>
+                        </div>
+                        <!-- <div class="tab-pane" [class.show]="activeTab === 'chars'" [class.active]="activeTab === 'chars'" *ngIf="activeTab === 'chars'">
+                            <div *ngFor="let char of getCharacteristics(selectedProduct)">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">{{ char.label }}</span>
+                                    <span class="fw-semibold">{{ char.value }}</span>
+                                </div>
+                            </div>
+                        </div> -->
+                        <div class="tab-pane" [class.show]="activeTab === 'usage'" [class.active]="activeTab === 'usage'" *ngIf="activeTab === 'usage' && selectedProduct?.methodOfUse">
+                            <p>{{ selectedProduct?.methodOfUse }}</p>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <h5>Способ применения:</h5>
-                    <p>{{ selectedProduct?.methodOfUse }}</p>
-                </div>
-
-                <div class="price-section mb-3">
-                    <h3>{{ selectedProduct?.price | number: '1.2-2' }} р.</h3>
-                </div>
-
-                <div class="d-grid gap-2">
-                    <button class="btn btn-primary btn-lg" (click)="addToCart(selectedProduct)">
-                        <i class="bi bi-cart-plus"></i> Добавить в корзину
+                <!-- Compact Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-primary btn-sm" (click)="addToCart(selectedProduct)">
+                        <i class="bi bi-cart-plus"></i>
+                        В корзину
                     </button>
-                    <button class="btn btn-outline-primary" (click)="moreInfo()">Подробнее</button>
-                    <button class="btn btn-outline-secondary" (click)="modal.close()">Закрыть</button>
+                    <button class="btn btn-outline-primary btn-sm" (click)="moreInfo()">
+                        <i class="bi bi-eye"></i>
+                        Подробнее
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" (click)="modal.close()">
+                        <i class="bi bi-x-circle"></i>
+                        Закрыть
+                    </button>
                 </div>
             </div>
         </div>
