@@ -1,11 +1,11 @@
 .card {
     transition: transform 0.2s;
-    border-color: var(--light-beige);
+    border-color: var(--powder-pink);
 }
 
 .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(253, 204, 217, 0.3);
+    box-shadow: 0 4px 15px rgba(212, 80, 109, 0.2);
 }
 
 .card-img-top {
@@ -15,7 +15,7 @@
 
 .product-main-card {
     border: none;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+    box-shadow: 0 2px 12px rgba(212, 80, 109, 0.08);
     border-radius: 12px;
     margin-bottom: 2rem;
 }
@@ -43,7 +43,7 @@
     border-radius: 10px;
     padding: 24px 12px;
     min-height: 220px;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 6px rgba(212, 80, 109, 0.06);
 }
 
 .price-block {
@@ -57,11 +57,13 @@
 
 .characteristics-list {
     font-size: 1em;
+
     .fw-semibold {
-        color: #222;
+        color: var(--gray-dark);
     }
+
     .text-muted {
-        color: #888 !important;
+        color: var(--gray-medium) !important;
     }
 }
 
@@ -70,12 +72,12 @@
 
     .nav-link {
         border: none;
-        color: #666;
+        color: var(--gray-medium);
         padding-bottom: 10px;
         position: relative;
 
         &.active {
-            color: #333;
+            color: var(--gray-dark);
             background: transparent;
             font-weight: 500;
 
@@ -86,12 +88,12 @@
                 left: 10%;
                 width: 80%;
                 height: 2px;
-                background-color: var(--soft-pink);
+                background-color: var(--primary);
             }
         }
 
         &:hover:not(.active) {
-            color: #333;
+            color: var(--gray-dark);
         }
     }
 }
@@ -102,10 +104,11 @@
 }
 
 .btn-link {
-    color: var(--soft-pink);
+    color: var(--primary);
     text-decoration: underline;
+
     &:hover {
-        color: darken(#ffd6e0, 15%);
+        color: var(--accent);
     }
 }
 
@@ -114,20 +117,21 @@
     text-decoration: none;
     color: inherit;
     font-size: 1em;
+
     &:hover {
-        color: var(--soft-pink);
+        color: var(--primary);
     }
 }
 
 .btn-primary {
-    background-color: var(--soft-pink);
-    border-color: var(--soft-pink);
-    color: #333;
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: var(--white);
 
     &:hover {
-        background-color: darken(#ffd6e0, 5%);
-        border-color: darken(#ffd6e0, 5%);
-        color: #333;
+        background-color: var(--accent);
+        border-color: var(--accent);
+        color: var(--white);
     }
 }
 
@@ -138,22 +142,22 @@
     font-size: 0.9rem;
 
     i {
-        color: var(--soft-pink);
+        color: var(--primary);
         margin-right: 8px;
         font-size: 1.1rem;
     }
 }
 
 .consultation-box {
-    border: 2px solid var(--soft-pink);
+    border: 2px solid var(--secondary);
     border-radius: 8px;
     padding: 15px;
-    background-color: white;
+    background-color: var(--warm-white);
     margin-top: 20px;
     text-align: center;
 
     h5 {
-        color: #333;
+        color: var(--gray-dark);
         margin-bottom: 10px;
     }
 
@@ -161,7 +165,7 @@
         margin-bottom: 5px;
 
         i {
-            color: var(--soft-pink);
+            color: var(--primary);
             margin-right: 8px;
         }
     }

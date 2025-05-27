@@ -4,12 +4,12 @@ img {
 }
 
 .brand-header {
-    background: linear-gradient(135deg, #fff5f7 0%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--soft-pink) 0%, var(--warm-white) 100%);
     border-radius: 16px;
     padding: 3rem 2rem;
     margin-bottom: 2rem;
-    border: 2px solid #ffd6e0;
-    box-shadow: 0 4px 16px rgba(253, 204, 217, 0.1);
+    border: 2px solid var(--secondary);
+    box-shadow: 0 4px 16px rgba(212, 80, 109, 0.1);
 }
 
 .brand-image {
@@ -21,20 +21,20 @@ img {
     border-radius: 12px;
     margin: 0 auto 1.5rem;
     display: block;
-    border: 2px solid #f8f9fa;
+    border: 2px solid var(--powder-pink);
     padding: 1rem;
-    background: #fff;
+    background: var(--warm-white);
 }
 
 .brand-title {
-    color: #333;
+    color: var(--gray-dark);
     font-weight: 700;
     margin-bottom: 1rem;
     font-size: 2.5rem;
 }
 
 .brand-description {
-    color: #6c757d;
+    color: var(--gray-medium);
     font-size: 1.125rem;
     line-height: 1.6;
     max-width: 800px;
@@ -58,7 +58,7 @@ img {
 
 .error-icon {
     font-size: 4rem;
-    color: #dc3545;
+    color: var(--danger);
     margin-bottom: 1rem;
 }
 
@@ -66,15 +66,15 @@ img {
     .brand-header {
         padding: 2rem 1rem;
     }
-    
+
     .brand-title {
         font-size: 2rem;
     }
-    
+
     .brand-description {
         font-size: 1rem;
     }
-    
+
     .brand-image {
         max-width: 150px;
         max-height: 90px;

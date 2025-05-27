@@ -1,8 +1,3 @@
-:root {
-    --soft-pink: #ffd6e0;
-    --light-beige: #f5f0e6;
-}
-
 .carousel-container {
     position: relative;
 
@@ -19,11 +14,14 @@
     scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
     padding: 10px 0;
-    -ms-overflow-style: none; /* Hide scrollbar in IE and Edge */
-    scrollbar-width: none; /* Hide scrollbar in Firefox */
+    -ms-overflow-style: none;
+    /* Hide scrollbar in IE and Edge */
+    scrollbar-width: none;
+    /* Hide scrollbar in Firefox */
 
     &::-webkit-scrollbar {
-        display: none; /* Hide scrollbar in Chrome/Safari/Opera */
+        display: none;
+        /* Hide scrollbar in Chrome/Safari/Opera */
     }
 }
 
@@ -64,17 +62,17 @@
 
     &:hover {
         transform: translateY(-5px);
-        box-shadow: 0 4px 15px rgba(253, 204, 217, 0.3);
+        box-shadow: 0 4px 15px rgba(212, 80, 109, 0.2);
     }
 
     .btn-primary {
-        background-color: var(--soft-pink);
-        border-color: var(--soft-pink);
-        color: #333;
+        background-color: var(--primary);
+        border-color: var(--primary);
+        color: var(--white);
 
         &:hover {
-            background-color: darken(#ffd6e0, 5%);
-            border-color: darken(#ffd6e0, 5%);
+            background-color: var(--accent);
+            border-color: var(--accent);
         }
     }
 }
@@ -87,9 +85,9 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: white;
-    border: 1px solid var(--soft-pink);
-    color: #333;
+    background-color: var(--warm-white);
+    border: 1px solid var(--secondary);
+    color: var(--gray-dark);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -102,7 +100,7 @@
     padding: 0;
 
     &:hover {
-        background-color: var(--soft-pink);
+        background-color: var(--secondary);
         transform: translateY(-50%) scale(1.05);
     }
 
@@ -133,17 +131,17 @@
         left: 0;
         width: 100%;
         height: 3px;
-        background-color: var(--soft-pink);
+        background-color: var(--primary);
     }
 }
 
 .btn-outline-primary {
-    border-color: var(--soft-pink);
-    color: #333;
+    border-color: var(--primary);
+    color: var(--primary);
 
     &:hover {
-        background-color: var(--soft-pink);
-        border-color: var(--soft-pink);
-        color: #333;
+        background-color: var(--primary);
+        border-color: var(--primary);
+        color: var(--white);
     }
 }

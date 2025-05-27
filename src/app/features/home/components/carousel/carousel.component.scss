@@ -50,48 +50,63 @@
 .puzzle-piece:nth-child(1) {
     transition-delay: 0.05s;
 }
+
 .puzzle-piece:nth-child(2) {
     transition-delay: 0.1s;
 }
+
 .puzzle-piece:nth-child(3) {
     transition-delay: 0.15s;
 }
+
 .puzzle-piece:nth-child(4) {
     transition-delay: 0.2s;
 }
+
 .puzzle-piece:nth-child(5) {
     transition-delay: 0.25s;
 }
+
 .puzzle-piece:nth-child(6) {
     transition-delay: 0.3s;
 }
+
 .puzzle-piece:nth-child(7) {
     transition-delay: 0.35s;
 }
+
 .puzzle-piece:nth-child(8) {
     transition-delay: 0.4s;
 }
+
 .puzzle-piece:nth-child(9) {
     transition-delay: 0.1s;
 }
+
 .puzzle-piece:nth-child(10) {
     transition-delay: 0.15s;
 }
+
 .puzzle-piece:nth-child(11) {
     transition-delay: 0.2s;
 }
+
 .puzzle-piece:nth-child(12) {
     transition-delay: 0.25s;
 }
+
 .puzzle-piece:nth-child(13) {
     transition-delay: 0.3s;
 }
+
 .puzzle-piece:nth-child(14) {
     transition-delay: 0.35s;
 }
+
 .puzzle-piece:nth-child(15) {
     transition-delay: 0.4s;
 }
+
 .puzzle-piece:nth-child(16) {
     transition-delay: 0.45s;
 }
@@ -105,8 +120,10 @@
 
 .puzzle-inner img {
     position: absolute;
-    width: 400%; /* 4x width for the 4 column grid */
-    height: 400%; /* 4x height for the 4 row grid */
+    width: 400%;
+    /* 4x width for the 4 column grid */
+    height: 400%;
+    /* 4x height for the 4 row grid */
     object-fit: cover;
     filter: brightness(0.9);
 }
@@ -116,14 +133,17 @@
     top: 0;
     left: 0;
 }
+
 .puzzle-piece:nth-child(2) .puzzle-inner img {
     top: 0;
     left: -100%;
 }
+
 .puzzle-piece:nth-child(3) .puzzle-inner img {
     top: 0;
     left: -200%;
 }
+
 .puzzle-piece:nth-child(4) .puzzle-inner img {
     top: 0;
     left: -300%;
@@ -134,14 +154,17 @@
     top: -100%;
     left: 0;
 }
+
 .puzzle-piece:nth-child(6) .puzzle-inner img {
     top: -100%;
     left: -100%;
 }
+
 .puzzle-piece:nth-child(7) .puzzle-inner img {
     top: -100%;
     left: -200%;
 }
+
 .puzzle-piece:nth-child(8) .puzzle-inner img {
     top: -100%;
     left: -300%;
@@ -152,14 +175,17 @@
     top: -200%;
     left: 0;
 }
+
 .puzzle-piece:nth-child(10) .puzzle-inner img {
     top: -200%;
     left: -100%;
 }
+
 .puzzle-piece:nth-child(11) .puzzle-inner img {
     top: -200%;
     left: -200%;
 }
+
 .puzzle-piece:nth-child(12) .puzzle-inner img {
     top: -200%;
     left: -300%;
@@ -170,14 +196,17 @@
     top: -300%;
     left: 0;
 }
+
 .puzzle-piece:nth-child(14) .puzzle-inner img {
     top: -300%;
     left: -100%;
 }
+
 .puzzle-piece:nth-child(15) .puzzle-inner img {
     top: -300%;
     left: -200%;
 }
+
 .puzzle-piece:nth-child(16) .puzzle-inner img {
     top: -300%;
     left: -300%;
@@ -197,7 +226,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 3; /* Make sure overlay is above puzzle pieces */
+    z-index: 3;
+    /* Make sure overlay is above puzzle pieces */
 }
 
 .slide-content {
@@ -216,21 +246,22 @@
 }
 
 .btn-shop {
-    background-color: var(--soft-pink, #ffd6e0);
+    background: linear-gradient(135deg, var(--secondary) 0%, var(--tertiary) 100%);
     border: none;
-    color: #333;
+    color: var(--gray-dark);
     font-size: 1.2rem;
     padding: 0.75rem 2rem;
     border-radius: 30px;
     font-weight: 600;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 8px rgba(212, 80, 109, 0.15);
 }
 
 .btn-shop:hover {
-    background-color: #f8c1ce;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: var(--white);
     transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 12px rgba(212, 80, 109, 0.3);
 }
 
 .carousel-controls {
@@ -259,7 +290,8 @@
     opacity: 0;
     z-index: 5;
     border: none;
-    background-color: transparent; /* Transparent by default */
+    background-color: transparent;
+    /* Transparent by default */
     width: 60px;
     padding: 0;
 }
@@ -275,13 +307,14 @@
     padding: 12px;
     transition: all 0.3s ease;
     background: rgba(0, 0, 0, 0);
-    border-radius: 50%; /* Rounded corners for the container */
+    border-radius: 50%;
+    /* Rounded corners for the container */
 }
 
 .carousel-control:hover .control-icon-container {
-    background: rgba(255, 214, 224, 0.6); /* Softer pink with transparency */
-    backdrop-filter: blur(3px); /* Add blur effect */
-    -webkit-backdrop-filter: blur(3px); /* For Safari */
+    background: rgba(212, 80, 109, 0.2);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
 }
 
 .carousel-control svg {
@@ -323,7 +356,7 @@
 }
 
 .indicator.active {
-    background: var(--soft-pink, #ffd6e0);
+    background: var(--secondary);
     transform: scale(1.2);
 }
 

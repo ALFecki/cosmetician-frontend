@@ -1,6 +1,6 @@
 :root {
-    --soft-pink: #ffd6e0;
-    --light-beige: #f5f0e6;
+    --soft-pink: #f5e6ea;
+    --light-beige: #faf6f1;
 }
 
 .circle-icon {
@@ -24,7 +24,7 @@
     transition:
         transform 0.3s ease,
         background-color 0.3s ease;
-    border-color: var(--light-beige);
+    border-color: var(--powder-pink);
 }
 
 .card:hover {
@@ -33,7 +33,7 @@
 }
 
 .card:hover .circle-icon {
-    background-color: #ffffff;
+    background-color: var(--warm-white);
 }
 
 .section-title {
@@ -50,6 +50,6 @@
         left: 0;
         width: 100%;
         height: 3px;
-        background-color: var(--soft-pink);
+        background-color: var(--primary);
     }
 }

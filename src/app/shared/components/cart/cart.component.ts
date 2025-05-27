@@ -9,6 +9,8 @@ import { CartService } from '../../services/cart.service';
 import { ToastService } from '../../services/toast.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { IconsModule } from '../../base/icons/icons.module';
+import { ProductModel } from '../../models/product.model';
+import { ProductModalComponent } from '../product-modal/product-modal.component';
 
 @Component({
     selector: 'app-cart',
@@ -68,4 +70,14 @@ export class CartComponent {
 
         this.router.navigate(['/order-confirmation']);
     }
+
+        openProductDetails(product: ProductModel) {
+            this.modalService.dismissAll();
+            const activeModal = this.modalService.open(ProductModalComponent, {
+                size: 'lg',
+                centered: true,
+                scrollable: true,
+            });
+            activeModal.componentInstance.selectedProduct = product;
+        }
 }

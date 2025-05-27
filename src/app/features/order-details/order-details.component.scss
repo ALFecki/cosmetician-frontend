@@ -1,36 +1,109 @@
 .card {
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    border: none;
-    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(212, 80, 109, 0.08);
+    border: 2px solid var(--powder-pink);
+    border-radius: 12px;
+    background: var(--warm-white);
 }
 
 .card-header {
-    border-bottom: 1px solid #eee;
-    padding: 1rem 1.5rem;
+    border-bottom: 2px solid var(--powder-pink);
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--soft-pink) 0%, var(--warm-white) 100%);
+
+    h5 {
+        color: var(--gray-dark);
+        font-weight: 600;
+        margin: 0;
+    }
 }
 
 .badge {
     padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-weight: 500;
+
+    &.bg-warning {
+        background: var(--warning) !important;
+        color: var(--white);
+    }
+
+    &.bg-success {
+        background: var(--success) !important;
+        color: var(--white);
+    }
+
+    &.bg-danger {
+        background: var(--danger) !important;
+        color: var(--white);
+    }
+
+    &.bg-info {
+        background: var(--info) !important;
+        color: var(--white);
+    }
 }
 
 .order-item-img {
     width: 60px;
     height: 60px;
     object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid var(--powder-pink);
 }
 
-.table th {
-    font-weight: 600;
-    color: #495057;
+.table {
+    th {
+        font-weight: 600;
+        color: var(--gray-dark);
+        background: var(--soft-pink);
+        border-bottom: 2px solid var(--powder-pink);
+        padding: 1rem 0.75rem;
+    }
+
+    td {
+        color: var(--gray-dark);
+        border-bottom: 1px solid var(--powder-pink);
+        padding: 1rem 0.75rem;
+        vertical-align: middle;
+    }
+
+    tbody tr:hover {
+        background: var(--soft-pink);
+    }
 }
 
 .btn-outline-secondary {
-    border-color: #adb5bd;
-    color: #6c757d;
+    border: 2px solid var(--gray-medium);
+    color: var(--gray-medium);
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
 
     &:hover {
-        background-color: #f8f9fa;
-        border-color: #6c757d;
-        color: #343a40;
+        background: var(--gray-medium);
+        border-color: var(--gray-medium);
+        color: var(--white);
+        transform: translateY(-1px);
+    }
+}
+
+@media (max-width: 768px) {
+    .card-header {
+        padding: 1rem;
+    }
+
+    .table {
+        font-size: 0.9rem;
+
+        th,
+        td {
+            padding: 0.75rem 0.5rem;
+        }
+    }
+
+    .order-item-img {
+        width: 50px;
+        height: 50px;
     }
 }

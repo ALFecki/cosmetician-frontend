@@ -11,6 +11,7 @@ import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
 import { PaginationComponent } from '../pagination/pagination.component';
 import { ProductFilterComponent } from '../product-filter/product-filter.component';
+import { ProductModalComponent } from '../product-modal/product-modal.component';
 
 @Component({
     selector: 'app-products',
@@ -25,8 +26,6 @@ export class ProductsComponent implements OnInit {
     @Input() categoryId: string | undefined;
     @Input() brandId: string | undefined;
     selectedProduct: ProductModel | null = null;
-
-    activeTab = 'description';
     itemsPerPage = 10;
     currentPage = 1;
     totalItems$: Observable<number> = of(0);
@@ -88,23 +87,14 @@ export class ProductsComponent implements OnInit {
         this.loadProducts();
     }
 
-    openProductDetails(product: ProductModel, content: unknown) {
-        this.selectedProduct = product;
-        this.modalService.open(content, {
+    openProductDetails(product: ProductModel) {
+        this.modalService.dismissAll();
+        const activeModal = this.modalService.open(ProductModalComponent, {
             size: 'lg',
             centered: true,
             scrollable: true,
-            windowClass: 'product-modal', // Add this class for custom styling
         });
-    }
-
-    getCountryNames(product: ProductModel | null): string {
-        return product?.countries?.map((country: CountryModel) => country.name).join(', ') || '';
-    }
-
-    moreInfo() {
-        this.modalService.dismissAll();
-        this.router.navigate(['/product', this.selectedProduct?.id]);
+        activeModal.componentInstance.selectedProduct = product;
     }
 
     async addToCart(product: ProductModel | null) {

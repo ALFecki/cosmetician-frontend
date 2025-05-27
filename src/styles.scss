@@ -5,19 +5,35 @@
 @import 'animate.css';
 
 :root {
-    // --primary: #f8d3d3;
-    --primary: #e91e63;
-    // --secondary: #f2b2b2;
-    --secondary: #f06292;
-    --tertiary: #eab8d1;
-    --beige: #e6d5b8;
-    --light-beige: #f5e1d3;
-    --creamy: #f9e6c1;
+    // Основная палитра - нежные розово-бежевые тона
+    --primary: #d4506d; // Элегантный розовый
+    --secondary: #e8a4b8; // Мягкий розовый
+    --tertiary: #f2c4d6; // Светло-розовый
+    --accent: #a67c8a; // Приглушенный розово-серый
+
+    // Нейтральные тона
+    --beige: #f7f0e8; // Теплый бежевый
+    --light-beige: #faf6f1; // Очень светлый бежевый
+    --cream: #fcf8f3; // Кремовый
+    --warm-white: #fefcfa; // Теплый белый
+
+    // Базовые цвета
     --white: #ffffff;
-    --black: #000000;
-    --red: #dc3545;
-    --soft-pink: #ffd6e0;
-    --light-beige: #f5f0e6;
+    --black: #2c2c2c; // Мягкий черный
+    --gray-light: #8a8a8a; // Светло-серый
+    --gray-medium: #666666; // Средний серый
+    --gray-dark: #404040; // Темно-серый
+
+    // Состояния
+    --success: #6b9080; // Мягкий зеленый
+    --warning: #d4a574; // Теплый оранжевый
+    --danger: #c75b7a; // Мягкий красный
+    --info: #8bb3d9; // Спокойный синий
+
+    // Мягкие оттенки для акцентов
+    --soft-pink: #f5e6ea; // Очень светлый розовый
+    --powder-pink: #ead7dc; // Пудровый розовый
+    --blush: #e6c7d0; // Румяный
 }
 
 $bs-font-sans-serif: 'Montserrat', sans-serif;
@@ -134,6 +150,7 @@ h6 {
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -144,6 +161,7 @@ h6 {
         opacity: 0;
         transform: translate3d(20px, 0, 0);
     }
+
     to {
         opacity: 1;
         transform: translate3d(0, 0, 0);

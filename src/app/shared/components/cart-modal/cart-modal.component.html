@@ -42,7 +42,12 @@
 
                     <div class="item-controls-row">
                         <div class="quantity-controls-modal">
-                            <button class="quantity-btn-modal" type="button" (click)="decreaseQuantity(item)" [disabled]="item.quantity <= 1">
+                            <button
+                                class="quantity-btn-modal"
+                                type="button"
+                                (click)="decreaseQuantity(item)"
+                                [disabled]="item.quantity <= 1"
+                            >
                                 -
                             </button>
                             <input
@@ -68,10 +73,10 @@
                 <span class="summary-label-modal">Товары: </span>
                 <span class="summary-value-modal">{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
             </div>
-                                        <div class="summary-row-modal">
-                                <span class="summary-label-modal">Доставка:</span>
-                                <span class="summary-value-modal">Рассчитается при оформлении</span>
-                            </div>
+            <div class="summary-row-modal">
+                <span class="summary-label-modal">Доставка:</span>
+                <span class="summary-value-modal">Рассчитается при оформлении</span>
+            </div>
             <div class="summary-row-modal total-row">
                 <span class="summary-label-modal">Итого: </span>
                 <span class="summary-value-modal total-price">{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
@@ -86,7 +91,7 @@
                 </button>
                 <button class="btn btn-secondary" (click)="goToCart()">
                     <i class="bi bi-bag"></i>
-                    <span class="btn-text">В корзину</span>
+                    <span class="btn-text">Перейти в корзину</span>
                 </button>
             </div>
             <button class="btn btn-primary checkout-btn" (click)="goToOrderConfirmation()">
