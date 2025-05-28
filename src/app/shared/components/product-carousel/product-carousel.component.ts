@@ -34,7 +34,7 @@ export class ProductCarouselComponent implements OnInit {
         this.loading = true;
         this.productService.getAll({ page: 1, limit: 30 }).subscribe({
             next: response => {
-                this.products = response.data.sort(() => 0.5 - Math.random()).slice(0, 10);
+                this.products = response.data.filter(product => product.variants.length !== 0).sort(() => 0.5 - Math.random()).slice(0, 10);
                 this.loading = false;
             },
             error: error => {

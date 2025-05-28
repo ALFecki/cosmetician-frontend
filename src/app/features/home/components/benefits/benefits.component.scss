@@ -25,6 +25,9 @@
         transform 0.3s ease,
         background-color 0.3s ease;
     border-color: var(--powder-pink);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .card:hover {
@@ -34,6 +37,14 @@
 
 .card:hover .circle-icon {
     background-color: var(--warm-white);
+}
+
+.card .card-body {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: center;
+    min-height: 300px;
 }
 
 .section-title {

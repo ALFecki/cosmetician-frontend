@@ -2,9 +2,9 @@
     <div class="d-flex justify-content-center align-items-center mb-4">
         <h2 class="text-center mb-4 section-title">Преимущества ProSkin</h2>
     </div>
-    <div class="row">
-        <div class="col-md-4 mb-4" *ngFor="let benefit of benefits">
-            <div class="card text-center">
+    <div class="row d-flex">
+        <div class="col-md-4 mb-4 d-flex" *ngFor="let benefit of benefits">
+            <div class="card text-center w-100">
                 <div class="card-body">
                     <div class="circle-icon mb-3">
                         <img [src]="benefit.icon" alt="{{ benefit.title }}" class="img-fluid" />

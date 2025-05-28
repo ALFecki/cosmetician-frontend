@@ -40,6 +40,7 @@ export class ProductService extends DataService<ProductModel, CreateProductSchem
     override create(data: CreateProductSchema): Promise<SingleResponse<ProductModel>> {
         const variants: { price: number; volume: number }[] =
             typeof data['variants'] === 'string' ? JSON.parse(data['variants']) : data['variants'] || [];
+        data.isDeleted = variants.length === 0;
         return new Promise((resolve, reject) => {
             this.http.post<SingleResponse<ProductModel>>(`${this.apiUrl}/${this.endpoint}`, data).subscribe({
                 next: response => {
@@ -54,6 +55,30 @@ export class ProductService extends DataService<ProductModel, CreateProductSchem
                 },
                 error: error => {
                     console.error('Error creating product:', error);
+                    reject(error);
+                },
+            });
+        });
+    }
+
+    override update(id: string, data: UpdateProductSchema): Promise<SingleResponse<ProductModel>> {
+        const variants: { price: number; volume: number }[] =
+            typeof data['variants'] === 'string' ? JSON.parse(data['variants']) : data['variants'] || [];
+        data.isDeleted = variants.length === 0;
+        return new Promise((resolve, reject) => {
+            this.http.patch<SingleResponse<ProductModel>>(`${this.apiUrl}/${this.endpoint}/${id}`, data).subscribe({
+                next: response => {
+                    const newVariants = this.setProductIdToVariants(response.data, variants);
+                    for (const variant of newVariants) {
+                        this.http.patch<SingleResponse<ProductModel>>(`${this.apiUrl}/product_variant/${variant.productId}`, variant).subscribe();
+                    }
+                    this.getById(response.data.id).subscribe({
+                        next: resolve,
+                        error: reject,
+                    });
+                },
+                error: error => {
+                    console.error('Error updating product:', error);
                     reject(error);
                 },
             });

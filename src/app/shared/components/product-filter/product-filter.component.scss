@@ -1,5 +1,12 @@
 .filter-container {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+
     .card {
+        width: 100%;
+        max-width: 100%;
         border-color: var(--powder-pink);
     }
 
@@ -77,8 +84,4 @@
     overflow-y: auto;
     padding-right: 10px;
     margin-bottom: 10px;
-}
-
-.filter-container {
-    position: relative;
 }

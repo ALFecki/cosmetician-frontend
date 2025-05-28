@@ -18,6 +18,8 @@
     /* Hide scrollbar in IE and Edge */
     scrollbar-width: none;
     /* Hide scrollbar in Firefox */
+    width: 100%;
+    max-width: 100%;
 
     &::-webkit-scrollbar {
         display: none;
@@ -31,6 +33,12 @@
     padding: 0 10px;
     scroll-snap-align: start;
     display: flex;
+    max-width: 280px;
+
+    @media (max-width: 768px) {
+        width: 250px;
+        max-width: 250px;
+    }
 }
 
 .product-card {

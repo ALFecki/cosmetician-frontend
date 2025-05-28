@@ -14,4 +14,5 @@ export interface FilterProductSchema extends FilterOptions {
     maxPrice?: number;
     minVolume?: number;
     maxVolume?: number;
+    isDeleted?: boolean;
 }

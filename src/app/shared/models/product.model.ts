@@ -20,6 +20,7 @@ export interface ProductModel {
 
     variants: ProductVariantModel[];
 
+    isDeleted: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
