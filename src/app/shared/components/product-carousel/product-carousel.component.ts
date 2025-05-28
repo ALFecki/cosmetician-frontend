@@ -18,6 +18,8 @@ export class ProductCarouselComponent implements OnInit {
     products: ProductModel[] = [];
     loading = false;
     error: string | null = null;
+    selectedVariantId?: string;
+
 
     @ViewChild('productCarousel') productCarousel!: ElementRef;
 
@@ -68,10 +70,5 @@ export class ProductCarouselComponent implements OnInit {
 
     openCatalog(): void {
         this.router.navigate(['/products']);
-    }
-
-    async addToCart(product: ProductModel): Promise<void> {
-        await this.cartService.addProductToCart(product.id);
-        this.toastService.show('Товар добавлен в корзину', 'success');
     }
 }

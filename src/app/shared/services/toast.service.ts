@@ -7,6 +7,7 @@ export class ToastService {
     message = '';
     visible = false;
     type: ToastType = 'info';
+    fadeOut = false;
     private timeoutId: ReturnType<typeof setTimeout> | null = null;
 
     constructor(private ngZone: NgZone) {}
@@ -15,6 +16,7 @@ export class ToastService {
         this.message = message;
         this.type = type;
         this.visible = true;
+        this.fadeOut = false;
 
         clearTimeout(this.timeoutId!);
         this.ngZone.runOutsideAngular(() => {
@@ -27,7 +29,11 @@ export class ToastService {
     }
 
     hide() {
-        this.visible = false;
-        this.message = '';
+        this.fadeOut = true;
+        setTimeout(() => {
+            this.visible = false;
+            this.message = '';
+            this.fadeOut = false;
+        }, 300);
     }
 }

@@ -82,11 +82,12 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
                     `${environment.server_url}/images/${await this.uploadImage(processedData[key])}` as (typeof processedData)[typeof key];
             }
         }
+        console.log('Processed create data:', processedData);
 
         return firstValueFrom(this.http.post<SingleResponse<Model>>(`${this.apiUrl}/${this.endpoint}`, processedData));
     }
 
-    async update(id: string, data: UpdateSchema): Promise<Observable<SingleResponse<Model>>> {
+    async update(id: string, data: UpdateSchema): Promise<SingleResponse<Model>> {
         const processedData = { ...(data as UpdateSchema) };
 
         for (const key in processedData) {
@@ -94,8 +95,9 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
                 processedData[key] = (await this.uploadImage(processedData[key])) as (typeof processedData)[typeof key];
             }
         }
+        console.log('Processed update data:', processedData);
 
-        return this.http.patch<SingleResponse<Model>>(`${this.apiUrl}/${this.endpoint}/${id}`, processedData);
+        return firstValueFrom(this.http.patch<SingleResponse<Model>>(`${this.apiUrl}/${this.endpoint}/${id}`, processedData));
     }
 
     delete(id: string): Observable<SingleResponse<Model>> {

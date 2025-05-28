@@ -5,13 +5,14 @@ import { Observable } from 'rxjs';
 import { PersonModel } from '../../models/person.model';
 import { AuthService } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
+import { IconsModule } from '../../base/icons/icons.module';
 
 @Component({
     selector: 'app-profile-sidebar',
     templateUrl: './profile-sidebar.component.html',
     styleUrl: './profile-sidebar.component.scss',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, IconsModule],
 })
 export class ProfileSidebarComponent implements OnInit {
     currentUser: Observable<PersonModel | null>;

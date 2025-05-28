@@ -1,21 +1,24 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ProductModel } from '../../models/product.model';
 import { AuthGuard } from '../../guards/auth.guard';
-import { CartService } from '../../services/cart.service';
 import { CountryModel } from '../../models/country.model';
-import { CommonModule } from '@angular/common';
+import { ProductModel } from '../../models/product.model';
+import { CartService } from '../../services/cart.service';
+import { ToastService } from '../../services/toast.service';
+import { IconsModule } from '../../base/icons/icons.module';
 
 @Component({
     selector: 'app-product-modal',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, IconsModule],
     templateUrl: './product-modal.component.html',
     styleUrl: './product-modal.component.scss',
 })
 export class ProductModalComponent {
     selectedProduct: ProductModel | null = null;
+    selectedVariantId: string | null = null;
     activeTab = 'description';
 
     constructor(
@@ -24,6 +27,7 @@ export class ProductModalComponent {
         private route: ActivatedRoute,
         private authGuard: AuthGuard,
         private cartService: CartService,
+        private toastService: ToastService,
     ) {}
 
     moreInfo() {
@@ -35,7 +39,13 @@ export class ProductModalComponent {
         if (product) {
             this.authGuard.canActivate(this.route.snapshot, this.router.routerState.snapshot).subscribe(async isAuthenticated => {
                 if (isAuthenticated) {
-                    await this.cartService.addProductToCart(product.id);
+                    if (this.selectedVariantId) {
+                            await this.cartService.addProductToCart(this.selectedVariantId);
+
+                    } else {
+                        this.toastService.show('Пожалуйста, выберите вариант продукта перед добавлением в корзину.', 'error');
+                        return;
+                    }
                 }
             });
         }
@@ -47,5 +57,24 @@ export class ProductModalComponent {
 
     closeModal() {
         this.modalService.dismissAll();
+    }
+
+    selectVariant(variantId: string) {
+        this.selectedVariantId = variantId;
+    }
+
+    getSelectedVariant() {
+        if (!this.selectedProduct?.variants) return null;
+        return this.selectedProduct.variants.find(v => v.id === this.selectedVariantId) || this.selectedProduct.variants[0];
+    }
+
+    getSelectedVariantPrice(): number {
+        const variant = this.getSelectedVariant();
+        return variant?.price || 0;
+    }
+
+    getSelectedVariantVolume(): number {
+        const variant = this.getSelectedVariant();
+        return variant?.volume || 0;
     }
 }

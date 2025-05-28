@@ -13,7 +13,7 @@
 
 .navbar-brand {
     color: var(--gray-dark);
-    font-family: 'Pacifico', cursive;
+    // font-family: 'Pacifico', cursive;
     font-size: 1.8rem;
     font-weight: 400;
     transition: all 0.3s ease;
@@ -225,23 +225,28 @@
 
     .badge {
         background: var(--primary);
-        border: 1px solid var(--white);
+        color: var(--white);
+        border: 2px solid var(--white);
         animation: pulse 2s infinite;
         font-size: 0.7rem;
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        transform: none;
     }
 }
 
 @keyframes pulse {
     0% {
-        transform: translateX(-50%) scale(1);
+        transform: scale(1);
     }
 
     50% {
-        transform: translateX(-50%) scale(1.1);
+        transform: scale(1.1);
     }
 
     100% {
-        transform: translateX(-50%) scale(1);
+        transform: scale(1);
     }
 }
 

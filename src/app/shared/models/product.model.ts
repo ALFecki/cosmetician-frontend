@@ -8,8 +8,6 @@ export interface ProductModel {
     fullTitle: string;
     description: string;
     image: string;
-    price: number;
-    volume: number;
     methodOfUse?: string;
     brandId: string;
     brand: BrandModel;
@@ -20,6 +18,19 @@ export interface ProductModel {
     categoryId: string;
     categories: CategoryModel[];
 
+    variants: ProductVariantModel[];
+
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface ProductVariantModel {
+    id: string;
+    productId: string;
+    volume: number;
+    price: number;
+    isDefault: boolean;
+    isDeleted: boolean;
     createdAt: Date;
     updatedAt: Date;
 }

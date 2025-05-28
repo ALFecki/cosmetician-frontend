@@ -1,4 +1,4 @@
-import { ProductModel } from './product.model';
+import { ProductModel, ProductVariantModel } from './product.model';
 
 export interface OrderModel {
     id: string;
@@ -12,5 +12,7 @@ export interface OrderModel {
 
 export interface OrderProductModel {
     product: ProductModel;
+    variant: ProductVariantModel;
     quantity: number;
 }
+

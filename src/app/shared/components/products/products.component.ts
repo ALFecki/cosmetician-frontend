@@ -30,6 +30,7 @@ export class ProductsComponent implements OnInit {
     currentPage = 1;
     totalItems$: Observable<number> = of(0);
     filterOptions: FilterProductSchema = {};
+    selectedVariants: { [key: string]: string } = {};
 
     constructor(
         private route: ActivatedRoute,
@@ -67,6 +68,12 @@ export class ProductsComponent implements OnInit {
             .subscribe(data => {
                 this.products$ = of(data.data);
                 this.totalItems$ = of(data.length);
+                for (const product of data.data) {
+                    // Initialize selected variant for each product
+                    if (product.variants && product.variants.length > 0) {
+                        this.selectedVariants[product.id] = product.variants[0].id;
+                    }
+                }
             });
     }
 
@@ -95,15 +102,38 @@ export class ProductsComponent implements OnInit {
             scrollable: true,
         });
         activeModal.componentInstance.selectedProduct = product;
+        activeModal.componentInstance.selectedVariantId = this.getSelectedVariant(product);
     }
 
     async addToCart(product: ProductModel | null) {
         if (product) {
             this.authGuard.canActivate(this.route.snapshot, this.router.routerState.snapshot).subscribe(async isAuthenticated => {
                 if (isAuthenticated) {
-                    await this.cartService.addProductToCart(product.id);
+                    await this.cartService.addProductToCart(this.selectedVariants[product.id]);
                 }
             });
         }
     }
+
+    selectVariant(productId: string, variantId: string) {
+        this.selectedVariants[productId] = variantId;
+    }
+
+    getSelectedVariant(product: ProductModel): string | undefined {
+        return this.selectedVariants[product.id] || product.variants?.[0]?.id;
+    }
+
+    getSelectedVariantPrice(product: ProductModel): number {
+        const variantId = this.getSelectedVariant(product);
+        const variant = product.variants?.find(v => v.id === variantId);
+        return variant ? variant.price : 0;
+    }
+
+    getSelectedVariantVolume(product: ProductModel): number {
+        const variantId = this.getSelectedVariant(product);
+        const variant = product.variants?.find(v => v.id === variantId);
+        return variant ? variant.volume : 0;
+    }
+
+    
 }

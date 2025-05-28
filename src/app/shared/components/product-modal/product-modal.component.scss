@@ -144,6 +144,58 @@
         gap: 1.5rem;
         height: 100%;
 
+        .variant-selection {
+            h6 {
+                color: #2c3e50;
+                font-weight: 600;
+                margin-bottom: 1rem;
+                font-size: 1.1rem;
+                display: flex;
+                align-items: center;
+
+                i {
+                    color: var(--secondary);
+                }
+            }
+
+            .variant-buttons {
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+
+                .variant-btn {
+                    background: #fff;
+                    border: 2px solid rgba(255, 214, 224, 0.3);
+                    border-radius: 8px;
+                    padding: 0.5rem 0.75rem;
+                    text-align: center;
+                    transition: all 0.3s ease;
+                    color: #666;
+
+                    &:hover {
+                        border-color: var(--secondary);
+                        background: rgba(255, 214, 224, 0.1);
+                    }
+
+                    &.active {
+                        background: var(--secondary);
+                        border-color: var(--secondary);
+                        color: white;
+                    }
+
+                    .variant-volume {
+                        font-weight: 600;
+                        font-size: 0.9rem;
+                    }
+
+                    .variant-price {
+                        font-size: 0.8rem;
+                        opacity: 0.8;
+                    }
+                }
+            }
+        }
+
         .characteristics-compact {
             h6 {
                 color: #2c3e50;
@@ -333,13 +385,16 @@
         }
     }
 }
+
 // }
 
 @keyframes shimmer {
+
     0%,
     100% {
         transform: rotate(0deg);
     }
+
     50% {
         transform: rotate(180deg);
     }

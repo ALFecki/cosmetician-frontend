@@ -23,9 +23,9 @@
                     </div>
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">{{ product.title }}</h5>
-                        <p class="card-text">Цена: {{ product.price }} р.</p>
+                        <p class="card-text">Цена: от {{ product.variants[0].price }} р.</p>
                         <div class="mt-auto">
-                            <button class="btn btn-primary w-100" (click)="$event.stopPropagation(); addToCart(product)">Купить</button>
+                            <button class="btn btn-primary w-100" (click)="$event.stopPropagation(); openProductDetails(product)">Купить</button>
                         </div>
                     </div>
                 </div>

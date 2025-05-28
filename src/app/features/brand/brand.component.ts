@@ -5,11 +5,12 @@ import { Observable, of } from 'rxjs';
 import { ProductsComponent } from '../../shared/components/products/products.component';
 import { BrandModel } from '../../shared/models/brand.model';
 import { BrandService } from '../../shared/services/brand.service';
+import { IconsModule } from '../../shared/base/icons/icons.module';
 
 @Component({
     selector: 'app-brand',
     standalone: true,
-    imports: [CommonModule, ProductsComponent],
+    imports: [CommonModule, ProductsComponent, IconsModule],
     templateUrl: './brand.component.html',
     styleUrl: './brand.component.scss',
 })

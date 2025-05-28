@@ -84,19 +84,23 @@ export class UserProfileComponent implements OnInit {
             email: this.currentUser.value?.email, // Keep original email
         };
 
-        (await this.personService.update(this.currentUser.value!.id, updatedUser)).subscribe(
-            user => {
-                this.loading = false;
-                this.currentUser.next(user.data);
-                this.success = 'Профиль успешно обновлен';
-                this.toastService.show('Профиль успешно обновлен', 'success');
-            },
-            error => {
-                this.loading = false;
-                this.error = 'Ошибка при обновлении профиля: ' + (error.message || 'Неизвестная ошибка');
-                this.toastService.show('Ошибка при обновлении профиля', 'error');
-            },
-        );
+        const result = await this.personService.update(this.currentUser.value!.id, updatedUser)
+
+        if (!result) {
+            this.loading = false;
+            this.error = 'Не удалось обновить профиль. Пожалуйста, попробуйте позже.';
+            this.toastService.show('Не удалось обновить профиль', 'error');
+            return;
+        } else if (result.status !== 'success') {
+            this.loading = false;
+            this.error = 'Ошибка при обновлении профиля: ' + (result.data || 'Неизвестная ошибка');
+            this.toastService.show('Ошибка при обновлении профиля', 'error');
+            return;
+        }
+        this.loading = false;
+        this.currentUser.next(result.data);
+        this.success = 'Профиль успешно обновлен';
+        this.toastService.show('Профиль успешно обновлен', 'success');
     }
 
     logout(): void {

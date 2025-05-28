@@ -8,18 +8,18 @@ import { Component } from '@angular/core';
 export class BenefitsComponent {
     benefits = [
         {
-            title: 'Широкий ассортимент',
-            description: 'Выбор из множества брендов и продуктов, доступных в любое время.',
+            title: 'Проефссиональный подбор косметики',
+            description: 'Консультация врача, кандидата медицинских наук, практикующего косметолога Виктории Скворцовой.',
             icon: 'assets/icons/variety.png',
         },
         {
             title: 'Удобство покупок',
-            description: 'Покупайте из дома, не тратя время на поездки в магазины.',
+            description: 'Дружелюбный интерфейс, широкий ассортимент, оперативная доставка.',
             icon: 'assets/icons/convenience.png',
         },
         {
-            title: 'Специальные предложения',
-            description: 'Получайте доступ к эксклюзивным скидкам и акциям.',
+            title: 'Индивидуальные скидки',
+            description: 'Специальные предложения именно для Вас. Эксклюзивные наборы.',
             icon: 'assets/icons/special-offers.png',
         },
     ];

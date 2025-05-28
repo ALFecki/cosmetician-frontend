@@ -45,8 +45,9 @@ export class CartService implements OnDestroy {
             if (order) {
                 const updatedItems = order.products.map(item => ({
                     product: item.product,
+                    variant: item.variant,
                     quantity: item.quantity,
-                    totalPrice: item.quantity * item.product.price,
+                    totalPrice: item.quantity * item.variant.price,
                 }));
                 this.cartItemsSubject.next(updatedItems);
                 this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
@@ -59,7 +60,7 @@ export class CartService implements OnDestroy {
     }
 
     private addToPendingUpdates(cartItem: CartModel): void {
-        const existingIndex = this.pendingUpdates.findIndex(item => item.product.id === cartItem.product.id);
+        const existingIndex = this.pendingUpdates.findIndex(item => item.variant.id === cartItem.variant.id);
 
         if (existingIndex !== -1) {
             this.pendingUpdates[existingIndex] = cartItem;
@@ -78,8 +79,9 @@ export class CartService implements OnDestroy {
                     if (order) {
                         const items = order.products.map(item => ({
                             product: item.product,
+                            variant: item.variant,
                             quantity: item.quantity,
-                            totalPrice: item.quantity * item.product.price,
+                            totalPrice: item.quantity * item.variant.price,
                         }));
                         this.cartItemsSubject.next(items);
                         this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
@@ -105,13 +107,14 @@ export class CartService implements OnDestroy {
         return this.totalPriceSubject.asObservable();
     }
 
-    async addProductToCart(productId: string): Promise<void> {
-        const order = await this.orderService.addProductToOrder(productId);
+    async addProductToCart(variantId: string): Promise<void> {
+        const order = await this.orderService.addProductToOrder(variantId);
         if (order) {
             const updatedItems = order.products.map(item => ({
                 product: item.product,
+                variant: item.variant,
                 quantity: item.quantity,
-                totalPrice: item.quantity * item.product.price,
+                totalPrice: item.quantity * item.variant.price,
             }));
             this.cartItemsSubject.next(updatedItems);
             this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
@@ -124,18 +127,18 @@ export class CartService implements OnDestroy {
     increaseQuantity(cartItem: CartModel): void {
         const currentItems = this.cartItemsSubject.value;
         const updatedItems = currentItems.map(item => {
-            if (item.product.id === cartItem.product.id) {
+            if (item.variant.id === cartItem.variant.id) {
                 return {
                     ...item,
                     quantity: item.quantity + 1,
-                    totalPrice: (item.quantity + 1) * item.product.price,
+                    totalPrice: (item.quantity + 1) * item.variant.price,
                 };
             }
             return item;
         });
 
         cartItem.quantity += 1;
-        cartItem.totalPrice = cartItem.quantity * cartItem.product.price;
+        cartItem.totalPrice = cartItem.quantity * cartItem.variant.price;
 
         this.cartItemsSubject.next(updatedItems);
         this.updateTotalPrice(updatedItems);
@@ -147,18 +150,18 @@ export class CartService implements OnDestroy {
 
         const currentItems = this.cartItemsSubject.value;
         const updatedItems = currentItems.map(item => {
-            if (item.product.id === cartItem.product.id) {
+            if (item.variant.id === cartItem.variant.id) {
                 return {
                     ...item,
                     quantity: item.quantity - 1,
-                    totalPrice: (item.quantity - 1) * item.product.price,
+                    totalPrice: (item.quantity - 1) * item.variant.price,
                 };
             }
             return item;
         });
 
         cartItem.quantity -= 1;
-        cartItem.totalPrice = cartItem.quantity * cartItem.product.price;
+        cartItem.totalPrice = cartItem.quantity * cartItem.variant.price;
 
         this.cartItemsSubject.next(updatedItems);
         this.updateTotalPrice(updatedItems);
@@ -170,12 +173,13 @@ export class CartService implements OnDestroy {
     }
 
     async removeProduct(cartItem: CartModel): Promise<void> {
-        const order = await this.orderService.removeProduct(cartItem.product.id);
+        const order = await this.orderService.removeProduct(cartItem.variant.id);
         if (order) {
             const updatedItems = order.products.map(item => ({
                 product: item.product,
+                variant: item.variant,
                 quantity: item.quantity,
-                totalPrice: item.quantity * item.product.price,
+                totalPrice: item.quantity * item.variant.price,
             }));
             this.cartItemsSubject.next(updatedItems);
             this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));

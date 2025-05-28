@@ -26,9 +26,9 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
         return of(0);
     }
 
-    async addProductToOrder(productId: string): Promise<OrderModel | null> {
+    async addProductToOrder(variantId: string): Promise<OrderModel | null> {
         const order = await firstValueFrom(
-            this.http.post<OrderModel>(`${environment.server_url}/${this.endpoint}/attach_product/${productId}`, {}),
+            this.http.post<OrderModel>(`${environment.server_url}/${this.endpoint}/attach_product/${variantId}`, {}),
         );
 
         if (order) {
@@ -62,13 +62,13 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
             );
     }
 
-    async changeQuantity(productId: string, quantity: number): Promise<OrderModel | null> {
+    async changeQuantity(variantId: string, quantity: number): Promise<OrderModel | null> {
         console.log('Current order:', this.currentOrder);
         if (this.currentOrder) {
-            const cartItem = this.currentOrder.products.find(item => item.product.id === productId);
+            const cartItem = this.currentOrder.products.find(item => item.variant.id === variantId);
             const newOrder = await firstValueFrom(
                 this.http.patch<OrderModel>(
-                    `${environment.server_url}/${this.endpoint}/product/${productId}/quantity/${quantity}`,
+                    `${environment.server_url}/${this.endpoint}/product/${variantId}/quantity/${quantity}`,
                     cartItem,
                 ),
             );
@@ -83,7 +83,7 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
         const result = await firstValueFrom(
             this.http.put<{ status: boolean; data: OrderModel }>(
                 `${environment.server_url}/${this.endpoint}/batch-quantity`,
-                { products: cartItems },
+                { variants: cartItems },
                 { withCredentials: true },
             ),
         )

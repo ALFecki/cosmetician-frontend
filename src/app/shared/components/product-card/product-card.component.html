@@ -32,24 +32,36 @@
     <div *ngIf="!loading && !error && product" class="card product-main-card p-4">
         <div class="row g-4 align-items-stretch">
             <div class="col-md-5 d-flex align-items-center justify-content-center">
-                <img
-                    [src]="product.image || 'assets/images/products/no-image.png'"
-                    [alt]="product.title"
-                    class="img-fluid product-main-image"
-                />
+                <img [src]="product.image || 'assets/images/products/no-image.png'" [alt]="product.title"
+                    class="img-fluid product-main-image" />
             </div>
             <div class="col-md-4">
                 <h2 class="card-title mb-3">{{ product.title }}</h2>
                 <div class="mb-3 text-muted">
                     Артикул: <span>{{ '—' }}</span>
                 </div>
+
+                <!-- Variant Selection -->
+                <div class="variant-selection-detail mb-4" *ngIf="product.variants && product.variants.length > 1">
+                    <h6 class="mb-3">Выберите объем:</h6>
+                    <div class="variant-buttons-detail">
+                        <button *ngFor="let variant of product.variants" class="btn variant-btn-detail"
+                            [class.active]="selectedVariantId === variant.id" (click)="selectVariant(variant.id)">
+                            <div class="variant-volume">{{ variant.volume }}мл</div>
+                            <div class="variant-price">{{ variant.price | number: '1.2-2' }} р.</div>
+                        </button>
+                    </div>
+                </div>
+
                 <div class="mb-3 d-flex align-items-center">
                     <a [routerLink]="['/brand', product.brand.id]" class="brand-link d-flex align-items-center me-3">
-                        <img *ngIf="product.brand.image" [src]="product.brand.image" [alt]="product.brand.title" class="brand-img me-2" />
+                        <img *ngIf="product.brand.image" [src]="product.brand.image" [alt]="product.brand.title"
+                            class="brand-img me-2" />
                         <span>{{ product.brand.title }}</span>
                     </a>
                     <div *ngFor="let category of product.categories">
-                        <a [routerLink]="['/category', category.id]" class="category-link"> {{ category.title }}&nbsp; </a>
+                        <a [routerLink]="['/category', category.id]" class="category-link"> {{ category.title }}&nbsp;
+                        </a>
                     </div>
                 </div>
                 <div class="characteristics-list mt-4">
@@ -60,7 +72,8 @@
                         </div>
                     </div>
                     <div *ngIf="hiddenCharacteristics.length && !showAllCharacteristics" class="mt-2">
-                        <button class="btn btn-link p-0" (click)="showAllCharacteristics = true">Все характеристики</button>
+                        <button class="btn btn-link p-0" (click)="showAllCharacteristics = true">Все
+                            характеристики</button>
                     </div>
                     <div *ngIf="showAllCharacteristics">
                         <div *ngFor="let char of hiddenCharacteristics">
@@ -76,28 +89,29 @@
             <div class="col-md-3">
                 <div class="right-panel d-flex flex-column">
                     <div class="price-block mb-3">
-                        <div class="h3 mb-1">{{ product.price | number: '1.2-2' }} <span class="currency">р.</span></div>
-                        <div class="text-muted small">Объем: {{ product.volume }} мл</div>
+                        <div class="h3 mb-1">{{ getSelectedVariantPrice() | number: '1.2-2' }} <span
+                                class="currency">р.</span></div>
+                        <div class="text-muted small">Объем: {{ getSelectedVariantVolume() }} мл</div>
                     </div>
                     <button class="btn btn-primary w-100 mb-3" (click)="addToCart(product)">
-                        <i class="bi bi-cart-plus"></i> Добавить в корзину
+                        <i-bs name="cart-plus"></i-bs> Добавить в корзину
                     </button>
 
                     <div class="features mt-3">
                         <div class="feature-item">
-                            <i class="bi bi-truck"></i>
+                            <i-bs name="truck"></i-bs>
                             <span>Быстрая доставка</span>
                         </div>
                         <div class="feature-item">
-                            <i class="bi bi-shield-check"></i>
+                            <i-bs name="shield-check"></i-bs>
                             <span>Гарантия качества</span>
                         </div>
                         <div class="feature-item">
-                            <i class="bi bi-arrow-repeat"></i>
+                            <i-bs name="arrow-repeat"></i-bs>
                             <span>Возврат в течение 14 дней</span>
                         </div>
                         <div class="feature-item">
-                            <i class="bi bi-credit-card"></i>
+                            <i-bs name="credit-card"></i-bs>
                             <span>Удобная оплата</span>
                         </div>
                     </div>
@@ -105,16 +119,16 @@
                     <div class="consultation-box">
                         <h5>Нужна консультация?</h5>
                         <div class="contact-item">
-                            <i class="bi bi-telephone"></i>
+                            <i-bs name="telephone"></i-bs>
                             <span>+375 (29) 598-77-52</span>
                         </div>
                         <div class="contact-item">
-                            <i class="bi bi-envelope"></i>
+                            <i-bs name="envelope"></i-bs>
                             <span>{{ 'info@cosmetician.ru' }}</span>
                         </div>
                         <div class="contact-item">
-                            <i class="bi bi-clock"></i>
-                            <span>Пн-Пт: 9:00 - 19:00</span>
+                            <i-bs name="clock"></i-bs>
+                            <span>Пн-Пт: 9:00-18:00</span>
                         </div>
                     </div>
 
@@ -131,22 +145,26 @@
         <div class="card-body">
             <ul class="nav nav-tabs" id="productTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" [class.active]="activeTab === 'desc'" (click)="activeTab = 'desc'" type="button">
+                    <button class="nav-link" [class.active]="activeTab === 'desc'" (click)="activeTab = 'desc'"
+                        type="button">
                         Описание
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" [class.active]="activeTab === 'composition'" (click)="activeTab = 'composition'" type="button">
+                    <button class="nav-link" [class.active]="activeTab === 'composition'"
+                        (click)="activeTab = 'composition'" type="button">
                         Состав
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" [class.active]="activeTab === 'chars'" (click)="activeTab = 'chars'" type="button">
+                    <button class="nav-link" [class.active]="activeTab === 'chars'" (click)="activeTab = 'chars'"
+                        type="button">
                         Характеристики
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" [class.active]="activeTab === 'use'" (click)="activeTab = 'use'" type="button">
+                    <button class="nav-link" [class.active]="activeTab === 'use'" (click)="activeTab = 'use'"
+                        type="button">
                         Применение
                     </button>
                 </li>
@@ -155,7 +173,8 @@
                 <div class="tab-pane fade" [class.show]="activeTab === 'desc'" [class.active]="activeTab === 'desc'">
                     <p>{{ product.description || 'Нет описания' }}</p>
                 </div>
-                <div class="tab-pane fade" [class.show]="activeTab === 'composition'" [class.active]="activeTab === 'composition'">
+                <div class="tab-pane fade" [class.show]="activeTab === 'composition'"
+                    [class.active]="activeTab === 'composition'">
                     <p>{{ 'Нет информации о составе' }}</p>
                 </div>
                 <div class="tab-pane fade" [class.show]="activeTab === 'chars'" [class.active]="activeTab === 'chars'">

@@ -4,13 +4,16 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, catchError, forkJoin, of, tap } from 'rxjs';
+import { FilterBrandSchema } from '../../schemas/brand.schema';
+import { FilterCategorySchema } from '../../schemas/category.schema';
 import { BrandService } from '../../services/brand.service';
 import { CategoryService } from '../../services/category.service';
 import { PersonSevice } from '../../services/person.service';
 import { ProductService } from '../../services/product.service';
 import { GenericTableComponent } from '../generic-table/generic-table.component';
-import { FilterBrandSchema } from '../../schemas/brand.schema';
-import { FilterCategorySchema } from '../../schemas/category.schema';
+import { CountryService } from '../../services/country.service';
+import { FilterCountrySchema } from '../../schemas/country.schema';
+import { IconsModule } from '../../base/icons/icons.module';
 
 interface ModelConfig {
     key: string;
@@ -19,21 +22,21 @@ interface ModelConfig {
     fields: {
         key: string;
         label: string;
-        type: 'text' | 'number' | 'textarea' | 'select' | 'file' | 'image' | 'email' | 'boolean';
+        type: 'text' | 'number' | 'textarea' | 'select' | 'file' | 'image' | 'email' | 'boolean' | 'multiselect' | 'variants';
         required?: boolean;
         options?: any[];
     }[];
     columns: {
         key: string;
         title: string;
-        type?: 'text' | 'number' | 'image' | 'date' | 'boolean';
+        type?: 'text' | 'number' | 'image' | 'date' | 'boolean' | 'array' | 'variants';
     }[];
 }
 
 @Component({
     selector: 'app-admin-panel-switcher',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, GenericTableComponent],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, GenericTableComponent, IconsModule],
     templateUrl: './admin-panel-switcher.component.html',
     styleUrl: './admin-panel-switcher.component.scss',
 })
@@ -70,6 +73,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
         private categoryService: CategoryService,
         private brandService: BrandService,
         private personService: PersonSevice,
+        private countryService: CountryService
     ) {}
 
     ngOnInit(): void {
@@ -92,15 +96,13 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'fullTitle', label: 'Полное название', type: 'text', required: false },
                 { key: 'description', label: 'Описание', type: 'textarea', required: true },
                 { key: 'image', label: 'Изображение', type: 'image', required: false },
-                { key: 'price', label: 'Цена', type: 'number', required: true },
-                { key: 'volume', label: 'Объем', required: true, type: 'number' },
-                { key: 'categoryId', label: 'Категория', type: 'select', required: true },
+                { key: 'variants', label: 'Варианты (Объем-Цена)', type: 'variants', required: true },
+                { key: 'categoryIds', label: 'Категории', type: 'multiselect', required: true },
                 { key: 'brandId', label: 'Бренд', type: 'select', required: true },
-                // { key: 'amount', label: 'Количество', type: 'number', required: true },
+                { key: 'countryIds', label: 'Страны производители', type: 'multiselect', required: false },
                 { key: 'composition', label: 'Состав', type: 'textarea', required: false },
                 { key: 'productScope', label: 'Область применения', type: 'textarea', required: false },
                 { key: 'productType', label: 'Тип продукта', type: 'textarea', required: false },
-                { key: 'country', label: 'Страна производитель', type: 'text', required: false },
                 { key: 'methodOfUse', label: 'Способ применения', type: 'textarea', required: false },
             ],
             columns: [
@@ -109,16 +111,13 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'title', title: 'Название' },
                 { key: 'fullTitle', title: 'Полное название' },
                 { key: 'description', title: 'Описание' },
-                { key: 'volume', title: 'Объем' },
-                { key: 'price', title: 'Цена', type: 'number' },
-                { key: 'category.title', title: 'Категория' },
+                { key: 'variants', title: 'Варианты (Объем/Цена)', type: 'variants' },
+                { key: 'categories', title: 'Категории', type: 'array' },
                 { key: 'brand.title', title: 'Бренд' },
-                // { key: 'amount', title: 'Количество', type: 'number' },
-                { key: 'characteristics', title: 'Характеристики' },
+                { key: 'countries', title: 'Страны', type: 'array' },
                 { key: 'composition', title: 'Состав' },
                 { key: 'productScope', title: 'Область применения' },
                 { key: 'productType', title: 'Тип продукта' },
-                { key: 'country', title: 'Страна производитель' },
                 { key: 'methodOfUse', title: 'Способ применения' },
                 { key: 'isDeleted', title: 'Удален' },
                 { key: 'createdAt', title: 'Дата создания', type: 'date' },
@@ -232,9 +231,24 @@ export class AdminPanelSwitcherComponent implements OnInit {
             ],
         };
 
-        // this.modelConfigs['countries'] = {
-        //     key: 'countries',
-        //     title: 'Страны',
+        this.modelConfigs['countries'] = {
+            key: 'countries',
+            title: 'Страны',
+            service: this.countryService,
+            fields: [
+                { key: 'name', label: 'Название', type: 'text', required: true },
+                { key: 'code', label: 'Код', type: 'text', required: true },
+            ],
+            columns: [
+                { key: 'id', title: 'ID' },
+                { key: 'name', title: 'Название' },
+                { key: 'code', title: 'Код' },
+                { key: 'isDeleted', title: 'Удален' },
+                { key: 'createdAt', title: 'Дата создания', type: 'date' },
+                { key: 'updatedAt', title: 'Дата обновления', type: 'date' },
+            ],
+        };
+
     }
 
     get currentModelConfig(): ModelConfig {
@@ -264,14 +278,13 @@ export class AdminPanelSwitcherComponent implements OnInit {
     loadData() {
         this.loading = true;
         this.error = null;
-        // const service = this.currentModelConfig.service;
 
-        // Get additional data for select fields
         const observables: Record<string, Observable<any>> = {};
 
         if (this.currentModel === 'products') {
             observables['categories'] = this.categoryService.getAll({ includeDeleted: true } as FilterCategorySchema);
             observables['brands'] = this.brandService.getAll({ includeDeleted: true } as FilterBrandSchema);
+            observables['countries'] = this.countryService.getAll({ includeDeleted: true } as FilterCountrySchema);
         }
 
         if (Object.keys(observables).length > 0) {
@@ -279,23 +292,26 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 .pipe(
                     tap(results => {
                         this.currentModelConfig.fields.forEach(field => {
-                            if (field.type === 'select') {
-                                if (field.key === 'categoryId' && results['categories']) {
+                            console.log(`Field: ${field.key}, Type: ${field.type}`);
+                            if (field.type === 'select' || field.type === 'multiselect') {
+                                if (field.key === 'categoryIds' && results['categories']) {
                                     field.options = results['categories'].data;
-                                } else if (field.key === 'brandId' && results['brands']) {
-                                    field.options = results['brands'].data;
-                                }
+                            } else if (field.key === 'brandId' && results['brands']) {
+                                field.options = results['brands'].data;
+                            } else if (field.key === 'countryIds' && results['countries']) {
+                                field.options = results['countries'].data;
                             }
-                        });
-                    }),
-                    catchError(error => {
-                        console.error('Error loading options:', error);
-                        return of(null);
-                    }),
-                )
-                .subscribe(() => {
-                    this.loadMainData();
-                });
+                        }
+                    });
+                }),
+                catchError(error => {
+                    console.error('Error loading options:', error);
+                    return of(null);
+                }),
+            )
+            .subscribe(() => {
+                this.loadMainData();
+            });
         } else {
             this.loadMainData();
         }
@@ -352,13 +368,40 @@ export class AdminPanelSwitcherComponent implements OnInit {
         const formControls: any = {};
 
         this.currentModelFields.forEach(field => {
-            const value = item ? (field.key.includes('.') ? this.getNestedProperty(item, field.key) : item[field.key]) : '';
+            let value: any = '';
+            
+            if (item) {
+                if (field.key === 'variants') {
+                    value = item.variants || [{ volume: '', price: '' }];
+                } else if (field.key === 'categoryIds') {
+                    value = item.categories?.map((cat: any) => cat.id) || [];
+                } else if (field.key === 'countryIds') {
+                    value = item.countries?.map((country: any) => country.id) || [];
+                } else {
+                    value = field.key.includes('.') ? this.getNestedProperty(item, field.key) : item[field.key] || '';
+                }
+            } else {
+                if (field.key === 'variants') {
+                    value = [{ volume: '', price: '' }];
+                } else if (field.type === 'multiselect') {
+                    value = [];
+                }
+            }
 
             const validators = [];
             if (field.required) validators.push(Validators.required);
             if (field.type === 'email') validators.push(Validators.email);
 
-            formControls[field.key] = [value, validators];
+            if (field.key === 'variants') {
+                formControls[field.key] = this.fb.array(
+                    value.map((variant: any) => this.fb.group({
+                        volume: [variant.volume || '', Validators.required],
+                        price: [variant.price || '', Validators.required]
+                    }))
+                );
+            } else {
+                formControls[field.key] = [value, validators];
+            }
         });
 
         return this.fb.group(formControls);
@@ -424,6 +467,25 @@ export class AdminPanelSwitcherComponent implements OnInit {
         delete this.selectedFiles[fieldKey];
     }
 
+    addVariant() {
+        const variantsArray = this.itemForm.get('variants') as any;
+        variantsArray.push(this.fb.group({
+            volume: ['', Validators.required],
+            price: ['', Validators.required]
+        }));
+    }
+
+    removeVariant(index: number) {
+        const variantsArray = this.itemForm.get('variants') as any;
+        if (variantsArray.length > 1) {
+            variantsArray.removeAt(index);
+        }
+    }
+
+    getVariantsFormArray() {
+        return this.itemForm.get('variants') as any;
+    }
+
     async saveItem() {
         console.log(`Item Form Value:`, this.itemForm.value);
         if (this.itemForm.invalid) {
@@ -445,7 +507,9 @@ export class AdminPanelSwitcherComponent implements OnInit {
             const value = this.itemForm.value[key];
             console.log(`Key: ${key}, Value: ${value}`);
             if (value !== null && value !== undefined) {
-                if (typeof value === 'object' && !Array.isArray(value)) {
+                if (key === 'variants' || key === 'categoryIds' || key === 'countryIds') {
+                    formData[key] = JSON.stringify(value);
+                } else if (typeof value === 'object' && !Array.isArray(value)) {
                     formData[key] = JSON.stringify(value);
                 } else {
                     formData[key] = value;
@@ -513,5 +577,18 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 this.deleting = false;
             },
         );
+    }
+
+    onMultiselectChange(fieldKey: string, optionId: string, event: any) {
+        const currentValue = this.itemForm.get(fieldKey)?.value || [];
+        let newValue: string[];
+
+        if (event.target.checked) {
+            newValue = [...currentValue, optionId];
+        } else {
+            newValue = currentValue.filter((id: string) => id !== optionId);
+        }
+
+        this.itemForm.get(fieldKey)?.setValue(newValue);
     }
 }

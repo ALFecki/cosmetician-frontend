@@ -107,30 +107,37 @@
                     font-size: 0.8rem;
                     font-weight: 500;
                     border-radius: 8px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
 
                     &.bg-warning {
-                        background: var(--warning) !important;
-                        color: var(--white);
+                        background: #ffc107 !important;
+                        color: #212529 !important;
                     }
 
                     &.bg-success {
-                        background: var(--success) !important;
-                        color: var(--white);
+                        background: #198754 !important;
+                        color: #ffffff !important;
                     }
 
                     &.bg-danger {
-                        background: var(--danger) !important;
-                        color: var(--white);
+                        background: #dc3545 !important;
+                        color: #ffffff !important;
                     }
 
                     &.bg-info {
-                        background: var(--info) !important;
-                        color: var(--white);
+                        background: #0dcaf0 !important;
+                        color: #212529 !important;
+                    }
+
+                    &.bg-primary {
+                        background: var(--primary) !important;
+                        color: #ffffff !important;
                     }
 
                     &.bg-secondary {
-                        background: var(--gray-medium) !important;
-                        color: var(--white);
+                        background: #6c757d !important;
+                        color: #ffffff !important;
                     }
                 }
 
