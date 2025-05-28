@@ -32,9 +32,11 @@
                                     <p class="mb-0">от {{ (order | async)?.createdAt | date: 'dd.MM.yyyy HH:mm' }}</p>
                                 </div>
                                 <div class="col-md-6 text-md-end">
-                                    <span class="badge rounded-pill order-status-badge {{
+                                    <span
+                                        class="badge rounded-pill order-status-badge {{
                                             getOrderStatusClass((order | async)?.status || '')
-                                        }} fs-6 mb-2">
+                                        }} fs-6 mb-2"
+                                    >
                                         {{ getOrderStatusText((order | async)?.status || '') }}
                                     </span>
                                     <!-- <div *ngIf="canCancelOrder()">
@@ -66,29 +68,27 @@
                                     <tbody>
                                         <tr *ngFor="let item of (order | async)?.products">
                                             <td>
-                                                <img [src]="item.product.image || 'assets/images/products/no-image.png'"
+                                                <img
+                                                    [src]="item.product.image || 'assets/images/products/no-image.png'"
                                                     class="img-thumbnail order-item-img"
-                                                    [alt]="item.product.title || 'Product'" />
+                                                    [alt]="item.product.title || 'Product'"
+                                                />
                                             </td>
                                             <td>
-                                                <a [routerLink]="['/product', item.product.id]"
-                                                    class="fw-medium text-decoration-none">
+                                                <a [routerLink]="['/product', item.product.id]" class="fw-medium text-decoration-none">
                                                     {{ item.product.title || 'Товар' }}
                                                 </a>
-                                                <small class="d-block text-muted"> {{ item.variant.volume || '-' }} мл
-                                                </small>
+                                                <small class="d-block text-muted"> {{ item.variant.volume || '-' }} мл </small>
                                             </td>
                                             <td class="text-end">{{ item.variant.price | number: '1.2-2' }} р.</td>
                                             <td class="text-center">{{ item.quantity }}</td>
-                                            <td class="text-end fw-bold">{{ item.variant.price * item.quantity | number:
-                                                '1.2-2' }} р.</td>
+                                            <td class="text-end fw-bold">{{ item.variant.price * item.quantity | number: '1.2-2' }} р.</td>
                                         </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <td colspan="4" class="text-end fw-bold">Итого:</td>
-                                            <td class="text-end fw-bold fs-5">{{ (order | async)?.totalPrice | number:
-                                                '1.2-2' }} р.</td>
+                                            <td class="text-end fw-bold fs-5">{{ (order | async)?.totalPrice | number: '1.2-2' }} р.</td>
                                         </tr>
                                     </tfoot>
                                 </table>

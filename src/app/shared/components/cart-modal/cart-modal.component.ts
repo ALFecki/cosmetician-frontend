@@ -41,6 +41,7 @@ export class CartModalComponent implements OnInit {
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     updateQuantity(item: CartModel, event: any): void {
         const quantity = parseInt(event.target.value);
         if (quantity > 0) {

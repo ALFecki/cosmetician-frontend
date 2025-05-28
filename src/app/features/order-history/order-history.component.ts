@@ -42,8 +42,7 @@ export class OrderHistoryComponent implements OnInit {
 
         this.loadOrders();
     }
-    
-    
+
     loadOrders(): void {
         this.loading = true;
         this.orders$ = this.orderService.getUserOrders().pipe(
@@ -51,11 +50,10 @@ export class OrderHistoryComponent implements OnInit {
                 const filteredOrders = orders.filter(order => order.status !== 'NotChecked');
                 filteredOrders.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
                 return filteredOrders;
-            })
+            }),
         );
         this.loading = false;
     }
-    
 
     getOrderStatusClass(status: string): string {
         switch (status?.toLowerCase()) {

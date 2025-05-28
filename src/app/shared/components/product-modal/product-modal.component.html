@@ -13,17 +13,23 @@
 <div class="modal-body">
     <div class="row g-3">
         <div class="col-md-5">
-            <img [src]="selectedProduct?.image || 'assets/images/products/no-image.png'" class="modal-product-image"
-                [alt]="selectedProduct?.title" />
+            <img
+                [src]="selectedProduct?.image || 'assets/images/products/no-image.png'"
+                class="modal-product-image"
+                [alt]="selectedProduct?.title"
+            />
         </div>
         <div class="col-md-7 modal-product-details">
             <!-- Volume Selection -->
-            <div class="variant-selection mb-3"
-                *ngIf="selectedProduct?.variants && selectedProduct!.variants.length > 1">
+            <div class="variant-selection mb-3" *ngIf="selectedProduct?.variants && selectedProduct!.variants.length > 1">
                 <h6><i-bs name="droplet" class="me-2"></i-bs>Выберите объем</h6>
                 <div class="variant-buttons">
-                    <button *ngFor="let variant of selectedProduct?.variants" class="btn btn-sm variant-btn"
-                        [class.active]="selectedVariantId === variant.id" (click)="selectVariant(variant.id)">
+                    <button
+                        *ngFor="let variant of selectedProduct?.variants"
+                        class="btn btn-sm variant-btn"
+                        [class.active]="selectedVariantId === variant.id"
+                        (click)="selectVariant(variant.id)"
+                    >
                         <div class="variant-volume">{{ variant.volume }}мл</div>
                         <div class="variant-price">{{ variant.price | number: '1.2-2' }} р.</div>
                     </button>
@@ -60,30 +66,44 @@
             <!-- Tabs for Description and Usage -->
             <div class="info-tabs" *ngIf="selectedProduct?.description || selectedProduct?.methodOfUse">
                 <div class="tab-buttons">
-                    <button class="tab-btn" [class.active]="activeTab === 'description'"
-                        (click)="activeTab = 'description'" *ngIf="selectedProduct?.description">
+                    <button
+                        class="tab-btn"
+                        [class.active]="activeTab === 'description'"
+                        (click)="activeTab = 'description'"
+                        *ngIf="selectedProduct?.description"
+                    >
                         <i-bs name="card-text" class="me-1"></i-bs>
                         Описание
                     </button>
-                    <button class="tab-btn" [class.active]="activeTab === 'composition'"
-                        (click)="activeTab = 'composition'">
+                    <button class="tab-btn" [class.active]="activeTab === 'composition'" (click)="activeTab = 'composition'">
                         <i-bs name="list-ul" class="me-1"></i-bs>
                         Состав
                     </button>
-                    <button class="tab-btn" [class.active]="activeTab === 'usage'" (click)="activeTab = 'usage'"
-                        *ngIf="selectedProduct?.methodOfUse">
+                    <button
+                        class="tab-btn"
+                        [class.active]="activeTab === 'usage'"
+                        (click)="activeTab = 'usage'"
+                        *ngIf="selectedProduct?.methodOfUse"
+                    >
                         <i-bs name="clipboard-check" class="me-1"></i-bs>
                         Применение
                     </button>
                 </div>
                 <div class="tab-content">
-                    <div class="tab-pane" [class.show]="activeTab === 'description'"
+                    <div
+                        class="tab-pane"
+                        [class.show]="activeTab === 'description'"
                         [class.active]="activeTab === 'description'"
-                        *ngIf="activeTab === 'description' && selectedProduct?.description">
+                        *ngIf="activeTab === 'description' && selectedProduct?.description"
+                    >
                         <p>{{ selectedProduct?.description }}</p>
                     </div>
-                    <div class="tab-pane" [class.show]="activeTab === 'composition'"
-                        [class.active]="activeTab === 'composition'" *ngIf="activeTab === 'composition'">
+                    <div
+                        class="tab-pane"
+                        [class.show]="activeTab === 'composition'"
+                        [class.active]="activeTab === 'composition'"
+                        *ngIf="activeTab === 'composition'"
+                    >
                         <p>Нет информации о составе</p>
                     </div>
                     <!-- <div class="tab-pane" [class.show]="activeTab === 'chars'" [class.active]="activeTab === 'chars'" *ngIf="activeTab === 'chars'">
@@ -94,8 +114,12 @@
                                 </div>
                             </div>
                         </div> -->
-                    <div class="tab-pane" [class.show]="activeTab === 'usage'" [class.active]="activeTab === 'usage'"
-                        *ngIf="activeTab === 'usage' && selectedProduct?.methodOfUse">
+                    <div
+                        class="tab-pane"
+                        [class.show]="activeTab === 'usage'"
+                        [class.active]="activeTab === 'usage'"
+                        *ngIf="activeTab === 'usage' && selectedProduct?.methodOfUse"
+                    >
                         <p>{{ selectedProduct?.methodOfUse }}</p>
                     </div>
                 </div>

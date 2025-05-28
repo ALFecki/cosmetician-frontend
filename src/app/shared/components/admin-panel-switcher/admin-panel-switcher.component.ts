@@ -73,7 +73,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
         private categoryService: CategoryService,
         private brandService: BrandService,
         private personService: PersonSevice,
-        private countryService: CountryService
+        private countryService: CountryService,
     ) {}
 
     ngOnInit(): void {
@@ -248,7 +248,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'updatedAt', title: 'Дата обновления', type: 'date' },
             ],
         };
-
     }
 
     get currentModelConfig(): ModelConfig {
@@ -296,22 +295,22 @@ export class AdminPanelSwitcherComponent implements OnInit {
                             if (field.type === 'select' || field.type === 'multiselect') {
                                 if (field.key === 'categoryIds' && results['categories']) {
                                     field.options = results['categories'].data;
-                            } else if (field.key === 'brandId' && results['brands']) {
-                                field.options = results['brands'].data;
-                            } else if (field.key === 'countryIds' && results['countries']) {
-                                field.options = results['countries'].data;
+                                } else if (field.key === 'brandId' && results['brands']) {
+                                    field.options = results['brands'].data;
+                                } else if (field.key === 'countryIds' && results['countries']) {
+                                    field.options = results['countries'].data;
+                                }
                             }
-                        }
-                    });
-                }),
-                catchError(error => {
-                    console.error('Error loading options:', error);
-                    return of(null);
-                }),
-            )
-            .subscribe(() => {
-                this.loadMainData();
-            });
+                        });
+                    }),
+                    catchError(error => {
+                        console.error('Error loading options:', error);
+                        return of(null);
+                    }),
+                )
+                .subscribe(() => {
+                    this.loadMainData();
+                });
         } else {
             this.loadMainData();
         }
@@ -369,7 +368,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
         this.currentModelFields.forEach(field => {
             let value: any = '';
-            
+
             if (item) {
                 if (field.key === 'variants') {
                     value = item.variants || [{ volume: '', price: '' }];
@@ -394,10 +393,12 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
             if (field.key === 'variants') {
                 formControls[field.key] = this.fb.array(
-                    value.map((variant: any) => this.fb.group({
-                        volume: [variant.volume || '', Validators.required],
-                        price: [variant.price || '', Validators.required]
-                    }))
+                    value.map((variant: any) =>
+                        this.fb.group({
+                            volume: [variant.volume || '', Validators.required],
+                            price: [variant.price || '', Validators.required],
+                        }),
+                    ),
                 );
             } else {
                 formControls[field.key] = [value, validators];
@@ -469,10 +470,12 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
     addVariant() {
         const variantsArray = this.itemForm.get('variants') as any;
-        variantsArray.push(this.fb.group({
-            volume: ['', Validators.required],
-            price: ['', Validators.required]
-        }));
+        variantsArray.push(
+            this.fb.group({
+                volume: ['', Validators.required],
+                price: ['', Validators.required],
+            }),
+        );
     }
 
     removeVariant(index: number) {

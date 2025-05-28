@@ -15,4 +15,3 @@ export interface OrderProductModel {
     variant: ProductVariantModel;
     quantity: number;
 }
-

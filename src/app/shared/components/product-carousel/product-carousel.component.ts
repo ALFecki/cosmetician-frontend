@@ -20,7 +20,6 @@ export class ProductCarouselComponent implements OnInit {
     error: string | null = null;
     selectedVariantId?: string;
 
-
     @ViewChild('productCarousel') productCarousel!: ElementRef;
 
     constructor(

@@ -84,7 +84,7 @@ export class UserProfileComponent implements OnInit {
             email: this.currentUser.value?.email, // Keep original email
         };
 
-        const result = await this.personService.update(this.currentUser.value!.id, updatedUser)
+        const result = await this.personService.update(this.currentUser.value!.id, updatedUser);
 
         if (!result) {
             this.loading = false;

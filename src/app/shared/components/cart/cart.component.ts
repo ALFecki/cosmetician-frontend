@@ -71,13 +71,13 @@ export class CartComponent {
         this.router.navigate(['/order-confirmation']);
     }
 
-        openProductDetails(product: ProductModel) {
-            this.modalService.dismissAll();
-            const activeModal = this.modalService.open(ProductModalComponent, {
-                size: 'lg',
-                centered: true,
-                scrollable: true,
-            });
-            activeModal.componentInstance.selectedProduct = product;
-        }
+    openProductDetails(product: ProductModel) {
+        this.modalService.dismissAll();
+        const activeModal = this.modalService.open(ProductModalComponent, {
+            size: 'lg',
+            centered: true,
+            scrollable: true,
+        });
+        activeModal.componentInstance.selectedProduct = product;
+    }
 }

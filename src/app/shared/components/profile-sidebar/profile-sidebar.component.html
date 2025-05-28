@@ -7,19 +7,16 @@
         <p class="card-text text-muted">{{ (currentUser | async)?.email }}</p>
     </div>
     <div class="list-group list-group-flush">
-        <a routerLink="/profile" class="list-group-item list-group-item-action"
-            [class.active]="activePage === 'profile'">
+        <a routerLink="/profile" class="list-group-item list-group-item-action" [class.active]="activePage === 'profile'">
             <i class="bi bi-person me-2"></i>Личные данные
         </a>
         <a routerLink="/orders" class="list-group-item list-group-item-action" [class.active]="activePage === 'orders'">
             <i-bs name="list-ul" class="me-2"></i-bs>Мои заказы
         </a>
-        <a routerLink="/favorites" class="list-group-item list-group-item-action"
-            [class.active]="activePage === 'favorites'">
+        <a routerLink="/favorites" class="list-group-item list-group-item-action" [class.active]="activePage === 'favorites'">
             <i-bs name="heart" class="me-2"></i-bs>Избранное
         </a>
-        <a href="#" (click)="$event.preventDefault(); logout()"
-            class="list-group-item list-group-item-action text-danger">
+        <a href="#" (click)="$event.preventDefault(); logout()" class="list-group-item list-group-item-action text-danger">
             <i-bs name="box-arrow-right" class="me-2"></i-bs>Выйти
         </a>
     </div>

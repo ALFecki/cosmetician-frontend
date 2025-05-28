@@ -5,8 +5,6 @@
         <span class="toast-icon" *ngIf="toastService.type === 'warning'">⚠️</span>
         <span class="toast-icon" *ngIf="toastService.type === 'info'">💡</span>
         <span class="error-toast-message">{{ toastService.message }}</span>
-        <button class="btn-close" (click)="toastService.hide()" aria-label="Закрыть">
-            ×
-        </button>
+        <button class="btn-close" (click)="toastService.hide()" aria-label="Закрыть">×</button>
     </div>
 </div>

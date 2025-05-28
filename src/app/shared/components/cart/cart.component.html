@@ -28,37 +28,59 @@
                                 Товары в корзине ({{ getCartItemsCount() | async }})
                             </h3>
 
-                            <div class="cart-item" *ngFor="let item of cartItems"
-                                (click)="openProductDetails(item.product)">
-                                <img [src]="item.product.image || 'assets/images/products/no-image.png'"
-                                    [alt]="item.product.title" class="item-image" />
+                            <div
+                                class="cart-item"
+                                *ngFor="let item of cartItems"
+                                (click)="openProductDetails(item.product)"
+                                (keyup.enter)="openProductDetails(item.product)"
+                                (keyup.space)="openProductDetails(item.product)"
+                                tabindex="0"
+                                role="button"
+                            >
+                                <img
+                                    [src]="item.product.image || 'assets/images/products/no-image.png'"
+                                    [alt]="item.product.title"
+                                    class="item-image"
+                                />
 
                                 <div class="item-details">
-                                    <a class="item-title" (click)="openProductDetails(item.product)">
+                                    <a
+                                        class="item-title"
+                                        (click)="openProductDetails(item.product)"
+                                        (keyup.enter)="openProductDetails(item.product)"
+                                        (keyup.space)="openProductDetails(item.product)"
+                                        tabindex="0"
+                                        role="link"
+                                    >
                                         {{ item.product.title }}
                                     </a>
-                                    <div class="item-volume">{{ item.variant.volume || '-' }} мл
-                                    </div>
-                                    <div class="item-price">{{ item.variant.price | number: '1.2-2' }}
-                                        р. за шт.</div>
+                                    <div class="item-volume">{{ item.variant.volume || '-' }} мл</div>
+                                    <div class="item-price">{{ item.variant.price | number: '1.2-2' }} р. за шт.</div>
                                 </div>
 
                                 <div class="quantity-controls">
-                                    <button class="quantity-btn" type="button"
+                                    <button
+                                        class="quantity-btn"
+                                        type="button"
                                         (click)="decreaseQuantity(item); $event.stopPropagation()"
-                                        [disabled]="item.quantity <= 1">
+                                        [disabled]="item.quantity <= 1"
+                                    >
                                         -
                                     </button>
                                     <span class="quantity-display">{{ item.quantity }}</span>
-                                    <button class="quantity-btn" type="button"
-                                        (click)="increaseQuantity(item); $event.stopPropagation()">+</button>
+                                    <button class="quantity-btn" type="button" (click)="increaseQuantity(item); $event.stopPropagation()">
+                                        +
+                                    </button>
                                 </div>
 
-                                <div class="item-total">{{ item.variant.price * item.quantity | number: '1.2-2' }}
-                                    р.</div>
+                                <div class="item-total">{{ item.variant.price * item.quantity | number: '1.2-2' }} р.</div>
 
-                                <button class="remove-btn" type="button"
-                                    (click)="removeProduct(item); $event.stopPropagation()" title="Удалить товар">
+                                <button
+                                    class="remove-btn"
+                                    type="button"
+                                    (click)="removeProduct(item); $event.stopPropagation()"
+                                    title="Удалить товар"
+                                >
                                     <i-bs name="trash"></i-bs>
                                 </button>
                             </div>
@@ -86,8 +108,7 @@
 
                             <div class="summary-row">
                                 <span class="summary-label">К оплате:</span>
-                                <span class="summary-value total-value">{{ totalPrice$ | async | number: '1.2-2' }}
-                                    р.</span>
+                                <span class="summary-value total-value">{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
                             </div>
 
                             <button class="btn checkout-btn" (click)="goToOrderConfirmation()">

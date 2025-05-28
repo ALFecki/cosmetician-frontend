@@ -4,7 +4,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, of } from 'rxjs';
 import { AuthGuard } from '../../guards/auth.guard';
-import { CountryModel } from '../../models/country.model';
 import { ProductModel } from '../../models/product.model';
 import { FilterProductSchema } from '../../schemas/product.schema';
 import { CartService } from '../../services/cart.service';
@@ -30,7 +29,7 @@ export class ProductsComponent implements OnInit {
     currentPage = 1;
     totalItems$: Observable<number> = of(0);
     filterOptions: FilterProductSchema = {};
-    selectedVariants: { [key: string]: string } = {};
+    selectedVariants: Record<string, string> = {};
 
     constructor(
         private route: ActivatedRoute,
@@ -134,6 +133,4 @@ export class ProductsComponent implements OnInit {
         const variant = product.variants?.find(v => v.id === variantId);
         return variant ? variant.volume : 0;
     }
-
-    
 }

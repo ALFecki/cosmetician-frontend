@@ -42,7 +42,7 @@ import {
     clipboardCheck,
     eye,
     xCircle,
-    cardText
+    cardText,
 } from 'ngx-bootstrap-icons';
 
 const icons = {
@@ -88,7 +88,7 @@ const icons = {
     clipboardCheck,
     eye,
     xCircle,
-    cardText
+    cardText,
 };
 
 @NgModule({

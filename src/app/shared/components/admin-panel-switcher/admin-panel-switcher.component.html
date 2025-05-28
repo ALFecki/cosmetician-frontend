@@ -3,8 +3,7 @@
 
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item" role="presentation" *ngFor="let model of availableModels">
-            <button class="nav-link" [class.active]="currentModel === model.key" (click)="switchModel(model.key)"
-                type="button">
+            <button class="nav-link" [class.active]="currentModel === model.key" (click)="switchModel(model.key)" type="button">
                 {{ model.title }}
             </button>
         </li>
@@ -13,15 +12,11 @@
     <div class="admin-actions">
         <div class="search-box">
             <div class="input-group">
-                <input type="text" class="form-control" placeholder="Поиск..." [(ngModel)]="searchText"
-                    (input)="onSearchChange()" />
-                <button class="btn btn-outline-secondary" type="button" *ngIf="searchText"
-                    (click)="clearSearch()">✖</button>
+                <input type="text" class="form-control" placeholder="Поиск..." [(ngModel)]="searchText" (input)="onSearchChange()" />
+                <button class="btn btn-outline-secondary" type="button" *ngIf="searchText" (click)="clearSearch()">✖</button>
             </div>
         </div>
-        <button class="btn btn-primary" (click)="openAddModal()">
-            <i-bs name="plus-lg"></i-bs> Добавить {{ getCurrentModelTitle() }}
-        </button>
+        <button class="btn btn-primary" (click)="openAddModal()"><i-bs name="plus-lg"></i-bs> Добавить {{ getCurrentModelTitle() }}</button>
     </div>
 
     <div class="table-container">
@@ -35,13 +30,18 @@
             {{ error }}
         </div>
 
-        <app-generic-table *ngIf="!loading && currentModelData.length > 0" [data]="currentModelData"
-            [columns]="currentModelColumns" [key]="currentModel" (editItem)="editItem($event)"
-            (deleteItem)="openDeleteModal($event)" (cascadeDeleteItem)="openCascadeDeleteModal($event)">
+        <app-generic-table
+            *ngIf="!loading && currentModelData.length > 0"
+            [data]="currentModelData"
+            [columns]="currentModelColumns"
+            [key]="currentModel"
+            (editItem)="editItem($event)"
+            (deleteItem)="openDeleteModal($event)"
+            (cascadeDeleteItem)="openCascadeDeleteModal($event)"
+        >
         </app-generic-table>
 
-        <div *ngIf="!loading && currentModelData.length === 0" class="p-5 text-center text-muted">Нет данных для
-            отображения</div>
+        <div *ngIf="!loading && currentModelData.length === 0" class="p-5 text-center text-muted">Нет данных для отображения</div>
     </div>
 </div>
 
@@ -55,24 +55,37 @@
             <div class="mb-3" *ngFor="let field of currentModelFields">
                 <label [for]="field.key" class="form-label">{{ field.label }}</label>
 
-                <input *ngIf="field.type === 'text' || field.type === 'number' || field.type === 'email'"
-                    [type]="field.type" class="form-control" [id]="field.key" [formControlName]="field.key" />
+                <input
+                    *ngIf="field.type === 'text' || field.type === 'number' || field.type === 'email'"
+                    [type]="field.type"
+                    class="form-control"
+                    [id]="field.key"
+                    [formControlName]="field.key"
+                />
 
-                <textarea *ngIf="field.type === 'textarea'" class="form-control" [id]="field.key"
-                    [formControlName]="field.key" rows="3"></textarea>
+                <textarea
+                    *ngIf="field.type === 'textarea'"
+                    class="form-control"
+                    [id]="field.key"
+                    [formControlName]="field.key"
+                    rows="3"
+                ></textarea>
 
-                <select *ngIf="field.type === 'select'" class="form-select" [id]="field.key"
-                    [formControlName]="field.key">
+                <select *ngIf="field.type === 'select'" class="form-select" [id]="field.key" [formControlName]="field.key">
                     <option value="">Выберите...</option>
-                    <option *ngFor="let option of field.options" [value]="option.id">{{ option.title || option.name }}
-                    </option>
+                    <option *ngFor="let option of field.options" [value]="option.id">{{ option.title || option.name }}</option>
                 </select>
 
                 <div *ngIf="field.type === 'multiselect'" class="multiselect-container">
                     <div class="form-check" *ngFor="let option of field.options">
-                        <input class="form-check-input" type="checkbox" [id]="field.key + '-' + option.id"
-                            [value]="option.id" [checked]="itemForm.get(field.key)?.value?.includes(option.id)"
-                            (change)="onMultiselectChange(field.key, option.id, $event)" />
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            [id]="field.key + '-' + option.id"
+                            [value]="option.id"
+                            [checked]="itemForm.get(field.key)?.value?.includes(option.id)"
+                            (change)="onMultiselectChange(field.key, option.id, $event)"
+                        />
                         <label class="form-check-label" [for]="field.key + '-' + option.id">
                             {{ option.title || option.name }}
                         </label>
@@ -81,20 +94,25 @@
 
                 <div *ngIf="field.type === 'variants'" class="variants-container">
                     <div formArrayName="variants">
-                        <div *ngFor="let variant of getVariantsFormArray()?.controls; let i = index" [formGroupName]="i"
-                            class="variant-row mb-2">
+                        <div
+                            *ngFor="let variant of getVariantsFormArray()?.controls; let i = index"
+                            [formGroupName]="i"
+                            class="variant-row mb-2"
+                        >
                             <div class="row g-2">
                                 <div class="col-md-5">
-                                    <input type="number" class="form-control" placeholder="Объем (мл)"
-                                        formControlName="volume" />
+                                    <input type="number" class="form-control" placeholder="Объем (мл)" formControlName="volume" />
                                 </div>
                                 <div class="col-md-5">
-                                    <input type="number" step="0.01" class="form-control" placeholder="Цена (р.)"
-                                        formControlName="price" />
+                                    <input type="number" step="0.01" class="form-control" placeholder="Цена (р.)" formControlName="price" />
                                 </div>
                                 <div class="col-md-2">
-                                    <button type="button" class="btn btn-outline-danger btn-sm w-100"
-                                        (click)="removeVariant(i)" [disabled]="getVariantsFormArray()?.length <= 1">
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-danger btn-sm w-100"
+                                        (click)="removeVariant(i)"
+                                        [disabled]="getVariantsFormArray()?.length <= 1"
+                                    >
                                         <i-bs name="trash"></i-bs>
                                     </button>
                                 </div>
@@ -107,23 +125,35 @@
                 </div>
 
                 <div *ngIf="field.type === 'file' || field.type === 'image'" class="mb-3">
-                    <input type="file" class="form-control" [id]="field.key"
-                        (change)="onFileSelected($event, field.key)" accept="image/*" />
+                    <input
+                        type="file"
+                        class="form-control"
+                        [id]="field.key"
+                        (change)="onFileSelected($event, field.key)"
+                        accept="image/*"
+                    />
 
                     <div *ngIf="field.type === 'image'" class="d-flex align-items-center mt-2">
                         <div *ngIf="itemForm.get(field.key)?.value && !filePreviewUrls[field.key]" class="me-3">
                             <p class="mb-1 text-muted small">Текущее изображение:</p>
-                            <img [src]="itemForm.get(field.key)?.value" class="img-thumbnail"
-                                style="max-height: 100px; max-width: 200px" [alt]="field.label" />
+                            <img
+                                [src]="itemForm.get(field.key)?.value"
+                                class="img-thumbnail"
+                                style="max-height: 100px; max-width: 200px"
+                                [alt]="field.label"
+                            />
                         </div>
 
                         <div *ngIf="filePreviewUrls[field.key]" class="me-3">
                             <p class="mb-1 text-muted small">Новое изображение:</p>
-                            <img [src]="filePreviewUrls[field.key]" class="img-thumbnail"
-                                style="max-height: 100px; max-width: 200px" [alt]="'Новое ' + field.label" />
+                            <img
+                                [src]="filePreviewUrls[field.key]"
+                                class="img-thumbnail"
+                                style="max-height: 100px; max-width: 200px"
+                                [alt]="'Новое ' + field.label"
+                            />
                             <div class="mt-1">
-                                <button type="button" class="btn btn-sm btn-outline-danger"
-                                    (click)="cancelFileSelection(field.key)">
+                                <button type="button" class="btn btn-sm btn-outline-danger" (click)="cancelFileSelection(field.key)">
                                     Отменить
                                 </button>
                             </div>
@@ -162,8 +192,7 @@
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Отмена</button>
         <button type="button" class="btn btn-danger" (click)="deleteItem()" [disabled]="deleting">
-            <span *ngIf="deleting" class="spinner-border spinner-border-sm me-1" role="status"
-                aria-hidden="true"></span>
+            <span *ngIf="deleting" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
             Удалить
         </button>
     </div>

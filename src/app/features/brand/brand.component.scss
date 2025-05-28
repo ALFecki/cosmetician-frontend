@@ -109,7 +109,7 @@ img {
                 font-weight: 600;
             }
 
-            +.breadcrumb-item::before {
+            + .breadcrumb-item::before {
                 color: var(--accent);
             }
         }

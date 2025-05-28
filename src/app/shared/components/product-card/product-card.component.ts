@@ -92,7 +92,7 @@ export class ProductCardComponent implements OnInit {
         this.hiddenCharacteristics = this.allCharacteristics.slice(4);
     }
 
-    async addToCart(product: ProductModel) {
+    async addToCart() {
         this.authGuard.canActivate(this.route.snapshot, this.router.routerState.snapshot).subscribe(async canActivate => {
             if (canActivate) {
                 const variant = this.getSelectedVariant();

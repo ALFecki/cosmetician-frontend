@@ -40,8 +40,7 @@ export class ProductModalComponent {
             this.authGuard.canActivate(this.route.snapshot, this.router.routerState.snapshot).subscribe(async isAuthenticated => {
                 if (isAuthenticated) {
                     if (this.selectedVariantId) {
-                            await this.cartService.addProductToCart(this.selectedVariantId);
-
+                        await this.cartService.addProductToCart(this.selectedVariantId);
                     } else {
                         this.toastService.show('Пожалуйста, выберите вариант продукта перед добавлением в корзину.', 'error');
                         return;

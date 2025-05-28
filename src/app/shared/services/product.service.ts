@@ -23,19 +23,23 @@ export class ProductService extends DataService<ProductModel, CreateProductSchem
         super(http);
     }
 
-    private setProductIdToVariants(product: ProductModel, variants: {price: number; volume: number;}[]): {price: number; volume: number; productId: string;}[] {
-        let newVariants = [];
+    private setProductIdToVariants(
+        product: ProductModel,
+        variants: { price: number; volume: number }[],
+    ): { price: number; volume: number; productId: string }[] {
+        const newVariants = [];
         if (!variants || variants.length === 0) {
             return [];
         }
         for (const variant of variants) {
-            newVariants.push({price: variant.price, volume: variant.volume, productId: product.id});
+            newVariants.push({ price: variant.price, volume: variant.volume, productId: product.id });
         }
         return newVariants;
     }
 
     override create(data: CreateProductSchema): Promise<SingleResponse<ProductModel>> {
-        const variants: {price: number; volume: number}[] = typeof data['variants'] === 'string' ? JSON.parse(data['variants']) : data['variants'] || [];
+        const variants: { price: number; volume: number }[] =
+            typeof data['variants'] === 'string' ? JSON.parse(data['variants']) : data['variants'] || [];
         return new Promise((resolve, reject) => {
             this.http.post<SingleResponse<ProductModel>>(`${this.apiUrl}/${this.endpoint}`, data).subscribe({
                 next: response => {
@@ -45,7 +49,7 @@ export class ProductService extends DataService<ProductModel, CreateProductSchem
                     }
                     this.getById(response.data.id).subscribe({
                         next: resolve,
-                        error: reject
+                        error: reject,
                     });
                 },
                 error: error => {

@@ -168,6 +168,7 @@ export class CartService implements OnDestroy {
         this.addToPendingUpdates(cartItem);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async updateQuantity(productId: string, quantity: number): Promise<void> {
         throw new Error('Method not implemented.');
     }
