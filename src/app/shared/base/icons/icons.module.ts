@@ -43,6 +43,7 @@ import {
     eye,
     xCircle,
     cardText,
+    personWorkspace,
 } from 'ngx-bootstrap-icons';
 
 const icons = {
@@ -89,6 +90,7 @@ const icons = {
     eye,
     xCircle,
     cardText,
+    personWorkspace,
 };
 
 @NgModule({

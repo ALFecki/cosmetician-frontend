@@ -33,11 +33,7 @@
 
                         <div class="order-items" *ngIf="cartItems$ | async as cartItems">
                             <div class="order-item" *ngFor="let item of cartItems">
-                                <img
-                                    [src]="item.product.image || 'assets/images/products/no-image.png'"
-                                    [alt]="item.product.title"
-                                    class="item-image"
-                                />
+                                <img [src]="item.product.image | imageUrl" [alt]="item.product.title" class="item-image" />
                                 <div class="item-details">
                                     <a type="button" class="item-title" [routerLink]="['/product', item.product.id]">
                                         {{ item.product.title }}

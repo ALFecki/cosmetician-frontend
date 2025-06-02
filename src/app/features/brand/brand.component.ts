@@ -6,11 +6,12 @@ import { ProductsComponent } from '../../shared/components/products/products.com
 import { BrandModel } from '../../shared/models/brand.model';
 import { BrandService } from '../../shared/services/brand.service';
 import { IconsModule } from '../../shared/base/icons/icons.module';
+import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
 
 @Component({
     selector: 'app-brand',
     standalone: true,
-    imports: [CommonModule, ProductsComponent, IconsModule],
+    imports: [CommonModule, ProductsComponent, IconsModule, ImageUrlPipe],
     templateUrl: './brand.component.html',
     styleUrl: './brand.component.scss',
 })

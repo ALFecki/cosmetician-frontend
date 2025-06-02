@@ -8,13 +8,14 @@ import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { CartModel } from '../../models/cart.model';
 import { CartService } from '../../services/cart.service';
 import { IconsModule } from '../../base/icons/icons.module';
+import { ImageUrlPipe } from '../../utils/image-url.pipe';
 
 @Component({
     selector: 'app-cart-modal',
     templateUrl: './cart-modal.component.html',
     styleUrls: ['./cart-modal.component.scss'],
     standalone: true,
-    imports: [CommonModule, RouterModule, NgbModalModule, FormsModule, IconsModule],
+    imports: [CommonModule, RouterModule, NgbModalModule, FormsModule, IconsModule, ImageUrlPipe],
 })
 export class CartModalComponent implements OnInit {
     cartItems$: Observable<CartModel[]> = new Observable<CartModel[]>();

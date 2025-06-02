@@ -3,11 +3,12 @@ import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BrandModel } from '../../../../shared/models/brand.model';
 import { BrandService } from '../../../../shared/services/brand.service';
+import { ImageUrlPipe } from '../../../../shared/utils/image-url.pipe';
 
 @Component({
     selector: 'app-brands',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, ImageUrlPipe],
     templateUrl: './brands.component.html',
     styleUrl: './brands.component.scss',
 })
@@ -24,7 +25,10 @@ export class BrandsComponent implements OnInit {
         this.brandService.getBrandsList().subscribe({
             next: brands => {
                 // Get just the first 4 brands to display
-                this.brands = brands.slice(0, 4);
+                this.brands = brands
+                    .slice(0, 4)
+                    .sort((a, b) => a.title.localeCompare(b.title))
+                    .filter(brand => brand.image);
                 this.loading = false;
             },
             error: error => {

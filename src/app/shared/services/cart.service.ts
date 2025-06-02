@@ -34,7 +34,7 @@ export class CartService implements OnDestroy {
         try {
             const changes = cartItems.reduce(
                 (acc, item) => {
-                    acc[item.product.id] = item.quantity;
+                    acc[item.variant.id] = item.quantity;
                     return acc;
                 },
                 {} as Record<string, number>,

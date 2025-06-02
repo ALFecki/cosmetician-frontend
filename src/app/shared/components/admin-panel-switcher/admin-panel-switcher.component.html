@@ -104,6 +104,15 @@
                                     <input type="number" class="form-control" placeholder="Объем (мл)" formControlName="volume" />
                                 </div>
                                 <div class="col-md-5">
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        class="form-control"
+                                        placeholder="Себестоимость (р.)"
+                                        formControlName="costPrice"
+                                    />
+                                </div>
+                                <div class="col-md-5">
                                     <input type="number" step="0.01" class="form-control" placeholder="Цена (р.)" formControlName="price" />
                                 </div>
                                 <div class="col-md-2">
@@ -137,7 +146,7 @@
                         <div *ngIf="itemForm.get(field.key)?.value && !filePreviewUrls[field.key]" class="me-3">
                             <p class="mb-1 text-muted small">Текущее изображение:</p>
                             <img
-                                [src]="itemForm.get(field.key)?.value"
+                                [src]="itemForm.get(field.key)?.value | imageUrl"
                                 class="img-thumbnail"
                                 style="max-height: 100px; max-width: 200px"
                                 [alt]="field.label"

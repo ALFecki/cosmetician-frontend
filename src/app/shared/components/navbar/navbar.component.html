@@ -63,7 +63,7 @@
                                         href="/brand/{{ brand.id }}"
                                     >
                                         <img
-                                            [src]="brand.image || 'assets/images/products/no-image.png'"
+                                            [src]="brand.image | imageUrl"
                                             [alt]="brand.title"
                                             class="brand-logo-small"
                                             onerror="this.src='assets/images/products/no-image.png'"
@@ -76,7 +76,7 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" aria-disabled="true">
+                    <a class="nav-link active" href="/delivery">
                         <i-bs name="truck"></i-bs>
                         Доставка и оплата
                     </a>
@@ -125,9 +125,9 @@
                     <li *ngIf="authService.isLoggedIn()">
                         <a class="dropdown-item" routerLink="/orders"> <i-bs name="list-ul" class="me-2"></i-bs>История заказов </a>
                     </li>
-                    <li *ngIf="authService.isLoggedIn()">
+                    <!-- <li *ngIf="authService.isLoggedIn()">
                         <a class="dropdown-item" routerLink="/favorites"> <i-bs name="heart" class="me-2"></i-bs>Избранное </a>
-                    </li>
+                    </li> -->
                     <li *ngIf="authService.isLoggedIn()">
                         <hr class="dropdown-divider" />
                     </li>

@@ -13,13 +13,14 @@ import { CartService } from '../../services/cart.service';
 import { CategoryService } from '../../services/category.service';
 import { CartModalComponent } from '../cart-modal/cart-modal.component';
 import { LoginComponent } from '../login/login.component';
+import { ImageUrlPipe } from '../../utils/image-url.pipe';
 
 @Component({
     selector: 'app-navbar',
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.scss',
     standalone: true,
-    imports: [CommonModule, RouterModule, IconsModule],
+    imports: [CommonModule, RouterModule, IconsModule, ImageUrlPipe],
 })
 export class NavbarComponent implements OnDestroy, OnInit {
     isMenuOpen = false;

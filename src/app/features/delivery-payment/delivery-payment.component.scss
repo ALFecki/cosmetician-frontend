@@ -1,0 +1,611 @@
+.delivery-payment-page {
+    background: linear-gradient(135deg, var(--cream) 0%, var(--light-beige) 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 3px solid var(--secondary);
+}
+
+.page-title {
+    color: var(--gray-dark);
+    font-weight: 700;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+        color: var(--primary);
+    }
+}
+
+.page-subtitle {
+    color: var(--gray-medium);
+    font-size: 1.125rem;
+    margin: 0;
+}
+
+.content-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section-block {
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    color: var(--gray-dark);
+    font-weight: 600;
+    font-size: 1.75rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--secondary);
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+
+    i {
+        color: var(--primary);
+    }
+}
+
+.info-card {
+    background: var(--warm-white);
+    border: 2px solid var(--powder-pink);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 16px rgba(212, 80, 109, 0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+
+    &:hover {
+        border-color: var(--secondary);
+        box-shadow: 0 8px 32px rgba(212, 80, 109, 0.15);
+        transform: translateY(-2px);
+    }
+}
+
+.highlight-card {
+    background: linear-gradient(135deg, var(--soft-pink) 0%, var(--warm-white) 100%);
+    border-color: var(--secondary);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    .card-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        i {
+            font-size: 2rem;
+            color: var(--white);
+        }
+    }
+
+    .card-content {
+        h3 {
+            color: var(--gray-dark);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: var(--gray-medium);
+            margin: 0;
+            font-size: 1.1rem;
+        }
+    }
+}
+
+.card-title {
+    color: var(--gray-dark);
+    font-weight: 600;
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+
+    i {
+        color: var(--primary);
+    }
+}
+
+// Timeline
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+    }
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 2rem;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -2rem;
+    top: 0.25rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--warm-white);
+    box-shadow: 0 2px 8px rgba(212, 80, 109, 0.2);
+
+    &.minsk {
+        background: var(--primary);
+    }
+
+    &.belarus {
+        background: var(--secondary);
+    }
+
+    &.pickup {
+        background: var(--success);
+    }
+}
+
+.timeline-content {
+    h5 {
+        color: var(--gray-dark);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    p {
+        color: var(--gray-medium);
+        margin: 0;
+
+        &.small {
+            font-size: 0.9rem;
+            color: var(--gray-light);
+        }
+    }
+}
+
+// Delivery Zones
+.delivery-zone {
+    background: var(--soft-pink);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--powder-pink);
+}
+
+.zone-header {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    color: var(--gray-dark);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.zone-details {
+    .price-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+        background: var(--warm-white);
+        border-radius: 8px;
+        border: 1px solid var(--powder-pink);
+
+        .free-delivery {
+            color: var(--success);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .paid-delivery {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .condition {
+            color: var(--gray-medium);
+            font-size: 0.9rem;
+        }
+    }
+
+    .delivery-time {
+        background: var(--cream);
+        padding: 0.75rem;
+        border-radius: 8px;
+        border: 1px solid var(--powder-pink);
+        color: var(--gray-dark);
+        font-weight: 500;
+        text-align: center;
+    }
+}
+
+.delivery-zones {
+    .zone-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: var(--soft-pink);
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        border: 1px solid var(--powder-pink);
+
+        .zone-distance {
+            color: var(--gray-dark);
+            font-weight: 500;
+        }
+
+        .zone-price {
+            color: var(--primary);
+            font-weight: 700;
+        }
+    }
+
+    .delivery-time {
+        background: var(--cream);
+        padding: 0.75rem;
+        border-radius: 8px;
+        border: 1px solid var(--powder-pink);
+        color: var(--gray-dark);
+        font-weight: 500;
+        text-align: center;
+    }
+}
+
+// Belarus Delivery
+.belarus-delivery {
+    .delivery-option {
+        background: var(--soft-pink);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--powder-pink);
+
+        .option-header {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            color: var(--gray-dark);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+
+            i {
+                color: var(--primary);
+            }
+        }
+
+        .option-details {
+            .price-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.75rem;
+                background: var(--warm-white);
+                border-radius: 8px;
+                margin-bottom: 0.5rem;
+                border: 1px solid var(--powder-pink);
+
+                .price {
+                    font-weight: 600;
+                    color: var(--primary);
+
+                    &.free {
+                        color: var(--success);
+                    }
+                }
+            }
+        }
+    }
+
+    .warning-notice {
+        background: rgba(255, 193, 7, 0.1);
+        border: 2px solid #ffc107;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: flex-start;
+        color: #856404;
+
+        i {
+            color: #ffc107;
+            margin-top: 0.25rem;
+            flex-shrink: 0;
+        }
+    }
+
+    .additional-service {
+        background: var(--cream);
+        border-radius: 8px;
+        padding: 1rem;
+        border: 1px solid var(--powder-pink);
+        display: flex;
+        align-items: center;
+        color: var(--gray-dark);
+        font-weight: 500;
+
+        i {
+            color: var(--info);
+        }
+    }
+}
+
+// Payment Methods
+.payment-card {
+    background: var(--warm-white);
+    border: 2px solid var(--powder-pink);
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    transition: all 0.3s ease;
+    height: 100%;
+
+    &:hover {
+        border-color: var(--secondary);
+        box-shadow: 0 4px 16px rgba(212, 80, 109, 0.1);
+        transform: translateY(-2px);
+    }
+
+    &.online {
+        .payment-icon {
+            background: linear-gradient(135deg, var(--info) 0%, #0dcaf0 100%);
+        }
+    }
+
+    &.offline {
+        .payment-icon {
+            background: linear-gradient(135deg, var(--success) 0%, #198754 100%);
+        }
+    }
+
+    .payment-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        i {
+            font-size: 1.75rem;
+            color: var(--white);
+        }
+    }
+
+    .payment-content {
+        flex: 1;
+
+        h4 {
+            color: var(--gray-dark);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+
+            li {
+                display: flex;
+                align-items: center;
+                padding: 0.5rem 0;
+                color: var(--gray-medium);
+                font-weight: 500;
+
+                i {
+                    color: var(--primary);
+                }
+            }
+        }
+    }
+}
+
+// Contact Card
+.contact-card {
+    background: linear-gradient(135deg, var(--soft-pink) 0%, var(--cream) 100%);
+    border: 2px solid var(--secondary);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    height: 100%;
+}
+
+.contact-title {
+    color: var(--gray-dark);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+        color: var(--primary);
+    }
+}
+
+.contact-details {
+    .contact-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        color: var(--gray-dark);
+        font-weight: 500;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        i {
+            color: var(--primary);
+        }
+    }
+}
+
+// CTA Section
+.cta-section {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    margin-top: 3rem;
+    color: var(--white);
+}
+
+.cta-content {
+    h3 {
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        font-size: 1.125rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+
+    .btn-primary {
+        background: var(--white);
+        color: var(--primary);
+        border: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+
+        &:hover {
+            background: var(--cream);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 255, 255, 0.3);
+        }
+    }
+}
+
+// Responsive Design
+@media (max-width: 992px) {
+    .page-title {
+        font-size: 2rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .highlight-card {
+        flex-direction: column;
+        text-align: center;
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+
+            i {
+                font-size: 1.5rem;
+            }
+        }
+    }
+
+    .timeline {
+        padding-left: 1.5rem;
+
+        &::before {
+            left: 11px;
+        }
+    }
+
+    .timeline-marker {
+        left: -1.5rem;
+        width: 24px;
+        height: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .delivery-payment-page {
+        padding: 1rem 0;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+    }
+
+    .page-title {
+        font-size: 1.75rem;
+    }
+
+    .info-card {
+        padding: 1.5rem;
+    }
+
+    .highlight-card {
+        gap: 1rem;
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+
+            i {
+                font-size: 1.25rem;
+            }
+        }
+    }
+
+    .payment-card {
+        padding: 1.5rem;
+        flex-direction: column;
+        text-align: center;
+
+        .payment-icon {
+            width: 60px;
+            height: 60px;
+
+            i {
+                font-size: 1.5rem;
+            }
+        }
+    }
+
+    .cta-section {
+        padding: 2rem 1rem;
+
+        .cta-content h3 {
+            font-size: 1.5rem;
+        }
+    }
+}

@@ -69,7 +69,7 @@
                                         <tr *ngFor="let item of (order | async)?.products">
                                             <td>
                                                 <img
-                                                    [src]="item.product.image || 'assets/images/products/no-image.png'"
+                                                    [src]="item.product.image | imageUrl"
                                                     class="img-thumbnail order-item-img"
                                                     [alt]="item.product.title || 'Product'"
                                                 />

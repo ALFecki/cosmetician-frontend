@@ -7,10 +7,12 @@ import { BenefitsComponent } from './components/benefits/benefits.component';
 import { CarouselComponent } from './components/carousel/carousel.component';
 import { HomeComponent } from './home.component';
 import { BrandsComponent } from './components/brands/brands.component';
+import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
+import { AboutMeComponent } from './components/about-me/about-me.component';
 
 @NgModule({
-    declarations: [HomeComponent, CarouselComponent, BenefitsComponent],
-    imports: [CommonModule, RouterModule, IconsModule, ProductCarouselComponent, BrandsComponent],
+    declarations: [HomeComponent, CarouselComponent, BenefitsComponent, AboutMeComponent],
+    imports: [CommonModule, RouterModule, IconsModule, ProductCarouselComponent, BrandsComponent, ImageUrlPipe],
     exports: [HomeComponent, CarouselComponent, BenefitsComponent],
 })
 export class HomeModule {}

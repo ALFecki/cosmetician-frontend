@@ -14,6 +14,7 @@ import { GenericTableComponent } from '../generic-table/generic-table.component'
 import { CountryService } from '../../services/country.service';
 import { FilterCountrySchema } from '../../schemas/country.schema';
 import { IconsModule } from '../../base/icons/icons.module';
+import { ImageUrlPipe } from '../../utils/image-url.pipe';
 
 interface ModelConfig {
     key: string;
@@ -36,7 +37,7 @@ interface ModelConfig {
 @Component({
     selector: 'app-admin-panel-switcher',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, GenericTableComponent, IconsModule],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, GenericTableComponent, IconsModule, ImageUrlPipe],
     templateUrl: './admin-panel-switcher.component.html',
     styleUrl: './admin-panel-switcher.component.scss',
 })
@@ -96,7 +97,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'fullTitle', label: 'Полное название', type: 'text', required: false },
                 { key: 'description', label: 'Описание', type: 'textarea', required: true },
                 { key: 'image', label: 'Изображение', type: 'image', required: false },
-                { key: 'variants', label: 'Варианты (Объем-Цена)', type: 'variants', required: true },
+                { key: 'variants', label: 'Варианты (Объем-Себестоимость-Цена)', type: 'variants', required: true },
                 { key: 'categoryIds', label: 'Категории', type: 'multiselect', required: true },
                 { key: 'brandId', label: 'Бренд', type: 'select', required: true },
                 { key: 'countryIds', label: 'Страны производители', type: 'multiselect', required: false },
@@ -111,7 +112,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'title', title: 'Название' },
                 { key: 'fullTitle', title: 'Полное название' },
                 { key: 'description', title: 'Описание' },
-                { key: 'variants', title: 'Варианты (Объем/Цена)', type: 'variants' },
+                { key: 'variants', title: 'Варианты (Объем/Себестоимость/Цена)', type: 'variants' },
                 { key: 'categories', title: 'Категории', type: 'array' },
                 { key: 'brand.title', title: 'Бренд' },
                 { key: 'countries', title: 'Страны', type: 'array' },
@@ -381,7 +382,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 }
             } else {
                 if (field.key === 'variants') {
-                    value = [{ volume: '', price: '' }];
+                    value = [{ volume: '', costPrice: '', price: '' }];
                 } else if (field.type === 'multiselect') {
                     value = [];
                 }
@@ -396,6 +397,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
                     value.map((variant: any) =>
                         this.fb.group({
                             volume: [variant.volume || '', Validators.required],
+                            costPrice: [variant.costPrice || '', Validators.required],
                             price: [variant.price || '', Validators.required],
                         }),
                     ),
@@ -473,6 +475,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
         variantsArray.push(
             this.fb.group({
                 volume: ['', Validators.required],
+                costPrice: ['', Validators.required],
                 price: ['', Validators.required],
             }),
         );
@@ -508,7 +511,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
             }
 
             const value = this.itemForm.value[key];
-            console.log(`Key: ${key}, Value: ${value}`);
             if (value !== null && value !== undefined) {
                 if (key === 'variants' || key === 'categoryIds' || key === 'countryIds') {
                     formData[key] = JSON.stringify(value);
@@ -517,22 +519,17 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 } else {
                     formData[key] = value;
                 }
-                console.log('Form Data:', formData);
             }
         });
 
         Object.keys(this.selectedFiles).forEach(key => {
             if (this.selectedFiles[key] instanceof File) {
                 const file = this.selectedFiles[key];
-                console.log(`File Key: ${key}, File:`, file);
                 formData[key] = file;
             }
         });
 
-        console.log('Form Data:', formData);
-
         const operation = this.isEditMode ? service.update(this.selectedItemId, formData, true) : service.create(formData, true);
-        console.log('Operation:', operation);
 
         await operation
             .then(() => {

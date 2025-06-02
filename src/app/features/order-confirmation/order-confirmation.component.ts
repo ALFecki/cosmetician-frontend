@@ -9,13 +9,14 @@ import { PersonModel } from '../../shared/models/person.model';
 import { AuthService } from '../../shared/services/auth.service';
 import { OrderService } from '../../shared/services/order.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
 
 @Component({
     selector: 'app-order-confirmation',
     templateUrl: './order-confirmation.component.html',
     styleUrl: './order-confirmation.component.scss',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, RouterModule, IconsModule],
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, IconsModule, ImageUrlPipe],
 })
 export class OrderConfirmationComponent implements OnInit {
     confirmationForm: FormGroup;

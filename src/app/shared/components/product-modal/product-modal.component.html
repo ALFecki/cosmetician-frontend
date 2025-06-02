@@ -11,17 +11,12 @@
     </button>
 </div>
 <div class="modal-body">
-    <div class="row g-3">
-        <div class="col-md-5">
-            <img
-                [src]="selectedProduct?.image || 'assets/images/products/no-image.png'"
-                class="modal-product-image"
-                [alt]="selectedProduct?.title"
-            />
-        </div>
-        <div class="col-md-7 modal-product-details">
+    <div class="product-top-section">
+        <img [src]="selectedProduct?.image | imageUrl" class="modal-product-image" [alt]="selectedProduct?.title" />
+
+        <div class="product-details-side">
             <!-- Volume Selection -->
-            <div class="variant-selection mb-3" *ngIf="selectedProduct?.variants && selectedProduct!.variants.length > 1">
+            <div class="variant-selection" *ngIf="selectedProduct?.variants && selectedProduct!.variants.length > 1">
                 <h6><i-bs name="droplet" class="me-2"></i-bs>Выберите объем</h6>
                 <div class="variant-buttons">
                     <button
@@ -62,84 +57,71 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <!-- Tabs for Description and Usage -->
-            <div class="info-tabs" *ngIf="selectedProduct?.description || selectedProduct?.methodOfUse">
-                <div class="tab-buttons">
-                    <button
-                        class="tab-btn"
-                        [class.active]="activeTab === 'description'"
-                        (click)="activeTab = 'description'"
-                        *ngIf="selectedProduct?.description"
-                    >
-                        <i-bs name="card-text" class="me-1"></i-bs>
-                        Описание
-                    </button>
-                    <button class="tab-btn" [class.active]="activeTab === 'composition'" (click)="activeTab = 'composition'">
-                        <i-bs name="list-ul" class="me-1"></i-bs>
-                        Состав
-                    </button>
-                    <button
-                        class="tab-btn"
-                        [class.active]="activeTab === 'usage'"
-                        (click)="activeTab = 'usage'"
-                        *ngIf="selectedProduct?.methodOfUse"
-                    >
-                        <i-bs name="clipboard-check" class="me-1"></i-bs>
-                        Применение
-                    </button>
-                </div>
-                <div class="tab-content">
-                    <div
-                        class="tab-pane"
-                        [class.show]="activeTab === 'description'"
-                        [class.active]="activeTab === 'description'"
-                        *ngIf="activeTab === 'description' && selectedProduct?.description"
-                    >
-                        <p>{{ selectedProduct?.description }}</p>
-                    </div>
-                    <div
-                        class="tab-pane"
-                        [class.show]="activeTab === 'composition'"
-                        [class.active]="activeTab === 'composition'"
-                        *ngIf="activeTab === 'composition'"
-                    >
-                        <p>Нет информации о составе</p>
-                    </div>
-                    <!-- <div class="tab-pane" [class.show]="activeTab === 'chars'" [class.active]="activeTab === 'chars'" *ngIf="activeTab === 'chars'">
-                            <div *ngFor="let char of getCharacteristics(selectedProduct)">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">{{ char.label }}</span>
-                                    <span class="fw-semibold">{{ char.value }}</span>
-                                </div>
-                            </div>
-                        </div> -->
-                    <div
-                        class="tab-pane"
-                        [class.show]="activeTab === 'usage'"
-                        [class.active]="activeTab === 'usage'"
-                        *ngIf="activeTab === 'usage' && selectedProduct?.methodOfUse"
-                    >
-                        <p>{{ selectedProduct?.methodOfUse }}</p>
-                    </div>
-                </div>
+    <!-- Tabs for Description and Usage - Now full width -->
+    <div class="info-tabs" *ngIf="selectedProduct?.description || selectedProduct?.methodOfUse">
+        <div class="tab-buttons">
+            <button
+                class="tab-btn"
+                [class.active]="activeTab === 'description'"
+                (click)="activeTab = 'description'"
+                *ngIf="selectedProduct?.description"
+            >
+                <i-bs name="card-text"></i-bs>
+                <span>Описание</span>
+            </button>
+            <button class="tab-btn" [class.active]="activeTab === 'composition'" (click)="activeTab = 'composition'">
+                <i-bs name="list-ul"></i-bs>
+                <span>Состав</span>
+            </button>
+            <button
+                class="tab-btn"
+                [class.active]="activeTab === 'usage'"
+                (click)="activeTab = 'usage'"
+                *ngIf="selectedProduct?.methodOfUse"
+            >
+                <i-bs name="clipboard-check"></i-bs>
+                <span>Применение</span>
+            </button>
+        </div>
+        <div class="tab-content">
+            <div
+                class="tab-pane"
+                [class.show]="activeTab === 'description'"
+                [class.active]="activeTab === 'description'"
+                *ngIf="selectedProduct?.description"
+            >
+                <p>{{ selectedProduct?.description }}</p>
             </div>
-
-            <!-- Compact Action Buttons -->
-            <div class="action-buttons">
-                <button class="btn btn-primary btn-sm" (click)="addToCart(selectedProduct)">
-                    <i-bs name="cart-plus"></i-bs>
-                    В корзину
-                </button>
-                <button class="btn btn-outline-primary btn-sm" (click)="moreInfo()">
-                    <i-bs name="eye"></i-bs>
-                    Подробнее
-                </button>
-                <button class="btn btn-outline-secondary btn-sm" (click)="closeModal()">
-                    <i-bs name="x-circle"></i-bs>
-                    Закрыть
-                </button>
+            <div class="tab-pane" [class.show]="activeTab === 'composition'" [class.active]="activeTab === 'composition'">
+                <p>{{ selectedProduct?.composition || 'Нет информации о составе' }}</p>
+            </div>
+            <div
+                class="tab-pane"
+                [class.show]="activeTab === 'usage'"
+                [class.active]="activeTab === 'usage'"
+                *ngIf="selectedProduct?.methodOfUse"
+            >
+                <p>{{ selectedProduct?.methodOfUse }}</p>
             </div>
         </div>
+    </div>
+
+    <!-- Action Buttons - Fixed at bottom -->
+    <div class="action-buttons">
+        <button class="btn btn-primary btn-sm" (click)="addToCart(selectedProduct)">
+            <i-bs name="cart-plus"></i-bs>
+            В корзину
+        </button>
+        <button class="btn btn-outline-primary btn-sm" (click)="moreInfo()">
+            <i-bs name="eye"></i-bs>
+            Подробнее
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="closeModal()">
+            <i-bs name="x-circle"></i-bs>
+            Закрыть
+        </button>
     </div>
 </div>

@@ -1,13 +1,13 @@
 <div class="container mt-5">
     <div class="d-flex justify-content-center align-items-center mb-4">
-        <h2 class="text-center mb-4 section-title">Преимущества ProSkin</h2>
+        <h2 class="text-center mb-4 section-title">Преимущества SkViDerm</h2>
     </div>
     <div class="row d-flex">
         <div class="col-md-4 mb-4 d-flex" *ngFor="let benefit of benefits">
             <div class="card text-center w-100">
                 <div class="card-body">
                     <div class="circle-icon mb-3">
-                        <img [src]="benefit.icon" alt="{{ benefit.title }}" class="img-fluid" />
+                        <img [src]="benefit.icon | imageUrl" alt="{{ benefit.title }}" class="img-fluid" />
                     </div>
                     <h5 class="card-title">{{ benefit.title }}</h5>
                     <p class="card-text">{{ benefit.description }}</p>

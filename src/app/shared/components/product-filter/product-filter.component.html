@@ -1,21 +1,30 @@
 <div class="filter-container mb-4">
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">Фильтр товаров</h5>
+            <h5 class="card-title">
+                <i class="bi bi-funnel me-2"></i>
+                Фильтр товаров
+            </h5>
 
             <div class="mb-3">
-                <label for="searchName" class="form-label">Поиск по названию</label>
+                <label for="searchName" class="form-label">
+                    <i class="bi bi-search me-1"></i>
+                    Поиск по названию
+                </label>
                 <input
                     type="text"
                     class="form-control"
                     id="searchName"
-                    placeholder="Введите название товара"
+                    placeholder="Введите название товара..."
                     [(ngModel)]="filterData.title"
                 />
             </div>
 
             <div class="mb-3">
-                <label for="brandsFilter" class="form-label d-block">Бренды</label>
+                <label for="brandsFilter" class="form-label d-block">
+                    <i class="bi bi-tag me-1"></i>
+                    Бренды
+                </label>
                 <div id="brandsFilter" class="filter-scroll-container">
                     <div class="form-check" *ngFor="let brand of brands">
                         <input
@@ -33,7 +42,10 @@
             </div>
 
             <div class="mb-3">
-                <label for="categoriesFilter" class="form-label d-block">Категории</label>
+                <label for="categoriesFilter" class="form-label d-block">
+                    <i class="bi bi-grid-3x3-gap me-1"></i>
+                    Категории
+                </label>
                 <div id="categoriesFilter" class="filter-scroll-container">
                     <div class="form-check" *ngFor="let category of categories">
                         <input
@@ -51,7 +63,10 @@
             </div>
 
             <div class="mb-3">
-                <label for="countriesFilter" class="form-label d-block">Страны</label>
+                <label for="countriesFilter" class="form-label d-block">
+                    <i class="bi bi-globe me-1"></i>
+                    Страны
+                </label>
                 <div id="countriesFilter" class="filter-scroll-container">
                     <div class="form-check" *ngFor="let country of countries">
                         <input
@@ -70,7 +85,10 @@
 
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label for="minPrice" class="form-label">Мин. цена</label>
+                    <label for="minPrice" class="form-label">
+                        <i class="bi bi-currency-exchange me-1"></i>
+                        Мин. цена
+                    </label>
                     <input type="number" class="form-control" id="minPrice" placeholder="От" [(ngModel)]="filterData.minPrice" />
                 </div>
                 <div class="col-md-6">
@@ -81,7 +99,10 @@
 
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label for="minVolume" class="form-label">Мин. объем (мл)</label>
+                    <label for="minVolume" class="form-label">
+                        <i class="bi bi-droplet me-1"></i>
+                        Мин. объем (мл)
+                    </label>
                     <input type="number" class="form-control" id="minVolume" placeholder="От" [(ngModel)]="filterData.minVolume" />
                 </div>
                 <div class="col-md-6">
@@ -91,8 +112,14 @@
             </div>
 
             <div class="d-flex justify-content-between">
-                <button class="btn btn-secondary" (click)="resetFilter()">Сбросить</button>
-                <button class="btn btn-primary" (click)="applyFilter()">Применить</button>
+                <button class="btn btn-secondary" (click)="resetFilter()">
+                    <i class="bi bi-arrow-clockwise me-1"></i>
+                    Сбросить
+                </button>
+                <button class="btn btn-primary" (click)="applyFilter()">
+                    <i class="bi bi-check-lg me-1"></i>
+                    Применить
+                </button>
             </div>
         </div>
     </div>

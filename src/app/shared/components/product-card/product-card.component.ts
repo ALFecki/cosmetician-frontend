@@ -7,11 +7,12 @@ import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
 import { ProductCarouselComponent } from '../product-carousel/product-carousel.component';
 import { IconsModule } from '../../base/icons/icons.module';
+import { ImageUrlPipe } from '../../utils/image-url.pipe';
 
 @Component({
     selector: 'app-product-card',
     standalone: true,
-    imports: [CommonModule, RouterModule, ProductCarouselComponent, IconsModule],
+    imports: [CommonModule, RouterModule, ProductCarouselComponent, IconsModule, ImageUrlPipe],
     templateUrl: './product-card.component.html',
     styleUrl: './product-card.component.scss',
 })

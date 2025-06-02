@@ -7,8 +7,41 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
+.carousel-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.background-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    filter: blur(20px) brightness(0.7);
+    transition:
+        opacity 0.8s ease-in-out,
+        filter 0.8s ease-in-out;
+    transform: scale(1.1);
+    /* Slightly larger to hide blur edges */
+}
+
+.background-slide.active {
+    opacity: 1;
+}
+
 .carousel-inner {
     height: 100%;
+    position: relative;
+    z-index: 1;
 }
 
 .carousel-item {
@@ -20,6 +53,7 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(4, 1fr);
+    transition: opacity 0.8s ease-in-out;
 }
 
 .carousel-item.active {
@@ -121,9 +155,7 @@
 .puzzle-inner img {
     position: absolute;
     width: 400%;
-    /* 4x width for the 4 column grid */
     height: 400%;
-    /* 4x height for the 4 row grid */
     object-fit: cover;
     filter: brightness(0.9);
 }
@@ -222,7 +254,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5));
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6));
     display: flex;
     justify-content: center;
     align-items: center;
@@ -243,6 +275,14 @@
     margin-bottom: 1.5rem;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     font-family: 'Montserrat', sans-serif;
+}
+
+.slide-description {
+    color: white;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+    font-family: 'Open Sans', sans-serif;
 }
 
 .btn-shop {
@@ -365,6 +405,10 @@
         height: 60vh;
     }
 
+    .background-slide {
+        filter: blur(15px) brightness(0.7);
+    }
+
     .slide-title {
         font-size: 2.5rem;
     }
@@ -373,6 +417,10 @@
 @media (max-width: 768px) {
     .carousel {
         height: 50vh;
+    }
+
+    .background-slide {
+        filter: blur(12px) brightness(0.7);
     }
 
     .slide-title {
@@ -392,6 +440,10 @@
 @media (max-width: 480px) {
     .carousel {
         height: 40vh;
+    }
+
+    .background-slide {
+        filter: blur(10px) brightness(0.7);
     }
 
     .slide-title {

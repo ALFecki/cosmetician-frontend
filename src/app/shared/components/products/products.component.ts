@@ -8,6 +8,7 @@ import { ProductModel } from '../../models/product.model';
 import { FilterProductSchema } from '../../schemas/product.schema';
 import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
+import { ImageUrlPipe } from '../../utils/image-url.pipe';
 import { PaginationComponent } from '../pagination/pagination.component';
 import { ProductFilterComponent } from '../product-filter/product-filter.component';
 import { ProductModalComponent } from '../product-modal/product-modal.component';
@@ -16,7 +17,7 @@ import { ProductModalComponent } from '../product-modal/product-modal.component'
     selector: 'app-products',
     providers: [],
     standalone: true,
-    imports: [CommonModule, PaginationComponent, ProductFilterComponent],
+    imports: [CommonModule, PaginationComponent, ProductFilterComponent, ImageUrlPipe],
     templateUrl: './products.component.html',
     styleUrl: './products.component.scss',
 })
@@ -29,7 +30,7 @@ export class ProductsComponent implements OnInit {
     currentPage = 1;
     totalItems$: Observable<number> = of(0);
     filterOptions: FilterProductSchema = {};
-    selectedVariants: Record<string, string> = {};
+    private selectedVariants: Record<string, string> = {};
 
     constructor(
         private route: ActivatedRoute,
@@ -114,23 +115,45 @@ export class ProductsComponent implements OnInit {
         }
     }
 
-    selectVariant(productId: string, variantId: string) {
-        this.selectedVariants[productId] = variantId;
+    selectVariant(product: ProductModel, variantId: string): void {
+        this.selectedVariants[product.id] = variantId;
     }
 
-    getSelectedVariant(product: ProductModel): string | undefined {
-        return this.selectedVariants[product.id] || product.variants?.[0]?.id;
+    getSelectedVariantId(product: ProductModel): string {
+        return this.selectedVariants[product.id] || product.variants?.[0]?.id || '';
+    }
+
+    getSelectedVariant(product: ProductModel) {
+        const selectedId = this.getSelectedVariantId(product);
+        return product.variants?.find(v => v.id === selectedId) || product.variants?.[0];
     }
 
     getSelectedVariantPrice(product: ProductModel): number {
-        const variantId = this.getSelectedVariant(product);
-        const variant = product.variants?.find(v => v.id === variantId);
-        return variant ? variant.price : 0;
+        const variant = this.getSelectedVariant(product);
+        return variant?.price || 0;
     }
 
-    getSelectedVariantVolume(product: ProductModel): number {
-        const variantId = this.getSelectedVariant(product);
-        const variant = product.variants?.find(v => v.id === variantId);
-        return variant ? variant.volume : 0;
+    getMinPrice(product: ProductModel): number {
+        if (!product.variants || product.variants.length === 0) {
+            return 0;
+        }
+        return Math.min(...product.variants.map(variant => variant.price));
+    }
+
+    onImageLoad(event: Event): void {
+        const img = event.target as HTMLImageElement;
+        const container = img.closest('.card-image-container');
+        if (container) {
+            container.classList.remove('loading');
+        }
+    }
+
+    onImageError(event: Event): void {
+        const img = event.target as HTMLImageElement;
+        img.src = 'assets/images/placeholder-product.jpg'; // Add a placeholder image
+        const container = img.closest('.card-image-container');
+        if (container) {
+            container.classList.remove('loading');
+        }
     }
 }

@@ -25,22 +25,25 @@ export class ProductService extends DataService<ProductModel, CreateProductSchem
 
     private setProductIdToVariants(
         product: ProductModel,
-        variants: { price: number; volume: number }[],
-    ): { price: number; volume: number; productId: string }[] {
+        variants: { costPrice: number; price: number; volume: number }[],
+    ): { costPrice: number; price: number; volume: number; productId: string }[] {
         const newVariants = [];
         if (!variants || variants.length === 0) {
             return [];
         }
         for (const variant of variants) {
-            newVariants.push({ price: variant.price, volume: variant.volume, productId: product.id });
+            newVariants.push({ costPrice: variant.costPrice, price: variant.price, volume: variant.volume, productId: product.id });
         }
         return newVariants;
     }
 
-    override create(data: CreateProductSchema): Promise<SingleResponse<ProductModel>> {
-        const variants: { price: number; volume: number }[] =
+    override async create(data: CreateProductSchema): Promise<SingleResponse<ProductModel>> {
+        const variants: { costPrice: number; price: number; volume: number }[] =
             typeof data['variants'] === 'string' ? JSON.parse(data['variants']) : data['variants'] || [];
         data.isDeleted = variants.length === 0;
+        if (data.image && (data.image as unknown) instanceof File) {
+            data.image = await this.uploadImage(data.image as unknown as File);
+        }
         return new Promise((resolve, reject) => {
             this.http.post<SingleResponse<ProductModel>>(`${this.apiUrl}/${this.endpoint}`, data).subscribe({
                 next: response => {
@@ -61,16 +64,21 @@ export class ProductService extends DataService<ProductModel, CreateProductSchem
         });
     }
 
-    override update(id: string, data: UpdateProductSchema): Promise<SingleResponse<ProductModel>> {
-        const variants: { price: number; volume: number }[] =
+    override async update(id: string, data: UpdateProductSchema): Promise<SingleResponse<ProductModel>> {
+        const variants: { costPrice: number; price: number; volume: number }[] =
             typeof data['variants'] === 'string' ? JSON.parse(data['variants']) : data['variants'] || [];
         data.isDeleted = variants.length === 0;
+        if (data.image && (data.image as unknown) instanceof File) {
+            data.image = await this.uploadImage(data.image as unknown as File);
+        }
         return new Promise((resolve, reject) => {
             this.http.patch<SingleResponse<ProductModel>>(`${this.apiUrl}/${this.endpoint}/${id}`, data).subscribe({
                 next: response => {
                     const newVariants = this.setProductIdToVariants(response.data, variants);
                     for (const variant of newVariants) {
-                        this.http.patch<SingleResponse<ProductModel>>(`${this.apiUrl}/product_variant/${variant.productId}`, variant).subscribe();
+                        this.http
+                            .patch<SingleResponse<ProductModel>>(`${this.apiUrl}/product_variant/${variant.productId}`, variant)
+                            .subscribe();
                     }
                     this.getById(response.data.id).subscribe({
                         next: resolve,

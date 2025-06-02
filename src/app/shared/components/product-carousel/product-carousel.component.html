@@ -3,9 +3,24 @@
         <h2 class="section-title text-center">Популярные товары</h2>
     </div>
 
-    <div class="position-relative carousel-container">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Загрузка товаров...</span>
+        </div>
+        <p class="mt-3 text-muted">Загружаем лучшие товары для вас...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="alert alert-danger text-center" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ error }}
+    </div>
+
+    <!-- Carousel Container -->
+    <div *ngIf="!loading && !error" class="position-relative carousel-container">
         <div class="product-carousel" #productCarousel>
-            <div class="product-card-wrapper" *ngFor="let product of products">
+            <div class="product-card-wrapper" *ngFor="let product of products; trackBy: trackByProductId">
                 <div
                     class="card product-card h-100"
                     tabindex="0"
@@ -13,19 +28,34 @@
                     (click)="openProductDetails(product)"
                     (keydown.enter)="openProductDetails(product)"
                     (keydown.space)="openProductDetails(product); $event.preventDefault()"
+                    [attr.aria-label]="'Открыть детали товара: ' + product.title"
                 >
                     <div class="img-container">
                         <img
-                            [src]="product.image || 'assets/images/products/no-image.png'"
+                            [src]="product.image | imageUrl"
                             class="card-img-top"
-                            alt="{{ product.title }}"
+                            [alt]="product.title"
+                            loading="lazy"
+                            (load)="onImageLoad($event)"
+                            (error)="onImageError($event)"
                         />
+                        <div class="card-badge" *ngIf="product.brand">
+                            {{ product.brand.title }}
+                        </div>
                     </div>
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">{{ product.title }}</h5>
-                        <p class="card-text">Цена: от {{ product.variants[0].price }} р.</p>
+                        <p class="card-text">
+                            <span class="price-label">Цена: от </span>
+                            <span class="price-value">{{ getMinPrice(product) | number: '1.2-2' }} р.</span>
+                        </p>
                         <div class="mt-auto">
-                            <button class="btn btn-primary w-100" (click)="$event.stopPropagation(); openProductDetails(product)">
+                            <button
+                                class="btn btn-primary w-100"
+                                (click)="$event.stopPropagation(); openProductDetails(product)"
+                                [attr.aria-label]="'Купить ' + product.title"
+                            >
+                                <i class="bi bi-bag-plus me-2"></i>
                                 Купить
                             </button>
                         </div>
@@ -34,16 +64,29 @@
             </div>
         </div>
 
-        <button class="btn carousel-arrow carousel-prev" type="button" (click)="scrollLeft()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <!-- Navigation Arrows -->
+        <button
+            class="btn carousel-arrow carousel-prev"
+            type="button"
+            (click)="scrollLeft()"
+            [attr.aria-label]="'Показать предыдущие товары'"
+            [disabled]="products.length === 0"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
                 <path
                     fill-rule="evenodd"
                     d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
                 />
             </svg>
         </button>
-        <button class="btn carousel-arrow carousel-next" type="button" (click)="scrollRight()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <button
+            class="btn carousel-arrow carousel-next"
+            type="button"
+            (click)="scrollRight()"
+            [attr.aria-label]="'Показать следующие товары'"
+            [disabled]="products.length === 0"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
                 <path
                     fill-rule="evenodd"
                     d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"
@@ -52,7 +95,11 @@
         </button>
     </div>
 
-    <div class="text-center mt-4">
-        <button (click)="openCatalog()" class="btn btn-outline-primary">Показать больше</button>
+    <!-- Show More Button -->
+    <div class="text-center mt-4" *ngIf="!loading && !error">
+        <button (click)="openCatalog()" class="btn btn-outline-primary" [attr.aria-label]="'Перейти к полному каталогу товаров'">
+            <i class="bi bi-grid-3x3-gap-fill me-2"></i>
+            Показать больше товаров
+        </button>
     </div>
 </div>

@@ -9,13 +9,14 @@ import { PersonModel } from '../../shared/models/person.model';
 import { AuthService } from '../../shared/services/auth.service';
 import { OrderService } from '../../shared/services/order.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
 
 @Component({
     selector: 'app-order-details',
     templateUrl: './order-details.component.html',
     styleUrl: './order-details.component.scss',
     standalone: true,
-    imports: [CommonModule, RouterModule, ProfileSidebarComponent],
+    imports: [CommonModule, RouterModule, ProfileSidebarComponent, ImageUrlPipe],
 })
 export class OrderDetailsComponent implements OnInit {
     order: BehaviorSubject<OrderModel | null> = new BehaviorSubject<OrderModel | null>(null);

@@ -2,11 +2,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IconsModule } from '../../base/icons/icons.module';
+import { ImageUrlPipe } from '../../utils/image-url.pipe';
 
 @Component({
     selector: 'app-generic-table',
     standalone: true,
-    imports: [CommonModule, IconsModule],
+    imports: [CommonModule, IconsModule, ImageUrlPipe],
     templateUrl: './generic-table.component.html',
     styleUrl: './generic-table.component.scss',
 })

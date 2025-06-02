@@ -9,6 +9,7 @@ export interface ProductModel {
     description: string;
     image: string;
     methodOfUse?: string;
+    composition?: string;
     brandId: string;
     brand: BrandModel;
 
@@ -29,6 +30,7 @@ export interface ProductVariantModel {
     id: string;
     productId: string;
     volume: number;
+    costPrice: number;
     price: number;
     isDefault: boolean;
     isDeleted: boolean;

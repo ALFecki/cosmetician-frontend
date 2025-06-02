@@ -13,7 +13,7 @@
                         <ng-container *ngSwitchCase="'image'">
                             <img
                                 *ngIf="getNestedProperty(item, column.key)"
-                                [src]="getNestedProperty(item, column.key)"
+                                [src]="getNestedProperty(item, column.key) | imageUrl"
                                 class="table-thumbnail"
                                 [alt]="getNestedProperty(item, column.key)"
                             />
@@ -39,7 +39,9 @@
                         <ng-container *ngSwitchCase="'variants'">
                             <span *ngIf="getNestedProperty(item, column.key) && getNestedProperty(item, column.key).length > 0">
                                 <span *ngFor="let variant of getNestedProperty(item, column.key); let last = last">
-                                    {{ variant.volume }}мл/{{ variant.price | number: '1.2-2' }}р.<span *ngIf="!last"> • </span>
+                                    {{ variant.volume }}мл/{{ variant.costPrice | number: '1.2-2' }}р./{{
+                                        variant.price | number: '1.2-2'
+                                    }}р.<span *ngIf="!last"> • </span>
                                 </span>
                             </span>
                             <span *ngIf="!getNestedProperty(item, column.key) || getNestedProperty(item, column.key).length === 0">—</span>

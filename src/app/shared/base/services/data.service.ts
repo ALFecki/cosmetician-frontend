@@ -69,6 +69,8 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
             this.http.post<{ status: string; data: { path: string } }>(`${this.apiUrl}/upload/image`, formData),
         );
 
+        console.log('Image upload response:', response);
+
         return response.data.path;
     }
 
@@ -78,8 +80,7 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
 
         for (const key in processedData) {
             if (key.includes('image') && processedData[key] instanceof File) {
-                processedData[key] =
-                    `${environment.server_url}/images/${await this.uploadImage(processedData[key])}` as (typeof processedData)[typeof key];
+                processedData[key] = (await this.uploadImage(processedData[key])) as (typeof processedData)[typeof key];
             }
         }
         console.log('Processed create data:', processedData);

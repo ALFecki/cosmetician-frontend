@@ -30,7 +30,7 @@
                 </div>
                 <div class="col-lg-4" *ngIf="categoryData.image">
                     <div class="category-image">
-                        <img [src]="categoryData.image" [alt]="categoryData.title" class="img-fluid" />
+                        <img [src]="categoryData.image | imageUrl" [alt]="categoryData.title" class="img-fluid" />
                     </div>
                 </div>
             </div>

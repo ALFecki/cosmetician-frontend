@@ -8,11 +8,12 @@ import { ProductModel } from '../../models/product.model';
 import { CartService } from '../../services/cart.service';
 import { ToastService } from '../../services/toast.service';
 import { IconsModule } from '../../base/icons/icons.module';
+import { ImageUrlPipe } from '../../utils/image-url.pipe';
 
 @Component({
     selector: 'app-product-modal',
     standalone: true,
-    imports: [CommonModule, IconsModule],
+    imports: [CommonModule, IconsModule, ImageUrlPipe],
     templateUrl: './product-modal.component.html',
     styleUrl: './product-modal.component.scss',
 })

@@ -11,11 +11,12 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { IconsModule } from '../../base/icons/icons.module';
 import { ProductModel } from '../../models/product.model';
 import { ProductModalComponent } from '../product-modal/product-modal.component';
+import { ImageUrlPipe } from '../../utils/image-url.pipe';
 
 @Component({
     selector: 'app-cart',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule, IconsModule],
+    imports: [CommonModule, FormsModule, RouterModule, IconsModule, ImageUrlPipe],
     templateUrl: './cart.component.html',
     styleUrl: './cart.component.scss',
 })

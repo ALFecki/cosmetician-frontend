@@ -17,7 +17,7 @@
         <div class="col-6 col-sm-4 col-md-3 mb-4" *ngFor="let brand of brands">
             <a [routerLink]="['/brand', brand.id]" class="brand-link">
                 <div class="brand-card">
-                    <img [src]="brand.image || getPlaceholderImage()" [alt]="brand.title" class="brand-logo img-fluid" />
+                    <img [src]="brand.image || getPlaceholderImage() | imageUrl" [alt]="brand.title" class="brand-logo img-fluid" />
                     <h5 class="brand-title text-center mt-2">{{ brand.title }}</h5>
                 </div>
             </a>
