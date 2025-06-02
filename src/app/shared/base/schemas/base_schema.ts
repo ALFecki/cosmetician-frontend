@@ -15,6 +15,11 @@ export interface SingleResponse<Model> {
     data: Model;
 }
 
+export interface MaintenanceResponse {
+    status: string;
+    enabled: boolean;
+}
+
 export interface ErrorResponse {
     status: string;
 }

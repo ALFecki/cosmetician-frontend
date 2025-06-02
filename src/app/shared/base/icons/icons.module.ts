@@ -44,6 +44,9 @@ import {
     xCircle,
     cardText,
     personWorkspace,
+    shieldLock,
+    lock,
+    tools,
 } from 'ngx-bootstrap-icons';
 
 const icons = {
@@ -91,6 +94,9 @@ const icons = {
     xCircle,
     cardText,
     personWorkspace,
+    tools,
+    shieldLock,
+    lock,
 };
 
 @NgModule({

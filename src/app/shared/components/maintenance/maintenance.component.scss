@@ -1,0 +1,168 @@
+.maintenance-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--soft-pink) 0%, var(--warm-white) 50%, var(--cream) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.maintenance-content {
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+
+    .maintenance-icon {
+        margin-bottom: 2rem;
+        animation: pulse 2s infinite;
+    }
+
+    .maintenance-message {
+        margin-bottom: 3rem;
+
+        h1 {
+            color: var(--gray-dark);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .lead {
+            color: var(--gray-medium);
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        .text-muted {
+            font-size: 1rem;
+        }
+    }
+
+    .admin-login-section {
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(212, 80, 109, 0.15);
+            background: var(--warm-white);
+
+            .card-header {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+                color: var(--white);
+                border-radius: 12px 12px 0 0;
+                padding: 1.5rem;
+                border-bottom: none;
+
+                .card-title {
+                    font-weight: 600;
+                    font-size: 1.1rem;
+                }
+            }
+
+            .card-body {
+                padding: 2rem;
+            }
+        }
+
+        .form-label {
+            color: var(--gray-dark);
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+
+        .form-control {
+            border: 2px solid var(--powder-pink);
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--warm-white);
+
+            &:focus {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 0.2rem rgba(212, 80, 109, 0.15);
+            }
+
+            &.is-invalid {
+                border-color: var(--danger);
+            }
+
+            &::placeholder {
+                color: var(--gray-light);
+            }
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+
+            &:hover:not(:disabled) {
+                background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(212, 80, 109, 0.3);
+            }
+
+            &:disabled {
+                background: var(--gray-light);
+                transform: none;
+                box-shadow: none;
+            }
+        }
+
+        .alert-danger {
+            background: rgba(199, 91, 122, 0.1);
+            border-color: var(--danger);
+            color: var(--danger);
+            border-radius: 8px;
+        }
+
+        .invalid-feedback {
+            color: var(--danger);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .maintenance-container {
+        padding: 1rem;
+
+        .maintenance-content {
+            .maintenance-message {
+                h1 {
+                    font-size: 2.5rem;
+                }
+
+                .lead {
+                    font-size: 1.1rem;
+                }
+            }
+
+            .admin-login-section .card-body {
+                padding: 1.5rem;
+            }
+        }
+    }
+}

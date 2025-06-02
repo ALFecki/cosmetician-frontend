@@ -4,17 +4,19 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, catchError, forkJoin, of, tap } from 'rxjs';
+import { IconsModule } from '../../base/icons/icons.module';
 import { FilterBrandSchema } from '../../schemas/brand.schema';
 import { FilterCategorySchema } from '../../schemas/category.schema';
+import { FilterCountrySchema } from '../../schemas/country.schema';
 import { BrandService } from '../../services/brand.service';
 import { CategoryService } from '../../services/category.service';
+import { CountryService } from '../../services/country.service';
+import { MaintenanceService } from '../../services/maintenance.service';
 import { PersonSevice } from '../../services/person.service';
 import { ProductService } from '../../services/product.service';
-import { GenericTableComponent } from '../generic-table/generic-table.component';
-import { CountryService } from '../../services/country.service';
-import { FilterCountrySchema } from '../../schemas/country.schema';
-import { IconsModule } from '../../base/icons/icons.module';
+import { ToastService } from '../../services/toast.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
+import { GenericTableComponent } from '../generic-table/generic-table.component';
 
 interface ModelConfig {
     key: string;
@@ -62,6 +64,10 @@ export class AdminPanelSwitcherComponent implements OnInit {
     error: string | null = null;
     searchText = '';
 
+    // Maintenance mode properties
+    isMaintenanceMode = false;
+    maintenanceLoading = false;
+
     private modelConfigs: Record<string, ModelConfig> = {};
 
     filePreviewUrls: Record<string, string> = {};
@@ -75,6 +81,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
         private brandService: BrandService,
         private personService: PersonSevice,
         private countryService: CountryService,
+        private maintenanceService: MaintenanceService,
+        private toastService: ToastService,
     ) {}
 
     ngOnInit(): void {
@@ -85,6 +93,35 @@ export class AdminPanelSwitcherComponent implements OnInit {
         }));
 
         this.loadData();
+        this.loadMaintenanceStatus();
+    }
+
+    loadMaintenanceStatus(): void {
+        this.maintenanceService.getMaintenanceStatus().subscribe(status => {
+            this.isMaintenanceMode = status;
+        });
+    }
+
+    toggleMaintenanceMode(): void {
+        this.maintenanceLoading = true;
+
+        const operation = this.isMaintenanceMode
+            ? this.maintenanceService.disableMaintenanceMode()
+            : this.maintenanceService.enableMaintenanceMode();
+
+        operation.subscribe({
+            next: () => {
+                this.isMaintenanceMode = !this.isMaintenanceMode;
+                const status = this.isMaintenanceMode ? 'включен' : 'отключен';
+                this.toastService.show(`Режим технических работ ${status}`, 'success');
+                this.maintenanceLoading = false;
+            },
+            error: error => {
+                console.error('Error toggling maintenance mode:', error);
+                this.toastService.show('Ошибка при изменении режима технических работ', 'error');
+                this.maintenanceLoading = false;
+            },
+        });
     }
 
     setupModelConfigs() {

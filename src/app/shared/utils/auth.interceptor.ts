@@ -5,9 +5,7 @@ import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-    constructor(private authService: AuthService) {
-        // this.authService.checkAuth()
-    }
+    constructor(private authService: AuthService) {}
 
     intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
         if (!req.url.includes('login') && !req.url.includes('logout')) {

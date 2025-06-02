@@ -21,6 +21,7 @@ export class AuthService {
         return this.http.post<Claims>(`${environment.server_url}/login`, loginData, { withCredentials: true }).pipe(
             tap((response: Claims) => {
                 this.csrfToken.next(response.csrf_token);
+                this.userClaims.next(response);
                 this.onLogin.next(true);
             }),
             // catchError((error: HttpErrorResponse) => {
@@ -99,6 +100,7 @@ export class AuthService {
 
     isAdmin(): boolean {
         const claims = this.userClaims.getValue();
+        console.log('Checking admin status:', claims);
         return this.isLoggedIn() && !!claims && (claims.is_admin || claims.is_moderator);
     }
 

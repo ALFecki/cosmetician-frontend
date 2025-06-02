@@ -1,7 +1,9 @@
-<app-navbar></app-navbar>
-<div class="content">
+<app-navbar *ngIf="showNavbarAndFooter$ | async"></app-navbar>
+<div *ngIf="showNavbarAndFooter$ | async" class="content">
     <router-outlet></router-outlet>
 </div>
 
-<app-footer></app-footer>
+<router-outlet *ngIf="(showNavbarAndFooter$ | async) === false"></router-outlet>
+
+<app-footer *ngIf="showNavbarAndFooter$ | async"></app-footer>
 <app-toast></app-toast>

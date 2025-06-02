@@ -1,6 +1,46 @@
 <div class="admin-panel-switcher">
     <h1 class="mb-4">Панель администратора</h1>
 
+    <!-- Maintenance Mode Control -->
+    <div class="maintenance-control mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h6 class="mb-0">
+                    <i-bs name="tools" class="me-2"></i-bs>
+                    Режим технических работ
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="mb-1">
+                            <strong>Статус:</strong>
+                            <span [class]="'badge ' + (isMaintenanceMode ? 'bg-danger' : 'bg-success')">
+                                {{ isMaintenanceMode ? 'Включен' : 'Отключен' }}
+                            </span>
+                        </p>
+                        <small class="text-muted"> Когда включен, доступ к сайту имеют только администраторы </small>
+                    </div>
+                    <button
+                        class="btn"
+                        [class]="isMaintenanceMode ? 'btn-success' : 'btn-danger'"
+                        (click)="toggleMaintenanceMode()"
+                        [disabled]="maintenanceLoading"
+                    >
+                        <span
+                            *ngIf="maintenanceLoading"
+                            class="spinner-border spinner-border-sm me-2"
+                            role="status"
+                            aria-hidden="true"
+                        ></span>
+                        <i-bs [name]="isMaintenanceMode ? 'check-circle' : 'tools'" class="me-2"></i-bs>
+                        {{ isMaintenanceMode ? 'Отключить' : 'Включить' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item" role="presentation" *ngFor="let model of availableModels">
             <button class="nav-link" [class.active]="currentModel === model.key" (click)="switchModel(model.key)" type="button">
