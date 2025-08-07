@@ -45,6 +45,7 @@ export class ProfileSidebarComponent implements OnInit {
         await this.cartService.syncOrder();
         this.authService.logout().subscribe(() => {
             this.router.navigate(['/']);
+            window.location.reload();
         });
     }
 }

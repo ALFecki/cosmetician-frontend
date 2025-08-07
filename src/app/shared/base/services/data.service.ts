@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, firstValueFrom } from 'rxjs';
-import { environment } from '../../../../../environment';
+import { environment } from '../../../../environments/environment';
 import { ListResponse, SingleResponse } from '../schemas/base_schema';
 
 @Injectable({

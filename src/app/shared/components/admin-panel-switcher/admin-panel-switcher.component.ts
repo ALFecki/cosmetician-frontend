@@ -14,9 +14,11 @@ import { CountryService } from '../../services/country.service';
 import { MaintenanceService } from '../../services/maintenance.service';
 import { PersonSevice } from '../../services/person.service';
 import { ProductService } from '../../services/product.service';
+import { StatisticsService } from '../../services/statistics.service';
 import { ToastService } from '../../services/toast.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
 import { GenericTableComponent } from '../generic-table/generic-table.component';
+import { StatisticsComponent } from '../statistics/statistics.component';
 
 interface ModelConfig {
     key: string;
@@ -39,7 +41,7 @@ interface ModelConfig {
 @Component({
     selector: 'app-admin-panel-switcher',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, GenericTableComponent, IconsModule, ImageUrlPipe],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, GenericTableComponent, IconsModule, ImageUrlPipe, StatisticsComponent],
     templateUrl: './admin-panel-switcher.component.html',
     styleUrl: './admin-panel-switcher.component.scss',
 })
@@ -83,6 +85,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
         private countryService: CountryService,
         private maintenanceService: MaintenanceService,
         private toastService: ToastService,
+        private statisticsService: StatisticsService,
     ) {}
 
     ngOnInit(): void {
@@ -286,6 +289,14 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'updatedAt', title: 'Дата обновления', type: 'date' },
             ],
         };
+
+        this.modelConfigs['statistics'] = {
+            key: 'statistics',
+            title: 'Статистика',
+            service: this.statisticsService,
+            fields: [],
+            columns: [],
+        };
     }
 
     get currentModelConfig(): ModelConfig {
@@ -308,7 +319,12 @@ export class AdminPanelSwitcherComponent implements OnInit {
         if (this.currentModel !== modelKey) {
             this.currentModel = modelKey;
             this.searchText = '';
-            this.loadData();
+            if (modelKey === 'statistics') {
+                // Don't load data for statistics - it will be handled differently
+                this.loading = false;
+            } else {
+                this.loadData();
+            }
         }
     }
 

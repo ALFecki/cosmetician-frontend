@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { IconsModule } from '../../base/icons/icons.module';
 import { AuthGuard } from '../../guards/auth.guard';
 import { ProductModel } from '../../models/product.model';
 import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
-import { ProductCarouselComponent } from '../product-carousel/product-carousel.component';
-import { IconsModule } from '../../base/icons/icons.module';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
+import { ProductCarouselComponent } from '../product-carousel/product-carousel.component';
 
 @Component({
     selector: 'app-product-card',
@@ -86,8 +86,8 @@ export class ProductCardComponent implements OnInit {
             { label: 'Категория', value: this.product.categories?.map(category => category.title).join(', ') || '—' },
             { label: 'Объем', value: this.getSelectedVariantVolume() + ' мл' },
             { label: 'Страна', value: this.product.countries.map(country => country.name).join(', ') || '—' },
-            { label: 'Тип продукта', value: this.product.productType || '—' },
-            { label: 'Назначение', value: this.product.productScope || '—' },
+            { label: 'Тип продукта', value: this.product.productType.title || '—' },
+            { label: 'Назначение', value: this.product.productScopes?.map(scope => scope.title).join(', ') || '—' },
         ].filter(c => c.value && c.value !== '—');
         this.visibleCharacteristics = this.allCharacteristics.slice(0, 4);
         this.hiddenCharacteristics = this.allCharacteristics.slice(4);

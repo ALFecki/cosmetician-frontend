@@ -15,7 +15,6 @@
         <img [src]="selectedProduct?.image | imageUrl" class="modal-product-image" [alt]="selectedProduct?.title" />
 
         <div class="product-details-side">
-            <!-- Volume Selection -->
             <div class="variant-selection" *ngIf="selectedProduct?.variants && selectedProduct!.variants.length > 1">
                 <h6><i-bs name="droplet" class="me-2"></i-bs>Выберите объем</h6>
                 <div class="variant-buttons">
@@ -31,7 +30,6 @@
                 </div>
             </div>
 
-            <!-- Compact Characteristics -->
             <div class="characteristics-compact">
                 <h6><i-bs name="info-circle" class="me-2"></i-bs>Характеристики</h6>
                 <div class="characteristics-grid">
@@ -49,18 +47,17 @@
                     </div>
                     <div class="char-item">
                         <span class="char-label">Тип:</span>
-                        <span class="char-value">{{ selectedProduct?.productType || '—' }}</span>
+                        <span class="char-value">{{ selectedProduct?.productType?.title || '—' }}</span>
                     </div>
                     <div class="char-item">
                         <span class="char-label">Назначение:</span>
-                        <span class="char-value">{{ selectedProduct?.productScope || '—' }}</span>
+                        <span class="char-value">{{ getProductScopeNames(selectedProduct) }}</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Tabs for Description and Usage - Now full width -->
     <div class="info-tabs" *ngIf="selectedProduct?.description || selectedProduct?.methodOfUse">
         <div class="tab-buttons">
             <button
@@ -109,7 +106,6 @@
         </div>
     </div>
 
-    <!-- Action Buttons - Fixed at bottom -->
     <div class="action-buttons">
         <button class="btn btn-primary btn-sm" (click)="addToCart(selectedProduct)">
             <i-bs name="cart-plus"></i-bs>

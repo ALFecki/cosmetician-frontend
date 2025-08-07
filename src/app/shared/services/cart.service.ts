@@ -3,6 +3,7 @@ import { BehaviorSubject, debounceTime, map, Observable, Subject } from 'rxjs';
 import { CartModel } from '../models/cart.model';
 import { AuthService } from './auth.service';
 import { OrderService } from './order.service';
+import { OrderModel } from '../models/order.model';
 
 @Injectable({
     providedIn: 'root',
@@ -198,7 +199,7 @@ export class CartService implements OnDestroy {
         this.totalPriceSubject.next(0);
     }
 
-    async checkout(): Promise<void> {
+    async checkout(): Promise<OrderModel | null> {
         const order = await this.orderService.checkout();
         if (order) {
             this.cartItemsSubject.next([]);
@@ -207,6 +208,7 @@ export class CartService implements OnDestroy {
         } else {
             console.error('Error during checkout');
         }
+        return order;
     }
 
     ngOnDestroy(): void {

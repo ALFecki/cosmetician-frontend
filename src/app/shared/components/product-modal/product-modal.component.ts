@@ -41,7 +41,7 @@ export class ProductModalComponent {
             this.authGuard.canActivate(this.route.snapshot, this.router.routerState.snapshot).subscribe(async isAuthenticated => {
                 if (isAuthenticated) {
                     if (this.selectedVariantId) {
-                        await this.cartService.addProductToCart(this.selectedVariantId);
+                        await this.cartService.addProductToCart(this.getSelectedVariant()!.id);
                     } else {
                         this.toastService.show('Пожалуйста, выберите вариант продукта перед добавлением в корзину.', 'error');
                         return;
@@ -53,6 +53,10 @@ export class ProductModalComponent {
 
     getCountryNames(product: ProductModel | null): string {
         return product?.countries?.map((country: CountryModel) => country.name).join(', ') || '';
+    }
+
+    getProductScopeNames(product: ProductModel | null): string {
+        return product?.productScopes?.map(scope => scope.title).join(', ') || '';
     }
 
     closeModal() {

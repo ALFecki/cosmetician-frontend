@@ -10,6 +10,7 @@ import { AuthService } from '../../shared/services/auth.service';
 import { OrderService } from '../../shared/services/order.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
+import { CartService } from '../../shared/services/cart.service';
 
 @Component({
     selector: 'app-order-confirmation',
@@ -29,6 +30,7 @@ export class OrderConfirmationComponent implements OnInit {
     constructor(
         private formBuilder: FormBuilder,
         private orderService: OrderService,
+        private cartService: CartService,
         private authService: AuthService,
         private toastService: ToastService,
         private router: Router,
@@ -105,11 +107,11 @@ export class OrderConfirmationComponent implements OnInit {
         this.isSubmitting = true;
 
         try {
-            const result = await this.orderService.checkout();
+            const result = await this.cartService.checkout();
 
             if (result) {
                 this.toastService.show('Заказ успешно оформлен!', 'success');
-                this.router.navigate(['/orders']);
+                this.router.navigate(['/products']);
             } else {
                 this.toastService.show('Произошла ошибка при оформлении заказа', 'error');
             }

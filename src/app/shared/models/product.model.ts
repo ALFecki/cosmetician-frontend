@@ -13,8 +13,9 @@ export interface ProductModel {
     brandId: string;
     brand: BrandModel;
 
-    productScope: string;
-    productType: string;
+    productScopes: ProductScopeModel[];
+    productTypeId: string;
+    productType: ProductTypeModel;
     countries: CountryModel[];
     categoryId: string;
     categories: CategoryModel[];
@@ -34,6 +35,22 @@ export interface ProductVariantModel {
     price: number;
     isDefault: boolean;
     isDeleted: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface ProductTypeModel {
+    id: string;
+    title: string;
+    description: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface ProductScopeModel {
+    id: string;
+    title: string;
+    description: string;
     createdAt: Date;
     updatedAt: Date;
 }

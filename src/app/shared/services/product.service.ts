@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from '../../../../environment';
+import { environment } from '../../../environments/environment';
 import { SingleResponse } from '../base/schemas/base_schema';
 import { DataService } from '../base/services/data.service';
 import { ProductModel } from '../models/product.model';

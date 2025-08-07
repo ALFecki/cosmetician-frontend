@@ -4,6 +4,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { catchError, throwError } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 import { LoginData, RegistrationData } from '../../models/login.interface';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
@@ -33,6 +34,7 @@ export class LoginComponent {
         phone: new FormControl('', [Validators.required]),
         password: new FormControl('', [Validators.required, Validators.minLength(6)]),
         confirmPassword: new FormControl('', [Validators.required]),
+        personalDataConsent: new FormControl(false, [Validators.requiredTrue]),
     });
 
     @ViewChild('registerModal') registerModal!: TemplateRef<unknown>;
@@ -185,7 +187,7 @@ export class LoginComponent {
                 next: response => {
                     console.log('Registration successful:', response);
                     this.toastService.show('Регистрация успешно завершена!', 'success');
-                    // this.closeRegisterModal();
+                    this.closeRegisterModal();
 
                     // Optional: Automatically log in after registration
                     // this.email.setValue(registrationData.email);
@@ -196,5 +198,9 @@ export class LoginComponent {
                     this.isRegistering = false;
                 },
             });
+    }
+
+    getPersonalDataUrl(): string {
+        return `${environment.server_url}/images/skviderm-personal-data.pdf`;
     }
 }

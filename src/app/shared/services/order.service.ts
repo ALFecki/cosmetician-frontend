@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, firstValueFrom, map, Observable, of } from 'rxjs';
-import { environment } from '../../../../environment';
+import { environment } from '../../../environments/environment';
 import { DataService } from '../base/services/data.service';
 import { OrderModel } from '../models/order.model';
 import { CreateOrderSchema, FilterOrderSchema, UpdateOrderSchema } from '../schemas/order.schema';

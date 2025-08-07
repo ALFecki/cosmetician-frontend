@@ -133,11 +133,21 @@ export class ProductsComponent implements OnInit {
         return variant?.price || 0;
     }
 
+    getSelectedVariantVolume(product: ProductModel): number {
+        const variant = this.getSelectedVariant(product);
+        return variant?.volume || 0;
+    }
+
     getMinPrice(product: ProductModel): number {
         if (!product.variants || product.variants.length === 0) {
             return 0;
         }
         return Math.min(...product.variants.map(variant => variant.price));
+    }
+
+    // Add these utility methods
+    trackByProductId(index: number, product: ProductModel): string {
+        return product.id;
     }
 
     onImageLoad(event: Event): void {

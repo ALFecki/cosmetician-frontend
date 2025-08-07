@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
-import { environment } from '../../../../environment';
+import { environment } from '../../../environments/environment';
 import { Claims, LoginData, LoginResponse, RegistrationData } from '../models/login.interface';
 import { PersonModel } from '../models/person.model';
 
@@ -76,11 +76,12 @@ export class AuthService {
     getCurrentUser(): Observable<PersonModel | null> {
         return this.currentUser.asObservable();
     }
-
     logout(): Observable<unknown> {
         return this.http.post(`${environment.server_url}/logout`, {}, { withCredentials: true }).pipe(
             tap(() => {
                 this.csrfToken.next('');
+                this.userClaims.next(null);
+                this.currentUser.next(null);
                 this.onLogout.next(true);
             }),
         );
@@ -100,7 +101,6 @@ export class AuthService {
 
     isAdmin(): boolean {
         const claims = this.userClaims.getValue();
-        console.log('Checking admin status:', claims);
         return this.isLoggedIn() && !!claims && (claims.is_admin || claims.is_moderator);
     }
 

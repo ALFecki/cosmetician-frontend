@@ -25,16 +25,14 @@
 <div class="catalog-container">
     <div class="container-fluid">
         <div class="row g-4">
-            <!-- Left Sidebar - Product Filters -->
             <div class="col-lg-3">
                 <div class="filters-sticky">
-                    <app-product-filter [initialFilters]="filterOptions" (filterChange)="onFilterChange($event)"></app-product-filter>
+                    <app-product-filter [initialFilters]="filterOptions"
+                        (filterChange)="onFilterChange($event)"></app-product-filter>
                 </div>
             </div>
 
-            <!-- Right Content - Product Cards -->
             <div class="col-lg-9">
-                <!-- Results Header -->
                 <div class="results-header">
                     <div class="results-info">
                         <h2 class="results-title">
@@ -42,32 +40,20 @@
                             Наши товары
                         </h2>
                         <p class="results-count" *ngIf="totalItems$ | async as total">
-                            Найдено <strong>{{ total }}</strong> {{ total === 1 ? 'товар' : total < 5 ? 'товара' : 'товаров' }}
-                        </p>
+                            Найдено <strong>{{ total }}</strong> {{ total === 1 ? 'товар' : total < 5 ? 'товара'
+                                : 'товаров' }} </p>
                     </div>
                 </div>
 
-                <!-- Products Grid -->
                 <div class="products-grid" *ngIf="products$ | async as products">
-                    <div class="product-card-wrapper" *ngFor="let product of products">
-                        <div
-                            class="card product-card h-100"
-                            tabindex="0"
-                            role="button"
+                    <div class="product-card-wrapper" *ngFor="let product of products; trackBy: trackByProductId">
+                        <div class="card product-card" tabindex="0" role="button"
                             (click)="this.openProductDetails(product)"
                             (keydown.enter)="this.openProductDetails(product)"
-                            (keydown.space)="this.openProductDetails(product); $event.preventDefault()"
-                            [attr.aria-label]="'Открыть детали товара: ' + product.title"
-                        >
+                            (keydown.space)="this.openProductDetails(product); $event.preventDefault()">
                             <div class="card-image-container">
-                                <img
-                                    [src]="product.image | imageUrl"
-                                    class="card-img-top"
-                                    [alt]="product.title"
-                                    loading="lazy"
-                                    (load)="onImageLoad($event)"
-                                    (error)="onImageError($event)"
-                                />
+                                <img [src]="product.image | imageUrl" class="card-img-top" alt="{{ product.title }}"
+                                    loading="lazy" (load)="onImageLoad($event)" (error)="onImageError($event)" />
                                 <div class="card-badge" *ngIf="product.brand">
                                     {{ product.brand.title }}
                                 </div>
@@ -75,44 +61,36 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{ product.title }}</h5>
                                 <div class="card-details">
-                                    <span class="product-type" *ngIf="product.productType">{{ product.productType }}</span>
+                                    <span class="product-type" *ngIf="product.productType">{{ product.productType.title }}</span>
                                 </div>
 
-                                <!-- Volume selection -->
-                                <div class="volume-selection mb-3" *ngIf="product.variants && product.variants.length > 1">
-                                    <h6 class="volume-label">Объем:</h6>
-                                    <div class="variant-buttons">
-                                        <button
-                                            *ngFor="let variant of product.variants"
-                                            class="btn btn-sm variant-btn"
-                                            [class.active]="getSelectedVariantId(product) === variant.id"
-                                            (click)="selectVariant(product, variant.id); $event.stopPropagation()"
-                                        >
+                                <div class="volume-selection mb-3"
+                                    *ngIf="product.variants && product.variants.length > 1">
+                                    <div class="volume-buttons">
+                                        <button *ngFor="let variant of product.variants" class="btn btn-sm volume-btn"
+                                            [class.active]="getSelectedVariant(product).id === variant.id"
+                                            (click)="selectVariant(product, variant.id); $event.stopPropagation()">
                                             {{ variant.volume }}мл
                                         </button>
                                     </div>
                                 </div>
 
                                 <div class="price-section">
-                                    <span class="price-label">Цена: </span>
-                                    <span class="price-value">{{ getSelectedVariantPrice(product) | number: '1.2-2' }} р.</span>
+                                    <div class="price">{{ getSelectedVariantPrice(product) | number: '1.2-2' }} р.</div>
+                                    <div class="volume-info" *ngIf="!product.variants || product.variants.length === 1">
+                                        {{ getSelectedVariantVolume(product) }}мл
+                                    </div>
                                 </div>
-                                <div class="card-actions">
-                                    <button
-                                        class="btn btn-primary w-100"
-                                        (click)="$event.stopPropagation(); openProductDetails(product)"
-                                        [attr.aria-label]="'Купить ' + product.title"
-                                    >
-                                        <i class="bi bi-bag-plus me-2"></i>
-                                        Купить
-                                    </button>
-                                </div>
+                                <button class="btn btn-primary add-to-cart-btn"
+                                    (click)="$event.stopPropagation(); addToCart(product)">
+                                    <i class="bi bi-bag-plus me-2"></i>
+                                    Купить
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Empty State -->
                 <div class="empty-state text-center" *ngIf="(products$ | async)?.length === 0">
                     <div class="empty-icon">
                         <i class="bi bi-search"></i>
@@ -125,15 +103,10 @@
                     </button>
                 </div>
 
-                <!-- Pagination -->
                 <div class="pagination-wrapper" *ngIf="((products$ | async)?.length ?? 0) > 0">
-                    <app-pagination
-                        [totalItems]="(totalItems$ | async) ?? 0"
-                        [itemsPerPage]="itemsPerPage"
-                        [currentPage]="currentPage"
-                        (pageChange)="onPageChange($event)"
-                        (itemsPerPageChange)="onItemsPerPageChange($event)"
-                    ></app-pagination>
+                    <app-pagination [totalItems]="(totalItems$ | async) ?? 0" [itemsPerPage]="itemsPerPage"
+                        [currentPage]="currentPage" (pageChange)="onPageChange($event)"
+                        (itemsPerPageChange)="onItemsPerPageChange($event)"></app-pagination>
                 </div>
             </div>
         </div>
