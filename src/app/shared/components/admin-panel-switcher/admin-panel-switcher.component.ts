@@ -8,12 +8,15 @@ import { IconsModule } from '../../base/icons/icons.module';
 import { FilterBrandSchema } from '../../schemas/brand.schema';
 import { FilterCategorySchema } from '../../schemas/category.schema';
 import { FilterCountrySchema } from '../../schemas/country.schema';
+import { FilterProductScopeSchema, FilterProductTypeSchema } from '../../schemas/product.schema';
 import { BrandService } from '../../services/brand.service';
 import { CategoryService } from '../../services/category.service';
 import { CountryService } from '../../services/country.service';
 import { MaintenanceService } from '../../services/maintenance.service';
 import { PersonSevice } from '../../services/person.service';
 import { ProductService } from '../../services/product.service';
+import { ProductScopeSevice } from '../../services/product_scope.service';
+import { ProductTypeSevice } from '../../services/product_type.service';
 import { StatisticsService } from '../../services/statistics.service';
 import { ToastService } from '../../services/toast.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
@@ -66,7 +69,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
     error: string | null = null;
     searchText = '';
 
-    // Maintenance mode properties
     isMaintenanceMode = false;
     maintenanceLoading = false;
 
@@ -79,6 +81,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
         private fb: FormBuilder,
         private modalService: NgbModal,
         private productService: ProductService,
+        private productScopeService: ProductScopeSevice,
+        private productTypeService: ProductTypeSevice,
         private categoryService: CategoryService,
         private brandService: BrandService,
         private personService: PersonSevice,
@@ -142,8 +146,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'brandId', label: 'Бренд', type: 'select', required: true },
                 { key: 'countryIds', label: 'Страны производители', type: 'multiselect', required: false },
                 { key: 'composition', label: 'Состав', type: 'textarea', required: false },
-                { key: 'productScope', label: 'Область применения', type: 'textarea', required: false },
-                { key: 'productType', label: 'Тип продукта', type: 'textarea', required: false },
+                { key: 'productScopeIds', label: 'Область применения', type: 'multiselect', required: false },
+                { key: 'productTypeId', label: 'Тип продукта', type: 'select', required: false },
                 { key: 'methodOfUse', label: 'Способ применения', type: 'textarea', required: false },
             ],
             columns: [
@@ -157,14 +161,51 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'brand.title', title: 'Бренд' },
                 { key: 'countries', title: 'Страны', type: 'array' },
                 { key: 'composition', title: 'Состав' },
-                { key: 'productScope', title: 'Область применения' },
-                { key: 'productType', title: 'Тип продукта' },
+                { key: 'productScopes', title: 'Область применения', type: 'array' },
+                { key: 'productType.title', title: 'Тип продукта' },
                 { key: 'methodOfUse', title: 'Способ применения' },
                 { key: 'isDeleted', title: 'Удален' },
                 { key: 'createdAt', title: 'Дата создания', type: 'date' },
                 { key: 'updatedAt', title: 'Дата обновления', type: 'date' },
             ],
         };
+
+        this.modelConfigs['productTypes'] = {
+            key: 'productTypes',
+            title: 'Типы продуктов',
+            service: this.productService,
+            fields: [
+                { key: 'title', label: 'Название', type: 'text', required: true },
+                { key: 'description', label: 'Описание', type: 'textarea', required: false },
+            ],
+            columns: [
+                { key: 'id', title: 'ID' },
+                { key: 'title', title: 'Название' },
+                { key: 'description', title: 'Описание' },
+                { key: 'isDeleted', title: 'Удален' },
+                { key: 'createdAt', title: 'Дата создания', type: 'date' },
+                { key: 'updatedAt', title: 'Дата обновления', type: 'date' },
+            ],
+        };
+
+        this.modelConfigs['productScopes'] = {
+            key: 'productScopes',
+            title: 'Области применения',
+            service: this.productService,
+            fields: [
+                { key: 'title', label: 'Название', type: 'text', required: true },
+                { key: 'description', label: 'Описание', type: 'textarea', required: false },
+            ],
+            columns: [
+                { key: 'id', title: 'ID' },
+                { key: 'title', title: 'Название' },
+                { key: 'description', title: 'Описание' },
+                { key: 'isDeleted', title: 'Удален' },
+                { key: 'createdAt', title: 'Дата создания', type: 'date' },
+                { key: 'updatedAt', title: 'Дата обновления', type: 'date' },
+            ],
+        };
+
 
         this.modelConfigs['categories'] = {
             key: 'categories',
@@ -320,7 +361,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
             this.currentModel = modelKey;
             this.searchText = '';
             if (modelKey === 'statistics') {
-                // Don't load data for statistics - it will be handled differently
                 this.loading = false;
             } else {
                 this.loadData();
@@ -338,6 +378,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
             observables['categories'] = this.categoryService.getAll({ includeDeleted: true } as FilterCategorySchema);
             observables['brands'] = this.brandService.getAll({ includeDeleted: true } as FilterBrandSchema);
             observables['countries'] = this.countryService.getAll({ includeDeleted: true } as FilterCountrySchema);
+            observables['productTypes'] = this.productTypeService.getAll({ includeDeleted: true } as FilterProductTypeSchema);
+            observables['productScopes'] = this.productScopeService.getAll({ includeDeleted: true } as FilterProductScopeSchema);
         }
 
         if (Object.keys(observables).length > 0) {
@@ -353,6 +395,10 @@ export class AdminPanelSwitcherComponent implements OnInit {
                                     field.options = results['brands'].data;
                                 } else if (field.key === 'countryIds' && results['countries']) {
                                     field.options = results['countries'].data;
+                                } else if (field.key === 'productScopeIds' && results['productScopes']) {
+                                    field.options = results['productScopes'].data;
+                                } else if (field.key === 'productTypeId' && results['productTypes']) {
+                                    field.options = results['productTypes'].data;
                                 }
                             }
                         });
@@ -643,5 +689,19 @@ export class AdminPanelSwitcherComponent implements OnInit {
         }
 
         this.itemForm.get(fieldKey)?.setValue(newValue);
+    }
+
+    getSelectedOptionsText(fieldKey: string, options: any[]): string {
+        const selectedIds = this.itemForm.get(fieldKey)?.value || [];
+        if (selectedIds.length === 0) {
+            return `Выберите ${fieldKey.toLowerCase()}...`;
+        }
+        
+        if (selectedIds.length === 1) {
+            const selectedOption = options?.find(opt => opt.id === selectedIds[0]);
+            return selectedOption?.title || selectedOption?.name || 'Выбран 1 элемент';
+        }
+        
+        return `Выбрано: ${selectedIds.length}`;
     }
 }
