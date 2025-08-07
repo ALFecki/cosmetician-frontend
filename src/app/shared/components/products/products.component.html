@@ -27,8 +27,7 @@
         <div class="row g-4">
             <div class="col-lg-3">
                 <div class="filters-sticky">
-                    <app-product-filter [initialFilters]="filterOptions"
-                        (filterChange)="onFilterChange($event)"></app-product-filter>
+                    <app-product-filter [initialFilters]="filterOptions" (filterChange)="onFilterChange($event)"></app-product-filter>
                 </div>
             </div>
 
@@ -40,20 +39,30 @@
                             Наши товары
                         </h2>
                         <p class="results-count" *ngIf="totalItems$ | async as total">
-                            Найдено <strong>{{ total }}</strong> {{ total === 1 ? 'товар' : total < 5 ? 'товара'
-                                : 'товаров' }} </p>
+                            Найдено <strong>{{ total }}</strong> {{ total === 1 ? 'товар' : total < 5 ? 'товара' : 'товаров' }}
+                        </p>
                     </div>
                 </div>
 
                 <div class="products-grid" *ngIf="products$ | async as products">
                     <div class="product-card-wrapper" *ngFor="let product of products; trackBy: trackByProductId">
-                        <div class="card product-card" tabindex="0" role="button"
+                        <div
+                            class="card product-card"
+                            tabindex="0"
+                            role="button"
                             (click)="this.openProductDetails(product)"
                             (keydown.enter)="this.openProductDetails(product)"
-                            (keydown.space)="this.openProductDetails(product); $event.preventDefault()">
+                            (keydown.space)="this.openProductDetails(product); $event.preventDefault()"
+                        >
                             <div class="card-image-container">
-                                <img [src]="product.image | imageUrl" class="card-img-top" alt="{{ product.title }}"
-                                    loading="lazy" (load)="onImageLoad($event)" (error)="onImageError($event)" />
+                                <img
+                                    [src]="product.image | imageUrl"
+                                    class="card-img-top"
+                                    alt="{{ product.title }}"
+                                    loading="lazy"
+                                    (load)="onImageLoad($event)"
+                                    (error)="onImageError($event)"
+                                />
                                 <div class="card-badge" *ngIf="product.brand">
                                     {{ product.brand.title }}
                                 </div>
@@ -64,12 +73,14 @@
                                     <span class="product-type" *ngIf="product.productType">{{ product.productType.title }}</span>
                                 </div>
 
-                                <div class="volume-selection mb-3"
-                                    *ngIf="product.variants && product.variants.length > 1">
+                                <div class="volume-selection mb-3" *ngIf="product.variants && product.variants.length > 1">
                                     <div class="volume-buttons">
-                                        <button *ngFor="let variant of product.variants" class="btn btn-sm volume-btn"
+                                        <button
+                                            *ngFor="let variant of product.variants"
+                                            class="btn btn-sm volume-btn"
                                             [class.active]="getSelectedVariant(product).id === variant.id"
-                                            (click)="selectVariant(product, variant.id); $event.stopPropagation()">
+                                            (click)="selectVariant(product, variant.id); $event.stopPropagation()"
+                                        >
                                             {{ variant.volume }}мл
                                         </button>
                                     </div>
@@ -81,8 +92,7 @@
                                         {{ getSelectedVariantVolume(product) }}мл
                                     </div>
                                 </div>
-                                <button class="btn btn-primary add-to-cart-btn"
-                                    (click)="$event.stopPropagation(); addToCart(product)">
+                                <button class="btn btn-primary add-to-cart-btn" (click)="$event.stopPropagation(); addToCart(product)">
                                     <i class="bi bi-bag-plus me-2"></i>
                                     Купить
                                 </button>
@@ -104,9 +114,13 @@
                 </div>
 
                 <div class="pagination-wrapper" *ngIf="((products$ | async)?.length ?? 0) > 0">
-                    <app-pagination [totalItems]="(totalItems$ | async) ?? 0" [itemsPerPage]="itemsPerPage"
-                        [currentPage]="currentPage" (pageChange)="onPageChange($event)"
-                        (itemsPerPageChange)="onItemsPerPageChange($event)"></app-pagination>
+                    <app-pagination
+                        [totalItems]="(totalItems$ | async) ?? 0"
+                        [itemsPerPage]="itemsPerPage"
+                        [currentPage]="currentPage"
+                        (pageChange)="onPageChange($event)"
+                        (itemsPerPageChange)="onItemsPerPageChange($event)"
+                    ></app-pagination>
                 </div>
             </div>
         </div>

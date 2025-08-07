@@ -5,8 +5,17 @@ import { catchError, forkJoin, of } from 'rxjs';
 import { IconsModule } from '../../base/icons/icons.module';
 import { BrandService } from '../../services/brand.service';
 import { CategoryService } from '../../services/category.service';
-import { BrandProfitabilityResponse, InventoryTurnoverResponse, StatisticsFilterSchema, StatisticsService, StatisticsSummaryResponse, WeightedROIResponse } from '../../services/statistics.service';
+import {
+    BrandProfitabilityResponse,
+    InventoryTurnoverResponse,
+    StatisticsFilterSchema,
+    StatisticsService,
+    StatisticsSummaryResponse,
+    WeightedROIResponse,
+} from '../../services/statistics.service';
 import { ToastService } from '../../services/toast.service';
+import { BrandModel } from '../../models/brand.model';
+import { CategoryModel } from '../../models/category.model';
 
 @Component({
     selector: 'app-statistics',
@@ -27,8 +36,8 @@ export class StatisticsComponent implements OnInit {
     inventoryTurnover: InventoryTurnoverResponse[] = [];
 
     // Options for filters
-    brands: any[] = [];
-    categories: any[] = [];
+    brands: BrandModel[] = [];
+    categories: CategoryModel[] = [];
 
     // Active section
     activeSection: 'summary' | 'profitability' | 'roi' | 'turnover' = 'summary';
@@ -164,6 +173,7 @@ export class StatisticsComponent implements OnInit {
         return new Intl.NumberFormat('be-BY').format(value);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onBrandChange(brandId: string, event: any): void {
         const currentValue = this.filterForm.get('brandId')?.value || [];
         let newValue: string[];
@@ -178,6 +188,7 @@ export class StatisticsComponent implements OnInit {
         this.onFilterChange();
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onCategoryChange(categoryId: string, event: any): void {
         const currentValue = this.filterForm.get('categoryId')?.value || [];
         let newValue: string[];
@@ -205,15 +216,11 @@ export class StatisticsComponent implements OnInit {
     }
 
     getTopProfitableBrands(): BrandProfitabilityResponse[] {
-        return [...this.brandProfitability]
-            .sort((a, b) => b.totalProfit - a.totalProfit)
-            .slice(0, 5);
+        return [...this.brandProfitability].sort((a, b) => b.totalProfit - a.totalProfit).slice(0, 5);
     }
 
     getTopProfitabilityBrands(): BrandProfitabilityResponse[] {
-        return [...this.brandProfitability]
-            .sort((a, b) => b.profitabilityPercentage - a.profitabilityPercentage)
-            .slice(0, 5);
+        return [...this.brandProfitability].sort((a, b) => b.profitabilityPercentage - a.profitabilityPercentage).slice(0, 5);
     }
 
     getProfitabilityBadgeClass(percentage: number): string {

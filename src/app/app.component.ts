@@ -41,7 +41,7 @@ export class AppComponent implements OnInit {
     constructor(
         private router: Router,
         private maintenanceService: MaintenanceService,
-        private authService: AuthService
+        private authService: AuthService,
     ) {
         this.isLoading$ = this.maintenanceService.isLoading();
 
@@ -51,7 +51,7 @@ export class AppComponent implements OnInit {
             this.router.events.pipe(
                 filter(event => event instanceof NavigationEnd),
                 map((event: NavigationEnd) => event.url),
-                startWith(this.router.url)
+                startWith(this.router.url),
             ),
         ]).pipe(
             map(([isMaintenanceMode, isLoading, currentUrl]) => {

@@ -1,3 +1,4 @@
+<!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
 <div class="statistics-container">
     <div class="statistics-header">
         <h2 class="statistics-title">
@@ -7,7 +8,6 @@
         <p class="statistics-subtitle">Анализ эффективности брендов и товарооборота</p>
     </div>
 
-    <!-- Filters Section -->
     <div class="filters-section">
         <div class="card">
             <div class="card-header">
@@ -19,27 +19,35 @@
             <div class="card-body">
                 <form [formGroup]="filterForm">
                     <div class="row g-3">
-                        <!-- Date Range -->
                         <div class="col-md-3">
                             <label for="startDate" class="form-label">Дата начала</label>
-                            <input type="date" class="form-control" id="startDate" formControlName="startDate"
-                                (change)="onFilterChange()" />
+                            <input
+                                type="date"
+                                class="form-control"
+                                id="startDate"
+                                formControlName="startDate"
+                                (change)="onFilterChange()"
+                            />
                         </div>
                         <div class="col-md-3">
                             <label for="endDate" class="form-label">Дата окончания</label>
-                            <input type="date" class="form-control" id="endDate" formControlName="endDate"
-                                (change)="onFilterChange()" />
+                            <input type="date" class="form-control" id="endDate" formControlName="endDate" (change)="onFilterChange()" />
                         </div>
 
-                        <!-- Significance Coefficient -->
                         <div class="col-md-3">
                             <label for="significanceCoefficient" class="form-label">Коэффициент значимости</label>
-                            <input type="number" step="0.1" min="0.1" max="10" class="form-control"
-                                id="significanceCoefficient" formControlName="significanceCoefficient"
-                                (change)="onFilterChange()" />
+                            <input
+                                type="number"
+                                step="0.1"
+                                min="0.1"
+                                max="10"
+                                class="form-control"
+                                id="significanceCoefficient"
+                                formControlName="significanceCoefficient"
+                                (change)="onFilterChange()"
+                            />
                         </div>
 
-                        <!-- Clear Filters Button -->
                         <div class="col-md-3 d-flex align-items-end">
                             <button type="button" class="btn btn-outline-secondary w-100" (click)="clearFilters()">
                                 <i-bs name="arrow-clockwise" class="me-1"></i-bs>
@@ -48,16 +56,19 @@
                         </div>
                     </div>
 
-                    <!-- Brand Filter -->
                     <div class="row mt-3" *ngIf="brands.length > 0">
                         <div class="col-md-6">
                             <label class="form-label">Бренды</label>
                             <div class="multiselect-container">
                                 <div class="form-check" *ngFor="let brand of brands">
-                                    <input class="form-check-input" type="checkbox" [id]="'brand-' + brand.id"
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        [id]="'brand-' + brand.id"
                                         [value]="brand.id"
                                         [checked]="filterForm.get('brandId')?.value?.includes(brand.id)"
-                                        (change)="onBrandChange(brand.id, $event)" />
+                                        (change)="onBrandChange(brand.id, $event)"
+                                    />
                                     <label class="form-check-label" [for]="'brand-' + brand.id">
                                         {{ brand.title }}
                                     </label>
@@ -65,15 +76,18 @@
                             </div>
                         </div>
 
-                        <!-- Category Filter -->
                         <div class="col-md-6" *ngIf="categories.length > 0">
                             <label class="form-label">Категории</label>
                             <div class="multiselect-container">
                                 <div class="form-check" *ngFor="let category of categories">
-                                    <input class="form-check-input" type="checkbox" [id]="'category-' + category.id"
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        [id]="'category-' + category.id"
                                         [value]="category.id"
                                         [checked]="filterForm.get('categoryId')?.value?.includes(category.id)"
-                                        (change)="onCategoryChange(category.id, $event)" />
+                                        (change)="onCategoryChange(category.id, $event)"
+                                    />
                                     <label class="form-check-label" [for]="'category-' + category.id">
                                         {{ category.title }}
                                     </label>
@@ -86,33 +100,33 @@
         </div>
     </div>
 
-    <!-- Navigation Tabs -->
     <div class="statistics-tabs">
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link" [class.active]="activeSection === 'summary'"
-                    (click)="setActiveSection('summary')" type="button">
+                <button class="nav-link" [class.active]="activeSection === 'summary'" (click)="setActiveSection('summary')" type="button">
                     <i-bs name="speedometer2" class="me-2"></i-bs>
                     Сводка
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" [class.active]="activeSection === 'profitability'"
-                    (click)="setActiveSection('profitability')" type="button">
+                <button
+                    class="nav-link"
+                    [class.active]="activeSection === 'profitability'"
+                    (click)="setActiveSection('profitability')"
+                    type="button"
+                >
                     <i-bs name="currency-dollar" class="me-2"></i-bs>
                     Рентабельность
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" [class.active]="activeSection === 'roi'" (click)="setActiveSection('roi')"
-                    type="button">
+                <button class="nav-link" [class.active]="activeSection === 'roi'" (click)="setActiveSection('roi')" type="button">
                     <i-bs name="graph-up-arrow" class="me-2"></i-bs>
                     ROI
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" [class.active]="activeSection === 'turnover'"
-                    (click)="setActiveSection('turnover')" type="button">
+                <button class="nav-link" [class.active]="activeSection === 'turnover'" (click)="setActiveSection('turnover')" type="button">
                     <i-bs name="arrow-repeat" class="me-2"></i-bs>
                     Оборачиваемость
                 </button>
@@ -120,7 +134,6 @@
         </ul>
     </div>
 
-    <!-- Loading State -->
     <div *ngIf="loading" class="text-center p-5">
         <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Загрузка...</span>
@@ -128,18 +141,14 @@
         <p class="mt-3 text-muted">Загрузка статистики...</p>
     </div>
 
-    <!-- Error State -->
     <div *ngIf="error && !loading" class="alert alert-danger" role="alert">
         <i-bs name="exclamation-triangle" class="me-2"></i-bs>
         {{ error }}
     </div>
 
-    <!-- Statistics Content -->
     <div *ngIf="!loading && !error && statisticsSummary" class="statistics-content">
-        <!-- Summary Section -->
         <div *ngIf="activeSection === 'summary'" class="summary-section">
             <div class="row g-4">
-                <!-- Total Metrics Cards -->
                 <div class="col-md-4">
                     <div class="metric-card profit-card">
                         <div class="metric-icon">
@@ -175,7 +184,6 @@
                 </div>
             </div>
 
-            <!-- Top Performers -->
             <div class="row g-4 mt-4">
                 <div class="col-md-6">
                     <div class="card">
@@ -214,7 +222,6 @@
             </div>
         </div>
 
-        <!-- Brand Profitability Section -->
         <div *ngIf="activeSection === 'profitability'" class="profitability-section">
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -246,7 +253,6 @@
             </div>
         </div>
 
-        <!-- Weighted ROI Section -->
         <div *ngIf="activeSection === 'roi'" class="roi-section">
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -276,7 +282,6 @@
             </div>
         </div>
 
-        <!-- Inventory Turnover Section -->
         <div *ngIf="activeSection === 'turnover'" class="turnover-section">
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -309,7 +314,6 @@
         </div>
     </div>
 
-    <!-- Empty State -->
     <div *ngIf="!loading && !error && !statisticsSummary" class="empty-state">
         <div class="text-center p-5">
             <i-bs name="graph-down" class="display-1 text-muted"></i-bs>

@@ -57,7 +57,7 @@ export class StatisticsService {
 
     getStatisticsSummary(filter?: StatisticsFilterSchema): Observable<SingleResponse<StatisticsSummaryResponse>> {
         let params = new HttpParams();
-        
+
         if (filter) {
             if (filter.brandId && filter.brandId.length > 0) {
                 params = params.append('brandId[]', filter.brandId.join(','));
@@ -76,15 +76,15 @@ export class StatisticsService {
             }
         }
 
-        return this.http.get<SingleResponse<StatisticsSummaryResponse>>(`${this.apiUrl}/summary`, { 
+        return this.http.get<SingleResponse<StatisticsSummaryResponse>>(`${this.apiUrl}/summary`, {
             params,
-            withCredentials: true 
+            withCredentials: true,
         });
     }
 
     getBrandProfitability(filter?: StatisticsFilterSchema): Observable<BrandProfitabilityResponse[]> {
         let params = new HttpParams();
-        
+
         if (filter) {
             if (filter.brandId && filter.brandId.length > 0) {
                 params = params.append('brandId', filter.brandId.join(','));
@@ -103,15 +103,15 @@ export class StatisticsService {
             }
         }
 
-        return this.http.get<BrandProfitabilityResponse[]>(`${this.apiUrl}/brand-profitability`, { 
+        return this.http.get<BrandProfitabilityResponse[]>(`${this.apiUrl}/brand-profitability`, {
             params,
-            withCredentials: true 
+            withCredentials: true,
         });
     }
 
     getWeightedROI(filter?: StatisticsFilterSchema): Observable<WeightedROIResponse[]> {
         let params = new HttpParams();
-        
+
         if (filter) {
             if (filter.brandId && filter.brandId.length > 0) {
                 params = params.append('brandId', filter.brandId.join(','));
@@ -130,15 +130,15 @@ export class StatisticsService {
             }
         }
 
-        return this.http.get<WeightedROIResponse[]>(`${this.apiUrl}/weighted-roi`, { 
+        return this.http.get<WeightedROIResponse[]>(`${this.apiUrl}/weighted-roi`, {
             params,
-            withCredentials: true 
+            withCredentials: true,
         });
     }
 
     getInventoryTurnover(filter?: StatisticsFilterSchema): Observable<InventoryTurnoverResponse[]> {
         let params = new HttpParams();
-        
+
         if (filter) {
             if (filter.brandId && filter.brandId.length > 0) {
                 params = params.append('brandId', filter.brandId.join(','));
@@ -157,9 +157,9 @@ export class StatisticsService {
             }
         }
 
-        return this.http.get<InventoryTurnoverResponse[]>(`${this.apiUrl}/inventory-turnover`, { 
+        return this.http.get<InventoryTurnoverResponse[]>(`${this.apiUrl}/inventory-turnover`, {
             params,
-            withCredentials: true 
+            withCredentials: true,
         });
     }
 }
