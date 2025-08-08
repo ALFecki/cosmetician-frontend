@@ -43,7 +43,7 @@ export const routes: Routes = [
     {
         path: 'cart',
         loadComponent: () => import('./shared/components/cart/cart.component').then(m => m.CartComponent),
-        canActivate: [AuthGuard, MaintenanceGuard],
+        canActivate: [MaintenanceGuard],
     },
     {
         path: 'admin',

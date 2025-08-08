@@ -80,9 +80,9 @@
                                                 </a>
                                                 <small class="d-block text-muted"> {{ item.variant.volume || '-' }} мл </small>
                                             </td>
-                                            <td class="text-end">{{ item.variant.price | number: '1.2-2' }} р.</td>
+                                            <td class="text-end">{{ item.historicalPrice| number: '1.2-2' }} р.</td>
                                             <td class="text-center">{{ item.quantity }}</td>
-                                            <td class="text-end fw-bold">{{ item.variant.price * item.quantity | number: '1.2-2' }} р.</td>
+                                            <td class="text-end fw-bold">{{ item.historicalPrice * item.quantity | number: '1.2-2' }} р.</td>
                                         </tr>
                                     </tbody>
                                     <tfoot>

@@ -2,9 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IconsModule } from '../../base/icons/icons.module';
-import { AuthGuard } from '../../guards/auth.guard';
 import { ProductModel } from '../../models/product.model';
+import { AuthService } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
+import { LoginModalService } from '../../services/login-modal.service';
 import { ProductService } from '../../services/product.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
 import { ProductCarouselComponent } from '../product-carousel/product-carousel.component';
@@ -34,7 +35,8 @@ export class ProductCardComponent implements OnInit {
         private router: Router,
         private productService: ProductService,
         private cartService: CartService,
-        private authGuard: AuthGuard,
+        private authService: AuthService,
+        private loginModalService: LoginModalService,
     ) {}
 
     ngOnInit() {
@@ -94,13 +96,13 @@ export class ProductCardComponent implements OnInit {
     }
 
     async addToCart() {
-        this.authGuard.canActivate(this.route.snapshot, this.router.routerState.snapshot).subscribe(async canActivate => {
-            if (canActivate) {
-                const variant = this.getSelectedVariant();
-                if (variant) {
-                    await this.cartService.addProductToCart(variant.id);
-                }
+        if (this.authService.isLoggedIn()) {
+            const variant = this.getSelectedVariant();
+            if (variant) {
+                await this.cartService.addProductToCart(variant.id);
             }
-        });
+        } else {
+            this.loginModalService.openLoginModal();
+        }
     }
 }

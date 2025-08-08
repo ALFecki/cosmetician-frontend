@@ -11,16 +11,16 @@ import { AuthService } from '../../services/auth.service';
 import { BrandService } from '../../services/brand.service';
 import { CartService } from '../../services/cart.service';
 import { CategoryService } from '../../services/category.service';
-import { CartModalComponent } from '../cart-modal/cart-modal.component';
-import { LoginComponent } from '../login/login.component';
+import { LoginModalService } from '../../services/login-modal.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
+import { LoginComponent } from '../login/login.component';
 
 @Component({
     selector: 'app-navbar',
+    standalone: true,
+    imports: [CommonModule, RouterModule, ImageUrlPipe, IconsModule],
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.scss',
-    standalone: true,
-    imports: [CommonModule, RouterModule, IconsModule, ImageUrlPipe],
 })
 export class NavbarComponent implements OnDestroy, OnInit {
     isMenuOpen = false;
@@ -32,11 +32,12 @@ export class NavbarComponent implements OnDestroy, OnInit {
     currentUser: PersonModel | null = null;
 
     constructor(
-        public router: Router,
-        private categoryService: CategoryService,
         private brandService: BrandService,
+        private categoryService: CategoryService,
         private cartService: CartService,
         private readonly modalService: NgbModal,
+        private router: Router,
+        private loginModalService: LoginModalService,
     ) {
         this.categories$ = this.categoryService.getCategoriesList();
         this.brands$ = this.brandService.getBrandsList();
@@ -93,15 +94,10 @@ export class NavbarComponent implements OnDestroy, OnInit {
     }
 
     navigateToCart(): void {
-        if (this.isMobile()) {
+        if (this.authService.isLoggedIn()) {
             this.router.navigate(['/cart']);
         } else {
-            this.modalService.open(CartModalComponent, {
-                size: 'lg',
-                centered: true,
-                backdrop: 'static',
-                windowClass: 'cart-modal-window',
-            });
+            this.loginModalService.openLoginModal();
         }
     }
 

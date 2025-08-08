@@ -2,16 +2,17 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, of } from 'rxjs';
+import { IconsModule } from '../../base/icons/icons.module';
 import { CartModel } from '../../models/cart.model';
+import { ProductModel } from '../../models/product.model';
 import { AuthService } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
+import { LoginModalService } from '../../services/login-modal.service';
 import { ToastService } from '../../services/toast.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { IconsModule } from '../../base/icons/icons.module';
-import { ProductModel } from '../../models/product.model';
-import { ProductModalComponent } from '../product-modal/product-modal.component';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
+import { ProductModalComponent } from '../product-modal/product-modal.component';
 
 @Component({
     selector: 'app-cart',
@@ -30,6 +31,7 @@ export class CartComponent {
         private toastService: ToastService,
         private modalService: NgbModal,
         private router: Router,
+        private loginModalService: LoginModalService,
     ) {
         this.cartItems$ = this.cartService.getCartItems();
         this.totalPrice$ = this.cartService.getTotalPrice();
@@ -57,18 +59,11 @@ export class CartComponent {
 
     goToOrderConfirmation(): void {
         if (!this.authService.isLoggedIn()) {
-            this.toastService.show('Для оформления заказа необходимо войти в аккаунт', 'warning');
+            this.loginModalService.openLoginModal();
             return;
         }
 
-        // const items = this.cartItems$.value;
-        // if (!items || items.length === 0) {
-        //     this.toastService.show('Корзина пуста', 'warning');
-        //     return;
-        // }
-
         this.modalService.dismissAll();
-
         this.router.navigate(['/order-confirmation']);
     }
 

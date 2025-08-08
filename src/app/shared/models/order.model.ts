@@ -14,4 +14,6 @@ export interface OrderProductModel {
     product: ProductModel;
     variant: ProductVariantModel;
     quantity: number;
+    historicalPrice: number;
+    historicalCostPrice: number;
 }

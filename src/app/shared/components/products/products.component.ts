@@ -3,10 +3,11 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, of } from 'rxjs';
-import { AuthGuard } from '../../guards/auth.guard';
 import { ProductModel } from '../../models/product.model';
 import { FilterProductSchema } from '../../schemas/product.schema';
+import { AuthService } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
+import { LoginModalService } from '../../services/login-modal.service';
 import { ProductService } from '../../services/product.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
 import { PaginationComponent } from '../pagination/pagination.component';
@@ -38,11 +39,11 @@ export class ProductsComponent implements OnInit {
         private productService: ProductService,
         private cartService: CartService,
         private modalService: NgbModal,
-        private authGuard: AuthGuard,
+        private authService: AuthService,
+        private loginModalService: LoginModalService,
     ) {}
 
     ngOnInit(): void {
-        // Initialize filter options based on input props
         if (this.categoryId) {
             this.filterOptions.categoryId = [this.categoryId];
         }
@@ -69,7 +70,6 @@ export class ProductsComponent implements OnInit {
                 this.products$ = of(data.data);
                 this.totalItems$ = of(data.length);
                 for (const product of data.data) {
-                    // Initialize selected variant for each product
                     if (product.variants && product.variants.length > 0) {
                         this.selectedVariants[product.id] = product.variants[0].id;
                     }
@@ -79,7 +79,7 @@ export class ProductsComponent implements OnInit {
 
     onFilterChange(filterData: FilterProductSchema): void {
         this.filterOptions = { ...filterData };
-        this.currentPage = 1; // Reset to first page when filter changes
+        this.currentPage = 1;
         this.loadProducts();
     }
 
@@ -107,11 +107,11 @@ export class ProductsComponent implements OnInit {
 
     async addToCart(product: ProductModel | null) {
         if (product) {
-            this.authGuard.canActivate(this.route.snapshot, this.router.routerState.snapshot).subscribe(async isAuthenticated => {
-                if (isAuthenticated) {
-                    await this.cartService.addProductToCart(this.selectedVariants[product.id]);
-                }
-            });
+            if (this.authService.isLoggedIn()) {
+                await this.cartService.addProductToCart(this.selectedVariants[product.id]);
+            } else {
+                this.loginModalService.openLoginModal();
+            }
         }
     }
 
@@ -145,7 +145,6 @@ export class ProductsComponent implements OnInit {
         return Math.min(...product.variants.map(variant => variant.price));
     }
 
-    // Add these utility methods
     trackByProductId(index: number, product: ProductModel): string {
         return product.id;
     }
@@ -160,7 +159,7 @@ export class ProductsComponent implements OnInit {
 
     onImageError(event: Event): void {
         const img = event.target as HTMLImageElement;
-        img.src = 'assets/images/placeholder-product.jpg'; // Add a placeholder image
+        img.src = 'assets/images/placeholder-product.jpg';
         const container = img.closest('.card-image-container');
         if (container) {
             container.classList.remove('loading');

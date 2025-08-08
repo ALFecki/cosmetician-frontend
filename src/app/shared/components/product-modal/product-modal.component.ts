@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AuthGuard } from '../../guards/auth.guard';
+import { IconsModule } from '../../base/icons/icons.module';
 import { CountryModel } from '../../models/country.model';
 import { ProductModel } from '../../models/product.model';
+import { AuthService } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
+import { LoginModalService } from '../../services/login-modal.service';
 import { ToastService } from '../../services/toast.service';
-import { IconsModule } from '../../base/icons/icons.module';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
 
 @Component({
@@ -25,10 +26,10 @@ export class ProductModalComponent {
     constructor(
         private modalService: NgbModal,
         private router: Router,
-        private route: ActivatedRoute,
-        private authGuard: AuthGuard,
+        private authService: AuthService,
         private cartService: CartService,
         private toastService: ToastService,
+        private loginModalService: LoginModalService,
     ) {}
 
     moreInfo() {
@@ -38,16 +39,16 @@ export class ProductModalComponent {
 
     async addToCart(product: ProductModel | null) {
         if (product) {
-            this.authGuard.canActivate(this.route.snapshot, this.router.routerState.snapshot).subscribe(async isAuthenticated => {
-                if (isAuthenticated) {
-                    if (this.selectedVariantId) {
-                        await this.cartService.addProductToCart(this.getSelectedVariant()!.id);
-                    } else {
-                        this.toastService.show('Пожалуйста, выберите вариант продукта перед добавлением в корзину.', 'error');
-                        return;
-                    }
+            if (this.authService.isLoggedIn()) {
+                if (this.selectedVariantId) {
+                    await this.cartService.addProductToCart(this.getSelectedVariant()!.id);
+                } else {
+                    this.toastService.show('Пожалуйста, выберите вариант продукта перед добавлением в корзину.', 'error');
+                    return;
                 }
-            });
+            } else {
+                this.loginModalService.openLoginModal();
+            }
         }
     }
 

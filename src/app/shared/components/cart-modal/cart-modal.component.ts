@@ -5,9 +5,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { CartModel } from '../../models/cart.model';
-import { CartService } from '../../services/cart.service';
 import { IconsModule } from '../../base/icons/icons.module';
+import { CartModel } from '../../models/cart.model';
+import { AuthService } from '../../services/auth.service';
+import { CartService } from '../../services/cart.service';
+import { LoginModalService } from '../../services/login-modal.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
 
 @Component({
@@ -25,6 +27,8 @@ export class CartModalComponent implements OnInit {
         private cartService: CartService,
         private router: Router,
         public activeModal: NgbActiveModal,
+        private authService: AuthService,
+        private loginModalService: LoginModalService,
     ) {}
 
     ngOnInit(): void {
@@ -64,6 +68,12 @@ export class CartModalComponent implements OnInit {
     }
 
     goToOrderConfirmation(): void {
+        if (!this.authService.isLoggedIn()) {
+            this.activeModal.close();
+            this.loginModalService.openLoginModal();
+            return;
+        }
+
         this.activeModal.close();
         this.router.navigate(['/order-confirmation']);
     }

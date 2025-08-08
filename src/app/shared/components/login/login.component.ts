@@ -70,7 +70,7 @@ export class LoginComponent {
                 console.log('Login successful:', response);
                 this.toastService.show('Успешный вход в систему', 'success');
                 this.closeLoginModal();
-                if (this.returnUrl) {
+                if (this.returnUrl && this.returnUrl !== '/') {
                     this.router.navigate([this.returnUrl]);
                 }
             },
@@ -107,7 +107,6 @@ export class LoginComponent {
             size: 'lg',
             centered: true,
             scrollable: true,
-            // Add windowClass to ensure our styling applies to the modal window
             windowClass: 'cosmetician-modal',
         });
     }
@@ -123,7 +122,6 @@ export class LoginComponent {
             size: 'lg',
             centered: true,
             scrollable: true,
-            // Add windowClass to ensure our styling applies to the modal window
             windowClass: 'cosmetician-modal',
         });
     }
@@ -175,11 +173,9 @@ export class LoginComponent {
                         this.registrationError = `Ошибка регистрации: ${error.message || 'Неизвестная ошибка'}`;
                     }
 
-                    // Show error toast for any registration failure
                     this.toastService.show(this.registrationError, 'error');
                     this.isRegistering = false;
 
-                    // Return throwError to stop further processing in the pipeline
                     return throwError(() => error);
                 }),
             )
