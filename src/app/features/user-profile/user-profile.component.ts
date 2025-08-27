@@ -5,10 +5,10 @@ import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { ProfileSidebarComponent } from '../../shared/components/profile-sidebar/profile-sidebar.component';
 import { PersonModel } from '../../shared/models/person.model';
-import { AuthService } from '../../shared/services/auth.service';
-import { PersonSevice } from '../../shared/services/person.service';
-import { ToastService } from '../../shared/services/toast.service';
 import { UpdatePersonSchema } from '../../shared/schemas/person.schema';
+import { AuthService } from '../../shared/services/auth.service';
+import { PersonService } from '../../shared/services/person.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
     selector: 'app-user-profile',
@@ -26,7 +26,7 @@ export class UserProfileComponent implements OnInit {
 
     constructor(
         private authService: AuthService,
-        private personService: PersonSevice,
+        private personService: PersonService,
         private fb: FormBuilder,
         private router: Router,
         private toastService: ToastService,

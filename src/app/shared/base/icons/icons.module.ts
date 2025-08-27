@@ -65,6 +65,11 @@ import {
     bagPlus,
     globe,
     telephoneFill,
+    boxArrowUpRight,
+    link45Deg,
+    arrowDownUp,
+    arrowUp,
+    arrowDown,
 } from 'ngx-bootstrap-icons';
 
 const icons = {
@@ -76,6 +81,9 @@ const icons = {
     bagCheck,
     exclamationTriangle,
     arrowClockwise,
+    arrowDownUp,
+    arrowUp,
+    arrowDown,
     clockFill,
     creditCardFill,
     globe,
@@ -93,6 +101,8 @@ const icons = {
     telephoneFill,
     envelopeFill,
     bagPlus,
+    boxArrowUpRight,
+    link45Deg,
     // viber,
     arrowCounterclockwise,
     chevronLeft,

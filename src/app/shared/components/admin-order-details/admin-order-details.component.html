@@ -1,0 +1,155 @@
+<div class="container my-5">
+    <div class="card">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                <i-bs name="shield-check" class="me-2"></i-bs>
+                Админ: Детали заказа
+            </h4>
+            <button class="btn btn-sm btn-outline-secondary" (click)="goBackToAdmin()">
+                <i-bs name="arrow-left" class="me-1"></i-bs>
+                Назад к админ панели
+            </button>
+        </div>
+
+        <div class="card-body">
+            <div *ngIf="loading" class="text-center my-5">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+            </div>
+
+            <div *ngIf="error" class="alert alert-danger">
+                {{ error }}
+            </div>
+
+            <div *ngIf="!loading && !error && order">
+                <div class="order-header mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-muted mb-1">Заказ №{{ (order | async)?.id }}</h5>
+                            <p class="mb-0">от {{ (order | async)?.createdAt | date: 'dd.MM.yyyy HH:mm' }}</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <span class="badge rounded-pill order-status-badge {{
+                                    getOrderStatusClass((order | async)?.status || '')
+                                }} fs-6 mb-2">
+                                {{ getOrderStatusText((order | async)?.status || '') }}
+                            </span>
+                        </div>
+                    </div>
+                    <hr class="my-3" />
+                </div>
+
+                <div class="row mb-4" *ngIf="orderUser | async as user">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i-bs name="person" class="me-2"></i-bs>
+                                    Информация о клиенте
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-1"><strong>Имя:</strong> {{ user.firstName }} {{ user.secondName }}</p>
+                                <p class="mb-1"><strong>Email:</strong> {{ user.email }}</p>
+                                <p class="mb-0"><strong>Телефон:</strong> {{ user.phone || 'Не указан' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i-bs name="info-circle" class="me-2"></i-bs>
+                                    Информация о заказе
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-1"><strong>Дата создания:</strong> {{ (order | async)?.createdAt | date:
+                                    'dd.MM.yyyy HH:mm' }}</p>
+                                <p class="mb-1"><strong>Обновлен:</strong> {{ (order | async)?.updatedAt | date:
+                                    'dd.MM.yyyy HH:mm' }}</p>
+                                <p class="mb-0"><strong>Общая сумма:</strong> {{ (order | async)?.totalPrice | number:
+                                    '1.2-2' }} р.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-items mb-4">
+                    <h5>Товары в заказе</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px">Фото</th>
+                                    <th>Товар</th>
+                                    <th class="text-end">Цена</th>
+                                    <th class="text-center">Кол-во</th>
+                                    <th class="text-end">Сумма</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of (order | async)?.products">
+                                    <td>
+                                        <img [src]="item.product.image | imageUrl" class="img-thumbnail order-item-img"
+                                            [alt]="item.product.title || 'Product'"
+                                            style="width: 50px; height: 50px; object-fit: cover;" />
+                                    </td>
+                                    <td>
+                                        <div class="fw-medium"> <a class="item-title"
+                                                (click)="openProductDetails(item.product)"
+                                                (keyup.enter)="openProductDetails(item.product)"
+                                                (keyup.space)="openProductDetails(item.product)" tabindex="0"
+                                                role="link">
+                                                {{ item.product.title }}
+                                            </a></div>
+                                        <small class="text-muted">{{ item.variant.volume || '-' }} мл</small>
+                                    </td>
+                                    <td class="text-end">{{ item.historicalPrice | number: '1.2-2' }} р.</td>
+                                    <td class="text-center">{{ item.quantity }}</td>
+                                    <td class="text-end fw-bold">{{ item.historicalPrice * item.quantity | number:
+                                        '1.2-2' }} р.</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4" class="text-end fw-bold">Итого:</td>
+                                    <td class="text-end fw-bold fs-5">{{ (order | async)?.totalPrice | number: '1.2-2'
+                                        }} р.</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i-bs name="gear" class="me-2"></i-bs>
+                            Изменить статус
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <select class="form-select" [value]="(order | async)?.status"
+                                    (change)="updateOrderStatus($any($event.target).value)" [disabled]="updatingStatus">
+                                    <option *ngFor="let status of statusOptions" [value]="status.value">
+                                        {{ status.label }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <span *ngIf="updatingStatus" class="text-muted">
+                                    <i-bs name="arrow-clockwise" class="spin me-1"></i-bs>
+                                    Обновление...
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

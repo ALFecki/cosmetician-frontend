@@ -21,10 +21,8 @@ export class BrandsComponent implements OnInit {
 
     ngOnInit(): void {
         this.loading = true;
-        // Use the cached brands list method
         this.brandService.getBrandsList().subscribe({
             next: brands => {
-                // Get just the first 4 brands to display
                 this.brands = brands
                     .slice(0, 4)
                     .sort((a, b) => a.title.localeCompare(b.title))

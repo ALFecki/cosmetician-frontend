@@ -76,6 +76,7 @@ export class AuthService {
     getCurrentUser(): Observable<PersonModel | null> {
         return this.currentUser.asObservable();
     }
+    
     logout(): Observable<unknown> {
         return this.http.post(`${environment.server_url}/logout`, {}, { withCredentials: true }).pipe(
             tap(() => {

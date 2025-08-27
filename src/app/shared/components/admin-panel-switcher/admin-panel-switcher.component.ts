@@ -13,7 +13,7 @@ import { BrandService } from '../../services/brand.service';
 import { CategoryService } from '../../services/category.service';
 import { CountryService } from '../../services/country.service';
 import { MaintenanceService } from '../../services/maintenance.service';
-import { PersonSevice } from '../../services/person.service';
+import { PersonService } from '../../services/person.service';
 import { ProductService } from '../../services/product.service';
 import { ProductScopeSevice } from '../../services/product_scope.service';
 import { ProductTypeSevice } from '../../services/product_type.service';
@@ -102,7 +102,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
         private productTypeService: ProductTypeSevice,
         private categoryService: CategoryService,
         private brandService: BrandService,
-        private personService: PersonSevice,
+        private personService: PersonService,
         private countryService: CountryService,
         private maintenanceService: MaintenanceService,
         private toastService: ToastService,

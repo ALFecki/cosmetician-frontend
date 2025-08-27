@@ -6,6 +6,6 @@ import { CreatePersonSchema, FilterPersonSchema, UpdatePersonSchema } from '../s
 @Injectable({
     providedIn: 'root',
 })
-export class PersonSevice extends DataService<PersonModel, CreatePersonSchema, UpdatePersonSchema, FilterPersonSchema> {
+export class PersonService extends DataService<PersonModel, CreatePersonSchema, UpdatePersonSchema, FilterPersonSchema> {
     protected override endpoint = 'person';
 }

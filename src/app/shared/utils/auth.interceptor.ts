@@ -8,7 +8,7 @@ export class AuthInterceptor implements HttpInterceptor {
     constructor(private authService: AuthService) {}
 
     intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-        if (!req.url.includes('login') && !req.url.includes('logout')) {
+        if (!req.url.includes('login')) {
             req = req.clone({
                 headers: this.authService.addCsrfToken(req.headers),
             });

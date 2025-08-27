@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './features/home/home.component';
+import { AdminOrderDetailsComponent } from './shared/components/admin-order-details/admin-order-details.component';
 import { AdminGuard } from './shared/guards/admin.guard';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { MaintenanceGuard } from './shared/guards/maintenance.guard';
@@ -74,6 +75,12 @@ export const routes: Routes = [
         path: 'delivery',
         loadComponent: () => import('./features/delivery-payment/delivery-payment.component').then(m => m.DeliveryPaymentComponent),
         canActivate: [MaintenanceGuard],
+    },
+    {
+        path: 'admin/order/:id',
+        component: AdminOrderDetailsComponent,
+        canActivate: [AuthGuard, AdminGuard],
+        title: 'Детали заказа - Админ'
     },
     { path: '**', redirectTo: '' },
 ];

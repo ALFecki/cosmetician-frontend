@@ -1,13 +1,26 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Observable, of } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { IconsModule } from '../../base/icons/icons.module';
 import { OrderModel } from '../../models/order.model';
+import { PersonModel } from '../../models/person.model';
 import { OrderService } from '../../services/order.service';
+import { PersonService } from '../../services/person.service';
 import { ToastService } from '../../services/toast.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
-import { IconsModule } from '../../base/icons/icons.module';
+import { ProductModel } from '../../models/product.model';
+import { ProductModalComponent } from '../product-modal/product-modal.component';
+
+interface OrderWithUser extends OrderModel {
+    user?: PersonModel;
+}
+
+type SortField = 'id' | 'updatedAt' | 'totalPrice' | 'status' | 'user';
+type SortDirection = 'asc' | 'desc';
 
 @Component({
     selector: 'app-admin-orders',
@@ -17,14 +30,21 @@ import { IconsModule } from '../../base/icons/icons.module';
     imports: [CommonModule, FormsModule, ImageUrlPipe, IconsModule],
 })
 export class AdminOrdersComponent implements OnInit {
-    orders$!: Observable<OrderModel[]>;
+    orders$!: Observable<OrderWithUser[]>;
+    filteredOrders$!: Observable<OrderWithUser[]>;
     loading = true;
     error: string | null = null;
-    selectedOrder: OrderModel | null = null;
+    selectedOrder: OrderWithUser | null = null;
     updatingStatus = false;
+    
+    // Tab and filtering
+    activeTab: 'all' | 'checked' = 'all';
+    
+    // Sorting
+    sortField: SortField = 'updatedAt';
+    sortDirection: SortDirection = 'desc';
 
     statusOptions = [
-        { value: 'New', label: 'Новый' },
         { value: 'Checked', label: 'Подтвержден' },
         { value: 'Processing', label: 'В обработке' },
         { value: 'InDelivery', label: 'В доставке' },
@@ -34,7 +54,9 @@ export class AdminOrdersComponent implements OnInit {
     ];
 
     constructor(
+        private router: Router,
         private orderService: OrderService,
+        private personService: PersonService,
         private toastService: ToastService,
         private modalService: NgbModal,
     ) {}
@@ -48,7 +70,24 @@ export class AdminOrdersComponent implements OnInit {
         this.error = null;
         this.orderService.getAll().subscribe({
             next: (orders) => {
-                this.orders$ = of(orders.data.filter(order => order.status !== 'NotChecked'));
+                const filteredOrders = orders.data.filter(order => order.status !== 'NotChecked');
+                
+                // Load user information for each order
+                const ordersWithUsers$ = forkJoin(
+                    filteredOrders.map(order =>
+                        order.personId ? 
+                        this.personService.getById(order.personId).pipe(
+                            map(userResponse => ({ ...order, user: userResponse.data }))
+                        ) :
+                        of({ ...order, user: undefined })
+                    )
+                );
+
+                this.orders$ = ordersWithUsers$.pipe(
+                    map(orders => this.sortOrders(orders))
+                );
+                
+                this.updateFilteredOrders();
             },
             error: (error) => {
                 this.error = 'Ошибка при загрузке заказов';
@@ -58,6 +97,90 @@ export class AdminOrdersComponent implements OnInit {
                 this.loading = false;
             }
         });
+    }
+
+    setActiveTab(tab: 'all' | 'checked'): void {
+        this.activeTab = tab;
+        this.updateFilteredOrders();
+    }
+
+    updateFilteredOrders(): void {
+        if (!this.orders$) return;
+        
+        this.filteredOrders$ = this.orders$.pipe(
+            map(orders => {
+                let filtered = orders;
+                
+                if (this.activeTab === 'checked') {
+                    filtered = orders.filter(order => order.status === 'Checked');
+                }
+                
+                return filtered;
+            })
+        );
+    }
+
+    sortBy(field: SortField): void {
+        if (this.sortField === field) {
+            this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            this.sortField = field;
+            this.sortDirection = 'asc';
+        }
+        
+        this.orders$ = this.orders$.pipe(
+            map(orders => this.sortOrders(orders))
+        );
+        
+        this.updateFilteredOrders();
+    }
+
+    private sortOrders(orders: OrderWithUser[]): OrderWithUser[] {
+        return [...orders].sort((a, b) => {
+            let aValue: any;
+            let bValue: any;
+            
+            switch (this.sortField) {
+                case 'id':
+                    aValue = a.id;
+                    bValue = b.id;
+                    break;
+                case 'updatedAt':
+                    aValue = new Date(a.updatedAt);
+                    bValue = new Date(b.updatedAt);
+                    break;
+                case 'totalPrice':
+                    aValue = a.totalPrice;
+                    bValue = b.totalPrice;
+                    break;
+                case 'status':
+                    aValue = a.status;
+                    bValue = b.status;
+                    break;
+                case 'user':
+                    aValue = `${a.user?.firstName || ''} ${a.user?.secondName || ''}`.trim();
+                    bValue = `${b.user?.firstName || ''} ${b.user?.secondName || ''}`.trim();
+                    break;
+                default:
+                    aValue = a.updatedAt;
+                    bValue = b.updatedAt;
+            }
+            
+            if (aValue < bValue) {
+                return this.sortDirection === 'asc' ? -1 : 1;
+            }
+            if (aValue > bValue) {
+                return this.sortDirection === 'asc' ? 1 : -1;
+            }
+            return 0;
+        });
+    }
+
+    getSortIcon(field: SortField) {
+        if (this.sortField !== field) {
+            return 'arrow-down-up';
+        }
+        return this.sortDirection === 'asc' ? 'arrow-up' : 'arrow-down';
     }
 
     getOrderStatusClass(status: string): string {
@@ -86,9 +209,32 @@ export class AdminOrdersComponent implements OnInit {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    openOrderDetails(order: OrderModel, content: any): void {
+    openOrderDetails(order: OrderWithUser, content: any): void {
         this.selectedOrder = order;
         this.modalService.open(content, { size: 'xl', centered: true });
+    }
+
+    openProductDetails(product: ProductModel) {
+        this.modalService.dismissAll();
+        const activeModal = this.modalService.open(ProductModalComponent, {
+            size: 'lg',
+            centered: true,
+            scrollable: true,
+        });
+        activeModal.componentInstance.selectedProduct = product;
+    }
+
+    viewOrderDetails(order: OrderWithUser): void {
+        this.router.navigate(['/admin/order', order.id]);
+    }
+
+    copyOrderLink(order: OrderWithUser): void {
+        const link = `${window.location.origin}/admin/order/${order.id}`;
+        navigator.clipboard.writeText(link).then(() => {
+            this.toastService.show('Ссылка скопирована в буфер обмена', 'success');
+        }).catch(() => {
+            this.toastService.show('Не удалось скопировать ссылку', 'error');
+        });
     }
 
     async updateOrderStatus(order: OrderModel, newStatus: string): Promise<void> {
