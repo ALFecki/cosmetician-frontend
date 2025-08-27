@@ -42,7 +42,7 @@
         </li>
     </ul>
 
-    <div class="admin-actions" *ngIf="currentModel !== 'statistics'">
+    <div class="admin-actions" *ngIf="currentModel !== 'statistics' && currentModel !== 'orders'">
         <div class="search-box">
             <div class="input-group">
                 <input type="text" class="form-control" placeholder="Поиск..." [(ngModel)]="searchText"
@@ -68,7 +68,10 @@
 
         <app-statistics *ngIf="!loading && currentModel === 'statistics'"> </app-statistics>
 
-        <app-generic-table *ngIf="!loading && currentModelData.length > 0 && currentModel !== 'statistics'"
+        <app-admin-orders *ngIf="!loading && currentModel === 'orders'"> </app-admin-orders>
+
+        <app-generic-table
+            *ngIf="!loading && currentModelData.length > 0 && currentModel !== 'statistics' && currentModel !== 'orders'"
             [data]="currentModelData" [columns]="currentModelColumns" [key]="currentModel" (editItem)="editItem($event)"
             (deleteItem)="openDeleteModal($event)" (cascadeDeleteItem)="openCascadeDeleteModal($event)">
         </app-generic-table>

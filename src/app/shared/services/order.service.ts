@@ -156,4 +156,8 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
             }),
         );
     }
+
+    updateStatus(orderId: string, status: string): Observable<any> {
+        return this.http.put(`${this.apiUrl}/${orderId}/status`, { status });
+    }
 }

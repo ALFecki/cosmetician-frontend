@@ -68,6 +68,10 @@
 
 .nav-item.dropdown {
     position: static !important;
+
+    @media (max-width: 991.98px) {
+        position: relative !important;
+    }
 }
 
 .dropdown-toggle {
@@ -85,6 +89,10 @@
         background: var(--primary);
         transition: all 0.3s ease;
         transform: translateX(-50%);
+
+        @media (max-width: 991.98px) {
+            display: none;
+        }
     }
 
     &:hover::before {
@@ -112,6 +120,41 @@
         opacity: 1;
         transform: translateY(0);
     }
+
+    @media (max-width: 991.98px) {
+        position: static !important;
+        width: 100% !important;
+        left: auto !important;
+        right: auto !important;
+        transform: none !important;
+        opacity: 1 !important;
+        border-radius: 12px !important;
+        margin: 0.5rem 0 !important;
+        padding: 1rem !important;
+        background: rgba(254, 252, 250, 0.95) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+        border: 1px solid rgba(245, 230, 234, 0.3) !important;
+        max-height: 250px;
+        overflow-y: auto;
+
+        &::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: rgba(245, 230, 234, 0.2);
+            border-radius: 2px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 2px;
+
+            &:hover {
+                background: var(--accent);
+            }
+        }
+    }
 }
 
 .dropdown-grid {
@@ -122,10 +165,23 @@
     padding: 0;
     margin: 0;
     list-style: none;
+
+    @media (max-width: 991.98px) {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto !important;
+        grid-auto-flow: row !important;
+        gap: 8px !important;
+        max-height: none;
+    }
 }
 
 .dropdown-item-container {
     overflow: hidden;
+
+    @media (max-width: 991.98px) {
+        overflow: visible;
+        width: 100%;
+    }
 }
 
 .dropdown-grid .dropdown-item {
@@ -162,6 +218,32 @@
     &:hover::before {
         transform: scaleY(1);
     }
+
+    @media (max-width: 991.98px) {
+        padding: 0.5rem 0.75rem !important;
+        margin: 0 !important;
+        border-radius: 6px !important;
+        font-size: 0.9rem !important;
+        min-height: 44px; // Better touch target
+        width: 100% !important;
+        box-sizing: border-box !important;
+        text-align: left !important;
+        justify-content: flex-start !important;
+
+        &:hover {
+            transform: none !important;
+            background: rgba(245, 230, 234, 0.4) !important;
+        }
+
+        &::before {
+            display: none;
+        }
+
+        &:active {
+            background: rgba(245, 230, 234, 0.6) !important;
+            transform: scale(0.98) !important;
+        }
+    }
 }
 
 .brand-logo-small {
@@ -173,12 +255,23 @@
     border: 1px solid rgba(245, 230, 234, 0.5);
     transition: all 0.3s ease;
     opacity: 0.8;
+    flex-shrink: 0;
+
+    @media (max-width: 991.98px) {
+        width: 18px !important;
+        height: 18px !important;
+        margin-right: 8px !important;
+    }
 }
 
 .dropdown-item:hover .brand-logo-small {
     border-color: var(--primary);
     transform: scale(1.1);
     opacity: 1;
+
+    @media (max-width: 991.98px) {
+        transform: none !important;
+    }
 }
 
 /* Cart button styling - minimalistic */
@@ -374,31 +467,75 @@
         font-size: 1.5rem;
     }
 
-    .nav-item.dropdown {
-        position: relative !important;
-    }
+    .navbar-nav {
+        .nav-link {
+            padding: 0.75rem 1rem !important;
+            margin: 0.25rem 0 !important;
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
 
-    .dropdown-menu {
-        width: auto;
-        position: relative;
-        border-radius: 15px;
-        margin-top: 0.5rem;
-        background: rgba(254, 252, 250, 0.98);
-    }
+            &:hover {
+                background: rgba(245, 230, 234, 0.2) !important;
+                transform: none !important;
+            }
 
-    .dropdown-grid {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto;
-    }
+            &::after {
+                display: none !important;
+            }
 
-    .navbar-nav .nav-link {
-        padding: 0.6rem 1rem !important;
-        margin: 0.2rem 0;
+            i {
+                margin-right: 8px;
+                opacity: 0.8;
+            }
+        }
+
+        .dropdown {
+            .nav-link {
+                position: relative;
+
+                &[aria-expanded="true"] {
+                    background: rgba(245, 230, 234, 0.3) !important;
+                    color: var(--primary) !important;
+                }
+            }
+        }
     }
 
     .cart-button .btn {
-        padding: 0.6rem 0.8rem;
-        font-size: 0.9rem;
+        padding: 0.75rem 1rem !important;
+        margin: 0.25rem 0 !important;
+        border-radius: 8px !important;
+        transition: all 0.3s ease !important;
+
+        &:hover {
+            background: rgba(245, 230, 234, 0.2) !important;
+            transform: none !important;
+        }
+
+        &::after {
+            display: none !important;
+        }
+    }
+
+    .user-dropdown {
+        .user-icon-btn {
+            margin: 0.25rem 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+
+            &:hover {
+                background: rgba(245, 230, 234, 0.2);
+                transform: none;
+            }
+        }
+
+        .dropdown-menu {
+            position: static !important;
+            width: 100% !important;
+            margin: 0.5rem 0 !important;
+            transform: none !important;
+            opacity: 1 !important;
+        }
     }
 }
 
@@ -410,6 +547,31 @@
 
     .navbar-brand {
         font-size: 1.3rem;
+    }
+
+    .navbar-nav {
+        .nav-link {
+            padding: 0.65rem 0.75rem !important;
+            font-size: 0.9rem !important;
+        }
+    }
+
+    .dropdown-menu {
+        padding: 0.75rem !important;
+        margin: 0.25rem 0 !important;
+        max-height: 200px !important;
+    }
+
+    .dropdown-grid .dropdown-item {
+        padding: 0.4rem 0.6rem !important;
+        font-size: 0.85rem !important;
+        min-height: 40px !important;
+    }
+
+    .brand-logo-small {
+        width: 16px !important;
+        height: 16px !important;
+        margin-right: 6px !important;
     }
 
     .user-dropdown .user-icon-btn {

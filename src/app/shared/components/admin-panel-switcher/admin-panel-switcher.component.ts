@@ -20,6 +20,7 @@ import { ProductTypeSevice } from '../../services/product_type.service';
 import { StatisticsService } from '../../services/statistics.service';
 import { ToastService } from '../../services/toast.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
+import { AdminOrdersComponent } from '../admin-orders/admin-orders.component';
 import { GenericTableComponent } from '../generic-table/generic-table.component';
 import { StatisticsComponent } from '../statistics/statistics.component';
 
@@ -43,16 +44,32 @@ interface ModelConfig {
 
 @Component({
     selector: 'app-admin-panel-switcher',
-    standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, GenericTableComponent, IconsModule, ImageUrlPipe, StatisticsComponent],
     templateUrl: './admin-panel-switcher.component.html',
     styleUrl: './admin-panel-switcher.component.scss',
+    standalone: true,
+    imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    StatisticsComponent,
+    AdminOrdersComponent,
+    GenericTableComponent,
+    IconsModule,
+    ImageUrlPipe
+],
 })
 export class AdminPanelSwitcherComponent implements OnInit {
     @ViewChild('itemModal') itemModal!: TemplateRef<any>;
     @ViewChild('deleteModal') deleteModal!: TemplateRef<any>;
 
-    availableModels: { key: string; title: string }[] = [];
+    availableModels = [
+        { key: 'orders', title: 'Заказы' },
+        { key: 'product', title: 'Товары' },
+        { key: 'category', title: 'Категории' },
+        { key: 'brand', title: 'Бренды' },
+        { key: 'person', title: 'Пользователи' },
+        { key: 'statistics', title: 'Статистика' },
+    ];
     currentModel = 'products';
     currentModelData: any[] = [];
     filteredData: any[] = [];

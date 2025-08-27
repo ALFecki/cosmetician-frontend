@@ -1,15 +1,8 @@
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">SkViDerm</a>
-        <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-        >
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -27,52 +20,44 @@
                     </a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
                         <i-bs name="tags"></i-bs>
                         Категории
                     </a>
                     <div class="dropdown-menu animate__animated animate__fadeIn">
-                        <ul class="dropdown-grid">
-                            <div *ngFor="let category of categories$ | async; let i = index" class="dropdown-item-container">
-                                <li>
-                                    <a
-                                        class="dropdown-item animate__animated animate__fadeInRight"
-                                        [style.animation-delay]="i * 50 + 'ms'"
-                                        href="/category/{{ category.id }}"
-                                    >
-                                        <i-bs name="dot" class="me-2" style="color: var(--secondary); font-size: 1.2rem"></i-bs>
-                                        {{ category.title }}
-                                    </a>
-                                </li>
+                        <div class="dropdown-grid">
+                            <div *ngFor="let category of categories$ | async; let i = index"
+                                class="dropdown-item-container">
+                                <a class="dropdown-item animate__animated animate__fadeInRight"
+                                    [style.animation-delay]="i * 50 + 'ms'" href="/category/{{ category.id }}"
+                                    role="menuitem">
+                                    <i-bs name="dot" class="me-2"
+                                        style="color: var(--secondary); font-size: 1.2rem"></i-bs>
+                                    {{ category.title }}
+                                </a>
                             </div>
-                        </ul>
+                        </div>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
                         <i-bs name="award"></i-bs>
                         Бренды
                     </a>
                     <div class="dropdown-menu animate__animated animate__fadeIn">
-                        <ul class="dropdown-grid">
+                        <div class="dropdown-grid">
                             <div *ngFor="let brand of brands$ | async; let i = index" class="dropdown-item-container">
-                                <li>
-                                    <a
-                                        class="dropdown-item animate__animated animate__fadeInRight"
-                                        [style.animation-delay]="i * 50 + 'ms'"
-                                        href="/brand/{{ brand.id }}"
-                                    >
-                                        <img
-                                            [src]="brand.image | imageUrl"
-                                            [alt]="brand.title"
-                                            class="brand-logo-small"
-                                            onerror="this.src='assets/images/products/no-image.png'"
-                                        />
-                                        {{ brand.title }}
-                                    </a>
-                                </li>
+                                <a class="dropdown-item animate__animated animate__fadeInRight"
+                                    [style.animation-delay]="i * 50 + 'ms'" href="/brand/{{ brand.id }}"
+                                    role="menuitem">
+                                    <img [src]="brand.image | imageUrl" [alt]="brand.title" class="brand-logo-small"
+                                        onerror="this.src='assets/images/products/no-image.png'" />
+                                    {{ brand.title }}
+                                </a>
                             </div>
-                        </ul>
+                        </div>
                     </div>
                 </li>
                 <li class="nav-item">
@@ -101,7 +86,8 @@
             </div>
 
             <div class="dropdown user-dropdown">
-                <button class="btn user-icon-btn" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn user-icon-btn" type="button" id="userDropdown" data-bs-toggle="dropdown"
+                    aria-expanded="false">
                     <i-bs name="person"></i-bs>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end user-menu" aria-labelledby="userDropdown">
@@ -120,14 +106,13 @@
                         </a>
                     </li>
                     <li *ngIf="authService.isLoggedIn()">
-                        <a class="dropdown-item" routerLink="/profile"> <i-bs name="person" class="me-2"></i-bs>Личный кабинет </a>
+                        <a class="dropdown-item" routerLink="/profile"> <i-bs name="person" class="me-2"></i-bs>Личный
+                            кабинет </a>
                     </li>
                     <li *ngIf="authService.isLoggedIn()">
-                        <a class="dropdown-item" routerLink="/orders"> <i-bs name="list-ul" class="me-2"></i-bs>История заказов </a>
+                        <a class="dropdown-item" routerLink="/orders"> <i-bs name="list-ul" class="me-2"></i-bs>История
+                            заказов </a>
                     </li>
-                    <!-- <li *ngIf="authService.isLoggedIn()">
-                        <a class="dropdown-item" routerLink="/favorites"> <i-bs name="heart" class="me-2"></i-bs>Избранное </a>
-                    </li> -->
                     <li *ngIf="authService.isLoggedIn()">
                         <hr class="dropdown-divider" />
                     </li>
