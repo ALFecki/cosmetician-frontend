@@ -6,6 +6,11 @@ import { DataService } from '../base/services/data.service';
 @Injectable({
     providedIn: 'root',
 })
-export class ProductVariantService extends DataService<ProductVariantModel, CreateProductVariantSchema, UpdateProductVariantSchema, FilterProductVariantSchema> {
+export class ProductVariantService extends DataService<
+    ProductVariantModel,
+    CreateProductVariantSchema,
+    UpdateProductVariantSchema,
+    FilterProductVariantSchema
+> {
     protected readonly endpoint = 'product_variant';
 }

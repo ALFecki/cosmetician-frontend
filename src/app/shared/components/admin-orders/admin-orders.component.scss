@@ -1,133 +1,133 @@
 .admin-orders-container {
-  .orders-header {
-    .orders-title {
-      color: var(--primary);
-      font-weight: 600;
-      font-size: 1.5rem;
-    }
-
-    .orders-subtitle {
-      color: var(--text-muted);
-      margin-bottom: 0;
-    }
-  }
-
-  .orders-tabs {
-    .nav-pills {
-      .nav-link {
-        color: var(--text-muted);
-        background-color: transparent;
-        border: 1px solid var(--border-color);
-        margin-right: 0.5rem;
-
-        &:hover {
-          background-color: var(--light);
-          border-color: var(--primary);
-          color: var(--primary);
+    .orders-header {
+        .orders-title {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1.5rem;
         }
 
-        &.active {
-          background-color: var(--primary);
-          border-color: var(--primary);
-          color: white;
+        .orders-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 0;
         }
-      }
     }
-  }
 
-  .customer-info {
-    .fw-medium {
-      font-size: 0.9rem;
+    .orders-tabs {
+        .nav-pills {
+            .nav-link {
+                color: var(--text-muted);
+                background-color: transparent;
+                border: 1px solid var(--border-color);
+                margin-right: 0.5rem;
+
+                &:hover {
+                    background-color: var(--light);
+                    border-color: var(--primary);
+                    color: var(--primary);
+                }
+
+                &.active {
+                    background-color: var(--primary);
+                    border-color: var(--primary);
+                    color: white;
+                }
+            }
+        }
     }
-  }
 
-  .action-buttons {
-    display: flex;
-    gap: 0.25rem;
-    align-items: center;
-
-    .dropdown-toggle {
-      &:after {
-        font-size: 0.7rem;
-      }
+    .customer-info {
+        .fw-medium {
+            font-size: 0.9rem;
+        }
     }
-  }
 
-  .table {
-    th {
-      font-weight: 600;
-      color: var(--text-dark);
-      border-bottom: 2px solid var(--border-color);
+    .action-buttons {
+        display: flex;
+        gap: 0.25rem;
+        align-items: center;
 
-      &.sortable-header {
-        cursor: pointer;
-        user-select: none;
-        transition: background-color 0.2s ease;
+        .dropdown-toggle {
+            &:after {
+                font-size: 0.7rem;
+            }
+        }
+    }
 
-        &:hover {
-          background-color: var(--light);
+    .table {
+        th {
+            font-weight: 600;
+            color: var(--text-dark);
+            border-bottom: 2px solid var(--border-color);
+
+            &.sortable-header {
+                cursor: pointer;
+                user-select: none;
+                transition: background-color 0.2s ease;
+
+                &:hover {
+                    background-color: var(--light);
+                }
+
+                .sort-icon {
+                    opacity: 0.5;
+                    font-size: 0.8rem;
+                    transition: opacity 0.2s ease;
+                }
+
+                &:hover .sort-icon {
+                    opacity: 1;
+                }
+            }
         }
 
-        .sort-icon {
-          opacity: 0.5;
-          font-size: 0.8rem;
-          transition: opacity 0.2s ease;
+        td {
+            vertical-align: middle;
         }
 
-        &:hover .sort-icon {
-          opacity: 1;
+        .badge {
+            font-size: 0.75rem;
         }
-      }
     }
-
-    td {
-      vertical-align: middle;
-    }
-
-    .badge {
-      font-size: 0.75rem;
-    }
-  }
 }
 
 .order-details {
-  .card {
-    border: 1px solid var(--border-color);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    .card {
+        border: 1px solid var(--border-color);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
-    .card-header {
-      background-color: var(--light);
-      border-bottom: 1px solid var(--border-color);
+        .card-header {
+            background-color: var(--light);
+            border-bottom: 1px solid var(--border-color);
 
-      h6 {
-        color: var(--text-dark);
-        font-weight: 600;
-      }
+            h6 {
+                color: var(--text-dark);
+                font-weight: 600;
+            }
+        }
     }
-  }
 
-  .img-thumbnail {
-    border-radius: 8px;
-  }
+    .img-thumbnail {
+        border-radius: 8px;
+    }
 
-  .spin {
-    animation: spin 1s linear infinite;
-  }
+    .spin {
+        animation: spin 1s linear infinite;
+    }
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
 
-  to {
-    transform: rotate(360deg);
-  }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @media (max-width: 768px) {
-  .action-buttons {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 }

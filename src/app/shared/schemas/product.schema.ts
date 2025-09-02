@@ -17,7 +17,6 @@ export interface FilterProductSchema extends FilterOptions {
     isDeleted?: boolean;
 }
 
-
 export type CreateProductScopeSchema = Omit<ProductScopeModel, 'id' | 'createdAt' | 'updatedAt'>;
 export type UpdateProductScopeSchema = Partial<Omit<ProductScopeModel, 'id' | 'createdAt' | 'updatedAt'>>;
 

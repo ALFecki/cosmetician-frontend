@@ -36,10 +36,10 @@ export class AdminOrdersComponent implements OnInit {
     error: string | null = null;
     selectedOrder: OrderWithUser | null = null;
     updatingStatus = false;
-    
+
     // Tab and filtering
     activeTab: 'all' | 'checked' = 'all';
-    
+
     // Sorting
     sortField: SortField = 'updatedAt';
     sortDirection: SortDirection = 'desc';
@@ -69,33 +69,29 @@ export class AdminOrdersComponent implements OnInit {
         this.loading = true;
         this.error = null;
         this.orderService.getAll().subscribe({
-            next: (orders) => {
+            next: orders => {
                 const filteredOrders = orders.data.filter(order => order.status !== 'NotChecked');
-                
+
                 // Load user information for each order
                 const ordersWithUsers$ = forkJoin(
                     filteredOrders.map(order =>
-                        order.personId ? 
-                        this.personService.getById(order.personId).pipe(
-                            map(userResponse => ({ ...order, user: userResponse.data }))
-                        ) :
-                        of({ ...order, user: undefined })
-                    )
+                        order.personId
+                            ? this.personService.getById(order.personId).pipe(map(userResponse => ({ ...order, user: userResponse.data })))
+                            : of({ ...order, user: undefined }),
+                    ),
                 );
 
-                this.orders$ = ordersWithUsers$.pipe(
-                    map(orders => this.sortOrders(orders))
-                );
-                
+                this.orders$ = ordersWithUsers$.pipe(map(orders => this.sortOrders(orders)));
+
                 this.updateFilteredOrders();
             },
-            error: (error) => {
+            error: error => {
                 this.error = 'Ошибка при загрузке заказов';
                 console.error('Error loading orders:', error);
             },
             complete: () => {
                 this.loading = false;
-            }
+            },
         });
     }
 
@@ -106,17 +102,17 @@ export class AdminOrdersComponent implements OnInit {
 
     updateFilteredOrders(): void {
         if (!this.orders$) return;
-        
+
         this.filteredOrders$ = this.orders$.pipe(
             map(orders => {
                 let filtered = orders;
-                
+
                 if (this.activeTab === 'checked') {
                     filtered = orders.filter(order => order.status === 'Checked');
                 }
-                
+
                 return filtered;
-            })
+            }),
         );
     }
 
@@ -127,19 +123,17 @@ export class AdminOrdersComponent implements OnInit {
             this.sortField = field;
             this.sortDirection = 'asc';
         }
-        
-        this.orders$ = this.orders$.pipe(
-            map(orders => this.sortOrders(orders))
-        );
-        
+
+        this.orders$ = this.orders$.pipe(map(orders => this.sortOrders(orders)));
+
         this.updateFilteredOrders();
     }
 
     private sortOrders(orders: OrderWithUser[]): OrderWithUser[] {
         return [...orders].sort((a, b) => {
-            let aValue: any;
-            let bValue: any;
-            
+            let aValue;
+            let bValue;
+
             switch (this.sortField) {
                 case 'id':
                     aValue = a.id;
@@ -165,7 +159,7 @@ export class AdminOrdersComponent implements OnInit {
                     aValue = a.updatedAt;
                     bValue = b.updatedAt;
             }
-            
+
             if (aValue < bValue) {
                 return this.sortDirection === 'asc' ? -1 : 1;
             }
@@ -230,11 +224,14 @@ export class AdminOrdersComponent implements OnInit {
 
     copyOrderLink(order: OrderWithUser): void {
         const link = `${window.location.origin}/admin/order/${order.id}`;
-        navigator.clipboard.writeText(link).then(() => {
-            this.toastService.show('Ссылка скопирована в буфер обмена', 'success');
-        }).catch(() => {
-            this.toastService.show('Не удалось скопировать ссылку', 'error');
-        });
+        navigator.clipboard
+            .writeText(link)
+            .then(() => {
+                this.toastService.show('Ссылка скопирована в буфер обмена', 'success');
+            })
+            .catch(() => {
+                this.toastService.show('Не удалось скопировать ссылку', 'error');
+            });
     }
 
     async updateOrderStatus(order: OrderModel, newStatus: string): Promise<void> {
@@ -254,7 +251,7 @@ export class AdminOrdersComponent implements OnInit {
     }
 
     getTotalOrderValue(order: OrderModel): number {
-        return order.products?.reduce((total, item) => total + (item.historicalPrice * item.quantity), 0) || 0;
+        return order.products?.reduce((total, item) => total + item.historicalPrice * item.quantity, 0) || 0;
     }
 
     getOrderItemsCount(order: OrderModel): number {

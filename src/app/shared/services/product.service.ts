@@ -24,7 +24,8 @@ export class ProductService extends DataService<ProductModel, CreateProductSchem
     }
 
     override async create(data: CreateProductSchema): Promise<SingleResponse<ProductModel>> {
-        const { variants, ...productData } = data as any;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { variants, ...productData } = data;
         productData.isDeleted = false;
 
         if (productData.image && (productData.image as unknown) instanceof File) {
@@ -48,7 +49,8 @@ export class ProductService extends DataService<ProductModel, CreateProductSchem
     }
 
     override async update(id: string, data: UpdateProductSchema): Promise<SingleResponse<ProductModel>> {
-        const { variants, ...productData } = data as any;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { variants, ...productData } = data;
 
         if (productData.image && (productData.image as unknown) instanceof File) {
             productData.image = await this.uploadImage(productData.image as unknown as File);

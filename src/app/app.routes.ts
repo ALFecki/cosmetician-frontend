@@ -80,7 +80,7 @@ export const routes: Routes = [
         path: 'admin/order/:id',
         component: AdminOrderDetailsComponent,
         canActivate: [AuthGuard, AdminGuard],
-        title: 'Детали заказа - Админ'
+        title: 'Детали заказа - Админ',
     },
     { path: '**', redirectTo: '' },
 ];

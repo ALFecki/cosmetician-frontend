@@ -30,9 +30,11 @@
                             <p class="mb-0">от {{ (order | async)?.createdAt | date: 'dd.MM.yyyy HH:mm' }}</p>
                         </div>
                         <div class="col-md-6 text-md-end">
-                            <span class="badge rounded-pill order-status-badge {{
+                            <span
+                                class="badge rounded-pill order-status-badge {{
                                     getOrderStatusClass((order | async)?.status || '')
-                                }} fs-6 mb-2">
+                                }} fs-6 mb-2"
+                            >
                                 {{ getOrderStatusText((order | async)?.status || '') }}
                             </span>
                         </div>
@@ -65,12 +67,11 @@
                                 </h6>
                             </div>
                             <div class="card-body">
-                                <p class="mb-1"><strong>Дата создания:</strong> {{ (order | async)?.createdAt | date:
-                                    'dd.MM.yyyy HH:mm' }}</p>
-                                <p class="mb-1"><strong>Обновлен:</strong> {{ (order | async)?.updatedAt | date:
-                                    'dd.MM.yyyy HH:mm' }}</p>
-                                <p class="mb-0"><strong>Общая сумма:</strong> {{ (order | async)?.totalPrice | number:
-                                    '1.2-2' }} р.</p>
+                                <p class="mb-1">
+                                    <strong>Дата создания:</strong> {{ (order | async)?.createdAt | date: 'dd.MM.yyyy HH:mm' }}
+                                </p>
+                                <p class="mb-1"><strong>Обновлен:</strong> {{ (order | async)?.updatedAt | date: 'dd.MM.yyyy HH:mm' }}</p>
+                                <p class="mb-0"><strong>Общая сумма:</strong> {{ (order | async)?.totalPrice | number: '1.2-2' }} р.</p>
                             </div>
                         </div>
                     </div>
@@ -92,31 +93,37 @@
                             <tbody>
                                 <tr *ngFor="let item of (order | async)?.products">
                                     <td>
-                                        <img [src]="item.product.image | imageUrl" class="img-thumbnail order-item-img"
+                                        <img
+                                            [src]="item.product.image | imageUrl"
+                                            class="img-thumbnail order-item-img"
                                             [alt]="item.product.title || 'Product'"
-                                            style="width: 50px; height: 50px; object-fit: cover;" />
+                                            style="width: 50px; height: 50px; object-fit: cover"
+                                        />
                                     </td>
                                     <td>
-                                        <div class="fw-medium"> <a class="item-title"
+                                        <div class="fw-medium">
+                                            <a
+                                                class="item-title"
                                                 (click)="openProductDetails(item.product)"
                                                 (keyup.enter)="openProductDetails(item.product)"
-                                                (keyup.space)="openProductDetails(item.product)" tabindex="0"
-                                                role="link">
+                                                (keyup.space)="openProductDetails(item.product)"
+                                                tabindex="0"
+                                                role="link"
+                                            >
                                                 {{ item.product.title }}
-                                            </a></div>
+                                            </a>
+                                        </div>
                                         <small class="text-muted">{{ item.variant.volume || '-' }} мл</small>
                                     </td>
                                     <td class="text-end">{{ item.historicalPrice | number: '1.2-2' }} р.</td>
                                     <td class="text-center">{{ item.quantity }}</td>
-                                    <td class="text-end fw-bold">{{ item.historicalPrice * item.quantity | number:
-                                        '1.2-2' }} р.</td>
+                                    <td class="text-end fw-bold">{{ item.historicalPrice * item.quantity | number: '1.2-2' }} р.</td>
                                 </tr>
                             </tbody>
                             <tfoot>
                                 <tr>
                                     <td colspan="4" class="text-end fw-bold">Итого:</td>
-                                    <td class="text-end fw-bold fs-5">{{ (order | async)?.totalPrice | number: '1.2-2'
-                                        }} р.</td>
+                                    <td class="text-end fw-bold fs-5">{{ (order | async)?.totalPrice | number: '1.2-2' }} р.</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -133,8 +140,12 @@
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-md-8">
-                                <select class="form-select" [value]="(order | async)?.status"
-                                    (change)="updateOrderStatus($any($event.target).value)" [disabled]="updatingStatus">
+                                <select
+                                    class="form-select"
+                                    [value]="(order | async)?.status"
+                                    (change)="updateOrderStatus($any($event.target).value)"
+                                    [disabled]="updatingStatus"
+                                >
                                     <option *ngFor="let status of statusOptions" [value]="status.value">
                                         {{ status.label }}
                                     </option>

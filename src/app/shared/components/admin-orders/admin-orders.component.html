@@ -10,15 +10,13 @@
     <div class="orders-tabs mb-4">
         <ul class="nav nav-pills" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link" [class.active]="activeTab === 'all'" type="button"
-                    (click)="setActiveTab('all')">
+                <button class="nav-link" [class.active]="activeTab === 'all'" type="button" (click)="setActiveTab('all')">
                     <i-bs name="list-ul" class="me-2"></i-bs>
                     Все заказы
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" [class.active]="activeTab === 'checked'" type="button"
-                    (click)="setActiveTab('checked')">
+                <button class="nav-link" [class.active]="activeTab === 'checked'" type="button" (click)="setActiveTab('checked')">
                     <i-bs name="check-circle" class="me-2"></i-bs>
                     Подтвержденные
                 </button>
@@ -45,9 +43,10 @@
                 {{ activeTab === 'all' ? 'Заказов пока нет' : 'Подтвержденных заказов пока нет' }}
             </h4>
             <p class="text-muted">
-                {{ activeTab === 'all'
-                ? 'Как только появятся новые заказы, они будут отображены здесь.'
-                : 'Как только появятся подтвержденные заказы, они будут отображены здесь.'
+                {{
+                    activeTab === 'all'
+                        ? 'Как только появятся новые заказы, они будут отображены здесь.'
+                        : 'Как только появятся подтвержденные заказы, они будут отображены здесь.'
                 }}
             </p>
         </div>
@@ -101,28 +100,45 @@
                         </td>
                         <td>
                             <div class="action-buttons">
-                                <button class="btn btn-sm btn-outline-primary me-2"
-                                    (click)="openOrderDetails(order, orderDetailsModal)" title="Подробности">
+                                <button
+                                    class="btn btn-sm btn-outline-primary me-2"
+                                    (click)="openOrderDetails(order, orderDetailsModal)"
+                                    title="Подробности"
+                                >
                                     <i-bs name="eye"></i-bs>
                                 </button>
-                                <button class="btn btn-sm btn-outline-info me-2" (click)="viewOrderDetails(order)"
-                                    title="Открыть в новой вкладке">
+                                <button
+                                    class="btn btn-sm btn-outline-info me-2"
+                                    (click)="viewOrderDetails(order)"
+                                    title="Открыть в новой вкладке"
+                                >
                                     <i-bs name="box-arrow-up-right"></i-bs>
                                 </button>
-                                <button class="btn btn-sm btn-outline-secondary me-2" (click)="copyOrderLink(order)"
-                                    title="Копировать ссылку">
+                                <button
+                                    class="btn btn-sm btn-outline-secondary me-2"
+                                    (click)="copyOrderLink(order)"
+                                    title="Копировать ссылку"
+                                >
                                     <i-bs name="link-45deg"></i-bs>
                                 </button>
                                 <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
-                                        data-bs-toggle="dropdown" [disabled]="updatingStatus" title="Изменить статус">
+                                    <button
+                                        class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        [disabled]="updatingStatus"
+                                        title="Изменить статус"
+                                    >
                                         <i-bs name="gear"></i-bs>
                                     </button>
                                     <ul class="dropdown-menu">
                                         <li *ngFor="let status of statusOptions">
-                                            <button class="dropdown-item" [class.active]="order.status === status.value"
+                                            <button
+                                                class="dropdown-item"
+                                                [class.active]="order.status === status.value"
                                                 (click)="updateOrderStatus(order, status.value)"
-                                                [disabled]="order.status === status.value || updatingStatus">
+                                                [disabled]="order.status === status.value || updatingStatus"
+                                            >
                                                 {{ status.label }}
                                             </button>
                                         </li>
@@ -156,11 +172,11 @@
                             </h6>
                         </div>
                         <div class="card-body">
-                            <p class="mb-1"><strong>Имя:</strong> {{ selectedOrder.user?.firstName }} {{
-                                selectedOrder.user?.secondName }}</p>
-                            <p class="mb-1"><strong>Email:</strong> {{ selectedOrder.user?.email }}</p>
-                            <p class="mb-0"><strong>Телефон:</strong> {{ selectedOrder.user?.phone || 'Не указан' }}
+                            <p class="mb-1">
+                                <strong>Имя:</strong> {{ selectedOrder.user?.firstName }} {{ selectedOrder.user?.secondName }}
                             </p>
+                            <p class="mb-1"><strong>Email:</strong> {{ selectedOrder.user?.email }}</p>
+                            <p class="mb-0"><strong>Телефон:</strong> {{ selectedOrder.user?.phone || 'Не указан' }}</p>
                         </div>
                     </div>
                 </div>
@@ -173,18 +189,15 @@
                             </h6>
                         </div>
                         <div class="card-body">
-                            <p class="mb-1"><strong>Дата создания:</strong> {{ selectedOrder.createdAt | date:
-                                'dd.MM.yyyy HH:mm' }}</p>
-                            <p class="mb-1"><strong>Обновлен:</strong> {{ selectedOrder.updatedAt | date:
-                                'dd.MM.yyyy HH:mm' }}</p>
+                            <p class="mb-1"><strong>Дата создания:</strong> {{ selectedOrder.createdAt | date: 'dd.MM.yyyy HH:mm' }}</p>
+                            <p class="mb-1"><strong>Обновлен:</strong> {{ selectedOrder.updatedAt | date: 'dd.MM.yyyy HH:mm' }}</p>
                             <p class="mb-1">
                                 <strong>Статус:</strong>
                                 <span class="badge {{ getOrderStatusClass(selectedOrder.status) }} ms-2">
                                     {{ getOrderStatusText(selectedOrder.status) }}
                                 </span>
                             </p>
-                            <p class="mb-0"><strong>Общая сумма:</strong> {{ selectedOrder.totalPrice | number: '1.2-2'
-                                }} р.</p>
+                            <p class="mb-0"><strong>Общая сумма:</strong> {{ selectedOrder.totalPrice | number: '1.2-2' }} р.</p>
                         </div>
                     </div>
                 </div>
@@ -212,16 +225,23 @@
                             <tbody>
                                 <tr *ngFor="let item of selectedOrder.products">
                                     <td>
-                                        <img [src]="item.product.image | imageUrl" [alt]="item.product.title"
+                                        <img
+                                            [src]="item.product.image | imageUrl"
+                                            [alt]="item.product.title"
                                             class="img-thumbnail"
-                                            style="width: 50px; height: 50px; object-fit: cover;" />
+                                            style="width: 50px; height: 50px; object-fit: cover"
+                                        />
                                     </td>
                                     <td>
                                         <div class="fw-medium">
-                                            <a class="item-title" (click)="openProductDetails(item.product)"
+                                            <a
+                                                class="item-title"
+                                                (click)="openProductDetails(item.product)"
                                                 (keyup.enter)="openProductDetails(item.product)"
-                                                (keyup.space)="openProductDetails(item.product)" tabindex="0"
-                                                role="link">
+                                                (keyup.space)="openProductDetails(item.product)"
+                                                tabindex="0"
+                                                role="link"
+                                            >
                                                 {{ item.product.title }}
                                             </a>
                                         </div>
@@ -229,8 +249,7 @@
                                     </td>
                                     <td>{{ item.historicalPrice | number: '1.2-2' }} р.</td>
                                     <td>{{ item.quantity }}</td>
-                                    <td class="fw-bold">{{ item.historicalPrice * item.quantity | number: '1.2-2' }} р.
-                                    </td>
+                                    <td class="fw-bold">{{ item.historicalPrice * item.quantity | number: '1.2-2' }} р.</td>
                                 </tr>
                             </tbody>
                             <tfoot>
@@ -255,9 +274,12 @@
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-md-8">
-                            <select class="form-select" [value]="selectedOrder.status"
+                            <select
+                                class="form-select"
+                                [value]="selectedOrder.status"
                                 (change)="updateOrderStatus(selectedOrder, $any($event.target).value)"
-                                [disabled]="updatingStatus">
+                                [disabled]="updatingStatus"
+                            >
                                 <option *ngFor="let status of statusOptions" [value]="status.value">
                                     {{ status.label }}
                                 </option>

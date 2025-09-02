@@ -493,7 +493,7 @@
             .nav-link {
                 position: relative;
 
-                &[aria-expanded="true"] {
+                &[aria-expanded='true'] {
                     background: rgba(245, 230, 234, 0.3) !important;
                     color: var(--primary) !important;
                 }

@@ -60,7 +60,7 @@ export class AdminOrderDetailsComponent implements OnInit {
     loadOrderDetails(): void {
         this.loading = true;
         this.error = null;
-        
+
         this.route.paramMap
             .pipe(
                 switchMap(params => {
@@ -72,14 +72,14 @@ export class AdminOrderDetailsComponent implements OnInit {
                 }),
             )
             .subscribe({
-                next: (response) => {
+                next: response => {
                     this.order.next(response.data);
                     this.loadOrderUser(response.data.personId);
                 },
-                error: (error) => {
+                error: error => {
                     this.error = 'Не удалось загрузить информацию о заказе: ' + (error.message || 'Неизвестная ошибка');
                     this.loading = false;
-                }
+                },
             });
     }
 
@@ -90,14 +90,14 @@ export class AdminOrderDetailsComponent implements OnInit {
         }
 
         this.personService.getById(personId).subscribe({
-            next: (response) => {
+            next: response => {
                 this.orderUser.next(response.data);
                 this.loading = false;
             },
-            error: (error) => {
+            error: error => {
                 console.error('Error loading user:', error);
                 this.loading = false;
-            }
+            },
         });
     }
 
@@ -144,7 +144,7 @@ export class AdminOrderDetailsComponent implements OnInit {
     }
 
     getTotalOrderValue(order: OrderModel): number {
-        return order.products?.reduce((total, item) => total + (item.historicalPrice * item.quantity), 0) || 0;
+        return order.products?.reduce((total, item) => total + item.historicalPrice * item.quantity, 0) || 0;
     }
 
     getOrderItemsCount(order: OrderModel): number {
@@ -155,13 +155,13 @@ export class AdminOrderDetailsComponent implements OnInit {
         this.router.navigate(['/admin']);
     }
 
-        openProductDetails(product: ProductModel) {
-            this.modalService.dismissAll();
-            const activeModal = this.modalService.open(ProductModalComponent, {
-                size: 'lg',
-                centered: true,
-                scrollable: true,
-            });
-            activeModal.componentInstance.selectedProduct = product;
-        }
+    openProductDetails(product: ProductModel) {
+        this.modalService.dismissAll();
+        const activeModal = this.modalService.open(ProductModalComponent, {
+            size: 'lg',
+            centered: true,
+            scrollable: true,
+        });
+        activeModal.componentInstance.selectedProduct = product;
+    }
 }

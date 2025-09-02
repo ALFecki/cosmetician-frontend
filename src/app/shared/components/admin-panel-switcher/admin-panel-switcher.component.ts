@@ -50,15 +50,15 @@ interface ModelConfig {
     styleUrl: './admin-panel-switcher.component.scss',
     standalone: true,
     imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    StatisticsComponent,
-    AdminOrdersComponent,
-    GenericTableComponent,
-    IconsModule,
-    ImageUrlPipe
-],
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        StatisticsComponent,
+        AdminOrdersComponent,
+        GenericTableComponent,
+        IconsModule,
+        ImageUrlPipe,
+    ],
 })
 export class AdminPanelSwitcherComponent implements OnInit {
     @ViewChild('itemModal') itemModal!: TemplateRef<any>;
@@ -134,7 +134,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
         this.variantForm = this.fb.group({
             volume: ['', [Validators.required, Validators.min(1)]],
             price: ['', [Validators.required, Validators.min(0.01)]],
-            costPrice: ['', [Validators.required, Validators.min(0.01)]]
+            costPrice: ['', [Validators.required, Validators.min(0.01)]],
         });
     }
 
@@ -240,7 +240,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'updatedAt', title: 'Дата обновления', type: 'date' },
             ],
         };
-
 
         this.modelConfigs['categories'] = {
             key: 'categories',
@@ -618,11 +617,11 @@ export class AdminPanelSwitcherComponent implements OnInit {
             if (response?.data) {
                 // Update the editing item with fresh data
                 this.editingItem = response.data;
-                
+
                 // Rebuild form with updated variants - filter based on showDeletedVariants
                 const filteredVariants = this.getFilteredVariants(response.data.variants || []);
                 this.updateVariantsInForm(filteredVariants);
-                
+
                 // Also update the main data array
                 const index = this.currentModelData.findIndex(item => item.id === this.currentProductId);
                 if (index !== -1) {
@@ -652,13 +651,15 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
         // Add updated variants
         variants.forEach(variant => {
-            variantsArray.push(this.fb.group({
-                id: [variant.id || null],
-                volume: [variant.volume || '', Validators.required],
-                costPrice: [variant.costPrice || '', Validators.required],
-                price: [variant.price || '', Validators.required],
-                isDeleted: [variant.isDeleted || false]
-            }));
+            variantsArray.push(
+                this.fb.group({
+                    id: [variant.id || null],
+                    volume: [variant.volume || '', Validators.required],
+                    costPrice: [variant.costPrice || '', Validators.required],
+                    price: [variant.price || '', Validators.required],
+                    isDeleted: [variant.isDeleted || false],
+                }),
+            );
         });
     }
 
@@ -674,7 +675,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
             this.toastService.show('Сначала сохраните продукт, затем добавляйте варианты', 'warning');
             return;
         }
-        
+
         this.currentProductId = this.editingItem.id;
         this.variantForm.reset();
         this.modalService.open(this.variantModal, { backdrop: 'static' });
@@ -692,7 +693,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
         const variantData: CreateProductVariantSchema = {
             ...this.variantForm.value,
-            productId: this.currentProductId
+            productId: this.currentProductId,
         };
 
         try {
@@ -734,8 +735,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
         try {
             const response = await this.productVariantService.delete(variantId).toPromise();
-            console.log("!!!!!!!!!!!")
-            console.log(response)
+            console.log('!!!!!!!!!!!');
+            console.log(response);
             if (response?.status) {
                 this.toastService.show('Вариант удален', 'success');
                 await this.reloadProductVariants();
@@ -789,7 +790,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
         });
 
         if (this.currentModel === 'product') {
-            delete formData["variants"];
+            delete formData['variants'];
         }
 
         Object.keys(this.selectedFiles).forEach(key => {
@@ -867,12 +868,12 @@ export class AdminPanelSwitcherComponent implements OnInit {
         if (selectedIds.length === 0) {
             return `Выберите ${fieldKey.toLowerCase()}...`;
         }
-        
+
         if (selectedIds.length === 1) {
             const selectedOption = options?.find(opt => opt.id === selectedIds[0]);
             return selectedOption?.title || selectedOption?.name || 'Выбран 1 элемент';
         }
-        
+
         return `Выбрано: ${selectedIds.length}`;
     }
 }

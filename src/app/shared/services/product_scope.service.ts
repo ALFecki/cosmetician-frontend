@@ -6,6 +6,11 @@ import { CreateProductScopeSchema, FilterProductScopeSchema, UpdateProductScopeS
 @Injectable({
     providedIn: 'root',
 })
-export class ProductScopeSevice extends DataService<ProductScopeModel, CreateProductScopeSchema, UpdateProductScopeSchema, FilterProductScopeSchema> {
+export class ProductScopeSevice extends DataService<
+    ProductScopeModel,
+    CreateProductScopeSchema,
+    UpdateProductScopeSchema,
+    FilterProductScopeSchema
+> {
     protected override endpoint = 'product_scope';
 }

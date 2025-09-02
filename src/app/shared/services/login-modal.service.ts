@@ -3,7 +3,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LoginComponent } from '../components/login/login.component';
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class LoginModalService {
     constructor(private modalService: NgbModal) {}
