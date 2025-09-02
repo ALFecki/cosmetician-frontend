@@ -70,6 +70,7 @@ export class ProductsComponent implements OnInit {
                 this.products$ = of(data.data);
                 this.totalItems$ = of(data.length);
                 for (const product of data.data) {
+                    product.variants = product.variants.filter(v => !v.isDeleted);
                     if (product.variants && product.variants.length > 0) {
                         this.selectedVariants[product.id] = product.variants[0].id;
                     }

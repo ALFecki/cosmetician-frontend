@@ -1,4 +1,5 @@
-<div class="table-responsive">
+<div class="table-responsive table-drag-scroll" #tableContainer (mousedown)="startDrag($event)"
+    (mousemove)="onDrag($event)" (mouseup)="stopDrag()" (mouseleave)="stopDrag()" [class.dragging]="isDragging">
     <table class="table table-striped">
         <thead>
             <tr>
@@ -11,12 +12,9 @@
                 <td *ngFor="let column of columns">
                     <ng-container [ngSwitch]="column.type">
                         <ng-container *ngSwitchCase="'image'">
-                            <img
-                                *ngIf="getNestedProperty(item, column.key)"
-                                [src]="getNestedProperty(item, column.key) | imageUrl"
-                                class="table-thumbnail"
-                                [alt]="getNestedProperty(item, column.key)"
-                            />
+                            <img *ngIf="getNestedProperty(item, column.key)"
+                                [src]="getNestedProperty(item, column.key) | imageUrl" class="table-thumbnail"
+                                [alt]="getNestedProperty(item, column.key)" />
                             <span *ngIf="!getNestedProperty(item, column.key)">—</span>
                         </ng-container>
 
@@ -31,29 +29,50 @@
                         <ng-container *ngSwitchCase="'boolean'">
                             <span *ngIf="getNestedProperty(item, column.key) === true">Да</span>
                             <span *ngIf="getNestedProperty(item, column.key) === false">Нет</span>
-                            <span *ngIf="getNestedProperty(item, column.key) === null || getNestedProperty(item, column.key) === undefined"
-                                >—</span
-                            >
+                            <span
+                                *ngIf="getNestedProperty(item, column.key) === null || getNestedProperty(item, column.key) === undefined">—</span>
                         </ng-container>
 
                         <ng-container *ngSwitchCase="'variants'">
-                            <span *ngIf="getNestedProperty(item, column.key) && getNestedProperty(item, column.key).length > 0">
-                                <span *ngFor="let variant of getNestedProperty(item, column.key); let last = last">
-                                    {{ variant.volume }}мл/{{ variant.costPrice | number: '1.2-2' }}р./{{
-                                        variant.price | number: '1.2-2'
-                                    }}р.<span *ngIf="!last"> • </span>
-                                </span>
-                            </span>
-                            <span *ngIf="!getNestedProperty(item, column.key) || getNestedProperty(item, column.key).length === 0">—</span>
+                            <div *ngIf="getNestedProperty(item, column.key) && getNestedProperty(item, column.key).length > 0"
+                                class="variants-table-container">
+                                <table class="table table-sm table-bordered variants-table">
+                                    <thead>
+                                        <tr>
+                                            <!-- <th>ID</th> -->
+                                            <th>Объем (мл)</th>
+                                            <th>Себестоимость (р.)</th>
+                                            <th>Цена (р.)</th>
+                                            <th>Активен?</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let variant of getNestedProperty(item, column.key)">
+                                            <!-- <td><small class="text-muted">{{ variant.id }}</small></td> -->
+                                            <td>{{ variant.volume }}</td>
+                                            <td>{{ variant.costPrice | number: '1.2-2' }}</td>
+                                            <td>{{ variant.price | number: '1.2-2' }}</td>
+                                            <td>
+                                                <span *ngIf="!variant.isDeleted">Да</span>
+                                                <span *ngIf="variant.isDeleted">Нет</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <span
+                                *ngIf="!getNestedProperty(item, column.key) || getNestedProperty(item, column.key).length === 0">—</span>
                         </ng-container>
 
                         <ng-container *ngSwitchCase="'array'">
-                            <span *ngIf="getNestedProperty(item, column.key) && getNestedProperty(item, column.key).length > 0">
+                            <span
+                                *ngIf="getNestedProperty(item, column.key) && getNestedProperty(item, column.key).length > 0">
                                 <span *ngFor="let arrayItem of getNestedProperty(item, column.key); let last = last">
                                     {{ arrayItem.title || arrayItem.name || arrayItem }}<span *ngIf="!last">, </span>
                                 </span>
                             </span>
-                            <span *ngIf="!getNestedProperty(item, column.key) || getNestedProperty(item, column.key).length === 0">—</span>
+                            <span
+                                *ngIf="!getNestedProperty(item, column.key) || getNestedProperty(item, column.key).length === 0">—</span>
                         </ng-container>
 
                         <ng-container *ngSwitchDefault>
@@ -64,34 +83,22 @@
 
                 <td class="text-end">
                     <div class="btn-group">
-                        <button type="button" title="Редактировать" class="btn btn-sm btn-outline-primary" (click)="onEdit(item)">
+                        <button type="button" title="Редактировать" class="btn btn-sm btn-outline-primary"
+                            (click)="onEdit(item)">
                             <i-bs name="pencil"></i-bs>
                         </button>
-                        <button
-                            type="button"
-                            title="Удалить с возможностью восстановления"
-                            class="btn btn-sm btn-outline-danger"
-                            (click)="onDelete(item)"
-                        >
+                        <button type="button" title="Удалить с возможностью восстановления"
+                            class="btn btn-sm btn-outline-danger" (click)="onDelete(item)">
                             <i-bs name="trash2"></i-bs>
                         </button>
 
-                        <button
-                            type="button"
-                            title="Удалить полностью"
-                            class="btn btn-sm btn-outline-danger"
-                            (click)="onCascadeDelete(item)"
-                        >
+                        <button type="button" title="Удалить полностью" class="btn btn-sm btn-outline-danger"
+                            (click)="onCascadeDelete(item)">
                             <i-bs name="trash"></i-bs>
                         </button>
 
-                        <button
-                            *ngIf="item.isDeleted"
-                            type="button"
-                            title="Восстановить"
-                            class="btn btn-sm btn-outline-success"
-                            (click)="onRestore(item)"
-                        >
+                        <button *ngIf="item.isDeleted" type="button" title="Восстановить"
+                            class="btn btn-sm btn-outline-success" (click)="onRestore(item)">
                             <i-bs name="arrow-counterclockwise"></i-bs>
                         </button>
                     </div>

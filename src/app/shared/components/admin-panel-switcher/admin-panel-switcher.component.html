@@ -135,34 +135,91 @@
                 </div>
 
                 <div *ngIf="field.type === 'variants'" class="variants-container">
+                    <div class="alert alert-info" *ngIf="isEditMode">
+                        <i-bs name="info-circle" class="me-2"></i-bs>
+                        Варианты продукта управляются отдельно. Изменения сохраняются автоматически.
+                    </div>
+                    <div class="alert alert-warning" *ngIf="!isEditMode">
+                        <i-bs name="exclamation-triangle" class="me-2"></i-bs>
+                        Сначала сохраните продукт, затем добавляйте варианты
+                    </div>
+
+                    <div class="form-check mb-3" *ngIf="isEditMode">
+                        <input class="form-check-input" type="checkbox" id="showDeletedVariants"
+                            [(ngModel)]="showDeletedVariants" [ngModelOptions]="{standalone: true}"
+                            (change)="onShowDeletedVariantsChange()" />
+                        <label class="form-check-label" for="showDeletedVariants">
+                            <i-bs name="eye" class="me-1"></i-bs>
+                            Показать удаленные варианты
+                        </label>
+                    </div>
+
                     <div formArrayName="variants">
-                        <div *ngFor="let variant of getVariantsFormArray()?.controls; let i = index" [formGroupName]="i"
-                            class="variant-row mb-2">
-                            <div class="row g-2">
-                                <div class="col-md-5">
-                                    <input type="number" class="form-control" placeholder="Объем (мл)"
-                                        formControlName="volume" />
-                                </div>
-                                <div class="col-md-5">
-                                    <input type="number" step="0.01" class="form-control"
-                                        placeholder="Себестоимость (р.)" formControlName="costPrice" />
-                                </div>
-                                <div class="col-md-5">
-                                    <input type="number" step="0.01" class="form-control" placeholder="Цена (р.)"
-                                        formControlName="price" />
-                                </div>
-                                <div class="col-md-2">
-                                    <button type="button" class="btn btn-outline-danger btn-sm w-100"
-                                        (click)="removeVariant(i)" [disabled]="getVariantsFormArray()?.length <= 1">
-                                        <i-bs name="trash"></i-bs>
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm variants-form-table">
+                                <thead class="table-light">
+                                    <tr>
+                                        <!-- <th>ID</th> -->
+                                        <th>Объем (мл)</th>
+                                        <th>Себестоимость (р.)</th>
+                                        <th>Цена (р.)</th>
+                                        <th>Статус</th>
+                                        <th style="width: 60px;">Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let variant of getVariantsFormArray()?.controls; let i = index"
+                                        [formGroupName]="i" [class.table-secondary]="variant.get('isDeleted')?.value">
+                                        <!-- <td class="align-middle">
+                                            <small class="text-muted font-monospace">
+                                                {{ getVariantId(i) || 'новый' }}
+                                            </small>
+                                        </td> -->
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm"
+                                                placeholder="Объем" formControlName="volume" readonly />
+                                        </td>
+                                        <td>
+                                            <input type="number" step="0.01" class="form-control form-control-sm"
+                                                placeholder="Себестоимость" formControlName="costPrice" readonly />
+                                        </td>
+                                        <td>
+                                            <input type="number" step="0.01" class="form-control form-control-sm"
+                                                placeholder="Цена" formControlName="price" readonly />
+                                        </td>
+                                        <td class="align-middle">
+                                            <span *ngIf="variant.get('isDeleted')?.value" class="badge bg-danger">
+                                                <i-bs name="trash" class="me-1"></i-bs>
+                                                Удален
+                                            </span>
+                                            <span *ngIf="!variant.get('isDeleted')?.value" class="badge bg-success">
+                                                <i-bs name="check-circle" class="me-1"></i-bs>
+                                                Активен
+                                            </span>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <button type="button" class="btn btn-outline-danger btn-sm"
+                                                (click)="removeVariant(i)" [disabled]="variant.get('isDeleted')?.value"
+                                                title="Удалить вариант">
+                                                <i-bs name="trash"></i-bs>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-outline-primary btn-sm mt-2" (click)="addVariant()">
+                    <button type="button" class="btn btn-outline-primary btn-sm mt-2" (click)="openVariantModal()"
+                        [disabled]="!isEditMode">
                         <i-bs name="plus"></i-bs> Добавить вариант
                     </button>
+                    <div class="text-muted small mt-2">
+                        <i-bs name="info-circle" class="me-1"></i-bs>
+                        Все поля только для чтения. Используйте модальное окно для создания новых вариантов.
+                        <br>
+                        <i-bs name="exclamation-circle" class="me-1"></i-bs>
+                        Удаленные варианты отображаются серым цветом и недоступны для редактирования.
+                    </div>
                 </div>
 
                 <div *ngIf="field.type === 'file' || field.type === 'image'" class="mb-3">
@@ -224,6 +281,81 @@
             <span *ngIf="deleting" class="spinner-border spinner-border-sm me-1" role="status"
                 aria-hidden="true"></span>
             Удалить
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #variantModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">
+            <i-bs name="plus-circle" class="me-2"></i-bs>
+            Добавить вариант продукта
+        </h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="variantForm" (ngSubmit)="saveVariant()">
+            <div class="mb-3">
+                <label for="variantVolume" class="form-label">
+                    <i-bs name="droplet" class="me-1"></i-bs>
+                    Объем (мл) <span class="text-danger">*</span>
+                </label>
+                <input type="number" class="form-control" id="variantVolume" formControlName="volume"
+                    placeholder="Введите объем в миллилитрах" min="1" step="1" />
+                <div class="invalid-feedback"
+                    *ngIf="variantForm.get('volume')?.invalid && variantForm.get('volume')?.touched">
+                    <div *ngIf="variantForm.get('volume')?.errors?.['required']">Объем обязателен для заполнения</div>
+                    <div *ngIf="variantForm.get('volume')?.errors?.['min']">Объем должен быть больше 0</div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="variantCostPrice" class="form-label">
+                    <i-bs name="currency-dollar" class="me-1"></i-bs>
+                    Себестоимость (руб.) <span class="text-danger">*</span>
+                </label>
+                <input type="number" class="form-control" id="variantCostPrice" formControlName="costPrice"
+                    placeholder="Введите себестоимость" min="0.01" step="0.01" />
+                <div class="invalid-feedback"
+                    *ngIf="variantForm.get('costPrice')?.invalid && variantForm.get('costPrice')?.touched">
+                    <div *ngIf="variantForm.get('costPrice')?.errors?.['required']">Себестоимость обязательна для
+                        заполнения</div>
+                    <div *ngIf="variantForm.get('costPrice')?.errors?.['min']">Себестоимость должна быть больше 0</div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="variantPrice" class="form-label">
+                    <i-bs name="tag" class="me-1"></i-bs>
+                    Цена продажи (руб.) <span class="text-danger">*</span>
+                </label>
+                <input type="number" class="form-control" id="variantPrice" formControlName="price"
+                    placeholder="Введите цену продажи" min="0.01" step="0.01" />
+                <div class="invalid-feedback"
+                    *ngIf="variantForm.get('price')?.invalid && variantForm.get('price')?.touched">
+                    <div *ngIf="variantForm.get('price')?.errors?.['required']">Цена обязательна для заполнения</div>
+                    <div *ngIf="variantForm.get('price')?.errors?.['min']">Цена должна быть больше 0</div>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <i-bs name="info-circle" class="me-2"></i-bs>
+                <strong>Примечание:</strong> Вариант будет добавлен и форма останется открытой для добавления следующих
+                вариантов.
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">
+            <i-bs name="x-circle" class="me-1"></i-bs>
+            Закрыть
+        </button>
+        <button type="button" class="btn btn-primary" (click)="saveVariant()"
+            [disabled]="variantForm.invalid || savingVariant">
+            <span *ngIf="savingVariant" class="spinner-border spinner-border-sm me-2" role="status"
+                aria-hidden="true"></span>
+            <i-bs name="check-lg" class="me-1" *ngIf="!savingVariant"></i-bs>
+            Создать вариант
         </button>
     </div>
 </ng-template>

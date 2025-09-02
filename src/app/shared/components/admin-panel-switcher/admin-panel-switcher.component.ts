@@ -14,6 +14,7 @@ import { CategoryService } from '../../services/category.service';
 import { CountryService } from '../../services/country.service';
 import { MaintenanceService } from '../../services/maintenance.service';
 import { PersonService } from '../../services/person.service';
+import { ProductVariantService } from '../../services/product-variant.service';
 import { ProductService } from '../../services/product.service';
 import { ProductScopeSevice } from '../../services/product_scope.service';
 import { ProductTypeSevice } from '../../services/product_type.service';
@@ -23,6 +24,7 @@ import { ImageUrlPipe } from '../../utils/image-url.pipe';
 import { AdminOrdersComponent } from '../admin-orders/admin-orders.component';
 import { GenericTableComponent } from '../generic-table/generic-table.component';
 import { StatisticsComponent } from '../statistics/statistics.component';
+import { CreateProductVariantSchema } from '../../schemas/product_variant.schema';
 
 interface ModelConfig {
     key: string;
@@ -61,6 +63,7 @@ interface ModelConfig {
 export class AdminPanelSwitcherComponent implements OnInit {
     @ViewChild('itemModal') itemModal!: TemplateRef<any>;
     @ViewChild('deleteModal') deleteModal!: TemplateRef<any>;
+    @ViewChild('variantModal') variantModal!: TemplateRef<any>;
 
     availableModels = [
         { key: 'orders', title: 'Заказы' },
@@ -75,12 +78,17 @@ export class AdminPanelSwitcherComponent implements OnInit {
     filteredData: any[] = [];
 
     itemForm!: FormGroup;
+    variantForm!: FormGroup;
     isEditMode = false;
+    editingItem: any = null;
     selectedItemId: string | null = null;
     saving = false;
+    savingVariant = false;
     deleting = false;
     cascadeDeleting = false;
     restoring = false;
+    currentProductId: string | null = null;
+    showDeletedVariants = false;
 
     loading = false;
     error: string | null = null;
@@ -107,10 +115,12 @@ export class AdminPanelSwitcherComponent implements OnInit {
         private maintenanceService: MaintenanceService,
         private toastService: ToastService,
         private statisticsService: StatisticsService,
+        private productVariantService: ProductVariantService,
     ) {}
 
     ngOnInit(): void {
         this.setupModelConfigs();
+        this.setupVariantForm();
         this.availableModels = Object.keys(this.modelConfigs).map(key => ({
             key,
             title: this.modelConfigs[key].title,
@@ -118,6 +128,14 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
         this.loadData();
         this.loadMaintenanceStatus();
+    }
+
+    setupVariantForm() {
+        this.variantForm = this.fb.group({
+            volume: ['', [Validators.required, Validators.min(1)]],
+            price: ['', [Validators.required, Validators.min(0.01)]],
+            costPrice: ['', [Validators.required, Validators.min(0.01)]]
+        });
     }
 
     loadMaintenanceStatus(): void {
@@ -488,11 +506,14 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
             if (item) {
                 if (field.key === 'variants') {
-                    value = item.variants || [{ volume: '', price: '' }];
+                    const allVariants = item.variants || [{ volume: '', costPrice: '', price: '' }];
+                    value = this.getFilteredVariants(allVariants);
                 } else if (field.key === 'categoryIds') {
                     value = item.categories?.map((cat: any) => cat.id) || [];
                 } else if (field.key === 'countryIds') {
                     value = item.countries?.map((country: any) => country.id) || [];
+                } else if (field.key === 'productScopeIds') {
+                    value = item.productScopes?.map((scope: any) => scope.id) || [];
                 } else {
                     value = field.key.includes('.') ? this.getNestedProperty(item, field.key) : item[field.key] || '';
                 }
@@ -512,9 +533,11 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 formControls[field.key] = this.fb.array(
                     value.map((variant: any) =>
                         this.fb.group({
+                            id: [variant.id || null],
                             volume: [variant.volume || '', Validators.required],
                             costPrice: [variant.costPrice || '', Validators.required],
                             price: [variant.price || '', Validators.required],
+                            isDeleted: [variant.isDeleted || false],
                         }),
                     ),
                 );
@@ -533,6 +556,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
     openAddModal() {
         this.isEditMode = false;
         this.selectedItemId = null;
+        this.editingItem = null;
         this.itemForm = this.buildForm();
         this.resetFileUploads();
         this.modalService.open(this.itemModal, { size: 'lg' });
@@ -541,6 +565,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
     editItem(item: any) {
         this.isEditMode = true;
         this.selectedItemId = item.id;
+        this.editingItem = item;
+        this.showDeletedVariants = false; // Reset checkbox when opening new item
         this.itemForm = this.buildForm(item);
         this.resetFileUploads();
         this.modalService.open(this.itemModal, { size: 'lg' });
@@ -581,26 +607,142 @@ export class AdminPanelSwitcherComponent implements OnInit {
         if (fileInput) {
             fileInput.value = '';
         }
-
-        delete this.filePreviewUrls[fieldKey];
-        delete this.selectedFiles[fieldKey];
+        return null;
     }
 
-    addVariant() {
-        const variantsArray = this.itemForm.get('variants') as any;
-        variantsArray.push(
-            this.fb.group({
-                volume: ['', Validators.required],
-                costPrice: ['', Validators.required],
-                price: ['', Validators.required],
-            }),
-        );
+    async reloadProductVariants() {
+        if (!this.currentProductId || this.currentModel !== 'products') return;
+
+        try {
+            const response = await this.productService.getById(this.currentProductId).toPromise();
+            if (response?.data) {
+                // Update the editing item with fresh data
+                this.editingItem = response.data;
+                
+                // Rebuild form with updated variants - filter based on showDeletedVariants
+                const filteredVariants = this.getFilteredVariants(response.data.variants || []);
+                this.updateVariantsInForm(filteredVariants);
+                
+                // Also update the main data array
+                const index = this.currentModelData.findIndex(item => item.id === this.currentProductId);
+                if (index !== -1) {
+                    this.currentModelData[index] = response.data;
+                    this.filteredData = [...this.currentModelData];
+                }
+            }
+        } catch (error) {
+            console.error('Error reloading product variants:', error);
+            this.toastService.show('Ошибка при обновлении данных продукта', 'error');
+        }
     }
 
-    removeVariant(index: number) {
-        const variantsArray = this.itemForm.get('variants') as any;
-        if (variantsArray.length > 1) {
+    getFilteredVariants(variants: any[]): any[] {
+        if (!variants) return [];
+        return this.showDeletedVariants ? variants : variants.filter(v => !v.isDeleted);
+    }
+
+    updateVariantsInForm(variants: any[]) {
+        const variantsArray = this.getVariantsFormArray();
+        if (!variantsArray) return;
+
+        // Clear existing controls
+        while (variantsArray.length !== 0) {
+            variantsArray.removeAt(0);
+        }
+
+        // Add updated variants
+        variants.forEach(variant => {
+            variantsArray.push(this.fb.group({
+                id: [variant.id || null],
+                volume: [variant.volume || '', Validators.required],
+                costPrice: [variant.costPrice || '', Validators.required],
+                price: [variant.price || '', Validators.required],
+                isDeleted: [variant.isDeleted || false]
+            }));
+        });
+    }
+
+    onShowDeletedVariantsChange() {
+        if (this.editingItem?.variants) {
+            const filteredVariants = this.getFilteredVariants(this.editingItem.variants);
+            this.updateVariantsInForm(filteredVariants);
+        }
+    }
+
+    openVariantModal() {
+        if (!this.editingItem?.id) {
+            this.toastService.show('Сначала сохраните продукт, затем добавляйте варианты', 'warning');
+            return;
+        }
+        
+        this.currentProductId = this.editingItem.id;
+        this.variantForm.reset();
+        this.modalService.open(this.variantModal, { backdrop: 'static' });
+    }
+
+    async saveVariant() {
+        if (this.variantForm.invalid || this.savingVariant || !this.currentProductId) {
+            Object.keys(this.variantForm.controls).forEach(key => {
+                this.variantForm.get(key)?.markAsTouched();
+            });
+            return;
+        }
+
+        this.savingVariant = true;
+
+        const variantData: CreateProductVariantSchema = {
+            ...this.variantForm.value,
+            productId: this.currentProductId
+        };
+
+        try {
+            const response = await this.productVariantService.create(variantData);
+            if (response?.status) {
+                this.toastService.show('Вариант успешно добавлен', 'success');
+                this.variantForm.reset();
+                await this.reloadProductVariants();
+            }
+        } catch (error) {
+            console.error('Error creating variant:', error);
+            this.toastService.show('Ошибка при создании варианта', 'error');
+        } finally {
+            this.savingVariant = false;
+        }
+    }
+
+    async removeVariant(index: number): Promise<void> {
+        if (this.currentModel !== 'products') return;
+
+        const variantsArray = this.getVariantsFormArray();
+        if (!variantsArray) return;
+
+        // Count non-deleted variants
+        const activeVariants = this.editingItem?.variants?.filter((v: any) => !v.isDeleted) || [];
+        if (activeVariants.length <= 1) {
+            this.toastService.show('Нельзя удалить последний активный вариант продукта', 'warning');
+            return;
+        }
+
+        const variantControl = variantsArray.at(index);
+        const variantId = variantControl?.get('id')?.value;
+
+        if (!variantId) {
+            // For new variants without ID, just remove from form
             variantsArray.removeAt(index);
+            return;
+        }
+
+        try {
+            const response = await this.productVariantService.delete(variantId).toPromise();
+            console.log("!!!!!!!!!!!")
+            console.log(response)
+            if (response?.status) {
+                this.toastService.show('Вариант удален', 'success');
+                await this.reloadProductVariants();
+            }
+        } catch (error) {
+            console.error('Error deleting variant:', error);
+            this.toastService.show('Ошибка при удалении варианта', 'error');
         }
     }
 
@@ -608,9 +750,17 @@ export class AdminPanelSwitcherComponent implements OnInit {
         return this.itemForm.get('variants') as any;
     }
 
+    getVariantId(index: number): string | null {
+        const variantsArray = this.itemForm.get('variants') as any;
+        if (variantsArray && variantsArray.at(index)) {
+            return variantsArray.at(index).get('id')?.value || null;
+        }
+        return null;
+    }
+
     async saveItem() {
         console.log(`Item Form Value:`, this.itemForm.value);
-        if (this.itemForm.invalid) {
+        if (this.itemForm.invalid || this.saving) {
             Object.keys(this.itemForm.controls).forEach(key => {
                 this.itemForm.get(key)?.markAsTouched();
             });
@@ -637,6 +787,10 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 }
             }
         });
+
+        if (this.currentModel === 'product') {
+            delete formData["variants"];
+        }
 
         Object.keys(this.selectedFiles).forEach(key => {
             if (this.selectedFiles[key] instanceof File) {

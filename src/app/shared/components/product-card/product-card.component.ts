@@ -48,7 +48,7 @@ export class ProductCardComponent implements OnInit {
         this.productService.getById(productId).subscribe({
             next: data => {
                 this.product = data.data;
-                // Set default variant
+                this.product.variants = this.product.variants.filter(v => !v.isDeleted);
                 if (this.product.variants && this.product.variants.length > 0) {
                     this.selectedVariantId = this.product.variants[0].id;
                 }

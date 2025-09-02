@@ -70,6 +70,11 @@ import {
     arrowDownUp,
     arrowUp,
     arrowDown,
+    checkCircle,
+    plusCircle,
+    currencyDollar,
+    tag,
+    checkLg,
 } from 'ngx-bootstrap-icons';
 
 const icons = {
@@ -85,6 +90,11 @@ const icons = {
     arrowUp,
     arrowDown,
     clockFill,
+    checkCircle,
+    plusCircle,
+    currencyDollar,
+    tag,
+    checkLg,
     creditCardFill,
     globe,
     phone,
