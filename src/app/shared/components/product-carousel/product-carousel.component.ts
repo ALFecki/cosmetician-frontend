@@ -25,10 +25,7 @@ export class ProductCarouselComponent implements OnInit {
 
     constructor(
         private productService: ProductService,
-        private cartService: CartService,
         private router: Router,
-        private modalService: NgbModal,
-        private toastService: ToastService,
     ) {}
 
     ngOnInit(): void {
@@ -73,7 +70,10 @@ export class ProductCarouselComponent implements OnInit {
     openProductDetails(product: ProductModel): void {
         console.log('!~!!!');
         console.log(product.id);
-        this.router.navigate(['/product', product.id], { onSameUrlNavigation: 'reload' });
+        this.router.navigate([`/product/${product.id}`], { onSameUrlNavigation: 'reload' })
+        .then(() => {
+    window.location.reload();
+  });
     }
 
     openProductDetailsWithScroll(product: ProductModel): void {

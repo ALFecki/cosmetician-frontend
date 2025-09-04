@@ -64,6 +64,7 @@ export class ProductCardComponent implements OnInit {
 
     selectVariant(variantId: string) {
         this.selectedVariantId = variantId;
+        this.prepareCharacteristics();
     }
 
     getSelectedVariant() {

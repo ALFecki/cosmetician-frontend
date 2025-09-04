@@ -2,7 +2,8 @@
     <div class="modal-header">
         <h4 class="modal-title">
             Корзина
-            <span class="cart-count" *ngIf="((getTotalItemsCount() | async) || 0) > 0">{{ getTotalItemsCount() | async }}</span>
+            <span class="cart-count" *ngIf="((getTotalItemsCount() | async) || 0) > 0">{{ getTotalItemsCount() | async
+                }}</span>
         </h4>
         <button type="button" class="btn-close" (click)="activeModal.dismiss()">
             <i-bs name="x-lg"></i-bs>
@@ -12,6 +13,7 @@
     <div class="modal-body">
         <ng-container *ngIf="cartItems$ | async as cartItems">
             <div *ngIf="cartItems.length === 0" class="empty-cart-modal">
+                <span class="empty-icon"><i-bs name="cart-x"></i-bs></span>
                 <h4>Корзина пуста</h4>
                 <p>Добавьте товары для оформления заказа</p>
                 <button class="btn btn-primary" (click)="continueShopping()">
@@ -23,9 +25,11 @@
             <div *ngIf="cartItems.length > 0" class="cart-items-container">
                 <div class="cart-item-modal" *ngFor="let item of cartItems; trackBy: trackByProductId">
                     <div class="item-info-row">
-                        <img [src]="item.product.image | imageUrl" [alt]="item.product.title" class="item-image-modal" />
+                        <img [src]="item.product.image | imageUrl" [alt]="item.product.title"
+                            class="item-image-modal" />
                         <div class="item-details-modal">
-                            <a [routerLink]="['/product', item.product.id]" class="item-title-modal" (click)="activeModal.close()">
+                            <a [routerLink]="['/product', item.product.id]" class="item-title-modal"
+                                (click)="activeModal.close()">
                                 {{ item.product.title }}
                             </a>
                             <div class="item-volume-modal">{{ item.variant.volume || '-' }} мл</div>
@@ -38,25 +42,16 @@
 
                     <div class="item-controls-row">
                         <div class="quantity-controls-modal">
-                            <button
-                                class="quantity-btn-modal"
-                                type="button"
-                                (click)="decreaseQuantity(item)"
-                                [disabled]="item.quantity <= 1"
-                            >
+                            <button class="quantity-btn-modal" type="button" (click)="decreaseQuantity(item)"
+                                [disabled]="item.quantity <= 1">
                                 -
                             </button>
-                            <input
-                                type="number"
-                                class="quantity-input-modal"
-                                [(ngModel)]="item.quantity"
-                                (change)="updateQuantity(item, $event)"
-                                min="1"
-                                max="99"
-                            />
+                            <input type="number" class="quantity-input-modal" [(ngModel)]="item.quantity"
+                                (change)="updateQuantity(item, $event)" min="1" max="99" />
                             <button class="quantity-btn-modal" type="button" (click)="increaseQuantity(item)">+</button>
                         </div>
-                        <div class="item-total-modal">{{ item.variant.price * item.quantity | number: '1.2-2' }} р.</div>
+                        <div class="item-total-modal">{{ item.variant.price * item.quantity | number: '1.2-2' }} р.
+                        </div>
                     </div>
                 </div>
             </div>

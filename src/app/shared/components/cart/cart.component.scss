@@ -285,6 +285,7 @@
         .summary-value {
             font-weight: 600;
             color: var(--gray-dark);
+            text-align: end;
 
             &.total-value {
                 font-size: 1.4rem;

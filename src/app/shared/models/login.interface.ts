@@ -11,7 +11,6 @@ export interface RegistrationData {
     surname: string | null;
     email: string;
     password: string;
-    confirmPassword: string;
 }
 
 export interface LoginResponse {

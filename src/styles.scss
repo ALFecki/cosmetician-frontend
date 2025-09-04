@@ -34,6 +34,11 @@
     --soft-pink: #f5e6ea; // Очень светлый розовый
     --powder-pink: #ead7dc; // Пудровый розовый
     --blush: #e6c7d0; // Румяный
+
+    // Градиенты для карточек
+    --card-gradient: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+    --hero-gradient: linear-gradient(135deg, var(--light-beige) 0%, var(--warm-white) 100%);
+    --accent-gradient: linear-gradient(135deg, var(--secondary) 0%, var(--tertiary) 100%);
 }
 
 $bs-font-sans-serif: 'Montserrat', sans-serif;

@@ -11,8 +11,8 @@ import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
 import { AboutMeComponent } from './components/about-me/about-me.component';
 
 @NgModule({
-    declarations: [HomeComponent, CarouselComponent, BenefitsComponent, AboutMeComponent],
-    imports: [CommonModule, RouterModule, IconsModule, ProductCarouselComponent, BrandsComponent, ImageUrlPipe],
-    exports: [HomeComponent, CarouselComponent, BenefitsComponent],
+    declarations: [HomeComponent, BenefitsComponent, AboutMeComponent],
+    imports: [CommonModule, CarouselComponent, RouterModule, IconsModule, ProductCarouselComponent, BrandsComponent, ImageUrlPipe],
+    exports: [HomeComponent, BenefitsComponent],
 })
 export class HomeModule {}

@@ -1,4 +1,6 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ImageUrlPipe } from '../../../../shared/utils/image-url.pipe';
 
 interface Slide {
     image: string;
@@ -12,6 +14,8 @@ interface Slide {
     selector: 'app-carousel',
     templateUrl: './carousel.component.html',
     styleUrls: ['./carousel.component.scss'],
+    standalone: true,
+    imports: [CommonModule, ImageUrlPipe],
 })
 export class CarouselComponent implements OnInit, OnDestroy {
     slides: Slide[] = [

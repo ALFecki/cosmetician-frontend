@@ -3,6 +3,7 @@ import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {Md5} from 'ts-md5';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { LoginData, RegistrationData } from '../../models/login.interface';
@@ -62,8 +63,10 @@ export class LoginComponent {
 
         const loginData = {
             email: this.email.value,
-            password: this.password.value,
+            password: Md5.hashStr(this.password.value!),
         } as LoginData;
+
+        console.log('Attempting login with data:', loginData);
 
         this.authService.login(loginData).subscribe({
             next: response => {
@@ -141,21 +144,21 @@ export class LoginComponent {
         this.registrationError = null;
         this.isRegistering = true;
 
-        const registrationData = {
-            email: this.registrationForm.get('email')?.value,
-            phone: this.registrationForm.get('phone')?.value,
-            password: this.registrationForm.get('password')?.value,
-            firstName: this.registrationForm.get('firstName')?.value,
-            secondName: this.registrationForm.get('secondName')?.value,
-            surname: this.registrationForm.get('surname')?.value,
-            confirmPassword: this.registrationForm.get('confirmPassword')?.value,
-        } as RegistrationData;
-
-        if (registrationData.password !== registrationData.confirmPassword) {
+        if (this.registrationForm.get('confirmPassword')?.value !== this.registrationForm.get('password')?.value) {
             this.registrationError = 'Пароли не совпадают';
             this.isRegistering = false;
             return;
         }
+
+        const registrationData = {
+            email: this.registrationForm.get('email')?.value,
+            phone: this.registrationForm.get('phone')?.value,
+            password: Md5.hashStr(this.registrationForm.get('password')?.value),
+            firstName: this.registrationForm.get('firstName')?.value,
+            secondName: this.registrationForm.get('secondName')?.value,
+            surname: this.registrationForm.get('surname')?.value,
+        } as RegistrationData;
+
 
         this.authService
             .register(registrationData)
