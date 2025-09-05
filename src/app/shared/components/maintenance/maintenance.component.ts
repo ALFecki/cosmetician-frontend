@@ -8,6 +8,7 @@ import { AuthService } from '../../services/auth.service';
 import { MaintenanceService } from '../../services/maintenance.service';
 import { ToastService } from '../../services/toast.service';
 import { firstValueFrom } from 'rxjs';
+import { Md5 } from 'ts-md5';
 
 @Component({
     selector: 'app-maintenance',
@@ -50,7 +51,7 @@ export class MaintenanceComponent implements OnInit {
 
         const loginData: LoginData = {
             email: this.loginForm.get('email')?.value,
-            password: this.loginForm.get('password')?.value,
+            password: Md5.hashStr(this.loginForm.get('password')?.value),
         };
 
         this.authService.login(loginData).subscribe({
