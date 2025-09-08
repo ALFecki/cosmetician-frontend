@@ -177,7 +177,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'fullTitle', label: 'Полное название', type: 'text', required: false },
                 { key: 'description', label: 'Описание', type: 'textarea', required: true },
                 { key: 'image', label: 'Изображение', type: 'image', required: false },
-                { key: 'variants', label: 'Варианты (Объем-Себестоимость-Цена)', type: 'variants', required: true },
+                { key: 'variants', label: 'Варианты (Объем-Себестоимость-Цена)', type: 'variants', required: false },
                 { key: 'categoryIds', label: 'Категории', type: 'multiselect', required: true },
                 { key: 'brandId', label: 'Бренд', type: 'select', required: true },
                 { key: 'countryIds', label: 'Страны производители', type: 'multiselect', required: false },
@@ -209,7 +209,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
         this.modelConfigs['productTypes'] = {
             key: 'productTypes',
             title: 'Типы продуктов',
-            service: this.productService,
+            service: this.productTypeService,
             fields: [
                 { key: 'title', label: 'Название', type: 'text', required: true },
                 { key: 'description', label: 'Описание', type: 'textarea', required: false },
@@ -227,7 +227,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
         this.modelConfigs['productScopes'] = {
             key: 'productScopes',
             title: 'Области применения',
-            service: this.productService,
+            service: this.productScopeService,
             fields: [
                 { key: 'title', label: 'Название', type: 'text', required: true },
                 { key: 'description', label: 'Описание', type: 'textarea', required: false },
@@ -235,7 +235,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
             columns: [
                 { key: 'id', title: 'ID' },
                 { key: 'title', title: 'Название' },
-                { key: 'description', title: 'Описание' },
+                { key: 'description', title: 'Описание'},
                 { key: 'isDeleted', title: 'Удален' },
                 { key: 'createdAt', title: 'Дата создания', type: 'date' },
                 { key: 'updatedAt', title: 'Дата обновления', type: 'date' },
@@ -519,15 +519,11 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 }
             } else {
                 if (field.key === 'variants') {
-                    value = [{ volume: '', costPrice: '', price: '' }];
+                    value = [];
                 } else if (field.type === 'multiselect') {
                     value = [];
                 }
             }
-
-            const validators = [];
-            if (field.required) validators.push(Validators.required);
-            if (field.type === 'email') validators.push(Validators.email);
 
             if (field.key === 'variants') {
                 formControls[field.key] = this.fb.array(
@@ -542,6 +538,9 @@ export class AdminPanelSwitcherComponent implements OnInit {
                     ),
                 );
             } else {
+                            const validators = [];
+            if (field.required) validators.push(Validators.required);
+            if (field.type === 'email') validators.push(Validators.email);
                 formControls[field.key] = [value, validators];
             }
         });
@@ -780,7 +779,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
             const value = this.itemForm.value[key];
             if (value !== null && value !== undefined) {
-                if (key === 'variants' || key === 'categoryIds' || key === 'countryIds') {
+                if (key === 'variants' || key === 'categoryIds' || key === 'countryIds' || key === 'productScopeIds') {
                     formData[key] = JSON.stringify(value);
                 } else if (typeof value === 'object' && !Array.isArray(value)) {
                     formData[key] = JSON.stringify(value);
