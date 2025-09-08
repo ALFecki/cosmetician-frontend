@@ -4,6 +4,7 @@ import { CartModel } from '../models/cart.model';
 import { AuthService } from './auth.service';
 import { OrderService } from './order.service';
 import { OrderModel } from '../models/order.model';
+import { LoginResponse } from '../models/login.interface';
 
 @Injectable({
     providedIn: 'root',
@@ -73,8 +74,8 @@ export class CartService implements OnDestroy {
     }
 
     private async loadInitialCart(): Promise<void> {
-        this.authService.checkAuth().subscribe(
-            async isAuthenticated => {
+        this.authService.checkAuth().subscribe({
+            next: async (isAuthenticated: LoginResponse | null) => {
                 if (isAuthenticated) {
                     const order = await this.orderService.getLastNotCheckedOrder().toPromise();
                     if (order) {
@@ -89,11 +90,14 @@ export class CartService implements OnDestroy {
                     }
                 }
             },
-            error => {
+            error: (error) => {
                 console.error('Error loading initial cart: ', error);
                 return [];
             },
-        );
+            complete: () => {
+                // this.loadInitialCart();
+            }
+        });
     }
 
     getCartItems(): Observable<CartModel[]> {

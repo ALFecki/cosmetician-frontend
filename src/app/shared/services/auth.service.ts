@@ -1,6 +1,8 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
+import { SsrCookieService } from 'ngx-cookie-service-ssr';
+import { BehaviorSubject, catchError, map, Observable, of, tap, throwError } from 'rxjs';
+import { Md5 } from 'ts-md5';
 import { environment } from '../../../environments/environment';
 import { Claims, LoginData, LoginResponse, RegistrationData } from '../models/login.interface';
 import { PersonModel } from '../models/person.model';
@@ -15,7 +17,7 @@ export class AuthService {
     private userClaims: BehaviorSubject<Claims | null> = new BehaviorSubject<Claims | null>(null);
     private currentUser: BehaviorSubject<PersonModel | null> = new BehaviorSubject<PersonModel | null>(null);
 
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient, private cookieService: SsrCookieService) {}
 
     login(loginData: LoginData): Observable<Claims> {
         return this.http.post<Claims>(`${environment.server_url}/login`, loginData, { withCredentials: true }).pipe(
@@ -46,6 +48,36 @@ export class AuthService {
         );
     }
 
+    forgotPassword(email: string): Observable<any> {
+        return this.http.post(`${environment.server_url}/auth/forgot_password`, { email }).pipe(
+            catchError(error => {
+                console.error('Forgot password error:', error);
+                return throwError(() => error);
+            })
+        );
+    }
+
+    resetPassword(token: string, newPassword: string): Observable<any> {
+        return this.http.post(`${environment.server_url}/auth/reset_password`, { 
+            token, 
+            newPassword: Md5.hashStr(newPassword)
+        }).pipe(
+            catchError(error => {
+                console.error('Reset password error:', error);
+                return throwError(() => error);
+            })
+        );
+    }
+
+    verifyResetToken(token: string): Observable<any> {
+        return this.http.get(`${environment.server_url}/auth/verify_reset_token/${token}`).pipe(
+            catchError(error => {
+                console.error('Verify reset token error:', error);
+                return throwError(() => error);
+            })
+        );
+    }
+
     getCsrfToken(): string {
         return this.csrfToken.value;
     }
@@ -59,6 +91,11 @@ export class AuthService {
     }
 
     checkAuth(): Observable<LoginResponse | null> {
+        console.log('Checking authentication status...');
+        console.log('Platform ID:', this.cookieService.check('jwt'));
+        if (this.cookieService.check('jwt') === false) {
+            return of(null);
+        }
         return this.http.get<LoginResponse>(`${environment.server_url}/check_auth`, { withCredentials: true }).pipe(
             tap((response: LoginResponse) => {
                 // console.log('Auth check response:', response);
@@ -66,10 +103,10 @@ export class AuthService {
                 this.userClaims.next(response.claims as Claims);
                 this.currentUser.next(response.user);
             }),
-            catchError(() => {
-                // console.error('Auth check error:', error);
-                return of(null);
-            }),
+            // catchError((error) => {
+            //     console.error('Auth check error:', error);
+            //     return of(null);
+            // }),
         );
     }
 
@@ -111,6 +148,7 @@ export class AuthService {
                 if (!claims) return false;
                 return claims.claims.is_admin === true;
             }),
+            catchError(() => of(false)),
         );
     }
 }

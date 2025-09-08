@@ -7,9 +7,15 @@
         <div class="maintenance-message">
             <h1 class="display-4 mb-4">Технические работы</h1>
             <p class="lead mb-4">
-                В настоящее время проводятся технические работы по улучшению нашего сервиса. Приносим извинения за временные неудобства.
+                В настоящее время проводятся технические работы по улучшению нашего сервиса. Приносим извинения за
+                временные неудобства.
             </p>
-            <p class="text-muted mb-5">Ожидаемое время завершения работ: в ближайшее время.</p>
+            <div *ngIf="timeLeft" class="text-center mb-5">
+                <p class="text-muted mb-2">Ожидаемое время завершения работ:</p>
+                <div class="countdown-display">
+                    <span class="countdown-time">{{ formatTime(timeLeft | async) }}</span>
+                </div>
+            </div>
         </div>
 
         <div class="admin-login-section">
@@ -32,14 +38,9 @@
                                 <i-bs name="envelope" class="me-1"></i-bs>
                                 Email
                             </label>
-                            <input
-                                type="email"
-                                class="form-control"
-                                id="email"
-                                formControlName="email"
+                            <input type="email" class="form-control" id="email" formControlName="email"
                                 placeholder="admin@example.com"
-                                [class.is-invalid]="email?.invalid && (email?.dirty || email?.touched)"
-                            />
+                                [class.is-invalid]="email?.invalid && (email?.dirty || email?.touched)" />
                             <div class="invalid-feedback" *ngIf="email?.invalid && (email?.dirty || email?.touched)">
                                 <div *ngIf="email?.errors?.['required']">Email обязателен</div>
                                 <div *ngIf="email?.errors?.['email']">Некорректный email</div>
@@ -51,22 +52,21 @@
                                 <i-bs name="lock" class="me-1"></i-bs>
                                 Пароль
                             </label>
-                            <input
-                                type="password"
-                                class="form-control"
-                                id="password"
-                                formControlName="password"
+                            <input type="password" class="form-control" id="password" formControlName="password"
                                 placeholder="Введите пароль"
-                                [class.is-invalid]="password?.invalid && (password?.dirty || password?.touched)"
-                            />
-                            <div class="invalid-feedback" *ngIf="password?.invalid && (password?.dirty || password?.touched)">
+                                [class.is-invalid]="password?.invalid && (password?.dirty || password?.touched)" />
+                            <div class="invalid-feedback"
+                                *ngIf="password?.invalid && (password?.dirty || password?.touched)">
                                 <div *ngIf="password?.errors?.['required']">Пароль обязателен</div>
-                                <div *ngIf="password?.errors?.['minlength']">Пароль должен содержать минимум 6 символов</div>
+                                <div *ngIf="password?.errors?.['minlength']">Пароль должен содержать минимум 6 символов
+                                </div>
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100" [disabled]="loginForm.invalid || isLoggingIn">
-                            <span *ngIf="isLoggingIn" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <button type="submit" class="btn btn-primary w-100"
+                            [disabled]="loginForm.invalid || isLoggingIn">
+                            <span *ngIf="isLoggingIn" class="spinner-border spinner-border-sm me-2" role="status"
+                                aria-hidden="true"></span>
                             <i-bs *ngIf="!isLoggingIn" name="box-arrow-in-right" class="me-2"></i-bs>
                             {{ isLoggingIn ? 'Вход...' : 'Войти' }}
                         </button>

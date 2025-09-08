@@ -95,6 +95,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
     searchText = '';
 
     isMaintenanceMode = false;
+    maintenanceDuration: number | null = null;
     maintenanceLoading = false;
 
     private modelConfigs: Record<string, ModelConfig> = {};
@@ -140,7 +141,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
     loadMaintenanceStatus(): void {
         this.maintenanceService.getMaintenanceStatus().subscribe(status => {
-            this.isMaintenanceMode = status;
+            this.isMaintenanceMode = status.enabled;
+            this.maintenanceDuration = status.ttl || null;
         });
     }
 
@@ -149,7 +151,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
         const operation = this.isMaintenanceMode
             ? this.maintenanceService.disableMaintenanceMode()
-            : this.maintenanceService.enableMaintenanceMode();
+            : this.maintenanceService.enableMaintenanceMode(this.maintenanceDuration || undefined);
 
         operation.subscribe({
             next: () => {

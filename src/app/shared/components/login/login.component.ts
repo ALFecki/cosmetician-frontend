@@ -3,8 +3,8 @@ import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import {Md5} from 'ts-md5';
 import { catchError, throwError } from 'rxjs';
+import { Md5 } from 'ts-md5';
 import { environment } from '../../../../environments/environment';
 import { LoginData, RegistrationData } from '../../models/login.interface';
 import { AuthService } from '../../services/auth.service';
@@ -38,12 +38,20 @@ export class LoginComponent {
         personalDataConsent: new FormControl(false, [Validators.requiredTrue]),
     });
 
+    forgotPasswordForm: FormGroup = new FormGroup({
+        email: new FormControl('', [Validators.required, Validators.email]),
+    });
+
     @ViewChild('registerModal') registerModal!: TemplateRef<unknown>;
+    @ViewChild('forgotPasswordModal') forgotPasswordModal!: TemplateRef<unknown>;
 
     registrationError: string | null = null;
     loginError: string | null = null;
+    forgotPasswordError: string | null = null;
+    forgotPasswordSuccess: string | null = null;
     isLoggingIn = false;
     isRegistering = false;
+    isSendingReset = false;
 
     constructor(
         private authService: AuthService,
@@ -197,6 +205,55 @@ export class LoginComponent {
                     this.isRegistering = false;
                 },
             });
+    }
+
+    openForgotPasswordModal(content: unknown) {
+        this.forgotPasswordForm.reset();
+        this.forgotPasswordError = null;
+        this.forgotPasswordSuccess = null;
+        this.modalService.open(content, {
+            size: 'md',
+            centered: true,
+            scrollable: true,
+            windowClass: 'cosmetician-modal',
+        });
+    }
+
+    closeForgotPasswordModal() {
+        this.modalService.dismissAll();
+    }
+
+    sendPasswordReset() {
+        if (this.forgotPasswordForm.invalid || this.isSendingReset) {
+            this.forgotPasswordForm.markAllAsTouched();
+            return;
+        }
+
+        this.forgotPasswordError = null;
+        this.forgotPasswordSuccess = null;
+        this.isSendingReset = true;
+
+        const email = this.forgotPasswordForm.get('email')?.value;
+
+        this.authService.forgotPassword(email).subscribe({
+            next: (response) => {
+                console.log('Password reset email sent:', response);
+                this.forgotPasswordSuccess = 'Ссылка для восстановления пароля отправлена на ваш email. Проверьте почту.';
+                this.toastService.show('Ссылка для восстановления отправлена', 'success');
+                this.isSendingReset = false;
+            },
+            error: (error) => {
+                console.error('Password reset failed:', error);
+                if (error.status === 404) {
+                    this.forgotPasswordError = 'Пользователь с таким email не найден';
+                } else if (error.status === 0) {
+                    this.forgotPasswordError = 'Не удалось подключиться к серверу';
+                } else {
+                    this.forgotPasswordError = `Ошибка: ${error.message || 'Неизвестная ошибка'}`;
+                }
+                this.isSendingReset = false;
+            }
+        });
     }
 
     getPersonalDataUrl(): string {

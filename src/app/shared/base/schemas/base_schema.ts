@@ -15,9 +15,13 @@ export interface SingleResponse<Model> {
     data: Model;
 }
 
-export interface MaintenanceResponse {
-    status: string;
+export interface MaintenanceStatus {
     enabled: boolean;
+    ttl: number | undefined;
+}
+
+export interface MaintenanceResponse extends MaintenanceStatus {
+    status: string;
 }
 
 export interface ErrorResponse {
