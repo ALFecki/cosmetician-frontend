@@ -12,10 +12,9 @@ import { ProductCarouselComponent } from '../product-carousel/product-carousel.c
 
 @Component({
     selector: 'app-product-card',
-    standalone: true,
     imports: [CommonModule, RouterModule, ProductCarouselComponent, IconsModule, ImageUrlPipe],
     templateUrl: './product-card.component.html',
-    styleUrl: './product-card.component.scss',
+    styleUrl: './product-card.component.scss'
 })
 export class ProductCardComponent implements OnInit {
     product!: ProductModel;

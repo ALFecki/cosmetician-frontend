@@ -48,7 +48,6 @@ interface ModelConfig {
     selector: 'app-admin-panel-switcher',
     templateUrl: './admin-panel-switcher.component.html',
     styleUrl: './admin-panel-switcher.component.scss',
-    standalone: true,
     imports: [
         CommonModule,
         FormsModule,
@@ -58,7 +57,7 @@ interface ModelConfig {
         GenericTableComponent,
         IconsModule,
         ImageUrlPipe,
-    ],
+    ]
 })
 export class AdminPanelSwitcherComponent implements OnInit {
     @ViewChild('itemModal') itemModal!: TemplateRef<any>;

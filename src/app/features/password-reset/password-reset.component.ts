@@ -9,8 +9,7 @@ import { ToastService } from '../../shared/services/toast.service';
     selector: 'app-password-reset',
     templateUrl: './password-reset.component.html',
     styleUrl: './password-reset.component.scss',
-    standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule]
 })
 export class PasswordResetComponent implements OnInit {
     resetForm: FormGroup = new FormGroup({

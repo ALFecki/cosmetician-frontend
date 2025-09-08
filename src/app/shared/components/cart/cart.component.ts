@@ -16,10 +16,9 @@ import { ProductModalComponent } from '../product-modal/product-modal.component'
 
 @Component({
     selector: 'app-cart',
-    standalone: true,
     imports: [CommonModule, FormsModule, RouterModule, IconsModule, ImageUrlPipe],
     templateUrl: './cart.component.html',
-    styleUrl: './cart.component.scss',
+    styleUrl: './cart.component.scss'
 })
 export class CartComponent {
     cartItems$: Observable<CartModel[]> = new Observable<CartModel[]>();

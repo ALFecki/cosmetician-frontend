@@ -10,10 +10,9 @@ import { CategoryService } from '../../services/category.service';
 
 @Component({
     selector: 'app-footer',
-    standalone: true,
     imports: [CommonModule, RouterModule, IconsModule],
     templateUrl: './footer.component.html',
-    styleUrl: './footer.component.scss',
+    styleUrl: './footer.component.scss'
 })
 export class FooterComponent {
     categories$: Observable<CategoryModel[]>;

@@ -12,10 +12,9 @@ import { ToastService } from '../../services/toast.service';
 
 @Component({
     selector: 'app-maintenance',
-    standalone: true,
     imports: [CommonModule, ReactiveFormsModule, IconsModule],
     templateUrl: './maintenance.component.html',
-    styleUrl: './maintenance.component.scss',
+    styleUrl: './maintenance.component.scss'
 })
 export class MaintenanceComponent implements OnInit {
     loginForm: FormGroup;

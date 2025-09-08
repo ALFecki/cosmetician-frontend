@@ -12,8 +12,7 @@ import { ImageUrlPipe } from '../../utils/image-url.pipe';
     selector: 'app-product-carousel',
     templateUrl: './product-carousel.component.html',
     styleUrls: ['./product-carousel.component.scss'],
-    standalone: true,
-    imports: [CommonModule, ImageUrlPipe],
+    imports: [CommonModule, ImageUrlPipe]
 })
 export class ProductCarouselComponent implements OnInit {
     products: ProductModel[] = [];

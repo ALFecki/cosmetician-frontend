@@ -11,10 +11,9 @@ import { CountryService } from '../../services/country.service';
 
 @Component({
     selector: 'app-product-filter',
-    standalone: true,
     imports: [CommonModule, FormsModule],
     templateUrl: './product-filter.component.html',
-    styleUrls: ['./product-filter.component.scss'],
+    styleUrls: ['./product-filter.component.scss']
 })
 export class ProductFilterComponent implements OnInit {
     @Output() filterChange = new EventEmitter<FilterProductSchema>();

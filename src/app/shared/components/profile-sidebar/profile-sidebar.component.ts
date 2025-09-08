@@ -11,8 +11,7 @@ import { IconsModule } from '../../base/icons/icons.module';
     selector: 'app-profile-sidebar',
     templateUrl: './profile-sidebar.component.html',
     styleUrl: './profile-sidebar.component.scss',
-    standalone: true,
-    imports: [CommonModule, RouterModule, IconsModule],
+    imports: [CommonModule, RouterModule, IconsModule]
 })
 export class ProfileSidebarComponent implements OnInit {
     currentUser: Observable<PersonModel | null>;

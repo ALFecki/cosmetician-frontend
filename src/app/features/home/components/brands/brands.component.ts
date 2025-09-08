@@ -7,10 +7,9 @@ import { ImageUrlPipe } from '../../../../shared/utils/image-url.pipe';
 
 @Component({
     selector: 'app-brands',
-    standalone: true,
     imports: [CommonModule, RouterModule, ImageUrlPipe],
     templateUrl: './brands.component.html',
-    styleUrl: './brands.component.scss',
+    styleUrl: './brands.component.scss'
 })
 export class BrandsComponent implements OnInit {
     brands: BrandModel[] = [];

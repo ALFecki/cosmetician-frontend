@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { SsrCookieService } from 'ngx-cookie-service-ssr';
+// import { SsrCookieService } from 'ngx-cookie-service-ssr';
 import { BehaviorSubject, catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { Md5 } from 'ts-md5';
 import { environment } from '../../../environments/environment';
@@ -17,7 +17,9 @@ export class AuthService {
     private userClaims: BehaviorSubject<Claims | null> = new BehaviorSubject<Claims | null>(null);
     private currentUser: BehaviorSubject<PersonModel | null> = new BehaviorSubject<PersonModel | null>(null);
 
-    constructor(private http: HttpClient, private cookieService: SsrCookieService) {}
+    constructor(private http: HttpClient,
+        //  private cookieService: SsrCookieService
+        ) {}
 
     login(loginData: LoginData): Observable<Claims> {
         return this.http.post<Claims>(`${environment.server_url}/login`, loginData, { withCredentials: true }).pipe(
@@ -92,10 +94,10 @@ export class AuthService {
 
     checkAuth(): Observable<LoginResponse | null> {
         console.log('Checking authentication status...');
-        console.log('Platform ID:', this.cookieService.check('jwt'));
-        if (this.cookieService.check('jwt') === false) {
-            return of(null);
-        }
+        // console.log('Platform ID:', this.cookieService.check('jwt'));
+        // if (this.cookieService.check('jwt') === false) {
+        //     return of(null);
+        // }
         return this.http.get<LoginResponse>(`${environment.server_url}/check_auth`, { withCredentials: true }).pipe(
             tap((response: LoginResponse) => {
                 // console.log('Auth check response:', response);

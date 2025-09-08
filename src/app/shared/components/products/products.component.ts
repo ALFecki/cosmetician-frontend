@@ -17,10 +17,9 @@ import { ProductModalComponent } from '../product-modal/product-modal.component'
 @Component({
     selector: 'app-products',
     providers: [],
-    standalone: true,
     imports: [CommonModule, PaginationComponent, ProductFilterComponent, ImageUrlPipe],
     templateUrl: './products.component.html',
-    styleUrl: './products.component.scss',
+    styleUrl: './products.component.scss'
 })
 export class ProductsComponent implements OnInit {
     products$!: Observable<ProductModel[]>;

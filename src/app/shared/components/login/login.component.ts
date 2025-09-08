@@ -14,8 +14,7 @@ import { ToastService } from '../../services/toast.service';
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss',
-    standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule]
 })
 export class LoginComponent {
     @Input() loginForm: FormGroup = new FormGroup({});

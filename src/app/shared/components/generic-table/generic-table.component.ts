@@ -6,10 +6,9 @@ import { ImageUrlPipe } from '../../utils/image-url.pipe';
 
 @Component({
     selector: 'app-generic-table',
-    standalone: true,
     imports: [CommonModule, IconsModule, ImageUrlPipe],
     templateUrl: './generic-table.component.html',
-    styleUrls: ['./generic-table.component.scss'],
+    styleUrls: ['./generic-table.component.scss']
 })
 export class GenericTableComponent {
     @ViewChild('tableContainer') tableContainer!: ElementRef;

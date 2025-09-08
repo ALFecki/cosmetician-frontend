@@ -14,8 +14,7 @@ import { ToastService } from '../../shared/services/toast.service';
     selector: 'app-user-profile',
     templateUrl: './user-profile.component.html',
     styleUrl: './user-profile.component.scss',
-    standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, ProfileSidebarComponent],
+    imports: [CommonModule, ReactiveFormsModule, ProfileSidebarComponent]
 })
 export class UserProfileComponent implements OnInit {
     profileForm!: FormGroup;

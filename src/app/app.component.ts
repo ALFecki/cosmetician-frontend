@@ -11,15 +11,13 @@ import { ToastComponent } from './shared/components/toast/toast.component';
 import { MaintenanceService } from './shared/services/maintenance.service';
 import { AuthInterceptor } from './shared/utils/auth.interceptor';
 import { SnakeToCamelInterceptor } from './shared/utils/case.interceptor';
-import { MaintenanceComponent } from './shared/components/maintenance/maintenance.component';
 import { AuthService } from './shared/services/auth.service';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
-    standalone: true,
-    imports: [CommonModule, NgbModule, RouterOutlet, NavbarComponent, HomeModule, FooterComponent, ToastComponent, MaintenanceComponent],
+    imports: [CommonModule, NgbModule, RouterOutlet, NavbarComponent, HomeModule, FooterComponent, ToastComponent],
     providers: [
         {
             provide: HTTP_INTERCEPTORS,
@@ -31,7 +29,7 @@ import { AuthService } from './shared/services/auth.service';
             useClass: SnakeToCamelInterceptor,
             multi: true,
         },
-    ],
+    ]
 })
 export class AppComponent implements OnInit {
     title = 'proskin-frontend';

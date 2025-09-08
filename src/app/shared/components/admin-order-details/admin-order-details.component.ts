@@ -19,8 +19,7 @@ import { ProductModalComponent } from '../product-modal/product-modal.component'
     selector: 'app-admin-order-details',
     templateUrl: './admin-order-details.component.html',
     styleUrl: './admin-order-details.component.scss',
-    standalone: true,
-    imports: [CommonModule, RouterModule, ImageUrlPipe, IconsModule],
+    imports: [CommonModule, RouterModule, ImageUrlPipe, IconsModule]
 })
 export class AdminOrderDetailsComponent implements OnInit {
     order: BehaviorSubject<OrderModel | null> = new BehaviorSubject<OrderModel | null>(null);

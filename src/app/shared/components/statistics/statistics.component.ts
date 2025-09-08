@@ -19,10 +19,9 @@ import { CategoryModel } from '../../models/category.model';
 
 @Component({
     selector: 'app-statistics',
-    standalone: true,
     imports: [CommonModule, ReactiveFormsModule, IconsModule],
     templateUrl: './statistics.component.html',
-    styleUrl: './statistics.component.scss',
+    styleUrl: './statistics.component.scss'
 })
 export class StatisticsComponent implements OnInit {
     filterForm!: FormGroup;

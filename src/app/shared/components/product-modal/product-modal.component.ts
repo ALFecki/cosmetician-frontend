@@ -13,10 +13,9 @@ import { ImageUrlPipe } from '../../utils/image-url.pipe';
 
 @Component({
     selector: 'app-product-modal',
-    standalone: true,
     imports: [CommonModule, IconsModule, ImageUrlPipe],
     templateUrl: './product-modal.component.html',
-    styleUrl: './product-modal.component.scss',
+    styleUrl: './product-modal.component.scss'
 })
 export class ProductModalComponent {
     selectedProduct: ProductModel | null = null;

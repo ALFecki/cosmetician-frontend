@@ -15,8 +15,7 @@ import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
     selector: 'app-order-details',
     templateUrl: './order-details.component.html',
     styleUrl: './order-details.component.scss',
-    standalone: true,
-    imports: [CommonModule, RouterModule, ProfileSidebarComponent, ImageUrlPipe],
+    imports: [CommonModule, RouterModule, ProfileSidebarComponent, ImageUrlPipe]
 })
 export class OrderDetailsComponent implements OnInit {
     order: BehaviorSubject<OrderModel | null> = new BehaviorSubject<OrderModel | null>(null);

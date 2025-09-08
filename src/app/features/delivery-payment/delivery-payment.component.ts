@@ -5,9 +5,8 @@ import { IconsModule } from '../../shared/base/icons/icons.module';
 
 @Component({
     selector: 'app-delivery-payment',
-    standalone: true,
     imports: [CommonModule, RouterModule, IconsModule],
     templateUrl: './delivery-payment.component.html',
-    styleUrl: './delivery-payment.component.scss',
+    styleUrl: './delivery-payment.component.scss'
 })
 export class DeliveryPaymentComponent {}
