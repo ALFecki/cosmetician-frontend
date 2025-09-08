@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,7 +14,7 @@ import { ToastService } from '../../services/toast.service';
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss',
-    imports: [CommonModule, ReactiveFormsModule]
+    imports: [ReactiveFormsModule]
 })
 export class LoginComponent {
     @Input() loginForm: FormGroup = new FormGroup({});

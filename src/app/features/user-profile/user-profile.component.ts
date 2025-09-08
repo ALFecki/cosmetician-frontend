@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -14,7 +14,7 @@ import { ToastService } from '../../shared/services/toast.service';
     selector: 'app-user-profile',
     templateUrl: './user-profile.component.html',
     styleUrl: './user-profile.component.scss',
-    imports: [CommonModule, ReactiveFormsModule, ProfileSidebarComponent]
+    imports: [ReactiveFormsModule, ProfileSidebarComponent]
 })
 export class UserProfileComponent implements OnInit {
     profileForm!: FormGroup;

@@ -1,26 +1,32 @@
 <div class="brands-container container mt-5 mb-5">
-    <div class="d-flex justify-content-center align-items-center mb-4">
-        <h2 class="text-center section-title">Мы работаем с брендами</h2>
-    </div>
+  <div class="d-flex justify-content-center align-items-center mb-4">
+    <h2 class="text-center section-title">Мы работаем с брендами</h2>
+  </div>
 
-    <div *ngIf="loading" class="text-center my-4">
-        <div class="spinner-border" role="status">
-            <span class="visually-hidden">Загрузка...</span>
-        </div>
+  @if (loading) {
+    <div class="text-center my-4">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Загрузка...</span>
+      </div>
     </div>
+  }
 
-    <div *ngIf="error" class="alert alert-danger" role="alert">
-        {{ error }}
+  @if (error) {
+    <div class="alert alert-danger" role="alert">
+      {{ error }}
     </div>
+  }
 
-    <div class="brands-row row justify-content-center align-items-center">
-        <div class="col-6 col-sm-4 col-md-3 mb-4" *ngFor="let brand of brands">
-            <a [routerLink]="['/brand', brand.id]" class="brand-link">
-                <div class="brand-card">
-                    <img [src]="brand.image || getPlaceholderImage() | imageUrl" [alt]="brand.title" class="brand-logo img-fluid" />
-                    <h5 class="brand-title text-center mt-2">{{ brand.title }}</h5>
-                </div>
-            </a>
-        </div>
-    </div>
+  <div class="brands-row row justify-content-center align-items-center">
+    @for (brand of brands; track brand) {
+      <div class="col-6 col-sm-4 col-md-3 mb-4">
+        <a [routerLink]="['/brand', brand.id]" class="brand-link">
+          <div class="brand-card">
+            <img [src]="brand.image || getPlaceholderImage() | imageUrl" [alt]="brand.title" class="brand-logo img-fluid" />
+            <h5 class="brand-title text-center mt-2">{{ brand.title }}</h5>
+          </div>
+        </a>
+      </div>
+    }
+  </div>
 </div>

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BrandModel } from '../../../../shared/models/brand.model';
@@ -7,7 +7,7 @@ import { ImageUrlPipe } from '../../../../shared/utils/image-url.pipe';
 
 @Component({
     selector: 'app-brands',
-    imports: [CommonModule, RouterModule, ImageUrlPipe],
+    imports: [RouterModule, ImageUrlPipe],
     templateUrl: './brands.component.html',
     styleUrl: './brands.component.scss'
 })

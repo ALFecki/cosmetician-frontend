@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -49,15 +49,14 @@ interface ModelConfig {
     templateUrl: './admin-panel-switcher.component.html',
     styleUrl: './admin-panel-switcher.component.scss',
     imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        StatisticsComponent,
-        AdminOrdersComponent,
-        GenericTableComponent,
-        IconsModule,
-        ImageUrlPipe,
-    ]
+    FormsModule,
+    ReactiveFormsModule,
+    StatisticsComponent,
+    AdminOrdersComponent,
+    GenericTableComponent,
+    IconsModule,
+    ImageUrlPipe
+]
 })
 export class AdminPanelSwitcherComponent implements OnInit {
     @ViewChild('itemModal') itemModal!: TemplateRef<any>;

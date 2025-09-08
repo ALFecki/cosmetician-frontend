@@ -1,4 +1,4 @@
-import { CommonModule, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { catchError, map, Observable, of, tap } from 'rxjs';
@@ -11,7 +11,7 @@ import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
     selector: 'app-category',
     templateUrl: './category.component.html',
     styleUrl: './category.component.scss',
-    imports: [ProductsComponent, NgIf, CommonModule, ImageUrlPipe]
+    imports: [ProductsComponent, CommonModule, ImageUrlPipe]
 })
 export class CategoryComponent {
     categoryId!: string;

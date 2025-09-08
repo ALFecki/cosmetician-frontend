@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,7 +9,7 @@ import { ToastService } from '../../shared/services/toast.service';
     selector: 'app-password-reset',
     templateUrl: './password-reset.component.html',
     styleUrl: './password-reset.component.scss',
-    imports: [CommonModule, ReactiveFormsModule]
+    imports: [ReactiveFormsModule]
 })
 export class PasswordResetComponent implements OnInit {
     resetForm: FormGroup = new FormGroup({
