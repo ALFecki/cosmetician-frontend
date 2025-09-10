@@ -177,6 +177,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'description', label: 'Описание', type: 'textarea', required: true },
                 { key: 'image', label: 'Изображение', type: 'image', required: false },
                 { key: 'variants', label: 'Варианты (Объем-Себестоимость-Цена)', type: 'variants', required: false },
+                { key: 'isPriceHidden', label: 'Скрыть цену', type: 'boolean', required: false },
                 { key: 'categoryIds', label: 'Категории', type: 'multiselect', required: true },
                 { key: 'brandId', label: 'Бренд', type: 'select', required: true },
                 { key: 'countryIds', label: 'Страны производители', type: 'multiselect', required: false },
@@ -727,15 +728,12 @@ export class AdminPanelSwitcherComponent implements OnInit {
         const variantId = variantControl?.get('id')?.value;
 
         if (!variantId) {
-            // For new variants without ID, just remove from form
             variantsArray.removeAt(index);
             return;
         }
 
         try {
             const response = await this.productVariantService.delete(variantId).toPromise();
-            console.log('!!!!!!!!!!!');
-            console.log(response);
             if (response?.status) {
                 this.toastService.show('Вариант удален', 'success');
                 await this.reloadProductVariants();
@@ -777,6 +775,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
             }
 
             const value = this.itemForm.value[key];
+            console.log(`Processing field: ${key}, Value:`, value);
             if (value !== null && value !== undefined) {
                 if (key === 'variants' || key === 'categoryIds' || key === 'countryIds' || key === 'productScopeIds') {
                     formData[key] = JSON.stringify(value);
@@ -787,6 +786,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 }
             }
         });
+
+        console.log('Prepared form data:', formData);
 
         if (this.currentModel === 'product') {
             delete formData['variants'];

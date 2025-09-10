@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 // import { SsrCookieService } from 'ngx-cookie-service-ssr';
 import { BehaviorSubject, catchError, map, Observable, of, tap, throwError } from 'rxjs';
@@ -6,6 +6,7 @@ import { Md5 } from 'ts-md5';
 import { environment } from '../../../environments/environment';
 import { Claims, LoginData, LoginResponse, RegistrationData } from '../models/login.interface';
 import { PersonModel } from '../models/person.model';
+import { ForgotPasswordResponse } from '../base/schemas/base_schema';
 
 @Injectable({
     providedIn: 'root',
@@ -50,8 +51,11 @@ export class AuthService {
         );
     }
 
-    forgotPassword(email: string): Observable<any> {
-        return this.http.post(`${environment.server_url}/auth/forgot_password`, { email }).pipe(
+    forgotPassword(email: string): Observable<ForgotPasswordResponse> {
+        return this.http.get<ForgotPasswordResponse>(`${environment.server_url}/forgot_password`, { params: new HttpParams().set('email', email) }).pipe(
+            tap(() => {
+                console.log('Forgot password email sent');
+            }),
             catchError(error => {
                 console.error('Forgot password error:', error);
                 return throwError(() => error);
@@ -59,8 +63,9 @@ export class AuthService {
         );
     }
 
-    resetPassword(token: string, newPassword: string): Observable<any> {
-        return this.http.post(`${environment.server_url}/auth/reset_password`, { 
+    resetPassword(email: string, token: string, newPassword: string): Observable<PersonModel> {
+        return this.http.post<PersonModel>(`${environment.server_url}/reset_password`, { 
+            email,
             token, 
             newPassword: Md5.hashStr(newPassword)
         }).pipe(
@@ -71,8 +76,8 @@ export class AuthService {
         );
     }
 
-    verifyResetToken(token: string): Observable<any> {
-        return this.http.get(`${environment.server_url}/auth/verify_reset_token/${token}`).pipe(
+    verifyResetToken(token: string, email: string): Observable<{valid: boolean}> {
+        return this.http.get<{valid: boolean}>(`${environment.server_url}/verify_reset_token`, { params: new HttpParams().set('token', token).set('email', email) }).pipe(
             catchError(error => {
                 console.error('Verify reset token error:', error);
                 return throwError(() => error);

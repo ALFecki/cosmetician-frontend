@@ -27,3 +27,8 @@ export interface MaintenanceResponse extends MaintenanceStatus {
 export interface ErrorResponse {
     status: string;
 }
+
+export interface ForgotPasswordResponse {
+    status: string;
+    link: string;
+}

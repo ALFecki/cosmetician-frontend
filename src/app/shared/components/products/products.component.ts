@@ -31,6 +31,7 @@ export class ProductsComponent implements OnInit {
     totalItems$: Observable<number> = of(0);
     filterOptions: FilterProductSchema = {};
     private selectedVariants: Record<string, string> = {};
+    private revealedPrices = new Set<string>();
 
     constructor(
         private route: ActivatedRoute,
@@ -52,6 +53,15 @@ export class ProductsComponent implements OnInit {
         this.loadProducts();
     }
 
+ 
+
+isPriceRevealed(productId: string): boolean {
+  return this.revealedPrices.has(productId);
+}
+
+revealPrice(productId: string): void {
+  this.revealedPrices.add(productId);
+}
     resetFilters(): void {
         this.filterOptions = {};
         this.currentPage = 1;

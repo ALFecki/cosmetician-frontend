@@ -22,6 +22,8 @@ export interface ProductModel {
 
     variants: ProductVariantModel[];
 
+    isPriceHidden: boolean;
+
     isDeleted: boolean;
     createdAt: Date;
     updatedAt: Date;

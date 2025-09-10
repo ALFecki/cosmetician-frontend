@@ -83,7 +83,7 @@ export const routes: Routes = [
         title: 'Детали заказа - Админ',
     },
     {
-        path: 'reset-password/:token',
+        path: 'reset-password',
         loadComponent: () => import('./features/password-reset/password-reset.component').then(m => m.PasswordResetComponent),
         title: 'Восстановление пароля - SkViDerm'
     },

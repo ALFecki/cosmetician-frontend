@@ -1,11 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ProductModel } from '../../models/product.model';
-import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
-import { ToastService } from '../../services/toast.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
 
 @Component({
@@ -35,7 +32,7 @@ export class ProductCarouselComponent implements OnInit {
                     product.variants = product.variants.filter(variant => !variant.isDeleted);
                 });
                 this.products = response.data
-                    .filter(product => product.variants.length !== 0)
+                    .filter(product => product.variants.length !== 0 && !product.isPriceHidden)
                     .sort(() => 0.5 - Math.random())
                     .slice(0, 10);
                 this.loading = false;

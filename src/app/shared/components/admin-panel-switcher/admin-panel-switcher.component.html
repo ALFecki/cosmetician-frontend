@@ -132,6 +132,15 @@
             <input
               [type]="field.type" class="form-control" [id]="field.key" [formControlName]="field.key" />
           }
+          @if (field.type === 'boolean') {
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" [id]="field.key"
+                [formControlName]="field.key" />
+              <label class="form-check-label" [for]="field.key">
+                {{ field.label }}
+              </label>
+            </div>
+          }
           @if (field.type === 'textarea') {
             <textarea class="form-control" [id]="field.key"
             [formControlName]="field.key" rows="3"></textarea>

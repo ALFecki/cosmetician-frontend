@@ -18,6 +18,7 @@ export class PasswordResetComponent implements OnInit {
     });
 
     token: string | null = null;
+    email: string | null = null;
     isLoading = false;
     isTokenValid = false;
     isResetting = false;
@@ -32,8 +33,9 @@ export class PasswordResetComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.token = this.route.snapshot.paramMap.get('token');
-        
+        this.token = this.route.snapshot.queryParamMap.get('token');
+        this.email = this.route.snapshot.queryParamMap.get('email');
+
         if (!this.token) {
             this.error = 'Недействительная ссылка для восстановления пароля';
             return;
@@ -43,10 +45,10 @@ export class PasswordResetComponent implements OnInit {
     }
 
     verifyToken(): void {
-        if (!this.token) return;
+        if (!this.token || !this.email) return;
 
         this.isLoading = true;
-        this.authService.verifyResetToken(this.token).subscribe({
+        this.authService.verifyResetToken(this.token, this.email).subscribe({
             next: (response) => {
                 console.log('Token verification successful:', response);
                 this.isTokenValid = true;
@@ -85,10 +87,15 @@ export class PasswordResetComponent implements OnInit {
             return;
         }
 
+        if (!this.email) {
+            this.error = 'Недействительный email';
+            return;
+        }
+
         this.isResetting = true;
         this.error = null;
 
-        this.authService.resetPassword(this.token, password).subscribe({
+        this.authService.resetPassword(this.email, this.token, password).subscribe({
             next: (response) => {
                 console.log('Password reset successful:', response);
                 this.success = 'Пароль успешно изменен. Теперь вы можете войти с новым паролем.';
