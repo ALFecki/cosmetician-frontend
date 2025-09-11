@@ -9,6 +9,7 @@ import { UpdatePersonSchema } from '../../shared/schemas/person.schema';
 import { AuthService } from '../../shared/services/auth.service';
 import { PersonService } from '../../shared/services/person.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { VerifyEmailModalService } from '../../shared/services/verify-email-modal.service';
 
 @Component({
     selector: 'app-user-profile',
@@ -20,6 +21,7 @@ export class UserProfileComponent implements OnInit {
     profileForm!: FormGroup;
     currentUser: BehaviorSubject<PersonModel | null> = new BehaviorSubject<PersonModel | null>(null);
     loading = false;
+    emailVerificationLoading = false;
     error: string | null = null;
     success: string | null = null;
 
@@ -29,6 +31,7 @@ export class UserProfileComponent implements OnInit {
         private fb: FormBuilder,
         private router: Router,
         private toastService: ToastService,
+        private verifyEmailModalService: VerifyEmailModalService
     ) {}
 
     ngOnInit(): void {
@@ -100,6 +103,45 @@ export class UserProfileComponent implements OnInit {
         this.currentUser.next(result.data);
         this.success = 'Профиль успешно обновлен';
         this.toastService.show('Профиль успешно обновлен', 'success');
+    }
+
+    async sendEmailVerification(): Promise<void> {
+        this.emailVerificationLoading = true;
+        this.error = null;
+        this.success = null;
+
+        try {
+            this.authService.sendEmailVerification().subscribe({
+                next: (response) => {
+                    console.log('Verification code sent:', response);
+                    this.toastService.show('Код подтверждения отправлен на ваш email', 'success');
+                    this.verifyEmailModalService.openVerifyEmailModal().subscribe(
+                        (verified) => {
+                            if (verified) {
+                                // Email was successfully verified, update user info
+                                this.authService.getCurrentUser().subscribe(user => {
+                                    this.currentUser.next(user);
+                                });
+                            }
+                        }
+                    );
+                },
+                error: (error) => {
+                    console.error('Sending verification code failed:', error);
+                    this.error = 'Не удалось отправить код подтверждения. Попробуйте позже.';
+                    this.toastService.show('Не удалось отправить код подтверждения', 'error');
+                    this.emailVerificationLoading = false;
+                },
+                complete: () => {
+                    this.emailVerificationLoading = false;
+                }
+            });
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
+            this.error = 'Не удалось отправить письмо с подтверждением: ' + errorMessage;
+            this.toastService.show('Не удалось отправить письмо с подтверждением', 'error');
+            this.emailVerificationLoading = false;
+        }
     }
 
     logout(): void {

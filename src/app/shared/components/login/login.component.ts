@@ -1,4 +1,3 @@
-
 import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,12 +8,14 @@ import { environment } from '../../../../environments/environment';
 import { LoginData, RegistrationData } from '../../models/login.interface';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
+import { VerifyEmailModalService } from '../../services/verify-email-modal.service';
+import { IconsModule } from '../../base/icons/icons.module';
 
 @Component({
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss',
-    imports: [ReactiveFormsModule]
+    imports: [ReactiveFormsModule, IconsModule]
 })
 export class LoginComponent {
     @Input() loginForm: FormGroup = new FormGroup({});
@@ -58,6 +59,7 @@ export class LoginComponent {
         private route: ActivatedRoute,
         private toastService: ToastService,
         private router: Router,
+        private verifyEmailModalService: VerifyEmailModalService,
     ) {
         this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
     }
@@ -78,6 +80,18 @@ export class LoginComponent {
         this.authService.login(loginData).subscribe({
             next: response => {
                 console.log('Login successful:', response);
+                if (!response.user.isEmailVerified) {
+                    this.closeLoginModal();
+                    this.verifyEmailModalService.openVerifyEmailModal().subscribe(
+                        (verified) => {
+                            if (verified) {
+                                console.log('Email verification completed');
+                            }
+                        }
+                    );
+                    return;
+                }
+                
                 this.toastService.show('Успешный вход в систему', 'success');
                 this.closeLoginModal();
                 if (this.returnUrl && this.returnUrl !== '/') {
@@ -194,11 +208,6 @@ export class LoginComponent {
                     console.log('Registration successful:', response);
                     this.toastService.show('Регистрация успешно завершена!', 'success');
                     this.closeRegisterModal();
-
-                    // Optional: Automatically log in after registration
-                    // this.email.setValue(registrationData.email);
-                    // this.password.setValue(registrationData.password);
-                    // this.login();
                 },
                 complete: () => {
                     this.isRegistering = false;

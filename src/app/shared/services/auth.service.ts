@@ -22,11 +22,12 @@ export class AuthService {
         //  private cookieService: SsrCookieService
         ) {}
 
-    login(loginData: LoginData): Observable<Claims> {
-        return this.http.post<Claims>(`${environment.server_url}/login`, loginData, { withCredentials: true }).pipe(
-            tap((response: Claims) => {
-                this.csrfToken.next(response.csrf_token);
-                this.userClaims.next(response);
+    login(loginData: LoginData): Observable<LoginResponse> {
+        return this.http.post<LoginResponse>(`${environment.server_url}/login`, loginData, { withCredentials: true }).pipe(
+            tap((response: LoginResponse) => {
+                this.csrfToken.next(response.claims.csrf_token);
+                this.userClaims.next(response.claims);
+                this.currentUser.next(response.user);
                 this.onLogin.next(true);
             }),
             // catchError((error: HttpErrorResponse) => {
@@ -80,6 +81,31 @@ export class AuthService {
         return this.http.get<{valid: boolean}>(`${environment.server_url}/verify_reset_token`, { params: new HttpParams().set('token', token).set('email', email) }).pipe(
             catchError(error => {
                 console.error('Verify reset token error:', error);
+                return throwError(() => error);
+            })
+        );
+    }
+
+    sendEmailVerification(): Observable<{result: string, code: string}> {
+        return this.http.get<{result: string, code: string}>(`${environment.server_url}/verify_email`, { withCredentials: true }).pipe(
+            catchError(error => {
+                console.error('Send email verification error:', error);
+                return throwError(() => error);
+            })
+        );
+    }
+
+    verifyEmail(code: string): Observable<PersonModel> {
+        return this.http.get<PersonModel>(`${environment.server_url}/email_verification`, { params: new HttpParams().set('code', code), withCredentials: true }).pipe(
+            tap(response => {
+                if (response) {
+                    console.log('Email verified successfully');
+                } else {
+                    console.log('Email verification failed');
+                }
+            }),
+            catchError(error => {
+                console.error('Verify email error:', error);
                 return throwError(() => error);
             })
         );

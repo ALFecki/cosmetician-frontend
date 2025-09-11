@@ -25,3 +25,175 @@
         color: #333;
     }
 }
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+    color: #856404;
+
+    .btn-outline-warning {
+        color: #856404;
+        border-color: #ffc107;
+
+        &:hover {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #212529;
+        }
+
+        &:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+    }
+}
+
+// Email verification modal styles
+.verify-email-content {
+    text-align: center;
+    padding: 1rem 0;
+
+    .verify-icon {
+        color: var(--primary);
+        margin-bottom: 1rem;
+        font-size: 3rem;
+    }
+
+    .verify-title {
+        font-weight: 600;
+        color: var(--gray-dark);
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+    }
+
+    .verify-description {
+        color: var(--gray-medium);
+        margin-bottom: 2rem;
+        line-height: 1.5;
+        font-size: 0.95rem;
+    }
+
+    .verification-form {
+        max-width: 300px;
+        margin: 0 auto;
+        text-align: left;
+
+        .form-control {
+            text-align: center;
+            font-size: 1.1rem;
+            letter-spacing: 0.1rem;
+            border-radius: 8px;
+            padding: 0.75rem;
+            border: 1px solid var(--powder-pink);
+
+            &:focus {
+                box-shadow: 0 0 0 0.2rem rgba(212, 80, 109, 0.15);
+                border-color: var(--primary);
+            }
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--gray-medium);
+        }
+    }
+
+    .btn-primary {
+        background-color: var(--primary);
+        border-color: var(--primary);
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+
+        &:hover {
+            background-color: var(--accent);
+            border-color: var(--accent);
+        }
+    }
+
+    .btn-outline-secondary {
+        color: var(--gray-medium);
+        border-color: var(--powder-pink);
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+
+        &:hover {
+            background-color: var(--powder-pink);
+            border-color: var(--powder-pink);
+            color: var(--gray-dark);
+        }
+    }
+}
+
+.verification-success {
+    .success-icon {
+        color: var(--success, #28a745);
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .success-title {
+        color: var(--success, #28a745);
+        font-weight: 600;
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+    }
+}
+
+.error-message {
+    color: var(--danger, #dc3545);
+    font-size: 0.8em;
+    margin-top: 5px;
+}
+
+// Modal header styling
+.modal-header {
+    border-bottom: none;
+    padding: 1.5rem 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .modal-title {
+        font-weight: 600;
+        color: var(--gray-dark);
+        margin-bottom: 0.75rem;
+        position: relative;
+        text-align: center;
+        padding-bottom: 10px;
+
+        &:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 2px;
+            background-color: var(--primary);
+        }
+    }
+
+    .btn-close {
+        position: absolute;
+        right: 1.5rem;
+        top: 1.5rem;
+
+        &:focus {
+            box-shadow: none;
+        }
+    }
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+// Modal background styling
+::ng-deep .cosmetician-modal .modal-content {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    background-color: var(--light-beige);
+}
