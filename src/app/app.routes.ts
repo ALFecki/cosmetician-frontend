@@ -82,5 +82,10 @@ export const routes: Routes = [
         canActivate: [AuthGuard, AdminGuard],
         title: 'Детали заказа - Админ',
     },
+    {
+        path: 'reset-password',
+        loadComponent: () => import('./features/password-reset/password-reset.component').then(m => m.PasswordResetComponent),
+        title: 'Восстановление пароля - SkViDerm'
+    },
     { path: '**', redirectTo: '' },
 ];

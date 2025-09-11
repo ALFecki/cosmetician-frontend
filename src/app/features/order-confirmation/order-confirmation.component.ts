@@ -16,8 +16,7 @@ import { CartService } from '../../shared/services/cart.service';
     selector: 'app-order-confirmation',
     templateUrl: './order-confirmation.component.html',
     styleUrl: './order-confirmation.component.scss',
-    standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, RouterModule, IconsModule, ImageUrlPipe],
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, IconsModule, ImageUrlPipe]
 })
 export class OrderConfirmationComponent implements OnInit {
     confirmationForm: FormGroup;

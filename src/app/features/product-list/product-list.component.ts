@@ -3,9 +3,8 @@ import { ProductsComponent } from '../../shared/components/products/products.com
 
 @Component({
     selector: 'app-product-list',
-    standalone: true,
     imports: [ProductsComponent],
     templateUrl: './product-list.component.html',
-    styleUrl: './product-list.component.scss',
+    styleUrl: './product-list.component.scss'
 })
 export class ProductListComponent {}

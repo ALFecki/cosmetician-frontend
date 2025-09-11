@@ -1,5 +1,5 @@
 import { APP_BASE_HREF } from '@angular/common';
-import { CommonEngine } from '@angular/ssr';
+import { CommonEngine } from '@angular/ssr/node';
 import express from 'express';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -38,7 +38,11 @@ export function app(): express.Express {
                 documentFilePath: indexHtml,
                 url: `${protocol}://${headers.host}${originalUrl}`,
                 publicPath: browserDistFolder,
-                providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
+                providers: [
+                    { provide: APP_BASE_HREF, useValue: baseUrl },
+                    { provide: 'REQUEST', useValue: req },
+                    { provide: 'RESPONSE', useValue: res },
+                ],
             })
             .then(html => res.send(html))
             .catch(err => next(err));

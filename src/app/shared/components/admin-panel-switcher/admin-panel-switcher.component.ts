@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -48,17 +48,15 @@ interface ModelConfig {
     selector: 'app-admin-panel-switcher',
     templateUrl: './admin-panel-switcher.component.html',
     styleUrl: './admin-panel-switcher.component.scss',
-    standalone: true,
     imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        StatisticsComponent,
-        AdminOrdersComponent,
-        GenericTableComponent,
-        IconsModule,
-        ImageUrlPipe,
-    ],
+    FormsModule,
+    ReactiveFormsModule,
+    StatisticsComponent,
+    AdminOrdersComponent,
+    GenericTableComponent,
+    IconsModule,
+    ImageUrlPipe
+]
 })
 export class AdminPanelSwitcherComponent implements OnInit {
     @ViewChild('itemModal') itemModal!: TemplateRef<any>;
@@ -95,6 +93,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
     searchText = '';
 
     isMaintenanceMode = false;
+    maintenanceDuration: number | null = null;
     maintenanceLoading = false;
 
     private modelConfigs: Record<string, ModelConfig> = {};
@@ -140,7 +139,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
     loadMaintenanceStatus(): void {
         this.maintenanceService.getMaintenanceStatus().subscribe(status => {
-            this.isMaintenanceMode = status;
+            this.isMaintenanceMode = status.enabled;
+            this.maintenanceDuration = status.ttl || null;
         });
     }
 
@@ -149,7 +149,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
         const operation = this.isMaintenanceMode
             ? this.maintenanceService.disableMaintenanceMode()
-            : this.maintenanceService.enableMaintenanceMode();
+            : this.maintenanceService.enableMaintenanceMode(this.maintenanceDuration || undefined);
 
         operation.subscribe({
             next: () => {
@@ -177,6 +177,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'description', label: 'Описание', type: 'textarea', required: true },
                 { key: 'image', label: 'Изображение', type: 'image', required: false },
                 { key: 'variants', label: 'Варианты (Объем-Себестоимость-Цена)', type: 'variants', required: false },
+                { key: 'isPriceHidden', label: 'Скрыть цену', type: 'boolean', required: false },
                 { key: 'categoryIds', label: 'Категории', type: 'multiselect', required: true },
                 { key: 'brandId', label: 'Бренд', type: 'select', required: true },
                 { key: 'countryIds', label: 'Страны производители', type: 'multiselect', required: false },
@@ -614,14 +615,10 @@ export class AdminPanelSwitcherComponent implements OnInit {
         try {
             const response = await this.productService.getById(this.currentProductId).toPromise();
             if (response?.data) {
-                // Update the editing item with fresh data
                 this.editingItem = response.data;
 
-                // Rebuild form with updated variants - filter based on showDeletedVariants
                 const filteredVariants = this.getFilteredVariants(response.data.variants || []);
                 this.updateVariantsInForm(filteredVariants);
-
-                // Also update the main data array
                 const index = this.currentModelData.findIndex(item => item.id === this.currentProductId);
                 if (index !== -1) {
                     this.currentModelData[index] = response.data;
@@ -643,12 +640,10 @@ export class AdminPanelSwitcherComponent implements OnInit {
         const variantsArray = this.getVariantsFormArray();
         if (!variantsArray) return;
 
-        // Clear existing controls
         while (variantsArray.length !== 0) {
             variantsArray.removeAt(0);
         }
 
-        // Add updated variants
         variants.forEach(variant => {
             variantsArray.push(
                 this.fb.group({
@@ -716,7 +711,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
         const variantsArray = this.getVariantsFormArray();
         if (!variantsArray) return;
 
-        // Count non-deleted variants
         const activeVariants = this.editingItem?.variants?.filter((v: any) => !v.isDeleted) || [];
         if (activeVariants.length <= 1) {
             this.toastService.show('Нельзя удалить последний активный вариант продукта', 'warning');
@@ -727,15 +721,12 @@ export class AdminPanelSwitcherComponent implements OnInit {
         const variantId = variantControl?.get('id')?.value;
 
         if (!variantId) {
-            // For new variants without ID, just remove from form
             variantsArray.removeAt(index);
             return;
         }
 
         try {
             const response = await this.productVariantService.delete(variantId).toPromise();
-            console.log('!!!!!!!!!!!');
-            console.log(response);
             if (response?.status) {
                 this.toastService.show('Вариант удален', 'success');
                 await this.reloadProductVariants();
@@ -777,7 +768,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
             }
 
             const value = this.itemForm.value[key];
-            if (value !== null && value !== undefined) {
+            console.log(`Processing field: ${key}, Value:`, value);
+            if (value !== null && value !== undefined && value !== '') {
                 if (key === 'variants' || key === 'categoryIds' || key === 'countryIds' || key === 'productScopeIds') {
                     formData[key] = JSON.stringify(value);
                 } else if (typeof value === 'object' && !Array.isArray(value)) {
@@ -787,6 +779,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 }
             }
         });
+
+        console.log('Prepared form data:', formData);
 
         if (this.currentModel === 'product') {
             delete formData['variants'];

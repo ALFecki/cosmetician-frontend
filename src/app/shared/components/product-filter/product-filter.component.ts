@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrandModel } from '../../models/brand.model';
@@ -11,10 +11,9 @@ import { CountryService } from '../../services/country.service';
 
 @Component({
     selector: 'app-product-filter',
-    standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [FormsModule],
     templateUrl: './product-filter.component.html',
-    styleUrls: ['./product-filter.component.scss'],
+    styleUrls: ['./product-filter.component.scss']
 })
 export class ProductFilterComponent implements OnInit {
     @Output() filterChange = new EventEmitter<FilterProductSchema>();

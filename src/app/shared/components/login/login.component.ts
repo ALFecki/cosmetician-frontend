@@ -1,21 +1,21 @@
-import { CommonModule } from '@angular/common';
 import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import {Md5} from 'ts-md5';
 import { catchError, throwError } from 'rxjs';
+import { Md5 } from 'ts-md5';
 import { environment } from '../../../../environments/environment';
 import { LoginData, RegistrationData } from '../../models/login.interface';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
+import { VerifyEmailModalService } from '../../services/verify-email-modal.service';
+import { IconsModule } from '../../base/icons/icons.module';
 
 @Component({
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss',
-    standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [ReactiveFormsModule, IconsModule]
 })
 export class LoginComponent {
     @Input() loginForm: FormGroup = new FormGroup({});
@@ -38,12 +38,20 @@ export class LoginComponent {
         personalDataConsent: new FormControl(false, [Validators.requiredTrue]),
     });
 
+    forgotPasswordForm: FormGroup = new FormGroup({
+        email: new FormControl('', [Validators.required, Validators.email]),
+    });
+
     @ViewChild('registerModal') registerModal!: TemplateRef<unknown>;
+    @ViewChild('forgotPasswordModal') forgotPasswordModal!: TemplateRef<unknown>;
 
     registrationError: string | null = null;
     loginError: string | null = null;
+    forgotPasswordError: string | null = null;
+    forgotPasswordSuccess: string | null = null;
     isLoggingIn = false;
     isRegistering = false;
+    isSendingReset = false;
 
     constructor(
         private authService: AuthService,
@@ -51,6 +59,7 @@ export class LoginComponent {
         private route: ActivatedRoute,
         private toastService: ToastService,
         private router: Router,
+        private verifyEmailModalService: VerifyEmailModalService,
     ) {
         this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
     }
@@ -71,6 +80,18 @@ export class LoginComponent {
         this.authService.login(loginData).subscribe({
             next: response => {
                 console.log('Login successful:', response);
+                if (!response.user.isEmailVerified) {
+                    this.closeLoginModal();
+                    this.verifyEmailModalService.openVerifyEmailModal().subscribe(
+                        (verified) => {
+                            if (verified) {
+                                console.log('Email verification completed');
+                            }
+                        }
+                    );
+                    return;
+                }
+                
                 this.toastService.show('Успешный вход в систему', 'success');
                 this.closeLoginModal();
                 if (this.returnUrl && this.returnUrl !== '/') {
@@ -187,16 +208,60 @@ export class LoginComponent {
                     console.log('Registration successful:', response);
                     this.toastService.show('Регистрация успешно завершена!', 'success');
                     this.closeRegisterModal();
-
-                    // Optional: Automatically log in after registration
-                    // this.email.setValue(registrationData.email);
-                    // this.password.setValue(registrationData.password);
-                    // this.login();
                 },
                 complete: () => {
                     this.isRegistering = false;
                 },
             });
+    }
+
+    openForgotPasswordModal(content: unknown) {
+        this.forgotPasswordForm.reset();
+        this.forgotPasswordError = null;
+        this.forgotPasswordSuccess = null;
+        this.modalService.open(content, {
+            size: 'md',
+            centered: true,
+            scrollable: true,
+            windowClass: 'cosmetician-modal',
+        });
+    }
+
+    closeForgotPasswordModal() {
+        this.modalService.dismissAll();
+    }
+
+    sendPasswordReset() {
+        if (this.forgotPasswordForm.invalid || this.isSendingReset) {
+            this.forgotPasswordForm.markAllAsTouched();
+            return;
+        }
+
+        this.forgotPasswordError = null;
+        this.forgotPasswordSuccess = null;
+        this.isSendingReset = true;
+
+        const email = this.forgotPasswordForm.get('email')?.value;
+
+        this.authService.forgotPassword(email).subscribe({
+            next: (response) => {
+                console.log('Password reset email sent:', response);
+                this.forgotPasswordSuccess = 'Ссылка для восстановления пароля отправлена на ваш email. Проверьте почту.';
+                this.toastService.show('Ссылка для восстановления отправлена', 'success');
+                this.isSendingReset = false;
+            },
+            error: (error) => {
+                console.error('Password reset failed:', error);
+                if (error.status === 404) {
+                    this.forgotPasswordError = 'Пользователь с таким email не найден';
+                } else if (error.status === 0) {
+                    this.forgotPasswordError = 'Не удалось подключиться к серверу';
+                } else {
+                    this.forgotPasswordError = `Ошибка: ${error.message || 'Неизвестная ошибка'}`;
+                }
+                this.isSendingReset = false;
+            }
+        });
     }
 
     getPersonalDataUrl(): string {

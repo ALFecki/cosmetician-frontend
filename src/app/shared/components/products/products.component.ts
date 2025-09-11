@@ -17,10 +17,9 @@ import { ProductModalComponent } from '../product-modal/product-modal.component'
 @Component({
     selector: 'app-products',
     providers: [],
-    standalone: true,
     imports: [CommonModule, PaginationComponent, ProductFilterComponent, ImageUrlPipe],
     templateUrl: './products.component.html',
-    styleUrl: './products.component.scss',
+    styleUrl: './products.component.scss'
 })
 export class ProductsComponent implements OnInit {
     products$!: Observable<ProductModel[]>;
@@ -32,6 +31,7 @@ export class ProductsComponent implements OnInit {
     totalItems$: Observable<number> = of(0);
     filterOptions: FilterProductSchema = {};
     private selectedVariants: Record<string, string> = {};
+    private revealedPrices = new Set<string>();
 
     constructor(
         private route: ActivatedRoute,
@@ -53,6 +53,15 @@ export class ProductsComponent implements OnInit {
         this.loadProducts();
     }
 
+ 
+
+isPriceRevealed(productId: string): boolean {
+  return this.revealedPrices.has(productId);
+}
+
+revealPrice(productId: string): void {
+  this.revealedPrices.add(productId);
+}
     resetFilters(): void {
         this.filterOptions = {};
         this.currentPage = 1;

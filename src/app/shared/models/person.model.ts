@@ -8,6 +8,7 @@ export interface PersonModel {
     password: string;
     is_admin: boolean;
     is_moderator: boolean;
+    isEmailVerified: boolean;
     createdAt: Date;
     updatedAt: Date;
 }

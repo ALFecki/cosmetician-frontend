@@ -2,25 +2,26 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { firstValueFrom, Observable } from 'rxjs';
+import { Md5 } from 'ts-md5';
 import { IconsModule } from '../../base/icons/icons.module';
 import { LoginData } from '../../models/login.interface';
 import { AuthService } from '../../services/auth.service';
 import { MaintenanceService } from '../../services/maintenance.service';
 import { ToastService } from '../../services/toast.service';
-import { firstValueFrom } from 'rxjs';
-import { Md5 } from 'ts-md5';
 
 @Component({
     selector: 'app-maintenance',
-    standalone: true,
     imports: [CommonModule, ReactiveFormsModule, IconsModule],
     templateUrl: './maintenance.component.html',
-    styleUrl: './maintenance.component.scss',
+    styleUrl: './maintenance.component.scss'
 })
 export class MaintenanceComponent implements OnInit {
     loginForm: FormGroup;
     isLoggingIn = false;
     loginError: string | null = null;
+    timeLeft: Observable<number> | null = null;
+    intervalId: NodeJS.Timeout | null = null;
 
     constructor(
         private authService: AuthService,
@@ -35,6 +36,24 @@ export class MaintenanceComponent implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
+        this.maintenanceService.getMaintenanceStatus().subscribe(status => {
+            if (!status.enabled) {
+                this.router.navigate(['/']);
+                return;
+            } else if (status.ttl) {
+                this.timeLeft = new Observable<number>(observer => {
+                    let timeRemaining = status.ttl;
+                    const intervalId = setInterval(() => {
+                        timeRemaining!--;
+                        observer.next(timeRemaining!);
+                        if (timeRemaining! <= 0) {
+                            clearInterval(intervalId);
+                            observer.complete();
+                        }
+                    }, 1000);
+                });
+            }
+        });
         await firstValueFrom(this.authService.checkAuth());
     }
 
@@ -80,6 +99,16 @@ export class MaintenanceComponent implements OnInit {
                 this.isLoggingIn = false;
             },
         });
+    }
+
+    formatTime(seconds: number | null): string {
+        if (!seconds || seconds <= 0) return '00:00:00';
+        
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = seconds % 60;
+        
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     }
 
     get email() {

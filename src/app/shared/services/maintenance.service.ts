@@ -1,18 +1,18 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, catchError, firstValueFrom, map, of, shareReplay, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { MaintenanceResponse } from '../base/schemas/base_schema';
+import { MaintenanceResponse, MaintenanceStatus } from '../base/schemas/base_schema';
 
 @Injectable({
     providedIn: 'root',
 })
 export class MaintenanceService {
     private readonly apiUrl = `${environment.server_url}/maintenance`;
-    private maintenanceStatusSubject = new BehaviorSubject<boolean>(true);
+    private maintenanceStatusSubject = new BehaviorSubject<MaintenanceStatus>({enabled: true, ttl: undefined});
     private loadingSubject = new BehaviorSubject<boolean>(true);
     private initialized = false;
-    private statusCache$?: Observable<boolean>;
+    private statusCache$?: Observable<MaintenanceStatus>;
 
     constructor(private http: HttpClient) {
         this.checkMaintenanceStatus();
@@ -22,14 +22,14 @@ export class MaintenanceService {
         return firstValueFrom(
             this.http.get<MaintenanceResponse>(`${this.apiUrl}/status`).pipe(
                 tap(response => {
-                    this.maintenanceStatusSubject.next(response.enabled);
+                    this.maintenanceStatusSubject.next({enabled: response.enabled, ttl: response.ttl});
                     this.loadingSubject.next(false);
                     this.initialized = true;
                 }),
                 map(response => response.enabled),
                 catchError(error => {
                     console.error('Error checking maintenance status:', error);
-                    this.maintenanceStatusSubject.next(true);
+                    this.maintenanceStatusSubject.next({enabled: true, ttl: undefined});
                     this.loadingSubject.next(false);
                     this.initialized = true;
                     return of(true);
@@ -39,21 +39,21 @@ export class MaintenanceService {
         );
     }
 
-    getMaintenanceStatus(): Observable<boolean> {
+    getMaintenanceStatus(): Observable<MaintenanceStatus> {
         if (!this.statusCache$) {
             this.statusCache$ = this.http.get<MaintenanceResponse>(`${this.apiUrl}/status`).pipe(
                 tap(response => {
-                    this.maintenanceStatusSubject.next(response.enabled);
+                    this.maintenanceStatusSubject.next({enabled: response.enabled, ttl: response.ttl});
                     this.loadingSubject.next(false);
                     this.initialized = true;
                 }),
-                map(response => response.enabled),
+                map(response => response),
                 catchError(error => {
                     console.error('Error checking maintenance status:', error);
-                    this.maintenanceStatusSubject.next(true);
+                    this.maintenanceStatusSubject.next({enabled: true, ttl: undefined});
                     this.loadingSubject.next(false);
                     this.initialized = true;
-                    return of(true);
+                    return of({enabled: true, ttl: undefined});
                 }),
                 shareReplay(1),
             );
@@ -62,11 +62,13 @@ export class MaintenanceService {
     }
 
     isMaintenanceMode(): boolean {
-        return this.maintenanceStatusSubject.value;
+        return this.maintenanceStatusSubject.value.enabled;
     }
 
     isMaintenanceModeEnabled(): Observable<boolean> {
-        return this.maintenanceStatusSubject.asObservable();
+        return this.maintenanceStatusSubject.asObservable().pipe(
+            map(status => status.enabled)
+        );
     }
 
     isLoading(): Observable<boolean> {
@@ -77,19 +79,20 @@ export class MaintenanceService {
         return this.initialized;
     }
 
-    enableMaintenanceMode(): Observable<void> {
-        return this.http.post<void>(`${this.apiUrl}/enable`, {}).pipe(
+    enableMaintenanceMode(ttl: number | undefined): Observable<void> {
+        const params = ttl ? { params: new HttpParams().set('ttl', ttl) } : {};
+        return this.http.get<void>(`${this.apiUrl}/enable`, params).pipe(
             tap(() => {
-                this.maintenanceStatusSubject.next(true);
+                this.maintenanceStatusSubject.next({enabled: true, ttl});
                 this.statusCache$ = undefined;
             }),
         );
     }
 
     disableMaintenanceMode(): Observable<void> {
-        return this.http.post<void>(`${this.apiUrl}/disable`, {}).pipe(
+        return this.http.get<void>(`${this.apiUrl}/disable`, {}).pipe(
             tap(() => {
-                this.maintenanceStatusSubject.next(false);
+                this.maintenanceStatusSubject.next({enabled: false, ttl: undefined});
                 this.statusCache$ = undefined;
             }),
         );

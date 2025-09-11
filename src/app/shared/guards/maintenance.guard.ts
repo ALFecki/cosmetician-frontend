@@ -19,7 +19,7 @@ export class MaintenanceGuard implements CanActivate {
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
         return this.maintenanceService.getMaintenanceStatus().pipe(
             switchMap(isMaintenanceMode => {
-                if (!isMaintenanceMode) {
+                if (!isMaintenanceMode.enabled) {
                     return of(true);
                 }
 

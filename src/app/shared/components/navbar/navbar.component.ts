@@ -18,10 +18,9 @@ import { CartModalComponent } from '../cart-modal/cart-modal.component';
 
 @Component({
     selector: 'app-navbar',
-    standalone: true,
     imports: [CommonModule, RouterModule, ImageUrlPipe, IconsModule],
     templateUrl: './navbar.component.html',
-    styleUrl: './navbar.component.scss',
+    styleUrl: './navbar.component.scss'
 })
 export class NavbarComponent implements OnDestroy, OnInit {
     isMenuOpen = false;
@@ -109,6 +108,10 @@ export class NavbarComponent implements OnDestroy, OnInit {
         } else {
             this.loginModalService.openLoginModal();
         }
+    }
+
+    navigateToProfile(): void {
+        this.router.navigate(['/profile']);
     }
 
     async logout() {

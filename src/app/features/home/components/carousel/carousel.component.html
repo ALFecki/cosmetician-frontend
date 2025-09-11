@@ -1,73 +1,77 @@
 <div id="carouselExample" class="carousel slide" (mouseenter)="pauseCarousel()" (mouseleave)="resumeCarousel()">
-    <!-- Background blur layer -->
-    <div class="carousel-background">
-        <div
-            *ngFor="let slide of slides; let i = index"
-            class="background-slide"
-            [class.active]="i === getPreviousIndex()"
-            [style.background-image]="'url(' + slide.image + ')'"
-        ></div>
-    </div>
+  <!-- Background blur layer -->
+  <div class="carousel-background">
+    @for (slide of slides; track slide; let i = $index) {
+      <div
+        class="background-slide"
+        [class.active]="i === getPreviousIndex()"
+        [style.background-image]="'url(' + slide.image + ')'"
+      ></div>
+    }
+  </div>
 
-    <div class="carousel-inner">
-        <div *ngFor="let slide of slides; let i = index" class="carousel-item" [class.active]="i === currentIndex">
-            <ng-container *ngFor="let piece of puzzlePieces">
-                <div class="puzzle-piece">
-                    <div class="puzzle-inner">
-                        <img [src]="slide.image | imageUrl" alt="{{ slide.title }}" />
-                    </div>
-                </div>
-            </ng-container>
-            <div class="overlay">
-                <div class="slide-content">
-                    <h2 class="slide-title">{{ slide.title }}</h2>
-                    <p class="slide-description">{{ slide.subtitle }}</p>
-                    <a type="button" class="btn btn-shop" href="{{ slide.buttonLink }}">{{ slide.buttonText }}</a>
-                </div>
+  <div class="carousel-inner">
+    @for (slide of slides; track slide; let i = $index) {
+      <div class="carousel-item" [class.active]="i === currentIndex">
+        @for (piece of puzzlePieces; track piece) {
+          <div class="puzzle-piece">
+            <div class="puzzle-inner">
+              <img [src]="slide.image | imageUrl" alt="{{ slide.title }}" />
             </div>
+          </div>
+        }
+        <div class="overlay">
+          <div class="slide-content">
+            <h2 class="slide-title">{{ slide.title }}</h2>
+            <p class="slide-description">{{ slide.subtitle }}</p>
+            <a type="button" class="btn btn-shop" href="{{ slide.buttonLink }}">{{ slide.buttonText }}</a>
+          </div>
         </div>
-    </div>
+      </div>
+    }
+  </div>
 
-    <button class="carousel-control carousel-control-prev" (click)="prevSlide()" tabindex="0" aria-label="Предыдущий слайд">
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-        >
-            <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
-    </button>
+  <button class="carousel-control carousel-control-prev" (click)="prevSlide()" tabindex="0" aria-label="Предыдущий слайд">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      >
+      <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+  </button>
 
-    <button class="carousel-control carousel-control-next" (click)="nextSlide()" tabindex="0" aria-label="Следующий слайд">
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-        >
-            <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-    </button>
+  <button class="carousel-control carousel-control-next" (click)="nextSlide()" tabindex="0" aria-label="Следующий слайд">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      >
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </button>
 
-    <div class="carousel-indicators">
-        <button
-            *ngFor="let slide of slides; let i = index"
-            class="indicator"
-            [class.active]="i === currentIndex"
-            (click)="goToSlide(i)"
-            tabindex="0"
-            [attr.aria-label]="'Перейти к слайду ' + (i + 1)"
-        ></button>
-    </div>
+  <div class="carousel-indicators">
+    @for (slide of slides; track slide; let i = $index) {
+      <button
+        class="indicator"
+        [class.active]="i === currentIndex"
+        (click)="goToSlide(i)"
+        tabindex="0"
+        [attr.aria-label]="'Перейти к слайду ' + (i + 1)"
+      ></button>
+    }
+  </div>
 </div>

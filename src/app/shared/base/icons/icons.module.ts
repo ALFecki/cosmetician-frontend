@@ -27,6 +27,8 @@ import {
     instagram,
     listUl,
     NgxBootstrapIconsModule,
+    cart3,
+    personCircle,
     pencil,
     person,
     plus,
@@ -85,6 +87,8 @@ import {
     gearFill,
     infoCircleFill,
     book,
+    clockHistory,
+    exclamationCircle,
 } from 'ngx-bootstrap-icons';
 
 const icons = {
@@ -112,10 +116,14 @@ const icons = {
     houseFill,
     grid3X2GapFill,
     listCheck,
+    exclamationCircle,
     awardFill,
     tagFill,
     dropletFill,
     chevronDown,
+    cart3,
+    personCircle,
+    clockHistory,
     gearFill,
     infoCircleFill,
     book,

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -6,8 +6,7 @@ import { FormsModule } from '@angular/forms';
     selector: 'app-pagination',
     templateUrl: './pagination.component.html',
     styleUrls: ['./pagination.component.scss'],
-    standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [FormsModule]
 })
 export class PaginationComponent implements OnChanges {
     @Input() totalItems = 0;

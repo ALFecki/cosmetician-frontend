@@ -13,6 +13,7 @@ export interface ProductModel {
     brandId: string;
     brand: BrandModel;
 
+    productScopeIds: string[];
     productScopes: ProductScopeModel[];
     productTypeId: string;
     productType: ProductTypeModel;
@@ -21,6 +22,8 @@ export interface ProductModel {
     categories: CategoryModel[];
 
     variants: ProductVariantModel[];
+
+    isPriceHidden: boolean;
 
     isDeleted: boolean;
     createdAt: Date;

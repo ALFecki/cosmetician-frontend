@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ImageUrlPipe } from '../../../../shared/utils/image-url.pipe';
 
@@ -14,8 +14,7 @@ interface Slide {
     selector: 'app-carousel',
     templateUrl: './carousel.component.html',
     styleUrls: ['./carousel.component.scss'],
-    standalone: true,
-    imports: [CommonModule, ImageUrlPipe],
+    imports: [ImageUrlPipe]
 })
 export class CarouselComponent implements OnInit, OnDestroy {
     slides: Slide[] = [
@@ -61,11 +60,12 @@ export class CarouselComponent implements OnInit, OnDestroy {
 
     private startAutoSlide() {
         this.stopAutoSlide();
-        this.intervalId = window.setInterval(() => {
-            if (!this.isPaused) {
-                this.nextSlide();
-            }
-        }, 5000);
+        // IMPORTANT TODO: enable auto slide
+        // this.intervalId = window.setInterval(() => {
+        //     if (!this.isPaused) {
+        //         this.nextSlide();
+        //     }
+        // }, 5000);
     }
 
     private stopAutoSlide() {
