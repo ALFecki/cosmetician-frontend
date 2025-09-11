@@ -615,14 +615,10 @@ export class AdminPanelSwitcherComponent implements OnInit {
         try {
             const response = await this.productService.getById(this.currentProductId).toPromise();
             if (response?.data) {
-                // Update the editing item with fresh data
                 this.editingItem = response.data;
 
-                // Rebuild form with updated variants - filter based on showDeletedVariants
                 const filteredVariants = this.getFilteredVariants(response.data.variants || []);
                 this.updateVariantsInForm(filteredVariants);
-
-                // Also update the main data array
                 const index = this.currentModelData.findIndex(item => item.id === this.currentProductId);
                 if (index !== -1) {
                     this.currentModelData[index] = response.data;
@@ -644,12 +640,10 @@ export class AdminPanelSwitcherComponent implements OnInit {
         const variantsArray = this.getVariantsFormArray();
         if (!variantsArray) return;
 
-        // Clear existing controls
         while (variantsArray.length !== 0) {
             variantsArray.removeAt(0);
         }
 
-        // Add updated variants
         variants.forEach(variant => {
             variantsArray.push(
                 this.fb.group({
@@ -717,7 +711,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
         const variantsArray = this.getVariantsFormArray();
         if (!variantsArray) return;
 
-        // Count non-deleted variants
         const activeVariants = this.editingItem?.variants?.filter((v: any) => !v.isDeleted) || [];
         if (activeVariants.length <= 1) {
             this.toastService.show('Нельзя удалить последний активный вариант продукта', 'warning');
@@ -776,7 +769,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
             const value = this.itemForm.value[key];
             console.log(`Processing field: ${key}, Value:`, value);
-            if (value !== null && value !== undefined) {
+            if (value !== null && value !== undefined && value !== '') {
                 if (key === 'variants' || key === 'categoryIds' || key === 'countryIds' || key === 'productScopeIds') {
                     formData[key] = JSON.stringify(value);
                 } else if (typeof value === 'object' && !Array.isArray(value)) {

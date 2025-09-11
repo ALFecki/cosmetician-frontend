@@ -147,7 +147,7 @@
           }
           @if (field.type === 'select') {
             <select class="form-select" [id]="field.key"
-              [formControlName]="field.key">
+              [formControlName]="field.key" [value]="itemForm.get(field.key)?.value">
               <option value="">Выберите...</option>
               @for (option of field.options; track option) {
                 <option [value]="option.id">{{ option.title || option.name }}

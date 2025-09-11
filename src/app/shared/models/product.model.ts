@@ -13,6 +13,7 @@ export interface ProductModel {
     brandId: string;
     brand: BrandModel;
 
+    productScopeIds: string[];
     productScopes: ProductScopeModel[];
     productTypeId: string;
     productType: ProductTypeModel;
