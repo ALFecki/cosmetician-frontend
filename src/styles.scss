@@ -48,6 +48,18 @@ html,
 body {
     overflow-y: scroll;
     height: 100%;
+    // navbar changes
+    padding-top: 85px; // Fixed navbar offset
+
+    @media (max-width: 991.98px) {
+        padding-top: 75px; // Smaller offset for tablet
+    }
+
+    @media (max-width: 576px) {
+        padding-top: 70px; // Smallest offset for mobile
+    }
+
+    // navbar changes
 }
 
 html {

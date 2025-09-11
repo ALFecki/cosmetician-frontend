@@ -6,6 +6,7 @@ import { provideClientHydration } from '@angular/platform-browser';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { routes } from './app.routes';
 import { AuthInterceptor } from './shared/utils/auth.interceptor';
+import { SsrCookieService } from 'ngx-cookie-service-ssr';
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -19,5 +20,6 @@ export const appConfig: ApplicationConfig = {
             multi: true,
         },
         NgbModule,
+        SsrCookieService
     ],
 };

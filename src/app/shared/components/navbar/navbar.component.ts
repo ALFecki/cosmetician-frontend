@@ -110,6 +110,10 @@ export class NavbarComponent implements OnDestroy, OnInit {
         }
     }
 
+    navigateToProfile(): void {
+        this.router.navigate(['/profile']);
+    }
+
     async logout() {
         await this.cartService.syncOrder();
         this.authService.logout().subscribe(() => {
