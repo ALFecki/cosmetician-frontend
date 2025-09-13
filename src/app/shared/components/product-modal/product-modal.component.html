@@ -1,6 +1,6 @@
 <div class="modal-header">
   <div class="modal-header-content">
-    <h4 class="modal-title">{{ selectedProduct?.title }}</h4>
+    <h4 class="modal-title">{{ selectedProduct?.fullTitle ? selectedProduct?.fullTitle : selectedProduct?.title }}</h4>
     <div class="modal-price">
       <span class="price-label">Цена:</span>
       <span class="price-value">{{ getSelectedVariantPrice() | number: '1.2-2' }} р.</span>

@@ -51,7 +51,7 @@
         </div>
         <div class="col-lg-4">
           <div class="product-info-section">
-            <h1 class="card-title">{{ product.title }}</h1>
+            <h1 class="card-title">{{ product.fullTitle ? product.fullTitle : product.title }}</h1>
             <div class="product-meta mb-4">
               <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
                 <a [routerLink]="['/brand', product.brand.id]" class="brand-link">
@@ -162,10 +162,6 @@
               <span>100% оригинальная продукция</span>
             </div>
             <div class="feature-item">
-              <i-bs name="arrow-repeat"></i-bs>
-              <span>Возврат в течение 14 дней</span>
-            </div>
-            <div class="feature-item">
               <i-bs name="credit-card"></i-bs>
               <span>Удобные способы оплаты</span>
             </div>
@@ -181,7 +177,7 @@
             </div>
             <div class="contact-item">
               <i-bs name="envelope-fill"></i-bs>
-              <span>{{ 'info@cosmetician.ru' }}</span>
+              <span>{{ 'skviderm@gmail.com' }}</span>
             </div>
             <div class="contact-item">
               <i-bs name="clock-fill"></i-bs>

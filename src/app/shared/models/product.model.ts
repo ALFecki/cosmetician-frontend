@@ -23,7 +23,7 @@ export interface ProductModel {
 
     variants: ProductVariantModel[];
 
-    isPriceHidden: boolean;
+    isPriceHidden?: boolean;
 
     isDeleted: boolean;
     createdAt: Date;

@@ -89,6 +89,7 @@ import {
     book,
     clockHistory,
     exclamationCircle,
+    personPlus,
 } from 'ngx-bootstrap-icons';
 
 const icons = {
@@ -117,6 +118,7 @@ const icons = {
     grid3X2GapFill,
     listCheck,
     exclamationCircle,
+    personPlus,
     awardFill,
     tagFill,
     dropletFill,
