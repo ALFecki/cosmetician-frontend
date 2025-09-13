@@ -26,7 +26,7 @@ type SortDirection = 'asc' | 'desc';
     selector: 'app-admin-orders',
     templateUrl: './admin-orders.component.html',
     styleUrl: './admin-orders.component.scss',
-    imports: [CommonModule, FormsModule, ImageUrlPipe, IconsModule]
+    imports: [CommonModule, FormsModule, ImageUrlPipe, IconsModule],
 })
 export class AdminOrdersComponent implements OnInit {
     orders$!: Observable<OrderWithUser[]>;

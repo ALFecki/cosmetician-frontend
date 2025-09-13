@@ -20,6 +20,6 @@ export const appConfig: ApplicationConfig = {
             multi: true,
         },
         NgbModule,
-        SsrCookieService
+        SsrCookieService,
     ],
 };

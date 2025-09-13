@@ -5,7 +5,7 @@ import { AdminPanelSwitcherComponent } from '../../shared/components/admin-panel
     selector: 'app-admin',
     templateUrl: './admin.component.html',
     styleUrls: ['./admin.component.scss'],
-    imports: [AdminPanelSwitcherComponent]
+    imports: [AdminPanelSwitcherComponent],
 })
 export class AdminComponent {
     // This component serves as a placeholder for the admin panel.

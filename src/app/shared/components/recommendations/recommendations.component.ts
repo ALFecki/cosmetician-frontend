@@ -4,6 +4,6 @@ import { Component } from '@angular/core';
     selector: 'app-recommendations',
     imports: [],
     templateUrl: './recommendations.component.html',
-    styleUrl: './recommendations.component.scss'
+    styleUrl: './recommendations.component.scss',
 })
 export class RecommendationsComponent {}

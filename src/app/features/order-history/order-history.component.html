@@ -1,76 +1,76 @@
 <div class="container my-5">
-  <div class="row">
-    <div class="col-md-3">
-      <app-profile-sidebar></app-profile-sidebar>
-    </div>
-
-    <div class="col-md-9">
-      <div class="card">
-        <div class="card-header bg-white">
-          <h4 class="mb-0">История заказов</h4>
+    <div class="row">
+        <div class="col-md-3">
+            <app-profile-sidebar></app-profile-sidebar>
         </div>
-        <div class="card-body">
-          @if (loading) {
-            <div class="text-center my-5">
-              <div class="spinner-border" role="status">
-                <span class="visually-hidden">Загрузка...</span>
-              </div>
-            </div>
-          }
 
-          @if (error) {
-            <div class="alert alert-danger">
-              {{ error }}
-            </div>
-          }
-
-          <div class="table-responsive">
-            @if (orders$ | async; as orders) {
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>№ заказа</th>
-                    <th>Дата</th>
-                    <th>Сумма</th>
-                    <th>Статус</th>
-                    <th>Действия</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (order of orders; track order) {
-                    <tr>
-                      <td>{{ order.id }}</td>
-                      <td>{{ order.createdAt | date: 'dd.MM.yyyy HH:mm' }}</td>
-                      <td>{{ order.totalPrice | number: '1.2-2' }} р.</td>
-                      <td>
-                        <span class="badge rounded-pill {{ getOrderStatusClass(order.status) }}">
-                          {{ getOrderStatusText(order.status) }}
-                        </span>
-                      </td>
-                      <td>
-                        <button class="btn btn-sm btn-outline-primary" [routerLink]="['/order', order.id]">
-                          Подробнее
-                        </button>
-                      </td>
-                    </tr>
-                  }
-                  @if (orders.length === 0) {
-                    <tr>
-                      <td colspan="5" class="text-center py-4">
-                        <div class="text-muted">
-                          <i class="bi bi-inbox-fill fs-2 d-block mb-2"></i>
-                          У вас пока нет заказов
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0">История заказов</h4>
+                </div>
+                <div class="card-body">
+                    @if (loading) {
+                        <div class="text-center my-5">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Загрузка...</span>
+                            </div>
                         </div>
-                        <a routerLink="/products" class="btn btn-primary mt-3">Перейти в каталог</a>
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            }
-          </div>
+                    }
+
+                    @if (error) {
+                        <div class="alert alert-danger">
+                            {{ error }}
+                        </div>
+                    }
+
+                    <div class="table-responsive">
+                        @if (orders$ | async; as orders) {
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>№ заказа</th>
+                                        <th>Дата</th>
+                                        <th>Сумма</th>
+                                        <th>Статус</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (order of orders; track order) {
+                                        <tr>
+                                            <td>{{ order.id }}</td>
+                                            <td>{{ order.createdAt | date: 'dd.MM.yyyy HH:mm' }}</td>
+                                            <td>{{ order.totalPrice | number: '1.2-2' }} р.</td>
+                                            <td>
+                                                <span class="badge rounded-pill {{ getOrderStatusClass(order.status) }}">
+                                                    {{ getOrderStatusText(order.status) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary" [routerLink]="['/order', order.id]">
+                                                    Подробнее
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (orders.length === 0) {
+                                        <tr>
+                                            <td colspan="5" class="text-center py-4">
+                                                <div class="text-muted">
+                                                    <i class="bi bi-inbox-fill fs-2 d-block mb-2"></i>
+                                                    У вас пока нет заказов
+                                                </div>
+                                                <a routerLink="/products" class="btn btn-primary mt-3">Перейти в каталог</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>

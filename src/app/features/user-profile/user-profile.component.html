@@ -1,97 +1,96 @@
 <div class="container my-5">
-  <div class="row">
-    <div class="col-md-3">
-      <app-profile-sidebar></app-profile-sidebar>
-    </div>
-
-    <div class="col-md-9">
-      <div class="card">
-        <div class="card-header bg-white">
-          <h4 class="mb-0">Личные данные</h4>
+    <div class="row">
+        <div class="col-md-3">
+            <app-profile-sidebar></app-profile-sidebar>
         </div>
-        <div class="card-body">
-          @if (currentUser.value && !currentUser.value.isEmailVerified) {
-          <div class="alert alert-warning d-flex justify-content-between align-items-center mb-3">
-            <div>
-              <i class="fas fa-exclamation-triangle me-2"></i>
-              <strong>Внимание!</strong> Ваш email не подтвержден. Подтвердите email для полного доступа к функциям
-              сайта.
-            </div>
-            <button type="button" class="btn btn-outline-warning btn-sm" (click)="sendEmailVerification()"
-              [disabled]="emailVerificationLoading">
-              @if (emailVerificationLoading) {
-              <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-              }
-              Отправить подтверждение
-            </button>
-          </div>
-          }
 
-          <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
-            @if (success) {
-            <div class="alert alert-success">{{ success }}</div>
-            }
-            @if (error) {
-            <div class="alert alert-danger">{{ error }}</div>
-            }
-
-            <div class="mb-3 row">
-              <label for="firstName" class="col-md-3 col-form-label">Имя</label>
-              <div class="col-md-9">
-                <input type="text" class="form-control" id="firstName" formControlName="firstName" />
-                @if (profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched) {
-                <div class="form-text text-danger">
-                  Имя обязательно для заполнения
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0">Личные данные</h4>
                 </div>
-                }
-              </div>
-            </div>
+                <div class="card-body">
+                    @if (currentUser.value && !currentUser.value.isEmailVerified) {
+                        <div class="alert alert-warning d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Внимание!</strong> Ваш email не подтвержден. Подтвердите email для полного доступа к функциям сайта.
+                            </div>
+                            <button
+                                type="button"
+                                class="btn btn-outline-warning btn-sm"
+                                (click)="sendEmailVerification()"
+                                [disabled]="emailVerificationLoading"
+                            >
+                                @if (emailVerificationLoading) {
+                                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                }
+                                Отправить подтверждение
+                            </button>
+                        </div>
+                    }
 
-            <div class="mb-3 row">
-              <label for="secondName" class="col-md-3 col-form-label">Фамилия</label>
-              <div class="col-md-9">
-                <input type="text" class="form-control" id="secondName" formControlName="secondName" />
-                @if (profileForm.get('secondName')?.invalid && profileForm.get('secondName')?.touched) {
-                <div class="form-text text-danger">
-                  Фамилия обязательна для заполнения
+                    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+                        @if (success) {
+                            <div class="alert alert-success">{{ success }}</div>
+                        }
+                        @if (error) {
+                            <div class="alert alert-danger">{{ error }}</div>
+                        }
+
+                        <div class="mb-3 row">
+                            <label for="firstName" class="col-md-3 col-form-label">Имя</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="firstName" formControlName="firstName" />
+                                @if (profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched) {
+                                    <div class="form-text text-danger">Имя обязательно для заполнения</div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label for="secondName" class="col-md-3 col-form-label">Фамилия</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="secondName" formControlName="secondName" />
+                                @if (profileForm.get('secondName')?.invalid && profileForm.get('secondName')?.touched) {
+                                    <div class="form-text text-danger">Фамилия обязательна для заполнения</div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label for="surname" class="col-md-3 col-form-label">Отчество</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="surname" formControlName="surname" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label for="email" class="col-md-3 col-form-label">Email</label>
+                            <div class="col-md-9">
+                                <input type="email" class="form-control" id="email" formControlName="email" [disabled]="true" />
+                                <div class="form-text">Для изменения email обратитесь в службу поддержки</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label for="phone" class="col-md-3 col-form-label">Телефон</label>
+                            <div class="col-md-9">
+                                <input type="tel" class="form-control" id="phone" formControlName="phone" />
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || loading">
+                                @if (loading) {
+                                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                }
+                                Сохранить изменения
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                }
-              </div>
             </div>
-
-            <div class="mb-3 row">
-              <label for="surname" class="col-md-3 col-form-label">Отчество</label>
-              <div class="col-md-9">
-                <input type="text" class="form-control" id="surname" formControlName="surname" />
-              </div>
-            </div>
-
-            <div class="mb-3 row">
-              <label for="email" class="col-md-3 col-form-label">Email</label>
-              <div class="col-md-9">
-                <input type="email" class="form-control" id="email" formControlName="email" [disabled]="true" />
-                <div class="form-text">Для изменения email обратитесь в службу поддержки</div>
-              </div>
-            </div>
-
-            <div class="mb-3 row">
-              <label for="phone" class="col-md-3 col-form-label">Телефон</label>
-              <div class="col-md-9">
-                <input type="tel" class="form-control" id="phone" formControlName="phone" />
-              </div>
-            </div>
-
-            <div class="d-flex justify-content-end">
-              <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || loading">
-                @if (loading) {
-                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                }
-                Сохранить изменения
-              </button>
-            </div>
-          </form>
         </div>
-      </div>
     </div>
-  </div>
 </div>

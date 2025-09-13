@@ -1,106 +1,111 @@
 <div class="container my-5">
-  <div class="row">
-    <div class="col-md-3">
-      <app-profile-sidebar></app-profile-sidebar>
-    </div>
-
-    <div class="col-md-9">
-      <div class="card">
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-          <h4 class="mb-0">Детали заказа</h4>
-          <a routerLink="/orders" class="btn btn-sm btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i> Назад к списку
-          </a>
+    <div class="row">
+        <div class="col-md-3">
+            <app-profile-sidebar></app-profile-sidebar>
         </div>
 
-        <div class="card-body">
-          @if (loading) {
-            <div class="text-center my-5">
-              <div class="spinner-border" role="status">
-                <span class="visually-hidden">Загрузка...</span>
-              </div>
-            </div>
-          }
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Детали заказа</h4>
+                    <a routerLink="/orders" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Назад к списку
+                    </a>
+                </div>
 
-          @if (error) {
-            <div class="alert alert-danger">
-              {{ error }}
-            </div>
-          }
+                <div class="card-body">
+                    @if (loading) {
+                        <div class="text-center my-5">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Загрузка...</span>
+                            </div>
+                        </div>
+                    }
 
-          @if (!loading && !error && order) {
-            <div>
-              <div class="order-header mb-4">
-                <div class="row">
-                  <div class="col-md-6">
-                    <h5 class="text-muted mb-1">Заказ №{{ (order | async)?.id }}</h5>
-                    <p class="mb-0">от {{ (order | async)?.createdAt | date: 'dd.MM.yyyy HH:mm' }}</p>
-                  </div>
-                  <div class="col-md-6 text-md-end">
-                    <span
-                                        class="badge rounded-pill order-status-badge {{
-                                            getOrderStatusClass((order | async)?.status || '')
-                                        }} fs-6 mb-2"
-                      >
-                      {{ getOrderStatusText((order | async)?.status || '') }}
-                    </span>
-                    <!-- <div *ngIf="canCancelOrder()">
+                    @if (error) {
+                        <div class="alert alert-danger">
+                            {{ error }}
+                        </div>
+                    }
+
+                    @if (!loading && !error && order) {
+                        <div>
+                            <div class="order-header mb-4">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5 class="text-muted mb-1">Заказ №{{ (order | async)?.id }}</h5>
+                                        <p class="mb-0">от {{ (order | async)?.createdAt | date: 'dd.MM.yyyy HH:mm' }}</p>
+                                    </div>
+                                    <div class="col-md-6 text-md-end">
+                                        <span
+                                            class="badge rounded-pill order-status-badge {{
+                                                getOrderStatusClass((order | async)?.status || '')
+                                            }} fs-6 mb-2"
+                                        >
+                                            {{ getOrderStatusText((order | async)?.status || '') }}
+                                        </span>
+                                        <!-- <div *ngIf="canCancelOrder()">
                     <button class="btn btn-sm btn-outline-danger" [disabled]="cancellingOrder" (click)="cancelOrder()">
                       <span class="spinner-border spinner-border-sm me-1" *ngIf="cancellingOrder"></span>
                       Отменить заказ
                     </button>
                   </div> -->
-                </div>
-              </div>
-              <hr class="my-3" />
-            </div>
-            <div class="order-items mb-4">
-              <h5>Товары в заказе</h5>
-              <div class="table-responsive">
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th style="width: 80px">Фото</th>
-                      <th>Товар</th>
-                      <th class="text-end">Цена</th>
-                      <th class="text-center">Кол-во</th>
-                      <th class="text-end">Сумма</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (item of (order | async)?.products; track item) {
-                      <tr>
-                        <td>
-                          <img
-                            [src]="item.product.image | imageUrl"
-                            class="img-thumbnail order-item-img"
-                            [alt]="item.product.title || 'Product'"
-                            />
-                        </td>
-                        <td>
-                          <a [routerLink]="['/product', item.product.id]" class="fw-medium text-decoration-none">
-                            {{ item.product.title || 'Товар' }}
-                          </a>
-                          <small class="d-block text-muted"> {{ item.variant.volume || '-' }} мл </small>
-                        </td>
-                        <td class="text-end">{{ item.historicalPrice | number: '1.2-2' }} р.</td>
-                        <td class="text-center">{{ item.quantity }}</td>
-                        <td class="text-end fw-bold">
-                          {{ item.historicalPrice * item.quantity | number: '1.2-2' }} р.
-                        </td>
-                      </tr>
-                    }
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <td colspan="4" class="text-end fw-bold">Итого:</td>
-                      <td class="text-end fw-bold fs-5">{{ (order | async)?.totalPrice | number: '1.2-2' }} р.</td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            </div>
-            <!-- <div class="row mt-4">
+                                    </div>
+                                </div>
+                                <hr class="my-3" />
+                            </div>
+                            <div class="order-items mb-4">
+                                <h5>Товары в заказе</h5>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 80px">Фото</th>
+                                                <th>Товар</th>
+                                                <th class="text-end">Цена</th>
+                                                <th class="text-center">Кол-во</th>
+                                                <th class="text-end">Сумма</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @for (item of (order | async)?.products; track item) {
+                                                <tr>
+                                                    <td>
+                                                        <img
+                                                            [src]="item.product.image | imageUrl"
+                                                            class="img-thumbnail order-item-img"
+                                                            [alt]="item.product.title || 'Product'"
+                                                        />
+                                                    </td>
+                                                    <td>
+                                                        <a
+                                                            [routerLink]="['/product', item.product.id]"
+                                                            class="fw-medium text-decoration-none"
+                                                        >
+                                                            {{ item.product.title || 'Товар' }}
+                                                        </a>
+                                                        <small class="d-block text-muted"> {{ item.variant.volume || '-' }} мл </small>
+                                                    </td>
+                                                    <td class="text-end">{{ item.historicalPrice | number: '1.2-2' }} р.</td>
+                                                    <td class="text-center">{{ item.quantity }}</td>
+                                                    <td class="text-end fw-bold">
+                                                        {{ item.historicalPrice * item.quantity | number: '1.2-2' }} р.
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="4" class="text-end fw-bold">Итого:</td>
+                                                <td class="text-end fw-bold fs-5">
+                                                    {{ (order | async)?.totalPrice | number: '1.2-2' }} р.
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- <div class="row mt-4">
             <div class="col-md-6 mb-3">
               <div class="card h-100">
                 <div class="card-header bg-light">
@@ -111,7 +116,7 @@
                 </div>
               </div>
             </div> -->
-            <!-- <div class="col-md-6 mb-3">
+                            <!-- <div class="col-md-6 mb-3">
             <div class="card h-100">
               <div class="card-header bg-light">
                 <h5 class="mb-0">Способ оплаты</h5>
@@ -122,20 +127,20 @@
             </div>
           </div>
         </div> -->
-        @if ((order | async)?.id) {
-          <div class="card mt-3">
-            <div class="card-header bg-light">
-              <h5 class="mb-0">Трек-номер</h5>
+                            @if ((order | async)?.id) {
+                                <div class="card mt-3">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Трек-номер</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-0">{{ (order | async)?.id }}</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
             </div>
-            <div class="card-body">
-              <p class="mb-0">{{ (order | async)?.id }}</p>
-            </div>
-          </div>
-        }
-      </div>
-    }
-  </div>
-</div>
-</div>
-</div>
+        </div>
+    </div>
 </div>

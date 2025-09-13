@@ -12,7 +12,7 @@ import { CategoryService } from '../../services/category.service';
     selector: 'app-footer',
     imports: [CommonModule, RouterModule, IconsModule],
     templateUrl: './footer.component.html',
-    styleUrl: './footer.component.scss'
+    styleUrl: './footer.component.scss',
 })
 export class FooterComponent {
     categories$: Observable<CategoryModel[]>;

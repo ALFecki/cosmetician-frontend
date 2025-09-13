@@ -20,7 +20,7 @@ import { CartModalComponent } from '../cart-modal/cart-modal.component';
     selector: 'app-navbar',
     imports: [CommonModule, RouterModule, ImageUrlPipe, IconsModule],
     templateUrl: './navbar.component.html',
-    styleUrl: './navbar.component.scss'
+    styleUrl: './navbar.component.scss',
 })
 export class NavbarComponent implements OnDestroy, OnInit {
     isMenuOpen = false;
@@ -102,7 +102,6 @@ export class NavbarComponent implements OnDestroy, OnInit {
                     size: 'lg',
                     centered: true,
                     scrollable: true,
-                    
                 });
             }
         } else {

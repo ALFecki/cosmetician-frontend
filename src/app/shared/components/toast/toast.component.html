@@ -1,20 +1,20 @@
 @if (toastService.visible) {
-  <div class="error-toast-container">
-    <div class="error-toast" [ngClass]="toastService.type">
-      @if (toastService.type === 'success') {
-        <span class="toast-icon">✅</span>
-      }
-      @if (toastService.type === 'error') {
-        <span class="toast-icon">❗</span>
-      }
-      @if (toastService.type === 'warning') {
-        <span class="toast-icon">⚠️</span>
-      }
-      @if (toastService.type === 'info') {
-        <span class="toast-icon">💡</span>
-      }
-      <span class="error-toast-message">{{ toastService.message }}</span>
-      <button class="btn-close" (click)="toastService.hide()" aria-label="Закрыть">×</button>
+    <div class="error-toast-container">
+        <div class="error-toast" [ngClass]="toastService.type">
+            @if (toastService.type === 'success') {
+                <span class="toast-icon">✅</span>
+            }
+            @if (toastService.type === 'error') {
+                <span class="toast-icon">❗</span>
+            }
+            @if (toastService.type === 'warning') {
+                <span class="toast-icon">⚠️</span>
+            }
+            @if (toastService.type === 'info') {
+                <span class="toast-icon">💡</span>
+            }
+            <span class="error-toast-message">{{ toastService.message }}</span>
+            <button class="btn-close" (click)="toastService.hide()" aria-label="Закрыть">×</button>
+        </div>
     </div>
-  </div>
 }

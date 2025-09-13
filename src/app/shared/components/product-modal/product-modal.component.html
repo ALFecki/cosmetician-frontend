@@ -1,132 +1,116 @@
 <div class="modal-header">
-  <div class="modal-header-content">
-    <h4 class="modal-title">{{ selectedProduct?.fullTitle ? selectedProduct?.fullTitle : selectedProduct?.title }}</h4>
-    <div class="modal-price">
-      <span class="price-label">Цена:</span>
-      <span class="price-value">{{ getSelectedVariantPrice() | number: '1.2-2' }} р.</span>
+    <div class="modal-header-content">
+        <h4 class="modal-title">{{ selectedProduct?.fullTitle ? selectedProduct?.fullTitle : selectedProduct?.title }}</h4>
+        <div class="modal-price">
+            <span class="price-label">Цена:</span>
+            <span class="price-value">{{ getSelectedVariantPrice() | number: '1.2-2' }} р.</span>
+        </div>
     </div>
-  </div>
-  <button type="button" class="btn-close" (click)="closeModal()" aria-label="Закрыть">
-    <i-bs name="x-lg"></i-bs>
-  </button>
+    <button type="button" class="btn-close" (click)="closeModal()" aria-label="Закрыть">
+        <i-bs name="x-lg"></i-bs>
+    </button>
 </div>
 <div class="modal-body">
-  <div class="product-top-section">
-    <img [src]="selectedProduct?.image | imageUrl" class="modal-product-image" [alt]="selectedProduct?.title" />
+    <div class="product-top-section">
+        <img [src]="selectedProduct?.image | imageUrl" class="modal-product-image" [alt]="selectedProduct?.title" />
 
-    <div class="product-details-side">
-      @if (selectedProduct?.variants && selectedProduct!.variants.length > 1) {
-        <div class="variant-selection">
-          <h6><i-bs name="droplet" class="me-2"></i-bs>Выберите объем</h6>
-          <div class="variant-buttons">
-            @for (variant of selectedProduct?.variants; track variant) {
-              <button
-                class="btn btn-sm variant-btn"
-                [class.active]="selectedVariantId === variant.id"
-                (click)="selectVariant(variant.id)"
-                >
-                <div class="variant-volume">{{ variant.volume }}мл</div>
-                <div class="variant-price">{{ variant.price | number: '1.2-2' }} р.</div>
-              </button>
+        <div class="product-details-side">
+            @if (selectedProduct?.variants && selectedProduct!.variants.length > 1) {
+                <div class="variant-selection">
+                    <h6><i-bs name="droplet" class="me-2"></i-bs>Выберите объем</h6>
+                    <div class="variant-buttons">
+                        @for (variant of selectedProduct?.variants; track variant) {
+                            <button
+                                class="btn btn-sm variant-btn"
+                                [class.active]="selectedVariantId === variant.id"
+                                (click)="selectVariant(variant.id)"
+                            >
+                                <div class="variant-volume">{{ variant.volume }}мл</div>
+                                <div class="variant-price">{{ variant.price | number: '1.2-2' }} р.</div>
+                            </button>
+                        }
+                    </div>
+                </div>
             }
-          </div>
-        </div>
-      }
 
-      <div class="characteristics-compact">
-        <h6><i-bs name="info-circle" class="me-2"></i-bs>Характеристики</h6>
-        <div class="characteristics-grid">
-          <div class="char-item">
-            <span class="char-label">Бренд:</span>
-            <span class="char-value">{{ selectedProduct?.brand?.title || '—' }}</span>
-          </div>
-          <div class="char-item">
-            <span class="char-label">Страна:</span>
-            <span class="char-value">{{ getCountryNames(selectedProduct) || '—' }}</span>
-          </div>
-          <div class="char-item">
-            <span class="char-label">Объем:</span>
-            <span class="char-value">{{ getSelectedVariantVolume() }}мл</span>
-          </div>
-          <div class="char-item">
-            <span class="char-label">Тип:</span>
-            <span class="char-value">{{ selectedProduct?.productType?.title || '—' }}</span>
-          </div>
-          <div class="char-item">
-            <span class="char-label">Назначение:</span>
-            <span class="char-value">{{ getProductScopeNames(selectedProduct) }}</span>
-          </div>
+            <div class="characteristics-compact">
+                <h6><i-bs name="info-circle" class="me-2"></i-bs>Характеристики</h6>
+                <div class="characteristics-grid">
+                    <div class="char-item">
+                        <span class="char-label">Бренд:</span>
+                        <span class="char-value">{{ selectedProduct?.brand?.title || '—' }}</span>
+                    </div>
+                    <div class="char-item">
+                        <span class="char-label">Страна:</span>
+                        <span class="char-value">{{ getCountryNames(selectedProduct) || '—' }}</span>
+                    </div>
+                    <div class="char-item">
+                        <span class="char-label">Объем:</span>
+                        <span class="char-value">{{ getSelectedVariantVolume() }}мл</span>
+                    </div>
+                    <div class="char-item">
+                        <span class="char-label">Тип:</span>
+                        <span class="char-value">{{ selectedProduct?.productType?.title || '—' }}</span>
+                    </div>
+                    <div class="char-item">
+                        <span class="char-label">Назначение:</span>
+                        <span class="char-value">{{ getProductScopeNames(selectedProduct) }}</span>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 
-  @if (selectedProduct?.description || selectedProduct?.methodOfUse) {
-    <div class="info-tabs">
-      <div class="tab-buttons">
-        @if (selectedProduct?.description) {
-          <button
-            class="tab-btn"
-            [class.active]="activeTab === 'description'"
-            (click)="activeTab = 'description'"
-            >
-            <i-bs name="card-text"></i-bs>
-            <span>Описание</span>
-          </button>
-        }
-        <button class="tab-btn" [class.active]="activeTab === 'composition'" (click)="activeTab = 'composition'">
-          <i-bs name="list-ul"></i-bs>
-          <span>Состав</span>
+    @if (selectedProduct?.description || selectedProduct?.methodOfUse) {
+        <div class="info-tabs">
+            <div class="tab-buttons">
+                @if (selectedProduct?.description) {
+                    <button class="tab-btn" [class.active]="activeTab === 'description'" (click)="activeTab = 'description'">
+                        <i-bs name="card-text"></i-bs>
+                        <span>Описание</span>
+                    </button>
+                }
+                <button class="tab-btn" [class.active]="activeTab === 'composition'" (click)="activeTab = 'composition'">
+                    <i-bs name="list-ul"></i-bs>
+                    <span>Состав</span>
+                </button>
+                @if (selectedProduct?.methodOfUse) {
+                    <button class="tab-btn" [class.active]="activeTab === 'usage'" (click)="activeTab = 'usage'">
+                        <i-bs name="clipboard-check"></i-bs>
+                        <span>Применение</span>
+                    </button>
+                }
+            </div>
+            <div class="tab-content">
+                @if (selectedProduct?.description) {
+                    <div class="tab-pane" [class.show]="activeTab === 'description'" [class.active]="activeTab === 'description'">
+                        <p>{{ selectedProduct?.description }}</p>
+                    </div>
+                }
+                <div class="tab-pane" [class.show]="activeTab === 'composition'" [class.active]="activeTab === 'composition'">
+                    <p>{{ selectedProduct?.composition || 'Нет информации о составе' }}</p>
+                </div>
+                @if (selectedProduct?.methodOfUse) {
+                    <div class="tab-pane" [class.show]="activeTab === 'usage'" [class.active]="activeTab === 'usage'">
+                        <p>{{ selectedProduct?.methodOfUse }}</p>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <div class="action-buttons">
+        <button class="btn btn-primary btn-sm" (click)="addToCart(selectedProduct)">
+            <i-bs name="cart-plus"></i-bs>
+            В корзину
         </button>
-        @if (selectedProduct?.methodOfUse) {
-          <button
-            class="tab-btn"
-            [class.active]="activeTab === 'usage'"
-            (click)="activeTab = 'usage'"
-            >
-            <i-bs name="clipboard-check"></i-bs>
-            <span>Применение</span>
-          </button>
-        }
-      </div>
-      <div class="tab-content">
-        @if (selectedProduct?.description) {
-          <div
-            class="tab-pane"
-            [class.show]="activeTab === 'description'"
-            [class.active]="activeTab === 'description'"
-            >
-            <p>{{ selectedProduct?.description }}</p>
-          </div>
-        }
-        <div class="tab-pane" [class.show]="activeTab === 'composition'" [class.active]="activeTab === 'composition'">
-          <p>{{ selectedProduct?.composition || 'Нет информации о составе' }}</p>
-        </div>
-        @if (selectedProduct?.methodOfUse) {
-          <div
-            class="tab-pane"
-            [class.show]="activeTab === 'usage'"
-            [class.active]="activeTab === 'usage'"
-            >
-            <p>{{ selectedProduct?.methodOfUse }}</p>
-          </div>
-        }
-      </div>
+        <button class="btn btn-outline-primary btn-sm" (click)="moreInfo()">
+            <i-bs name="eye"></i-bs>
+            Подробнее
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="closeModal()">
+            <i-bs name="x-circle"></i-bs>
+            Закрыть
+        </button>
     </div>
-  }
-
-  <div class="action-buttons">
-    <button class="btn btn-primary btn-sm" (click)="addToCart(selectedProduct)">
-      <i-bs name="cart-plus"></i-bs>
-      В корзину
-    </button>
-    <button class="btn btn-outline-primary btn-sm" (click)="moreInfo()">
-      <i-bs name="eye"></i-bs>
-      Подробнее
-    </button>
-    <button class="btn btn-outline-secondary btn-sm" (click)="closeModal()">
-      <i-bs name="x-circle"></i-bs>
-      Закрыть
-    </button>
-  </div>
 </div>

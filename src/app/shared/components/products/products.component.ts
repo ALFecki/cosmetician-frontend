@@ -19,7 +19,7 @@ import { ProductModalComponent } from '../product-modal/product-modal.component'
     providers: [],
     imports: [CommonModule, PaginationComponent, ProductFilterComponent, ImageUrlPipe],
     templateUrl: './products.component.html',
-    styleUrl: './products.component.scss'
+    styleUrl: './products.component.scss',
 })
 export class ProductsComponent implements OnInit {
     products$!: Observable<ProductModel[]>;
@@ -53,15 +53,13 @@ export class ProductsComponent implements OnInit {
         this.loadProducts();
     }
 
- 
+    isPriceRevealed(productId: string): boolean {
+        return this.revealedPrices.has(productId);
+    }
 
-isPriceRevealed(productId: string): boolean {
-  return this.revealedPrices.has(productId);
-}
-
-revealPrice(productId: string): void {
-  this.revealedPrices.add(productId);
-}
+    revealPrice(productId: string): void {
+        this.revealedPrices.add(productId);
+    }
     resetFilters(): void {
         this.filterOptions = {};
         this.currentPage = 1;

@@ -12,7 +12,7 @@ import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
     selector: 'app-brand',
     imports: [CommonModule, ProductsComponent, IconsModule, ImageUrlPipe],
     templateUrl: './brand.component.html',
-    styleUrl: './brand.component.scss'
+    styleUrl: './brand.component.scss',
 })
 export class BrandComponent implements OnInit {
     brandId!: string;

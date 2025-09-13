@@ -1,155 +1,149 @@
 <div
-  class="table-responsive table-drag-scroll"
-  #tableContainer
-  (mousedown)="startDrag($event)"
-  (mousemove)="onDrag($event)"
-  (mouseup)="stopDrag()"
-  (mouseleave)="stopDrag()"
-  [class.dragging]="isDragging"
-  >
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        @for (column of columns; track column) {
-          <th>{{ column.title }}</th>
-        }
-        <th class="text-end">Действия</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (item of data; track item) {
-        <tr>
-          @for (column of columns; track column) {
-            <td>
-              @switch (column.type) {
-                @case ('image') {
-                  @if (getNestedProperty(item, column.key)) {
-                    <img
-                      [src]="getNestedProperty(item, column.key) | imageUrl"
-                      class="table-thumbnail"
-                      [alt]="getNestedProperty(item, column.key)"
-                      />
-                  }
-                  @if (!getNestedProperty(item, column.key)) {
-                    <span>—</span>
-                  }
+    class="table-responsive table-drag-scroll"
+    #tableContainer
+    (mousedown)="startDrag($event)"
+    (mousemove)="onDrag($event)"
+    (mouseup)="stopDrag()"
+    (mouseleave)="stopDrag()"
+    [class.dragging]="isDragging"
+>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                @for (column of columns; track column) {
+                    <th>{{ column.title }}</th>
                 }
-                @case ('date') {
-                  {{ getNestedProperty(item, column.key) | date: 'dd.MM.yyyy' }}
-                }
-                @case ('number') {
-                  {{ getNestedProperty(item, column.key) | number: '1.2-2' }}
-                }
-                @case ('boolean') {
-                  @if (getNestedProperty(item, column.key) === true) {
-                    <span>Да</span>
-                  }
-                  @if (getNestedProperty(item, column.key) === false) {
-                    <span>Нет</span>
-                  }
-                  @if (getNestedProperty(item, column.key) === null || getNestedProperty(item, column.key) === undefined) {
-                    <span
-                      >—</span
-                      >
-                    }
-                  }
-                  @case ('variants') {
-                    @if (getNestedProperty(item, column.key) && getNestedProperty(item, column.key).length > 0) {
-                      <div
-                        class="variants-table-container"
-                        >
-                        <table class="table table-sm table-bordered variants-table">
-                          <thead>
-                            <tr>
-                              <!-- <th>ID</th> -->
-                              <th>Объем (мл)</th>
-                              <th>Себестоимость (р.)</th>
-                              <th>Цена (р.)</th>
-                              <th>Активен?</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            @for (variant of getNestedProperty(item, column.key); track variant) {
-                              <tr>
-                                <!-- <td><small class="text-muted">{{ variant.id }}</small></td> -->
-                                <td>{{ variant.volume }}</td>
-                                <td>{{ variant.costPrice | number: '1.2-2' }}</td>
-                                <td>{{ variant.price | number: '1.2-2' }}</td>
-                                <td>
-                                  @if (!variant.isDeleted) {
-                                    <span>Да</span>
-                                  }
-                                  @if (variant.isDeleted) {
-                                    <span>Нет</span>
-                                  }
-                                </td>
-                              </tr>
+                <th class="text-end">Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (item of data; track item) {
+                <tr>
+                    @for (column of columns; track column) {
+                        <td>
+                            @switch (column.type) {
+                                @case ('image') {
+                                    @if (getNestedProperty(item, column.key)) {
+                                        <img
+                                            [src]="getNestedProperty(item, column.key) | imageUrl"
+                                            class="table-thumbnail"
+                                            [alt]="getNestedProperty(item, column.key)"
+                                        />
+                                    }
+                                    @if (!getNestedProperty(item, column.key)) {
+                                        <span>—</span>
+                                    }
+                                }
+                                @case ('date') {
+                                    {{ getNestedProperty(item, column.key) | date: 'dd.MM.yyyy' }}
+                                }
+                                @case ('number') {
+                                    {{ getNestedProperty(item, column.key) | number: '1.2-2' }}
+                                }
+                                @case ('boolean') {
+                                    @if (getNestedProperty(item, column.key) === true) {
+                                        <span>Да</span>
+                                    }
+                                    @if (getNestedProperty(item, column.key) === false) {
+                                        <span>Нет</span>
+                                    }
+                                    @if (
+                                        getNestedProperty(item, column.key) === null || getNestedProperty(item, column.key) === undefined
+                                    ) {
+                                        <span>—</span>
+                                    }
+                                }
+                                @case ('variants') {
+                                    @if (getNestedProperty(item, column.key) && getNestedProperty(item, column.key).length > 0) {
+                                        <div class="variants-table-container">
+                                            <table class="table table-sm table-bordered variants-table">
+                                                <thead>
+                                                    <tr>
+                                                        <!-- <th>ID</th> -->
+                                                        <th>Объем (мл)</th>
+                                                        <th>Себестоимость (р.)</th>
+                                                        <th>Цена (р.)</th>
+                                                        <th>Активен?</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @for (variant of getNestedProperty(item, column.key); track variant) {
+                                                        <tr>
+                                                            <!-- <td><small class="text-muted">{{ variant.id }}</small></td> -->
+                                                            <td>{{ variant.volume }}</td>
+                                                            <td>{{ variant.costPrice | number: '1.2-2' }}</td>
+                                                            <td>{{ variant.price | number: '1.2-2' }}</td>
+                                                            <td>
+                                                                @if (!variant.isDeleted) {
+                                                                    <span>Да</span>
+                                                                }
+                                                                @if (variant.isDeleted) {
+                                                                    <span>Нет</span>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    }
+                                    @if (!getNestedProperty(item, column.key) || getNestedProperty(item, column.key).length === 0) {
+                                        <span>—</span>
+                                    }
+                                }
+                                @case ('array') {
+                                    @if (getNestedProperty(item, column.key) && getNestedProperty(item, column.key).length > 0) {
+                                        <span>
+                                            @for (arrayItem of getNestedProperty(item, column.key); track arrayItem; let last = $last) {
+                                                <span>
+                                                    {{ arrayItem.title || arrayItem.name || arrayItem }}
+                                                    @if (!last) {
+                                                        <span>, </span>
+                                                    }
+                                                </span>
+                                            }
+                                        </span>
+                                    }
+                                    @if (!getNestedProperty(item, column.key) || getNestedProperty(item, column.key).length === 0) {
+                                        <span>—</span>
+                                    }
+                                }
+                                @default {
+                                    {{ getNestedProperty(item, column.key) || '—' }}
+                                }
                             }
-                          </tbody>
-                        </table>
-                      </div>
+                        </td>
                     }
-                    @if (!getNestedProperty(item, column.key) || getNestedProperty(item, column.key).length === 0) {
-                      <span>—</span>
-                    }
-                  }
-                  @case ('array') {
-                    @if (getNestedProperty(item, column.key) && getNestedProperty(item, column.key).length > 0) {
-                      <span>
-                        @for (arrayItem of getNestedProperty(item, column.key); track arrayItem; let last = $last) {
-                          <span>
-                            {{ arrayItem.title || arrayItem.name || arrayItem }}@if (!last) {
-                            <span>, </span>
-                          }
-                        </span>
-                      }
-                    </span>
-                  }
-                  @if (!getNestedProperty(item, column.key) || getNestedProperty(item, column.key).length === 0) {
-                    <span>—</span>
-                  }
-                }
-                @default {
-                  {{ getNestedProperty(item, column.key) || '—' }}
-                }
-              }
-            </td>
-          }
-          <td class="text-end">
-            <div class="btn-group">
-              <button type="button" title="Редактировать" class="btn btn-sm btn-outline-primary" (click)="onEdit(item)">
-                <i-bs name="pencil"></i-bs>
-              </button>
-              <button
-                type="button"
-                title="Удалить с возможностью восстановления"
-                class="btn btn-sm btn-outline-danger"
-                (click)="onDelete(item)"
-                >
-                <i-bs name="trash2"></i-bs>
-              </button>
-              <button
-                type="button"
-                title="Удалить полностью"
-                class="btn btn-sm btn-outline-danger"
-                (click)="onCascadeDelete(item)"
-                >
-                <i-bs name="trash"></i-bs>
-              </button>
-              @if (item.isDeleted) {
-                <button
-                  type="button"
-                  title="Восстановить"
-                  class="btn btn-sm btn-outline-success"
-                  (click)="onRestore(item)"
-                  >
-                  <i-bs name="arrow-counterclockwise"></i-bs>
-                </button>
-              }
-            </div>
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
+                    <td class="text-end">
+                        <div class="btn-group">
+                            <button type="button" title="Редактировать" class="btn btn-sm btn-outline-primary" (click)="onEdit(item)">
+                                <i-bs name="pencil"></i-bs>
+                            </button>
+                            <button
+                                type="button"
+                                title="Удалить с возможностью восстановления"
+                                class="btn btn-sm btn-outline-danger"
+                                (click)="onDelete(item)"
+                            >
+                                <i-bs name="trash2"></i-bs>
+                            </button>
+                            <button
+                                type="button"
+                                title="Удалить полностью"
+                                class="btn btn-sm btn-outline-danger"
+                                (click)="onCascadeDelete(item)"
+                            >
+                                <i-bs name="trash"></i-bs>
+                            </button>
+                            @if (item.isDeleted) {
+                                <button type="button" title="Восстановить" class="btn btn-sm btn-outline-success" (click)="onRestore(item)">
+                                    <i-bs name="arrow-counterclockwise"></i-bs>
+                                </button>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>

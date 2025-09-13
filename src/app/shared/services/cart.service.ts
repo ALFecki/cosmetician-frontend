@@ -90,13 +90,13 @@ export class CartService implements OnDestroy {
                     }
                 }
             },
-            error: (error) => {
+            error: error => {
                 console.error('Error loading initial cart: ', error);
                 return [];
             },
             complete: () => {
                 // this.loadInitialCart();
-            }
+            },
         });
     }
 

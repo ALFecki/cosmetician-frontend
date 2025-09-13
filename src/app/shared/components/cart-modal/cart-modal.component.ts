@@ -16,7 +16,7 @@ import { ImageUrlPipe } from '../../utils/image-url.pipe';
     selector: 'app-cart-modal',
     templateUrl: './cart-modal.component.html',
     styleUrls: ['./cart-modal.component.scss'],
-    imports: [CommonModule, RouterModule, NgbModalModule, FormsModule, IconsModule, ImageUrlPipe]
+    imports: [CommonModule, RouterModule, NgbModalModule, FormsModule, IconsModule, ImageUrlPipe],
 })
 export class CartModalComponent implements OnInit {
     cartItems$: Observable<CartModel[]> = new Observable<CartModel[]>();

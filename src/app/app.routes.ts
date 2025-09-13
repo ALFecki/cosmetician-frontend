@@ -85,7 +85,7 @@ export const routes: Routes = [
     {
         path: 'reset-password',
         loadComponent: () => import('./features/password-reset/password-reset.component').then(m => m.PasswordResetComponent),
-        title: 'Восстановление пароля - SkViDerm'
+        title: 'Восстановление пароля - SkViDerm',
     },
     { path: '**', redirectTo: '' },
 ];

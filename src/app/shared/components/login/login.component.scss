@@ -160,27 +160,27 @@ form {
             font-size: 0.9rem;
         }
 
-        &[for="email"]:before,
-        &[for="regEmail"]:before,
-        &[for="forgotEmail"]:before {
+        &[for='email']:before,
+        &[for='regEmail']:before,
+        &[for='forgotEmail']:before {
             content: '\f0e0'; // fa-envelope
         }
 
-        &[for="password"]:before,
-        &[for="regPassword"]:before,
-        &[for="confirmPassword"]:before {
+        &[for='password']:before,
+        &[for='regPassword']:before,
+        &[for='confirmPassword']:before {
             content: '\f023'; // fa-lock
         }
 
-        &[for="firstName"]:before {
+        &[for='firstName']:before {
             content: '\f007'; // fa-user
         }
 
-        &[for="lastName"]:before {
+        &[for='lastName']:before {
             content: '\f007'; // fa-user
         }
 
-        &[for="phone"]:before {
+        &[for='phone']:before {
             content: '\f095'; // fa-phone
         }
     }

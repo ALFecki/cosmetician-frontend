@@ -49,14 +49,14 @@ interface ModelConfig {
     templateUrl: './admin-panel-switcher.component.html',
     styleUrl: './admin-panel-switcher.component.scss',
     imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    StatisticsComponent,
-    AdminOrdersComponent,
-    GenericTableComponent,
-    IconsModule,
-    ImageUrlPipe
-]
+        FormsModule,
+        ReactiveFormsModule,
+        StatisticsComponent,
+        AdminOrdersComponent,
+        GenericTableComponent,
+        IconsModule,
+        ImageUrlPipe,
+    ],
 })
 export class AdminPanelSwitcherComponent implements OnInit {
     @ViewChild('itemModal') itemModal!: TemplateRef<any>;
@@ -235,7 +235,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
             columns: [
                 { key: 'id', title: 'ID' },
                 { key: 'title', title: 'Название' },
-                { key: 'description', title: 'Описание'},
+                { key: 'description', title: 'Описание' },
                 { key: 'isDeleted', title: 'Удален' },
                 { key: 'createdAt', title: 'Дата создания', type: 'date' },
                 { key: 'updatedAt', title: 'Дата обновления', type: 'date' },
@@ -538,9 +538,9 @@ export class AdminPanelSwitcherComponent implements OnInit {
                     ),
                 );
             } else {
-                            const validators = [];
-            if (field.required) validators.push(Validators.required);
-            if (field.type === 'email') validators.push(Validators.email);
+                const validators = [];
+                if (field.required) validators.push(Validators.required);
+                if (field.type === 'email') validators.push(Validators.email);
                 formControls[field.key] = [value, validators];
             }
         });

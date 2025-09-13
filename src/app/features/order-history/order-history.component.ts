@@ -13,7 +13,7 @@ import { OrderService } from '../../shared/services/order.service';
     selector: 'app-order-history',
     templateUrl: './order-history.component.html',
     styleUrl: './order-history.component.scss',
-    imports: [CommonModule, RouterModule, ProfileSidebarComponent]
+    imports: [CommonModule, RouterModule, ProfileSidebarComponent],
 })
 export class OrderHistoryComponent implements OnInit {
     orders$!: Observable<OrderModel[]>;

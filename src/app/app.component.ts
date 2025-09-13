@@ -29,7 +29,7 @@ import { AuthService } from './shared/services/auth.service';
             useClass: SnakeToCamelInterceptor,
             multi: true,
         },
-    ]
+    ],
 })
 export class AppComponent implements OnInit {
     title = 'proskin-frontend';
