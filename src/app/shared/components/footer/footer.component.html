@@ -1,60 +1,59 @@
 <footer class="footer-main py-4 mt-5">
-  <div class="container">
-    <div class="row">
-      <!-- Компания -->
-      <div class="col-6 col-md-2 mb-3">
-        <h6 class="footer-title">Компания</h6>
-        <ul class="list-unstyled">
-          <li><a routerLink="/about" class="footer-link">О нас</a></li>
-          <li><a routerLink="/delivery" class="footer-link">Доставка и оплата</a></li>
-        </ul>
-      </div>
-      <!-- Категории -->
-      <div class="col-6 col-md-3 mb-3">
-        <h6 class="footer-title">Категории</h6>
-        <ul class="list-unstyled">
-          @for (cat of categories$ | async; track cat) {
-            <li>
-              <a [routerLink]="['/category', cat.id]" class="footer-link">{{ cat.title }}</a>
-            </li>
-          }
-        </ul>
-      </div>
-      <!-- Бренды -->
-      <div class="col-6 col-md-3 mb-3">
-        <h6 class="footer-title">Бренды</h6>
-        <ul class="list-unstyled">
-          @for (brand of brands$ | async; track brand) {
-            <li>
-              <a [routerLink]="['/brand', brand.id]" class="footer-link">{{ brand.title }}</a>
-            </li>
-          }
-        </ul>
-      </div>
-      <!-- Контакты -->
-      <div class="col-6 col-md-2 mb-3">
-        <h6 class="footer-title">Контакты</h6>
-        <ul class="list-unstyled">
-          <li><a href="tel:+375295987752" class="footer-link">+375 (29) 598-77-52</a></li>
-          <li><a href="mailto:skviderm@gmail.com" class="footer-link">skviderm@gmail.com</a></li>
-        </ul>
-      </div>
-      <!-- Соцсети и политика -->
-      <div class="col-12 col-md-2 d-flex flex-column align-items-end justify-content-between">
-        <!-- <div class="mb-2">
-        <a routerLink="/privacy-policy" class="footer-link privacy-link me-3">Политика конфиденциальности</a>
-      </div> -->
-                <div class="footer-socials">
-                    <a href="https://t.me/vikskvor" target="_blank" class="footer-social me-2" aria-label="Telegram">
-                        <i-bs name="telegram"></i-bs>
-                    </a>
-                    <!-- <a href="viber://chat?number=%2B79999999999" target="_blank" class="footer-social me-2" aria-label="Viber">
+    <div class="container">
+        <div class="row">
+            <div class="col-6 col-md-2 mb-3">
+                <h6 class="footer-title">Компания</h6>
+                <ul class="list-unstyled">
+                    <li><a routerLink="/about" class="footer-link">О нас</a></li>
+                    <li><a routerLink="/delivery" class="footer-link">Доставка и оплата</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md-3 mb-3">
+                <h6 class="footer-title">Категории</h6>
+                <ul class="list-unstyled">
+                    @for (cat of categories$ | async; track cat) {
+                        <li>
+                            <a [routerLink]="['/category', cat.id]" class="footer-link">{{ cat.title }}</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="col-6 col-md-3 mb-3">
+                <h6 class="footer-title">Бренды</h6>
+                <ul class="list-unstyled">
+                    @for (brand of brands$ | async; track brand) {
+                        <li>
+                            <a [routerLink]="['/brand', brand.id]" class="footer-link">{{ brand.title }}</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="col-6 col-md-2 mb-3">
+                <h6 class="footer-title">Контакты</h6>
+                <ul class="list-unstyled">
+                    <li><a href="tel:+375295987752" class="footer-link">+375 (29) 598-77-52</a></li>
+                    <li>
+                        <a href="mailto:skviderm@gmail.com" class="footer-link">{{ 'skviderm@gmail.com' }}</a>
+                    </li>
+                    <li>
+                        <div class="footer-socials">
+                            <a href="https://t.me/vikskvor" target="_blank" class="footer-social me-2" aria-label="Telegram">
+                                <i-bs name="telegram"></i-bs>
+                            </a>
+                            <!-- <a href="viber://chat?number=%2B79999999999" target="_blank" class="footer-social me-2" aria-label="Viber">
         <i-bs name="viber"></i-bs>
       </a> -->
-                    <a href="https://www.instagram.com/viktoria_skvorcova" target="_blank" class="footer-social" aria-label="Instagram">
-                        <i-bs name="instagram"></i-bs>
-                    </a>
-                </div>
+                            <a
+                                href="https://www.instagram.com/viktoria_skvorcova"
+                                target="_blank"
+                                class="footer-social"
+                                aria-label="Instagram"
+                            >
+                                <i-bs name="instagram"></i-bs>
+                            </a>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>

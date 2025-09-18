@@ -1,16 +1,20 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { IconsModule } from '../../shared/base/icons/icons.module';
-import { OrderProductModel } from '../../shared/models/order.model';
+import { ListResponse } from '../../shared/base/schemas/base_schema';
+import { OrderModel, OrderProductModel } from '../../shared/models/order.model';
 import { PersonModel } from '../../shared/models/person.model';
+import { PostPlacement } from '../../shared/models/utils.interface';
+import { UpdateOrderSchema } from '../../shared/schemas/order.schema';
 import { AuthService } from '../../shared/services/auth.service';
+import { CartService } from '../../shared/services/cart.service';
 import { OrderService } from '../../shared/services/order.service';
+import { PostService } from '../../shared/services/post.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
-import { CartService } from '../../shared/services/cart.service';
 
 @Component({
     selector: 'app-order-confirmation',
@@ -25,6 +29,11 @@ export class OrderConfirmationComponent implements OnInit {
     cartItems$: BehaviorSubject<OrderProductModel[]> = new BehaviorSubject<OrderProductModel[]>([]);
     totalPrice$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
     loading = true;
+    postPlacements$: BehaviorSubject<PostPlacement[]> = new BehaviorSubject<PostPlacement[]>([]);
+    filteredPostPlacements$: BehaviorSubject<PostPlacement[]> = new BehaviorSubject<PostPlacement[]>([]);
+    showDropdown = false;
+    selectedPlacementText = '';
+    currentOrder: OrderModel | null = null;
 
     constructor(
         private formBuilder: FormBuilder,
@@ -33,49 +42,96 @@ export class OrderConfirmationComponent implements OnInit {
         private authService: AuthService,
         private toastService: ToastService,
         private router: Router,
+        private postService: PostService,
     ) {
         this.currentUser$ = this.authService.getCurrentUser();
+        this.getPostPlacements().subscribe(data => {
+            if (data.status == 'success') {
+                this.postPlacements$.next(data.data);
+                this.filteredPostPlacements$.next(data.data);
+            }
+        });
 
         this.confirmationForm = this.formBuilder.group({
             firstName: ['', [Validators.required, Validators.minLength(2)]],
             lastName: ['', [Validators.required, Validators.minLength(2)]],
             email: ['', [Validators.required, Validators.email]],
             phone: ['', [Validators.required, Validators.pattern(/^\+?[0-9]\d{1,14}$/)]],
-            address: [''],
             city: [''],
-            postalCode: [''],
+            street: [''],
+            house: [''],
+            building: [''],
+            apartment: [''],
             deliveryMethod: ['pickup', Validators.required],
+            courierDelivery: [false],
             paymentMethod: ['card', Validators.required],
+            postPlacement: [''],
+            postPlacementFilter: [''],
             comments: [''],
         });
 
         this.confirmationForm.get('deliveryMethod')?.valueChanges.subscribe(value => {
-            if (value === 'express' || value === 'standard') {
-                this.confirmationForm.get('address')?.setValidators([Validators.required, Validators.minLength(10)]);
+            this.confirmationForm.get('postPlacement')?.clearValidators();
+            this.confirmationForm.get('postPlacement')?.setValue('');
+            this.confirmationForm.get('postPlacementFilter')?.clearValidators();
+            this.confirmationForm.get('postPlacementFilter')?.setValue('');
+            this.selectedPlacementText = '';
+            this.showDropdown = false;
+            this.confirmationForm.get('city')?.clearValidators();
+            this.confirmationForm.get('city')?.setValue('');
+            this.confirmationForm.get('street')?.clearValidators();
+            this.confirmationForm.get('street')?.setValue('');
+            this.confirmationForm.get('house')?.clearValidators();
+            this.confirmationForm.get('house')?.setValue('');
+            this.confirmationForm.get('building')?.clearValidators();
+            this.confirmationForm.get('building')?.setValue('');
+            this.confirmationForm.get('apartment')?.clearValidators();
+            this.confirmationForm.get('apartment')?.setValue('');
+            if (value === 'standard') {
                 this.confirmationForm.get('city')?.setValidators([Validators.required, Validators.minLength(2)]);
-                this.confirmationForm.get('postalCode')?.setValidators([Validators.required, Validators.pattern(/^\d{5,6}$/)]);
-            } else {
-                this.confirmationForm.get('address')?.clearValidators();
-                this.confirmationForm.get('address')?.setValue('');
-                this.confirmationForm.get('city')?.clearValidators();
-                this.confirmationForm.get('city')?.setValue('');
-                this.confirmationForm.get('postalCode')?.clearValidators();
-                this.confirmationForm.get('postalCode')?.setValue('');
+                this.confirmationForm.get('street')?.setValidators([Validators.required, Validators.minLength(2)]);
+                this.confirmationForm.get('house')?.setValidators([Validators.required]);
+                this.confirmationForm.get('building')?.clearValidators();
+                this.confirmationForm.get('building')?.setValue('');
+                this.confirmationForm.get('apartment')?.clearValidators();
+                this.confirmationForm.get('apartment')?.setValue('');
+            } else if (value === 'post') {
+                this.confirmationForm.get('postPlacement')?.setValidators([Validators.required]);
+                this.confirmationForm.get('postPlacementFilter')?.setValidators([Validators.required, this.validPostPlacementValidator()]);
+                if (this.confirmationForm.get('courierDelivery')?.value) {
+                    this.confirmationForm.get('city')?.setValidators([Validators.required, Validators.minLength(2)]);
+                    this.confirmationForm.get('street')?.setValidators([Validators.required, Validators.minLength(2)]);
+                    this.confirmationForm.get('house')?.setValidators([Validators.required]);
+                    this.confirmationForm.get('building')?.clearValidators();
+                    this.confirmationForm.get('building')?.setValue('');
+                    this.confirmationForm.get('apartment')?.setValidators([Validators.required]);
+                }
             }
-            this.confirmationForm.get('address')?.updateValueAndValidity();
+
+            this.confirmationForm.get('postPlacement')?.updateValueAndValidity();
+            this.confirmationForm.get('postPlacementFilter')?.updateValueAndValidity();
             this.confirmationForm.get('city')?.updateValueAndValidity();
-            this.confirmationForm.get('postalCode')?.updateValueAndValidity();
+            this.confirmationForm.get('street')?.updateValueAndValidity();
+            this.confirmationForm.get('house')?.updateValueAndValidity();
+            this.confirmationForm.get('building')?.updateValueAndValidity();
+            this.confirmationForm.get('apartment')?.updateValueAndValidity();
+        });
+
+        this.confirmationForm.get('postPlacementFilter')?.valueChanges.subscribe(filterText => {
+            this.filterPostPlacements(filterText || '');
         });
 
         this.loadCartItems();
     }
 
-    async loadCartItems(): Promise<void> {
-        const currentOrder = await this.orderService.getLastNotCheckedOrder().toPromise();
-        if (currentOrder) {
-            this.cartItems$.next(currentOrder.products);
-            this.totalPrice$.next(Number(currentOrder.totalPrice.toFixed(2)));
-        }
+    loadCartItems(): void {
+        this.orderService.getLastNotCheckedOrder().subscribe(order => {
+            this.currentOrder = order;
+            if (order) {
+                this.cartItems$.next(order.products);
+                this.totalPrice$.next(Number(order.totalPrice.toFixed(2)));
+            }
+        });
     }
 
     ngOnInit(): void {
@@ -104,6 +160,34 @@ export class OrderConfirmationComponent implements OnInit {
         }
 
         this.isSubmitting = true;
+
+        let deliveryAddress = '';
+        if (
+            this.confirmationForm.get('deliveryMethod')?.value === 'standart' ||
+            (this.confirmationForm.get('deliveryMethod')?.value === 'post' && this.confirmationForm.get('courierDelivery')?.value)
+        ) {
+            console.log(this.confirmationForm.value);
+            deliveryAddress = `${this.confirmationForm.get('city')?.value}, ${this.confirmationForm.get('street')?.value}, ${this.confirmationForm.get('house')?.value}`;
+            if (this.confirmationForm.get('building')?.value) {
+                deliveryAddress += `, корпус ${this.confirmationForm.get('building')?.value}`;
+            }
+            if (this.confirmationForm.get('apartment')?.value) {
+                deliveryAddress += `, кв. ${this.confirmationForm.get('apartment')?.value}`;
+            }
+        }
+
+        await this.orderService.update(this.currentOrder!.id, {
+            firstName: this.confirmationForm.get('firstName')?.value,
+            secondName: this.confirmationForm.get('lastName')?.value,
+            email: this.confirmationForm.get('email')?.value,
+            phone: this.confirmationForm.get('phone')?.value,
+            deliveryMethod: this.confirmationForm.get('deliveryMethod')?.value,
+            isCourierDelivery: this.confirmationForm.get('courierDelivery')?.value,
+            paymentMethod: this.confirmationForm.get('paymentMethod')?.value,
+            deliveryAddress: deliveryAddress,
+            deliveryPostAddress: this.confirmationForm.get('postPlacement')?.value,
+            comment: this.confirmationForm.get('comments')?.value,
+        } as UpdateOrderSchema);
 
         try {
             const result = await this.cartService.checkout();
@@ -156,6 +240,9 @@ export class OrderConfirmationComponent implements OnInit {
                 return 'Введите корректный почтовый индекс';
             }
         }
+        if (control.errors['invalidPostPlacement']) {
+            return 'Выберите пункт выдачи из списка';
+        }
 
         return null;
     }
@@ -176,5 +263,81 @@ export class OrderConfirmationComponent implements OnInit {
         let cartTotal = 0;
         this.totalPrice$.subscribe(total => (cartTotal = total)).unsubscribe();
         return cartTotal + this.getDeliveryPrice();
+    }
+
+    filterPostPlacements(filterText: string): void {
+        const allPlacements = this.postPlacements$.getValue();
+        if (!filterText.trim()) {
+            this.filteredPostPlacements$.next(allPlacements);
+            return;
+        }
+
+        const filtered = allPlacements.filter(
+            placement =>
+                placement.address.toLowerCase().includes(filterText.toLowerCase()) || placement.number.toString().includes(filterText),
+        );
+        this.filteredPostPlacements$.next(filtered);
+    }
+
+    selectPostPlacement(placement: PostPlacement): void {
+        this.confirmationForm.get('postPlacement')?.setValue(placement.id);
+        this.selectedPlacementText = `Отделение №${placement.number} - ${placement.address}`;
+        this.confirmationForm.get('postPlacementFilter')?.setValue(this.selectedPlacementText);
+        this.showDropdown = false;
+
+        this.confirmationForm.get('postPlacementFilter')?.updateValueAndValidity();
+    }
+
+    onFilterFocus(): void {
+        this.showDropdown = true;
+        if (this.confirmationForm.get('postPlacementFilter')?.value === this.selectedPlacementText) {
+            this.confirmationForm.get('postPlacementFilter')?.setValue('');
+        }
+    }
+
+    onFilterBlur(): void {
+        setTimeout(() => {
+            this.showDropdown = false;
+
+            const filterValue = this.confirmationForm.get('postPlacementFilter')?.value;
+            const allPlacements = this.postPlacements$.getValue();
+
+            const matchedPlacement = allPlacements.find(placement => {
+                const placementText = `Отделение №${placement.number} - ${placement.address}`;
+                return placementText === filterValue;
+            });
+
+            if (matchedPlacement) {
+                this.confirmationForm.get('postPlacement')?.setValue(matchedPlacement.id);
+                this.selectedPlacementText = filterValue;
+            } else {
+                this.confirmationForm.get('postPlacement')?.setValue('');
+                if (!filterValue && this.selectedPlacementText) {
+                    this.confirmationForm.get('postPlacementFilter')?.setValue(this.selectedPlacementText);
+                }
+            }
+
+            this.confirmationForm.get('postPlacementFilter')?.updateValueAndValidity();
+        }, 200);
+    }
+
+    private validPostPlacementValidator(): ValidatorFn {
+        return (control: AbstractControl): Record<string, unknown> | null => {
+            if (!control.value) {
+                return null;
+            }
+
+            const allPlacements = this.postPlacements$.getValue();
+            const isValid = allPlacements.some(placement => {
+                const placementText = `Отделение №${placement.number} - ${placement.address}`;
+                return placementText === control.value;
+            });
+
+            return isValid ? null : { invalidPostPlacement: { value: control.value } };
+        };
+    }
+
+    getPostPlacements(): Observable<ListResponse<PostPlacement>> {
+        return this.postService.getPostPlacements();
     }
 }

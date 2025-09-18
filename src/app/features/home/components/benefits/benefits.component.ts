@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
     selector: 'app-benefits',
     templateUrl: './benefits.component.html',
     styleUrl: './benefits.component.scss',
+    standalone: false,
 })
 export class BenefitsComponent {
     benefits = [
