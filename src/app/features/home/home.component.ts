@@ -12,6 +12,15 @@ import { IconsModule } from '../../shared/base/icons/icons.module';
     selector: 'app-home',
     templateUrl: './home.component.html',
     styleUrl: './home.component.scss',
-    imports: [CommonModule, RouterModule, IconsModule, BenefitsComponent, AboutMeComponent, CarouselComponent, BrandsComponent, ProductCarouselComponent],
+    imports: [
+        CommonModule,
+        RouterModule,
+        IconsModule,
+        BenefitsComponent,
+        AboutMeComponent,
+        CarouselComponent,
+        BrandsComponent,
+        ProductCarouselComponent,
+    ],
 })
 export class HomeComponent {}

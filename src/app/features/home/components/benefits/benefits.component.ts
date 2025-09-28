@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ImageUrlPipe } from "../../../../shared/utils/image-url.pipe";
+import { ImageUrlPipe } from '../../../../shared/utils/image-url.pipe';
 import { IconsModule } from '../../../../shared/base/icons/icons.module';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';

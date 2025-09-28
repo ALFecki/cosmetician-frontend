@@ -7,7 +7,7 @@ import { RouterModule } from '@angular/router';
     selector: 'app-about-me',
     templateUrl: './about-me.component.html',
     styleUrl: './about-me.component.scss',
-    imports: [CommonModule, RouterModule, IconsModule]
+    imports: [CommonModule, RouterModule, IconsModule],
 })
 export class AboutMeComponent {
     ownerInfo = {
