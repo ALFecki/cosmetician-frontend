@@ -147,12 +147,12 @@
                                 Доставка
                             </h3>
                             <div class="delivery-methods mb-3">
-                                <label class="form-check delivery-option" for="standard">
+                                <label class="form-check delivery-option" for="standart">
                                     <input
                                         class="form-check-input"
                                         type="radio"
-                                        value="standard"
-                                        id="standard"
+                                        value="standart"
+                                        id="standart"
                                         formControlName="deliveryMethod"
                                     />
                                     <div class="option-content">
@@ -235,12 +235,12 @@
                                             class="form-check-input"
                                         />
                                         <label for="courierDelivery" class="form-check-label">Курьер до двери</label>
-                                        <div class="courier-info">Доставка прямо к вашему дому</div>
+                                        <div class="courier-info">+10 рублей к стоимости доставки</div>
                                     </div>
                                 </div>
                             }
                             @if (
-                                confirmationForm.get('deliveryMethod')?.value === 'standard' ||
+                                confirmationForm.get('deliveryMethod')?.value === 'standart' ||
                                 (confirmationForm.get('deliveryMethod')?.value === 'post' && confirmationForm.get('courierDelivery')?.value)
                             ) {
                                 <div class="mb-3">

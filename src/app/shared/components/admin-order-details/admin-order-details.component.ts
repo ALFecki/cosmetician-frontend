@@ -163,4 +163,28 @@ export class AdminOrderDetailsComponent implements OnInit {
         });
         activeModal.componentInstance.selectedProduct = product;
     }
+
+    getPaymentMethodText(method: string): string {
+        switch (method?.toLowerCase()) {
+            case 'card':
+                return 'Банковская карта';
+            case 'cash':
+                return 'Наличные';
+            default:
+                return 'Не указано';
+        }
+    }
+
+    getDeliveryMethodText(method: string): string {
+        switch (method?.toLowerCase()) {
+            case 'standart':
+                return 'Стандартная доставка';
+            case 'post':
+                return 'Европочта';
+            case 'pickup':
+                return 'Самовывоз';
+            default:
+                return 'Не указано';
+        }
+    }
 }

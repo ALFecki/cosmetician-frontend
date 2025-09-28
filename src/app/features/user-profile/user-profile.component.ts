@@ -110,29 +110,14 @@ export class UserProfileComponent implements OnInit {
         this.success = null;
 
         try {
-            this.authService.sendEmailVerification().subscribe({
-                next: response => {
-                    console.log('Verification code sent:', response);
-                    this.toastService.show('Код подтверждения отправлен на ваш email', 'success');
-                    this.verifyEmailModalService.openVerifyEmailModal().subscribe(verified => {
-                        if (verified) {
-                            // Email was successfully verified, update user info
-                            this.authService.getCurrentUser().subscribe(user => {
-                                this.currentUser.next(user);
-                            });
-                        }
+            this.verifyEmailModalService.openVerifyEmailModal().subscribe(verified => {
+                if (verified) {
+                    this.authService.getCurrentUser().subscribe(user => {
+                        this.currentUser.next(user);
                     });
-                },
-                error: error => {
-                    console.error('Sending verification code failed:', error);
-                    this.error = 'Не удалось отправить код подтверждения. Попробуйте позже.';
-                    this.toastService.show('Не удалось отправить код подтверждения', 'error');
-                    this.emailVerificationLoading = false;
-                },
-                complete: () => {
-                    this.emailVerificationLoading = false;
-                },
+                }
             });
+            this.emailVerificationLoading = false;
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
             this.error = 'Не удалось отправить письмо с подтверждением: ' + errorMessage;

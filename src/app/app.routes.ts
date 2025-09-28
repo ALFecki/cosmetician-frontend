@@ -21,7 +21,7 @@ export const routes: Routes = [
     {
         path: 'category/:id',
         loadComponent: () => import('./features/category/category.component').then(m => m.CategoryComponent),
-        canActivate: [MaintenanceGuard],   
+        canActivate: [MaintenanceGuard],
     },
     {
         path: 'brand/:id',

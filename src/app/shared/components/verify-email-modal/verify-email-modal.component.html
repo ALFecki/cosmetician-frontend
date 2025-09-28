@@ -3,7 +3,9 @@
         <i class="fas fa-envelope-check modal-icon"></i>
         <h5 class="modal-title" id="verifyEmailModalLabel">Подтверждение Email</h5>
     </div>
-    <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
+    <button type="button" class="btn-close" aria-label="Close" (click)="close()">
+        <i-bs name="x-lg"></i-bs>
+    </button>
 </div>
 <div class="modal-body">
     @if (verifyEmailError) {

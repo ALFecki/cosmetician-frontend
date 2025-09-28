@@ -3,12 +3,13 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
+import { IconsModule } from '../../base/icons/icons.module';
 
 @Component({
     selector: 'app-verify-email-modal',
     templateUrl: './verify-email-modal.component.html',
     styleUrl: './verify-email-modal.component.scss',
-    imports: [ReactiveFormsModule],
+    imports: [ReactiveFormsModule, IconsModule],
 })
 export class VerifyEmailModalComponent {
     verifyEmailForm: FormGroup;

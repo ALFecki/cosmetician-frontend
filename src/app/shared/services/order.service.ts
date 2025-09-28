@@ -3,10 +3,10 @@ import { inject, Injectable } from '@angular/core';
 import { catchError, firstValueFrom, from, map, Observable, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { DataService } from '../base/services/data.service';
-import { OrderModel } from '../models/order.model';
+import { OrderMinimalModel, OrderModel } from '../models/order.model';
 import { CreateOrderSchema, FilterOrderSchema, UpdateOrderSchema } from '../schemas/order.schema';
 import { ToastService } from './toast.service';
-import { SingleResponse } from '../base/schemas/base_schema';
+import { ListResponse, SingleResponse } from '../base/schemas/base_schema';
 
 @Injectable({
     providedIn: 'root',
@@ -25,6 +25,20 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
             return of(this.currentOrder.products.length);
         }
         return of(0);
+    }
+
+    getAllMinimal(filter: FilterOrderSchema | null = null): Observable<OrderMinimalModel[]> {
+        const params = this.buildFilters(filter);
+        return this.http.get<ListResponse<OrderMinimalModel>>(`${environment.server_url}/${this.endpoint}_minimal`, { params }).pipe(
+            map(response => {
+                if (response.status) {
+                    return response.data;
+                } else {
+                    this.toastService.show('Ошибка получения заказов', 'error');
+                    return [];
+                }
+            }),
+        );
     }
 
     async addProductToOrder(variantId: string): Promise<OrderModel | null> {
@@ -143,6 +157,10 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
             this.toastService.show('Ошибка при оформлении заказа', 'error');
             throw error;
         }
+    }
+
+    getUserMinimalOrders(): Observable<OrderMinimalModel[]> {
+        return this.getAllMinimal({ personId: this.currentOrder?.personId });
     }
 
     getUserOrders(): Observable<OrderModel[]> {

@@ -161,6 +161,10 @@ export class AuthService {
         return this.currentUser.asObservable();
     }
 
+    getCurrentUserSync(): PersonModel | null {
+        return this.currentUser.value;
+    }
+
     logout(): Observable<unknown> {
         return this.http.post(`${environment.server_url}/logout`, {}, { withCredentials: true }).pipe(
             tap(() => {

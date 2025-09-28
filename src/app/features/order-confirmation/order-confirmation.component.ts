@@ -87,7 +87,7 @@ export class OrderConfirmationComponent implements OnInit {
             this.confirmationForm.get('building')?.setValue('');
             this.confirmationForm.get('apartment')?.clearValidators();
             this.confirmationForm.get('apartment')?.setValue('');
-            if (value === 'standard') {
+            if (value === 'standart') {
                 this.confirmationForm.get('city')?.setValidators([Validators.required, Validators.minLength(2)]);
                 this.confirmationForm.get('street')?.setValidators([Validators.required, Validators.minLength(2)]);
                 this.confirmationForm.get('house')?.setValidators([Validators.required]);
@@ -161,7 +161,8 @@ export class OrderConfirmationComponent implements OnInit {
 
         this.isSubmitting = true;
 
-        let deliveryAddress = '';
+        let deliveryAddress = null;
+        console.log(`Confirmation form value:`, this.confirmationForm.value);
         if (
             this.confirmationForm.get('deliveryMethod')?.value === 'standart' ||
             (this.confirmationForm.get('deliveryMethod')?.value === 'post' && this.confirmationForm.get('courierDelivery')?.value)
@@ -175,6 +176,11 @@ export class OrderConfirmationComponent implements OnInit {
                 deliveryAddress += `, кв. ${this.confirmationForm.get('apartment')?.value}`;
             }
         }
+        let postAddress = null;
+        if (this.confirmationForm.get('deliveryMethod')?.value === 'post') {
+            const placement = this.postPlacements$.getValue().find(p => p.id === this.confirmationForm.get('postPlacement')?.value);
+            postAddress = `Отделение №${placement?.number} - ${placement?.address}`; 
+        }
 
         await this.orderService.update(this.currentOrder!.id, {
             firstName: this.confirmationForm.get('firstName')?.value,
@@ -185,7 +191,7 @@ export class OrderConfirmationComponent implements OnInit {
             isCourierDelivery: this.confirmationForm.get('courierDelivery')?.value,
             paymentMethod: this.confirmationForm.get('paymentMethod')?.value,
             deliveryAddress: deliveryAddress,
-            deliveryPostAddress: this.confirmationForm.get('postPlacement')?.value,
+            deliveryPostAddress: postAddress,
             comment: this.confirmationForm.get('comments')?.value,
         } as UpdateOrderSchema);
 

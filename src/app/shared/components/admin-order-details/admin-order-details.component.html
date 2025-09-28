@@ -86,6 +86,100 @@
                             </div>
                         </div>
                     }
+
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">
+                                        <i-bs name="truck" class="me-2"></i-bs>
+                                        Информация о доставке
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <div class="delivery-info-item">
+                                                <strong>Способ доставки:</strong>
+                                                <div class="mt-1">
+                                                    <span class="badge {{ (order | async)?.isCourierDelivery ? 'bg-success' : 'bg-info' }}">
+                                                        {{ getDeliveryMethodText((order | async)?.deliveryMethod!) }}
+                                                    </span>
+                                                    <br />
+                                                    <span class="badge bg-secondary mt-1">
+                                                        @if ((order | async)?.isCourierDelivery) {
+                                                            {{ 'Курьерская доставка' }}
+                                                        }
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="delivery-info-item">
+                                                <strong>Дата доставки:</strong>
+                                                <div class="mt-1">
+                                                    @if ((order | async)?.deliveryDate) {
+                                                        <span class="text-info">{{
+                                                            (order | async)?.deliveryDate | date: 'dd.MM.yyyy'
+                                                        }}</span>
+                                                    } @else {
+                                                        <span class="text-muted">Не указана</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="delivery-info-item">
+                                                <strong>Способ оплаты:</strong>
+                                                <div class="mt-1">
+                                                    @if ((order | async)?.paymentMethod) {
+                                                        <span class="text-info">{{ getPaymentMethodText((order | async)?.paymentMethod!) }}</span>
+                                                    } @else {
+                                                        <span class="text-muted">Не указан</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @if ((order | async)?.deliveryAddress) {
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <div class="delivery-info-item">
+                                                    <strong>Адрес доставки:</strong>
+                                                    <div class="mt-1 text-info">{{ (order | async)?.deliveryAddress }}</div>
+                                                </div>
+                                            </div>
+                                            @if ((order | async)?.deliveryPostAddress) {
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="delivery-info-item">
+                                                        <strong>Почтовый адрес:</strong>
+                                                        <div class="mt-1 text-info">{{ (order | async)?.deliveryPostAddress }}</div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+
+                                    @if ((order | async)?.comment) {
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="delivery-info-item">
+                                                    <strong>Комментарий к заказу:</strong>
+                                                    <div class="mt-2">
+                                                        <div class="alert alert-light border-start border-info border-3">
+                                                            {{ (order | async)?.comment }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="order-items mb-4">
                         <h5>Товары в заказе</h5>
                         <div class="table-responsive">

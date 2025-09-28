@@ -11,6 +11,7 @@ import { AuthService } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
 import { LoginModalService } from '../../services/login-modal.service';
 import { ToastService } from '../../services/toast.service';
+import { VerifyEmailModalService } from '../../services/verify-email-modal.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
 import { ProductModalComponent } from '../product-modal/product-modal.component';
 
@@ -31,6 +32,7 @@ export class CartComponent {
         private modalService: NgbModal,
         private router: Router,
         private loginModalService: LoginModalService,
+        private verifyEmailModalService: VerifyEmailModalService,
     ) {
         this.cartItems$ = this.cartService.getCartItems();
         this.totalPrice$ = this.cartService.getTotalPrice();
@@ -62,6 +64,17 @@ export class CartComponent {
             return;
         }
 
+        const user = this.authService.getCurrentUserSync();
+        if (user && !user.isEmailVerified) {
+            this.toastService.show('Для оформления заказа необходимо подтвердить email', 'warning');
+            this.verifyEmailModalService.openVerifyEmailModal().subscribe(verified => {
+                if (verified) {
+                    this.modalService.dismissAll();
+                    this.router.navigate(['/order-confirmation']);
+                }
+            });
+            return;
+        }
         this.modalService.dismissAll();
         this.router.navigate(['/order-confirmation']);
     }
