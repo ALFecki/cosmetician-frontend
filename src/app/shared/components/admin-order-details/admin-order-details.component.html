@@ -133,7 +133,9 @@
                                                 <strong>Способ оплаты:</strong>
                                                 <div class="mt-1">
                                                     @if ((order | async)?.paymentMethod) {
-                                                        <span class="text-info">{{ getPaymentMethodText((order | async)?.paymentMethod!) }}</span>
+                                                        <span class="text-info">{{
+                                                            getPaymentMethodText((order | async)?.paymentMethod!)
+                                                        }}</span>
                                                     } @else {
                                                         <span class="text-muted">Не указан</span>
                                                     }

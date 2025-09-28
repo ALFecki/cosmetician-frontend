@@ -15,262 +15,249 @@
 
                 <div class="card-body">
                     @if (loading) {
-                    <div class="text-center my-5">
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">Загрузка...</span>
+                        <div class="text-center my-5">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Загрузка...</span>
+                            </div>
                         </div>
-                    </div>
                     }
 
                     @if (error) {
-                    <div class="alert alert-danger">
-                        {{ error }}
-                    </div>
+                        <div class="alert alert-danger">
+                            {{ error }}
+                        </div>
                     }
 
                     @if (!loading && !error && order) {
-                    <div>
-                        <div class="order-header mb-4">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h5 class="text-muted mb-1">Заказ №{{ (order | async)?.id }}</h5>
-                                    <p class="mb-0">от {{ (order | async)?.createdAt | date: 'dd.MM.yyyy HH:mm' }}</p>
-                                </div>
-                                <div class="col-md-6 text-md-end">
-                                    <span class="badge rounded-pill order-status-badge {{
+                        <div>
+                            <div class="order-header mb-4">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5 class="text-muted mb-1">Заказ №{{ (order | async)?.id }}</h5>
+                                        <p class="mb-0">от {{ (order | async)?.createdAt | date: 'dd.MM.yyyy HH:mm' }}</p>
+                                    </div>
+                                    <div class="col-md-6 text-md-end">
+                                        <span
+                                            class="badge rounded-pill order-status-badge {{
                                                 getOrderStatusClass((order | async)?.status || '')
-                                            }} fs-6 mb-2">
-                                        {{ getOrderStatusText((order | async)?.status || '') }}
-                                    </span>
-                                    <!-- <div *ngIf="canCancelOrder()">
+                                            }} fs-6 mb-2"
+                                        >
+                                            {{ getOrderStatusText((order | async)?.status || '') }}
+                                        </span>
+                                        <!-- <div *ngIf="canCancelOrder()">
                     <button class="btn btn-sm btn-outline-danger" [disabled]="cancellingOrder" (click)="cancelOrder()">
                       <span class="spinner-border spinner-border-sm me-1" *ngIf="cancellingOrder"></span>
                       Отменить заказ
                     </button>
                   </div> -->
-                                </div>
-                            </div>
-                            <hr class="my-3" />
-                        </div>
-                        <div class="order-items mb-4">
-                            <h5>Товары в заказе</h5>
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 80px">Фото</th>
-                                            <th>Товар</th>
-                                            <th class="text-end">Цена</th>
-                                            <th class="text-center">Кол-во</th>
-                                            <th class="text-end">Сумма</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @for (item of (order | async)?.products; track item) {
-                                        <tr>
-                                            <td>
-                                                <img [src]="item.product.image | imageUrl"
-                                                    class="img-thumbnail order-item-img"
-                                                    [alt]="item.product.title || 'Product'" />
-                                            </td>
-                                            <td>
-                                                <a [routerLink]="['/product', item.product.id]"
-                                                    class="fw-medium text-decoration-none">
-                                                    {{ item.product.title || 'Товар' }}
-                                                </a>
-                                                <small class="d-block text-muted"> {{ item.variant.volume || '-' }} мл
-                                                </small>
-                                            </td>
-                                            <td class="text-end">{{ item.historicalPrice | number: '1.2-2' }} р.</td>
-                                            <td class="text-center">{{ item.quantity }}</td>
-                                            <td class="text-end fw-bold">
-                                                {{ item.historicalPrice * item.quantity | number: '1.2-2' }} р.
-                                            </td>
-                                        </tr>
-                                        }
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td colspan="4" class="text-end fw-bold">Итого:</td>
-                                            <td class="text-end fw-bold fs-5">
-                                                {{ (order | async)?.totalPrice | number: '1.2-2' }} р.
-                                            </td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- Customer Information Section -->
-                        @if (orderRecipient | async) {
-                        <div class="customer-info mb-4">
-                            <h5>Информация о получателе</h5>
-                            <div class="row mt-3">
-                                <div class="col-md-6 mb-3">
-                                    <div class="card h-100">
-                                        <div class="card-header bg-light">
-                                            <h6 class="mb-0">
-                                                <i class="bi bi-person me-2"></i>Получатель
-                                            </h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="mb-1 fw-bold">
-                                                {{ (orderRecipient | async)?.firstName }}
-                                                {{ (orderRecipient | async)?.secondName }}
-                                                @if ((orderRecipient | async)?.surname) {
-                                                {{ (orderRecipient | async)?.surname }}
-                                                }
-                                            </p>
-                                            <small class="text-muted">ID: {{ (orderRecipient | async)?.id }}</small>
-                                        </div>
                                     </div>
                                 </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <div class="card h-100">
-                                        <div class="card-header bg-light">
-                                            <h6 class="mb-0">
-                                                <i class="bi bi-envelope me-2"></i>Контактные данные
-                                            </h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="mb-1">
-                                                <i class="bi bi-envelope-fill me-2 text-muted"></i>
-                                                {{ (orderRecipient | async)?.email }}
-                                            </p>
-                                            <p class="mb-0">
-                                                <i class="bi bi-telephone-fill me-2 text-muted"></i>
-                                                {{ (orderRecipient | async)?.phone }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
+                                <hr class="my-3" />
                             </div>
-                        </div>
-                        }
-
-                        <!-- Delivery Information Section -->
-                        <div class="delivery-info mb-4">
-                            <h5>Информация о доставке</h5>
-                            <div class="row mt-3">
-                                <div class="col-md-6 mb-3">
-                                    <div class="card h-100">
-                                        <div class="card-header bg-light">
-                                            <h6 class="mb-0">
-                                                <i class="bi bi-truck me-2"></i>Способ доставки
-                                            </h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="mb-1">{{ (order | async)?.deliveryMethod || 'Не указан' }}</p>
-                                            @if ((order | async)?.isCourierDelivery) {
-                                            <small class="text-success">
-                                                <i class="bi bi-check-circle me-1"></i>Курьерская доставка
-                                            </small>
-                                            } @else {
-                                            <small class="text-info">
-                                                <i class="bi bi-geo-alt me-1"></i>Самовывоз/Почта
-                                            </small>
+                            <div class="order-items mb-4">
+                                <h5>Товары в заказе</h5>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 80px">Фото</th>
+                                                <th>Товар</th>
+                                                <th class="text-end">Цена</th>
+                                                <th class="text-center">Кол-во</th>
+                                                <th class="text-end">Сумма</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @for (item of (order | async)?.products; track item) {
+                                                <tr>
+                                                    <td>
+                                                        <img
+                                                            [src]="item.product.image | imageUrl"
+                                                            class="img-thumbnail order-item-img"
+                                                            [alt]="item.product.title || 'Product'"
+                                                        />
+                                                    </td>
+                                                    <td>
+                                                        <a
+                                                            [routerLink]="['/product', item.product.id]"
+                                                            class="fw-medium text-decoration-none"
+                                                        >
+                                                            {{ item.product.title || 'Товар' }}
+                                                        </a>
+                                                        <small class="d-block text-muted"> {{ item.variant.volume || '-' }} мл </small>
+                                                    </td>
+                                                    <td class="text-end">{{ item.historicalPrice | number: '1.2-2' }} р.</td>
+                                                    <td class="text-center">{{ item.quantity }}</td>
+                                                    <td class="text-end fw-bold">
+                                                        {{ item.historicalPrice * item.quantity | number: '1.2-2' }} р.
+                                                    </td>
+                                                </tr>
                                             }
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="4" class="text-end fw-bold">Итого:</td>
+                                                <td class="text-end fw-bold fs-5">
+                                                    {{ (order | async)?.totalPrice | number: '1.2-2' }} р.
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Customer Information Section -->
+                            @if (orderRecipient | async) {
+                                <div class="customer-info mb-4">
+                                    <h5>Информация о получателе</h5>
+                                    <div class="row mt-3">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card h-100">
+                                                <div class="card-header bg-light">
+                                                    <h6 class="mb-0"><i class="bi bi-person me-2"></i>Получатель</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <p class="mb-1 fw-bold">
+                                                        {{ (orderRecipient | async)?.firstName }}
+                                                        {{ (orderRecipient | async)?.secondName }}
+                                                        @if ((orderRecipient | async)?.surname) {
+                                                            {{ (orderRecipient | async)?.surname }}
+                                                        }
+                                                    </p>
+                                                    <small class="text-muted">ID: {{ (orderRecipient | async)?.id }}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card h-100">
+                                                <div class="card-header bg-light">
+                                                    <h6 class="mb-0"><i class="bi bi-envelope me-2"></i>Контактные данные</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <p class="mb-1">
+                                                        <i class="bi bi-envelope-fill me-2 text-muted"></i>
+                                                        {{ (orderRecipient | async)?.email }}
+                                                    </p>
+                                                    <p class="mb-0">
+                                                        <i class="bi bi-telephone-fill me-2 text-muted"></i>
+                                                        {{ (orderRecipient | async)?.phone }}
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                            }
 
-                                <div class="col-md-6 mb-3">
-                                    <div class="card h-100">
-                                        <div class="card-header bg-light">
-                                            <h6 class="mb-0">
-                                                <i class="bi bi-calendar-event me-2"></i>Дата доставки
-                                            </h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="mb-0">
-                                                @if ((order | async)?.deliveryDate) {
-                                                {{ (order | async)?.deliveryDate | date: 'dd.MM.yyyy' }}
+                            <!-- Delivery Information Section -->
+                            <div class="delivery-info mb-4">
+                                <h5>Информация о доставке</h5>
+                                <div class="row mt-3">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-header bg-light">
+                                                <h6 class="mb-0"><i class="bi bi-truck me-2"></i>Способ доставки</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="mb-1">{{ (order | async)?.deliveryMethod || 'Не указан' }}</p>
+                                                @if ((order | async)?.isCourierDelivery) {
+                                                    <small class="text-success">
+                                                        <i class="bi bi-check-circle me-1"></i>Курьерская доставка
+                                                    </small>
                                                 } @else {
-                                                Не указана
+                                                    <small class="text-info"> <i class="bi bi-geo-alt me-1"></i>Самовывоз/Почта </small>
                                                 }
-                                            </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-header bg-light">
+                                                <h6 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Дата доставки</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="mb-0">
+                                                    @if ((order | async)?.deliveryDate) {
+                                                        {{ (order | async)?.deliveryDate | date: 'dd.MM.yyyy' }}
+                                                    } @else {
+                                                        Не указана
+                                                    }
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="row">
+                                    @if ((order | async)?.deliveryAddress) {
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card h-100">
+                                                <div class="card-header bg-light">
+                                                    <h6 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Адрес доставки</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <p class="mb-0">{{ (order | async)?.deliveryAddress }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @if ((order | async)?.deliveryPostAddress) {
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card h-100">
+                                                <div class="card-header bg-light">
+                                                    <h6 class="mb-0"><i class="bi bi-mailbox me-2"></i>Почтовый адрес</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <p class="mb-0">{{ (order | async)?.deliveryPostAddress }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                                @if ((order | async)?.paymentMethod) {
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card h-100">
+                                                <div class="card-header bg-light">
+                                                    <h6 class="mb-0"><i class="bi bi-credit-card me-2"></i>Способ оплаты</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <p class="mb-0">{{ (order | async)?.paymentMethod }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        @if ((order | async)?.comment) {
+                                            <div class="col-md-6 mb-3">
+                                                <div class="card h-100">
+                                                    <div class="card-header bg-light">
+                                                        <h6 class="mb-0"><i class="bi bi-chat-left-text me-2"></i>Комментарий к заказу</h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <p class="mb-0">{{ (order | async)?.comment }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
                             </div>
 
-                            <div class="row">
-                                @if ((order | async)?.deliveryAddress) {
-                                <div class="col-md-6 mb-3">
-                                    <div class="card h-100">
-                                        <div class="card-header bg-light">
-                                            <h6 class="mb-0">
-                                                <i class="bi bi-geo-alt me-2"></i>Адрес доставки
-                                            </h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="mb-0">{{ (order | async)?.deliveryAddress }}</p>
-                                        </div>
+                            @if ((order | async)?.id) {
+                                <div class="card mt-3">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Трек-номер</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-0">{{ (order | async)?.id }}</p>
                                     </div>
                                 </div>
-                                }
-
-                                @if ((order | async)?.deliveryPostAddress) {
-                                <div class="col-md-6 mb-3">
-                                    <div class="card h-100">
-                                        <div class="card-header bg-light">
-                                            <h6 class="mb-0">
-                                                <i class="bi bi-mailbox me-2"></i>Почтовый адрес
-                                            </h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="mb-0">{{ (order | async)?.deliveryPostAddress }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                }
-                            </div>
-
-                            @if ((order | async)?.paymentMethod) {
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <div class="card h-100">
-                                        <div class="card-header bg-light">
-                                            <h6 class="mb-0">
-                                                <i class="bi bi-credit-card me-2"></i>Способ оплаты
-                                            </h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="mb-0">{{ (order | async)?.paymentMethod }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                @if ((order | async)?.comment) {
-                                <div class="col-md-6 mb-3">
-                                    <div class="card h-100">
-                                        <div class="card-header bg-light">
-                                            <h6 class="mb-0">
-                                                <i class="bi bi-chat-left-text me-2"></i>Комментарий к заказу
-                                            </h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="mb-0">{{ (order | async)?.comment }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                }
-                            </div>
                             }
                         </div>
-
-                        @if ((order | async)?.id) {
-                        <div class="card mt-3">
-                            <div class="card-header bg-light">
-                                <h5 class="mb-0">Трек-номер</h5>
-                            </div>
-                            <div class="card-body">
-                                <p class="mb-0">{{ (order | async)?.id }}</p>
-                            </div>
-                        </div>
-                        }
-                    </div>
                     }
                 </div>
             </div>

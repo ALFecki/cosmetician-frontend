@@ -538,7 +538,6 @@
             }
         }
     }
-
 }
 
 @keyframes priceReveal {
@@ -581,6 +580,6 @@
     }
 
     &.animate-hide {
-    animation: priceHide 0.4s ease-in forwards;
+        animation: priceHide 0.4s ease-in forwards;
     }
 }

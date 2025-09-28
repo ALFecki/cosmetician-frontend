@@ -60,11 +60,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
     revealPrice(productId: string): void {
         this.revealedPrices.add(productId);
-        
+
         if (this.priceTimeouts.has(productId)) {
             clearTimeout(this.priceTimeouts.get(productId));
         }
-        
+
         const timeout = setTimeout(() => {
             const priceElement = document.querySelector(`[data-product-id="${productId}"] .price-revealed`);
             if (priceElement) {
@@ -80,17 +80,17 @@ export class ProductsComponent implements OnInit, OnDestroy {
                 this.priceTimeouts.delete(productId);
             }
         }, 5000);
-        
+
         this.priceTimeouts.set(productId, timeout);
     }
 
     ngOnDestroy(): void {
-        this.priceTimeouts.forEach((timeout) => {
+        this.priceTimeouts.forEach(timeout => {
             clearTimeout(timeout);
         });
         this.priceTimeouts.clear();
     }
-    
+
     resetFilters(): void {
         this.filterOptions = {};
         this.currentPage = 1;

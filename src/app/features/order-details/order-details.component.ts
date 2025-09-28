@@ -65,7 +65,7 @@ export class OrderDetailsComponent implements OnInit {
             .subscribe(
                 order => {
                     this.order.next(order.data);
-                    
+
                     // Load recipient information if available
                     if (order.data.personId) {
                         this.personService.getById(order.data.personId).subscribe(
@@ -75,10 +75,10 @@ export class OrderDetailsComponent implements OnInit {
                             error => {
                                 console.warn('Failed to load recipient information:', error);
                                 this.orderRecipient.next(null);
-                            }
+                            },
                         );
                     }
-                    
+
                     this.loading = false;
                 },
                 error => {

@@ -5,7 +5,11 @@ const angular = require('angular-eslint');
 
 module.exports = tseslint.config(
     {
+        ignores: ['.angular/**', 'dist/**', 'node_modules/**', '**/*.js.map', 'environments/**', '**/*.d.ts'],
+    },
+    {
         files: ['**/*.ts'],
+        ignores: ['.angular/**', 'dist/**', 'node_modules/**', 'environments/**'],
         extends: [
             eslint.configs.recommended,
             ...tseslint.configs.recommended,
@@ -34,6 +38,7 @@ module.exports = tseslint.config(
     },
     {
         files: ['**/*.html'],
+        ignores: ['.angular/**', 'dist/**', 'node_modules/**', 'environments/**'],
         extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility],
         rules: {},
     },

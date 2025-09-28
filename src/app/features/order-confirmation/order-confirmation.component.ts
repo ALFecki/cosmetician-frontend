@@ -179,7 +179,7 @@ export class OrderConfirmationComponent implements OnInit {
         let postAddress = null;
         if (this.confirmationForm.get('deliveryMethod')?.value === 'post') {
             const placement = this.postPlacements$.getValue().find(p => p.id === this.confirmationForm.get('postPlacement')?.value);
-            postAddress = `Отделение №${placement?.number} - ${placement?.address}`; 
+            postAddress = `Отделение №${placement?.number} - ${placement?.address}`;
         }
 
         await this.orderService.update(this.currentOrder!.id, {

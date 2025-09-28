@@ -110,17 +110,17 @@ export class ProductCardComponent implements OnInit, OnDestroy {
 
     revealPrice(): void {
         this.isPriceRevealed = true;
-        
+
         if (this.priceTimeout) {
             clearTimeout(this.priceTimeout);
         }
-        
+
         this.priceTimeout = setTimeout(() => {
             const priceElement = document.querySelector('.h3.price-revealed');
             if (priceElement) {
                 priceElement.classList.remove('animate-reveal');
                 priceElement.classList.add('animate-hide');
-                
+
                 setTimeout(() => {
                     this.isPriceRevealed = false;
                     this.priceTimeout = null;
