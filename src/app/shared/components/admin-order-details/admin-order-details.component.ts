@@ -19,7 +19,7 @@ import { ProductModalComponent } from '../product-modal/product-modal.component'
     selector: 'app-admin-order-details',
     templateUrl: './admin-order-details.component.html',
     styleUrl: './admin-order-details.component.scss',
-    imports: [CommonModule, RouterModule, ImageUrlPipe, IconsModule]
+    imports: [CommonModule, RouterModule, ImageUrlPipe, IconsModule],
 })
 export class AdminOrderDetailsComponent implements OnInit {
     order: BehaviorSubject<OrderModel | null> = new BehaviorSubject<OrderModel | null>(null);
@@ -162,5 +162,29 @@ export class AdminOrderDetailsComponent implements OnInit {
             scrollable: true,
         });
         activeModal.componentInstance.selectedProduct = product;
+    }
+
+    getPaymentMethodText(method: string): string {
+        switch (method?.toLowerCase()) {
+            case 'card':
+                return 'Банковская карта';
+            case 'cash':
+                return 'Наличные';
+            default:
+                return 'Не указано';
+        }
+    }
+
+    getDeliveryMethodText(method: string): string {
+        switch (method?.toLowerCase()) {
+            case 'standart':
+                return 'Стандартная доставка';
+            case 'post':
+                return 'Европочта';
+            case 'pickup':
+                return 'Самовывоз';
+            default:
+                return 'Не указано';
+        }
     }
 }

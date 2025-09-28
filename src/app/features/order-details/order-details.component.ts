@@ -8,6 +8,7 @@ import { OrderModel } from '../../shared/models/order.model';
 import { PersonModel } from '../../shared/models/person.model';
 import { AuthService } from '../../shared/services/auth.service';
 import { OrderService } from '../../shared/services/order.service';
+import { PersonService } from '../../shared/services/person.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
 
@@ -15,10 +16,11 @@ import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
     selector: 'app-order-details',
     templateUrl: './order-details.component.html',
     styleUrl: './order-details.component.scss',
-    imports: [CommonModule, RouterModule, ProfileSidebarComponent, ImageUrlPipe]
+    imports: [CommonModule, RouterModule, ProfileSidebarComponent, ImageUrlPipe],
 })
 export class OrderDetailsComponent implements OnInit {
     order: BehaviorSubject<OrderModel | null> = new BehaviorSubject<OrderModel | null>(null);
+    orderRecipient: BehaviorSubject<PersonModel | null> = new BehaviorSubject<PersonModel | null>(null);
     loading = true;
     error: string | null = null;
     cancellingOrder = false;
@@ -29,6 +31,7 @@ export class OrderDetailsComponent implements OnInit {
         private router: Router,
         public authService: AuthService,
         private orderService: OrderService,
+        private personService: PersonService,
         private toastService: ToastService,
     ) {
         this.authService.getCurrentUser().subscribe(user => {
@@ -62,6 +65,20 @@ export class OrderDetailsComponent implements OnInit {
             .subscribe(
                 order => {
                     this.order.next(order.data);
+
+                    // Load recipient information if available
+                    if (order.data.personId) {
+                        this.personService.getById(order.data.personId).subscribe(
+                            person => {
+                                this.orderRecipient.next(person.data);
+                            },
+                            error => {
+                                console.warn('Failed to load recipient information:', error);
+                                this.orderRecipient.next(null);
+                            },
+                        );
+                    }
+
                     this.loading = false;
                 },
                 error => {

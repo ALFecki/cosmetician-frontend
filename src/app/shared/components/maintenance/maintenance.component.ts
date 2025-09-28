@@ -14,7 +14,7 @@ import { ToastService } from '../../services/toast.service';
     selector: 'app-maintenance',
     imports: [CommonModule, ReactiveFormsModule, IconsModule],
     templateUrl: './maintenance.component.html',
-    styleUrl: './maintenance.component.scss'
+    styleUrl: './maintenance.component.scss',
 })
 export class MaintenanceComponent implements OnInit {
     loginForm: FormGroup;
@@ -103,11 +103,11 @@ export class MaintenanceComponent implements OnInit {
 
     formatTime(seconds: number | null): string {
         if (!seconds || seconds <= 0) return '00:00:00';
-        
+
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
         const remainingSeconds = seconds % 60;
-        
+
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     }
 

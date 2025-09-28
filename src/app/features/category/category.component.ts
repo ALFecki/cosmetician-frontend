@@ -11,7 +11,7 @@ import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
     selector: 'app-category',
     templateUrl: './category.component.html',
     styleUrl: './category.component.scss',
-    imports: [ProductsComponent, CommonModule, ImageUrlPipe]
+    imports: [ProductsComponent, CommonModule, ImageUrlPipe],
 })
 export class CategoryComponent {
     categoryId!: string;

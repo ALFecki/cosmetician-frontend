@@ -4,7 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ProfileSidebarComponent } from '../../shared/components/profile-sidebar/profile-sidebar.component';
-import { OrderModel } from '../../shared/models/order.model';
+import { OrderMinimalModel } from '../../shared/models/order.model';
 import { PersonModel } from '../../shared/models/person.model';
 import { AuthService } from '../../shared/services/auth.service';
 import { OrderService } from '../../shared/services/order.service';
@@ -13,10 +13,10 @@ import { OrderService } from '../../shared/services/order.service';
     selector: 'app-order-history',
     templateUrl: './order-history.component.html',
     styleUrl: './order-history.component.scss',
-    imports: [CommonModule, RouterModule, ProfileSidebarComponent]
+    imports: [CommonModule, RouterModule, ProfileSidebarComponent],
 })
 export class OrderHistoryComponent implements OnInit {
-    orders$!: Observable<OrderModel[]>;
+    orders$!: Observable<OrderMinimalModel[]>;
     loading = true;
     error: string | null = null;
     currentUser: BehaviorSubject<PersonModel | null> = new BehaviorSubject<PersonModel | null>(null);
@@ -44,7 +44,7 @@ export class OrderHistoryComponent implements OnInit {
 
     loadOrders(): void {
         this.loading = true;
-        this.orders$ = this.orderService.getUserOrders().pipe(
+        this.orders$ = this.orderService.getUserMinimalOrders().pipe(
             map(orders => {
                 const filteredOrders = orders.filter(order => order.status !== 'NotChecked');
                 filteredOrders.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());

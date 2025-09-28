@@ -50,6 +50,9 @@
     }
 
     .btn-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
         background: rgba(255, 255, 255, 0.9);
         border: 2px solid rgba(255, 214, 224, 0.3);
         border-radius: 50%;
@@ -62,7 +65,7 @@
         color: #666;
         transition: all 0.3s ease;
         padding: 0;
-        opacity: 1;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
         &:hover {
             background: var(--soft-pink);
@@ -73,6 +76,14 @@
 
         &:focus {
             box-shadow: 0 0 0 0.2rem rgba(212, 80, 109, 0.15);
+        }
+
+        @media (max-width: 575px) {
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 32px;
+            height: 32px;
+            font-size: 0.8rem;
         }
     }
 }
@@ -401,7 +412,6 @@
 }
 
 @keyframes bounce {
-
     0%,
     20%,
     50%,

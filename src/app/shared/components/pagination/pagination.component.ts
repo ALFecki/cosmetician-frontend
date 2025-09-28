@@ -1,4 +1,3 @@
-
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -6,13 +5,13 @@ import { FormsModule } from '@angular/forms';
     selector: 'app-pagination',
     templateUrl: './pagination.component.html',
     styleUrls: ['./pagination.component.scss'],
-    imports: [FormsModule]
+    imports: [FormsModule],
 })
 export class PaginationComponent implements OnChanges {
     @Input() totalItems = 0;
     @Input() itemsPerPage = 10;
     @Input() currentPage = 1;
-    @Input() pageSizeOptions: number[] = [5, 10, 20, 50];
+    @Input() pageSizeOptions: number[] = [10, 20, 50];
 
     @Output() pageChange = new EventEmitter<number>();
     @Output() itemsPerPageChange = new EventEmitter<number>();

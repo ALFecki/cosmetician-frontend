@@ -9,7 +9,7 @@ import { MaintenanceResponse, MaintenanceStatus } from '../base/schemas/base_sch
 })
 export class MaintenanceService {
     private readonly apiUrl = `${environment.server_url}/maintenance`;
-    private maintenanceStatusSubject = new BehaviorSubject<MaintenanceStatus>({enabled: true, ttl: undefined});
+    private maintenanceStatusSubject = new BehaviorSubject<MaintenanceStatus>({ enabled: true, ttl: undefined });
     private loadingSubject = new BehaviorSubject<boolean>(true);
     private initialized = false;
     private statusCache$?: Observable<MaintenanceStatus>;
@@ -22,14 +22,14 @@ export class MaintenanceService {
         return firstValueFrom(
             this.http.get<MaintenanceResponse>(`${this.apiUrl}/status`).pipe(
                 tap(response => {
-                    this.maintenanceStatusSubject.next({enabled: response.enabled, ttl: response.ttl});
+                    this.maintenanceStatusSubject.next({ enabled: response.enabled, ttl: response.ttl });
                     this.loadingSubject.next(false);
                     this.initialized = true;
                 }),
                 map(response => response.enabled),
                 catchError(error => {
                     console.error('Error checking maintenance status:', error);
-                    this.maintenanceStatusSubject.next({enabled: true, ttl: undefined});
+                    this.maintenanceStatusSubject.next({ enabled: true, ttl: undefined });
                     this.loadingSubject.next(false);
                     this.initialized = true;
                     return of(true);
@@ -43,17 +43,17 @@ export class MaintenanceService {
         if (!this.statusCache$) {
             this.statusCache$ = this.http.get<MaintenanceResponse>(`${this.apiUrl}/status`).pipe(
                 tap(response => {
-                    this.maintenanceStatusSubject.next({enabled: response.enabled, ttl: response.ttl});
+                    this.maintenanceStatusSubject.next({ enabled: response.enabled, ttl: response.ttl });
                     this.loadingSubject.next(false);
                     this.initialized = true;
                 }),
                 map(response => response),
                 catchError(error => {
                     console.error('Error checking maintenance status:', error);
-                    this.maintenanceStatusSubject.next({enabled: true, ttl: undefined});
+                    this.maintenanceStatusSubject.next({ enabled: true, ttl: undefined });
                     this.loadingSubject.next(false);
                     this.initialized = true;
-                    return of({enabled: true, ttl: undefined});
+                    return of({ enabled: true, ttl: undefined });
                 }),
                 shareReplay(1),
             );
@@ -66,9 +66,7 @@ export class MaintenanceService {
     }
 
     isMaintenanceModeEnabled(): Observable<boolean> {
-        return this.maintenanceStatusSubject.asObservable().pipe(
-            map(status => status.enabled)
-        );
+        return this.maintenanceStatusSubject.asObservable().pipe(map(status => status.enabled));
     }
 
     isLoading(): Observable<boolean> {
@@ -83,7 +81,7 @@ export class MaintenanceService {
         const params = ttl ? { params: new HttpParams().set('ttl', ttl) } : {};
         return this.http.get<void>(`${this.apiUrl}/enable`, params).pipe(
             tap(() => {
-                this.maintenanceStatusSubject.next({enabled: true, ttl});
+                this.maintenanceStatusSubject.next({ enabled: true, ttl });
                 this.statusCache$ = undefined;
             }),
         );
@@ -92,7 +90,7 @@ export class MaintenanceService {
     disableMaintenanceMode(): Observable<void> {
         return this.http.get<void>(`${this.apiUrl}/disable`, {}).pipe(
             tap(() => {
-                this.maintenanceStatusSubject.next({enabled: false, ttl: undefined});
+                this.maintenanceStatusSubject.next({ enabled: false, ttl: undefined });
                 this.statusCache$ = undefined;
             }),
         );

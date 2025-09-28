@@ -3,12 +3,13 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
+import { IconsModule } from '../../base/icons/icons.module';
 
 @Component({
     selector: 'app-verify-email-modal',
     templateUrl: './verify-email-modal.component.html',
     styleUrl: './verify-email-modal.component.scss',
-    imports: [ReactiveFormsModule]
+    imports: [ReactiveFormsModule, IconsModule],
 })
 export class VerifyEmailModalComponent {
     verifyEmailForm: FormGroup;
@@ -23,7 +24,7 @@ export class VerifyEmailModalComponent {
         private activeModal: NgbActiveModal,
         private authService: AuthService,
         private toastService: ToastService,
-        private fb: FormBuilder
+        private fb: FormBuilder,
     ) {
         this.verifyEmailForm = this.fb.group({
             code: ['', Validators.required],
@@ -37,17 +38,17 @@ export class VerifyEmailModalComponent {
     sendVerificationCode(): void {
         this.showVerifyEmailPrompt = false;
         this.verifyEmailError = null;
-        
+
         this.authService.sendEmailVerification().subscribe({
-            next: (response) => {
+            next: response => {
                 console.log('Verification code sent:', response);
                 this.toastService.show('Код подтверждения отправлен на ваш email', 'success');
             },
-            error: (error) => {
+            error: error => {
                 console.error('Sending verification code failed:', error);
                 this.verifyEmailError = 'Не удалось отправить код подтверждения. Попробуйте позже.';
                 this.toastService.show('Не удалось отправить код подтверждения', 'error');
-            }
+            },
         });
     }
 
@@ -64,17 +65,17 @@ export class VerifyEmailModalComponent {
         const code = this.verifyEmailForm.get('code')?.value;
 
         this.authService.verifyEmail(code).subscribe({
-            next: (response) => {
+            next: response => {
                 console.log('Email verification successful:', response);
                 this.verifyEmailSuccess = 'Ваш email успешно подтверждён!';
                 this.toastService.show('Email подтверждён', 'success');
                 this.emailVerified.emit();
-                
+
                 setTimeout(() => {
                     this.activeModal.close(true);
                 }, 2000);
             },
-            error: (error) => {
+            error: error => {
                 console.error('Email verification failed:', error);
                 if (error.status === 400) {
                     this.verifyEmailError = 'Некорректный код подтверждения';
@@ -87,7 +88,7 @@ export class VerifyEmailModalComponent {
             },
             complete: () => {
                 this.isVerifyingEmail = false;
-            }
+            },
         });
     }
 }

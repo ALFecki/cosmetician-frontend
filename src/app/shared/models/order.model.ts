@@ -1,13 +1,23 @@
 import { ProductModel, ProductVariantModel } from './product.model';
 
-export interface OrderModel {
+export interface OrderMinimalModel {
     id: string;
     personId: string;
     status: string;
-    products: OrderProductModel[];
     totalPrice: number;
     createdAt: Date;
     updatedAt: Date;
+}
+
+export interface OrderModel extends OrderMinimalModel {
+    products: OrderProductModel[];
+    deliveryMethod: string;
+    deliveryDate: Date;
+    deliveryAddress: string;
+    deliveryPostAddress: string;
+    isCourierDelivery: boolean;
+    paymentMethod: string;
+    comment: string;
 }
 
 export interface OrderProductModel {

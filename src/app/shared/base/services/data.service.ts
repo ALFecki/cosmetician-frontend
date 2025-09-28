@@ -13,7 +13,7 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
 
     constructor(protected http: HttpClient) {}
 
-    getAll(filter: FilterSchema | null = null): Observable<ListResponse<Model>> {
+    buildFilters(filter: FilterSchema | null): HttpParams {
         let params = new HttpParams();
         if (filter) {
             (Object.keys(filter) as (keyof FilterSchema)[]).forEach(key => {
@@ -31,6 +31,11 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
                 }
             });
         }
+        return params;
+    }
+
+    getAll(filter: FilterSchema | null = null): Observable<ListResponse<Model>> {
+        const params = this.buildFilters(filter);
         return this.http.get<ListResponse<Model>>(`${this.apiUrl}/${this.endpoint}`, { params });
     }
 

@@ -1,10 +1,13 @@
 import { Component } from '@angular/core';
+import { IconsModule } from '../../../../shared/base/icons/icons.module';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
     selector: 'app-about-me',
     templateUrl: './about-me.component.html',
     styleUrl: './about-me.component.scss',
-    standalone: false
+    imports: [CommonModule, RouterModule, IconsModule],
 })
 export class AboutMeComponent {
     ownerInfo = {

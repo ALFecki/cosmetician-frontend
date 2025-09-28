@@ -26,7 +26,7 @@ type SortDirection = 'asc' | 'desc';
     selector: 'app-admin-orders',
     templateUrl: './admin-orders.component.html',
     styleUrl: './admin-orders.component.scss',
-    imports: [CommonModule, FormsModule, ImageUrlPipe, IconsModule]
+    imports: [CommonModule, FormsModule, ImageUrlPipe, IconsModule],
 })
 export class AdminOrdersComponent implements OnInit {
     orders$!: Observable<OrderWithUser[]>;
@@ -255,5 +255,29 @@ export class AdminOrdersComponent implements OnInit {
 
     getOrderItemsCount(order: OrderModel): number {
         return order.products?.reduce((total, item) => total + item.quantity, 0) || 0;
+    }
+
+    getPaymentMethodText(method: string): string {
+        switch (method?.toLowerCase()) {
+            case 'card':
+                return 'Банковская карта';
+            case 'cash':
+                return 'Наличные';
+            default:
+                return 'Не указано';
+        }
+    }
+
+    getDeliveryMethodText(method: string): string {
+        switch (method?.toLowerCase()) {
+            case 'standart':
+                return 'Стандартная доставка';
+            case 'post':
+                return 'Европочта';
+            case 'pickup':
+                return 'Самовывоз';
+            default:
+                return 'Не указано';
+        }
     }
 }

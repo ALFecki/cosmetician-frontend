@@ -1,297 +1,328 @@
 <div class="modal-header">
-  <h5 class="modal-title" id="loginModalLabel">Вход в аккаунт</h5>
-  <button type="button" class="btn-close" aria-label="Close" (click)="closeLoginModal()"><i-bs
-      name="x-lg"></i-bs></button>
+    <h5 class="modal-title" id="loginModalLabel">Вход в аккаунт</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="closeLoginModal()"><i-bs name="x-lg"></i-bs></button>
 </div>
 <div class="modal-body">
-  <form [formGroup]="loginForm" class="login-form" (ngSubmit)="onSubmit($event)">
-    <!-- Alert for login errors -->
-    @if (loginError) {
-    <div class="alert alert-danger mb-3" role="alert">
-      {{ loginError }}
-    </div>
-    }
+    <form [formGroup]="loginForm" class="login-form" (ngSubmit)="onSubmit($event)">
+        <!-- Alert for login errors -->
+        @if (loginError) {
+            <div class="alert alert-danger mb-3" role="alert">
+                {{ loginError }}
+            </div>
+        }
 
-    <div class="mb-3">
-      <label for="email" class="form-label">Email</label>
-      <input type="email" class="form-control" id="email" [formControl]="email" placeholder="name@example.com" required
-        email />
-      @if (email.invalid && (email.dirty || email.touched)) {
-      <div class="error-message">
-        @if (email.errors?.['required']) {
-        <div>Email обязателен.</div>
-        }
-        @if (email.errors?.['email']) {
-        <div>Некорректный email.</div>
-        }
-      </div>
-      }
-    </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" [formControl]="email" placeholder="name@example.com" required email />
+            @if (email.invalid && (email.dirty || email.touched)) {
+                <div class="error-message">
+                    @if (email.errors?.['required']) {
+                        <div>Email обязателен.</div>
+                    }
+                    @if (email.errors?.['email']) {
+                        <div>Некорректный email.</div>
+                    }
+                </div>
+            }
+        </div>
 
-    <div class="mb-3">
-      <label for="password" class="form-label">Пароль</label>
-      <input type="password" class="form-control" id="password" [formControl]="password" placeholder="Введите пароль"
-        required minlength="6" />
-      @if (password.invalid && (password.dirty || password.touched)) {
-      <div class="error-message">
-        @if (password.errors?.['required']) {
-        <div>Пароль обязателен.</div>
-        }
-        @if (password.errors?.['minlength']) {
-        <div>Пароль должен содержать минимум 6 символов.</div>
-        }
-      </div>
-      }
-    </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Пароль</label>
+            <input
+                type="password"
+                class="form-control"
+                id="password"
+                [formControl]="password"
+                placeholder="Введите пароль"
+                required
+                minlength="6"
+            />
+            @if (password.invalid && (password.dirty || password.touched)) {
+                <div class="error-message">
+                    @if (password.errors?.['required']) {
+                        <div>Пароль обязателен.</div>
+                    }
+                    @if (password.errors?.['minlength']) {
+                        <div>Пароль должен содержать минимум 6 символов.</div>
+                    }
+                </div>
+            }
+        </div>
 
-    <!-- <div class="mb-3 form-check">
+        <!-- <div class="mb-3 form-check">
       <input type="checkbox" class="form-check-input" id="rememberMe" [formControl]="rememberMe" />
       <label class="form-check-label" for="rememberMe">Запомнить меня</label>
     </div> -->
 
-    <button type="sumbit" class="btn btn-primary" [disabled]="isLoggingIn">
-      @if (isLoggingIn) {
-      <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-      <span>Вход...</span>
-      } @else {
-      <i class="fas fa-sign-in-alt me-2"></i>
-      <span>Войти</span>
-      }
-    </button>
+        <button type="sumbit" class="btn btn-primary" [disabled]="isLoggingIn">
+            @if (isLoggingIn) {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                <span>Вход...</span>
+            } @else {
+                <i class="fas fa-sign-in-alt me-2"></i>
+                <span>Войти</span>
+            }
+        </button>
 
-    <div class="register-links">
-      <a href="#" class="btn btn-link"
-        (click)="openForgotPasswordModal(forgotPasswordModal); $event.preventDefault()">Забыли пароль?</a>
-      <a href="#" class="btn btn-link"
-        (click)="openRegisterModal(registerModal); $event.preventDefault()">Зарегистрироваться</a>
-    </div>
-  </form>
+        <div class="register-links">
+            <a href="#" class="btn btn-link" (click)="openForgotPasswordModal(forgotPasswordModal); $event.preventDefault()"
+                >Забыли пароль?</a
+            >
+            <a href="#" class="btn btn-link" (click)="openRegisterModal(registerModal); $event.preventDefault()">Зарегистрироваться</a>
+        </div>
+    </form>
 </div>
 
 <ng-template #registerModal>
-  <div class="modal-header">
-    <h5 class="modal-title" id="registerModalLabel">Регистрация</h5>
-    <button type="button" class="btn-close" aria-label="Close" (click)="closeRegisterModal()"><i-bs
-        name="x-lg"></i-bs></button>
-  </div>
-  <div class="modal-body">
-    @if (registrationError) {
-    <div class="alert alert-danger mb-3" role="alert">
-      {{ registrationError }}
+    <div class="modal-header">
+        <h5 class="modal-title" id="registerModalLabel">Регистрация</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeRegisterModal()"><i-bs name="x-lg"></i-bs></button>
     </div>
-    }
-
-    <form [formGroup]="registrationForm" (ngSubmit)="register()">
-      <div class="mb-3">
-        <label for="firstName" class="form-label">Имя</label>
-        <input type="text" class="form-control" id="firstName" formControlName="firstName" placeholder="Введите имя"
-          required />
-        @if (
-        registrationForm.get('firstName')?.invalid &&
-        (registrationForm.get('firstName')?.dirty || registrationForm.get('firstName')?.touched)
-        ) {
-        <div class="error-message">
-          @if (registrationForm.get('firstName')?.errors?.['required']) {
-          <div>Имя обязательно.</div>
-          }
-        </div>
+    <div class="modal-body">
+        @if (registrationError) {
+            <div class="alert alert-danger mb-3" role="alert">
+                {{ registrationError }}
+            </div>
         }
-      </div>
 
-      <div class="mb-3">
-        <label for="secondName" class="form-label">Фамилия</label>
-        <input type="text" class="form-control" id="secondName" formControlName="secondName"
-          placeholder="Введите фамилию" required />
-        @if (
-        registrationForm.get('secondName')?.invalid &&
-        (registrationForm.get('secondName')?.dirty || registrationForm.get('secondName')?.touched)
-        ) {
-        <div class="error-message">
-          @if (registrationForm.get('secondName')?.errors?.['required']) {
-          <div>Фамилия обязательна.</div>
-          }
-        </div>
-        }
-      </div>
+        <form [formGroup]="registrationForm" (ngSubmit)="register()">
+            <div class="mb-3">
+                <label for="firstName" class="form-label">Имя</label>
+                <input type="text" class="form-control" id="firstName" formControlName="firstName" placeholder="Введите имя" required />
+                @if (
+                    registrationForm.get('firstName')?.invalid &&
+                    (registrationForm.get('firstName')?.dirty || registrationForm.get('firstName')?.touched)
+                ) {
+                    <div class="error-message">
+                        @if (registrationForm.get('firstName')?.errors?.['required']) {
+                            <div>Имя обязательно.</div>
+                        }
+                    </div>
+                }
+            </div>
 
-      <div class="mb-3">
-        <label for="surname" class="form-label">Отчество</label>
-        <input type="text" class="form-control" id="surname" formControlName="surname" placeholder="Введите отчество" />
-      </div>
+            <div class="mb-3">
+                <label for="secondName" class="form-label">Фамилия</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="secondName"
+                    formControlName="secondName"
+                    placeholder="Введите фамилию"
+                    required
+                />
+                @if (
+                    registrationForm.get('secondName')?.invalid &&
+                    (registrationForm.get('secondName')?.dirty || registrationForm.get('secondName')?.touched)
+                ) {
+                    <div class="error-message">
+                        @if (registrationForm.get('secondName')?.errors?.['required']) {
+                            <div>Фамилия обязательна.</div>
+                        }
+                    </div>
+                }
+            </div>
 
-      <div class="mb-3">
-        <label for="regEmail" class="form-label">Email</label>
-        <input type="email" class="form-control" id="regEmail" formControlName="email" placeholder="name@example.com"
-          required email />
-        @if (
-        registrationForm.get('email')?.invalid &&
-        (registrationForm.get('email')?.dirty || registrationForm.get('email')?.touched)
-        ) {
-        <div class="error-message">
-          @if (registrationForm.get('email')?.errors?.['required']) {
-          <div>Email обязателен.</div>
-          }
-          @if (registrationForm.get('email')?.errors?.['email']) {
-          <div>Некорректный email.</div>
-          }
-        </div>
-        }
-      </div>
+            <div class="mb-3">
+                <label for="surname" class="form-label">Отчество</label>
+                <input type="text" class="form-control" id="surname" formControlName="surname" placeholder="Введите отчество" />
+            </div>
 
-      <div class="mb-3">
-        <label for="phone" class="form-label">Телефон</label>
-        <input type="tel" class="form-control" id="phone" formControlName="phone" placeholder="+375 (29) 999-99-99" />
-        @if (
-        registrationForm.get('phone')?.invalid &&
-        (registrationForm.get('phone')?.dirty || registrationForm.get('phone')?.touched)
-        ) {
-        <div class="error-message">
-          @if (registrationForm.get('phone')?.errors?.['required']) {
-          <div>Телефон обязателен.</div>
-          }
-          @if (registrationForm.get('phone')?.errors?.['pattern']) {
-          <div>Некорректный номер телефона.</div>
-          }
-        </div>
-        }
-      </div>
+            <div class="mb-3">
+                <label for="regEmail" class="form-label">Email</label>
+                <input
+                    type="email"
+                    class="form-control"
+                    id="regEmail"
+                    formControlName="email"
+                    placeholder="name@example.com"
+                    required
+                    email
+                />
+                @if (
+                    registrationForm.get('email')?.invalid &&
+                    (registrationForm.get('email')?.dirty || registrationForm.get('email')?.touched)
+                ) {
+                    <div class="error-message">
+                        @if (registrationForm.get('email')?.errors?.['required']) {
+                            <div>Email обязателен.</div>
+                        }
+                        @if (registrationForm.get('email')?.errors?.['email']) {
+                            <div>Некорректный email.</div>
+                        }
+                    </div>
+                }
+            </div>
 
-      <div class="mb-3">
-        <label for="regPassword" class="form-label">Пароль</label>
-        <input type="password" class="form-control" id="regPassword" formControlName="password"
-          placeholder="Введите пароль" required minlength="6" />
-        @if (
-        registrationForm.get('password')?.invalid &&
-        (registrationForm.get('password')?.dirty || registrationForm.get('password')?.touched)
-        ) {
-        <div class="error-message">
-          @if (registrationForm.get('password')?.errors?.['required']) {
-          <div>Пароль обязателен.</div>
-          }
-          @if (registrationForm.get('password')?.errors?.['minlength']) {
-          <div>Пароль должен содержать минимум
-            6 символов.</div>
-          }
-        </div>
-        }
-      </div>
+            <div class="mb-3">
+                <label for="phone" class="form-label">Телефон</label>
+                <input type="tel" class="form-control" id="phone" formControlName="phone" placeholder="+375 (29) 999-99-99" />
+                @if (
+                    registrationForm.get('phone')?.invalid &&
+                    (registrationForm.get('phone')?.dirty || registrationForm.get('phone')?.touched)
+                ) {
+                    <div class="error-message">
+                        @if (registrationForm.get('phone')?.errors?.['required']) {
+                            <div>Телефон обязателен.</div>
+                        }
+                        @if (registrationForm.get('phone')?.errors?.['pattern']) {
+                            <div>Некорректный номер телефона.</div>
+                        }
+                    </div>
+                }
+            </div>
 
-      <div class="mb-3">
-        <label for="confirmPassword" class="form-label">Подтвердите пароль</label>
-        <input type="password" class="form-control" id="confirmPassword" formControlName="confirmPassword"
-          placeholder="Подтвердите пароль" required />
-        @if (
-        registrationForm.get('confirmPassword')?.invalid &&
-        (registrationForm.get('confirmPassword')?.dirty || registrationForm.get('confirmPassword')?.touched)
-        ) {
-        <div class="error-message">
-          @if (registrationForm.get('confirmPassword')?.errors?.['required']) {
-          <div>Подтверждение пароля
-            обязательно.</div>
-          }
-        </div>
-        }
-      </div>
+            <div class="mb-3">
+                <label for="regPassword" class="form-label">Пароль</label>
+                <input
+                    type="password"
+                    class="form-control"
+                    id="regPassword"
+                    formControlName="password"
+                    placeholder="Введите пароль"
+                    required
+                    minlength="6"
+                />
+                @if (
+                    registrationForm.get('password')?.invalid &&
+                    (registrationForm.get('password')?.dirty || registrationForm.get('password')?.touched)
+                ) {
+                    <div class="error-message">
+                        @if (registrationForm.get('password')?.errors?.['required']) {
+                            <div>Пароль обязателен.</div>
+                        }
+                        @if (registrationForm.get('password')?.errors?.['minlength']) {
+                            <div>Пароль должен содержать минимум 6 символов.</div>
+                        }
+                    </div>
+                }
+            </div>
 
-      <div class="mb-3">
-        <div class="form-check">
-          <input type="checkbox" class="form-check-input" id="personalDataConsent" formControlName="personalDataConsent"
-            [class.is-invalid]="
+            <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Подтвердите пароль</label>
+                <input
+                    type="password"
+                    class="form-control"
+                    id="confirmPassword"
+                    formControlName="confirmPassword"
+                    placeholder="Подтвердите пароль"
+                    required
+                />
+                @if (
+                    registrationForm.get('confirmPassword')?.invalid &&
+                    (registrationForm.get('confirmPassword')?.dirty || registrationForm.get('confirmPassword')?.touched)
+                ) {
+                    <div class="error-message">
+                        @if (registrationForm.get('confirmPassword')?.errors?.['required']) {
+                            <div>Подтверждение пароля обязательно.</div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="mb-3">
+                <div class="form-check">
+                    <input
+                        type="checkbox"
+                        class="form-check-input"
+                        id="personalDataConsent"
+                        formControlName="personalDataConsent"
+                        [class.is-invalid]="
                             registrationForm.get('personalDataConsent')?.invalid &&
                             (registrationForm.get('personalDataConsent')?.dirty || registrationForm.get('personalDataConsent')?.touched)
-                        " />
-          <label class="form-check-label" for="personalDataConsent">
-            Я согласен(на) на
-            <a [href]="getPersonalDataUrl()" target="_blank" class="text-primary"> обработку персональных
-              данных </a> *
-          </label>
-        </div>
-        @if (
-        registrationForm.get('personalDataConsent')?.invalid &&
-        (registrationForm.get('personalDataConsent')?.dirty || registrationForm.get('personalDataConsent')?.touched)
-        ) {
-        <div class="error-message">
-          @if (registrationForm.get('personalDataConsent')?.errors?.['required']) {
-          <div>
-            Необходимо согласие на обработку персональных данных.
-          </div>
-          }
-        </div>
-        }
-      </div>
+                        "
+                    />
+                    <label class="form-check-label" for="personalDataConsent">
+                        Я согласен(на) на
+                        <a [href]="getPersonalDataUrl()" target="_blank" class="text-primary"> обработку персональных данных </a> *
+                    </label>
+                </div>
+                @if (
+                    registrationForm.get('personalDataConsent')?.invalid &&
+                    (registrationForm.get('personalDataConsent')?.dirty || registrationForm.get('personalDataConsent')?.touched)
+                ) {
+                    <div class="error-message">
+                        @if (registrationForm.get('personalDataConsent')?.errors?.['required']) {
+                            <div>Необходимо согласие на обработку персональных данных.</div>
+                        }
+                    </div>
+                }
+            </div>
 
-      <button type="submit" class="btn btn-primary" [disabled]="isRegistering">
-        @if (isRegistering) {
-        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-        <span>Регистрация...</span>
-        } @else {
-        <i class="fas fa-user-plus me-2"></i>
-        <span>Зарегистрироваться</span>
-        }
-      </button>
-    </form>
-  </div>
+            <button type="submit" class="btn btn-primary" [disabled]="isRegistering">
+                @if (isRegistering) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <span>Регистрация...</span>
+                } @else {
+                    <i class="fas fa-user-plus me-2"></i>
+                    <span>Зарегистрироваться</span>
+                }
+            </button>
+        </form>
+    </div>
 </ng-template>
 
 <ng-template #forgotPasswordModal>
-  <div class="modal-header">
-    <h5 class="modal-title" id="forgotPasswordModalLabel">Восстановление пароля</h5>
-    <button type="button" class="btn-close" aria-label="Close" (click)="closeForgotPasswordModal()"><i-bs
-        name="x-lg"></i-bs></button>
-  </div>
-  <div class="modal-body">
-    @if (forgotPasswordError) {
-    <div class="alert alert-danger mb-3" role="alert">
-      {{ forgotPasswordError }}
+    <div class="modal-header">
+        <h5 class="modal-title" id="forgotPasswordModalLabel">Восстановление пароля</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeForgotPasswordModal()"><i-bs name="x-lg"></i-bs></button>
     </div>
-    }
-
-    @if (forgotPasswordSuccess) {
-    <div class="alert alert-success mb-3" role="alert">
-      {{ forgotPasswordSuccess }}
-    </div>
-    }
-
-    @if (!forgotPasswordSuccess) {
-    <form [formGroup]="forgotPasswordForm" (ngSubmit)="sendPasswordReset()">
-      <div class="mb-3">
-        <label for="forgotEmail" class="form-label">Email</label>
-        <input type="email" class="form-control" id="forgotEmail" formControlName="email"
-          placeholder="Введите ваш email"
-          [class.is-invalid]="forgotPasswordForm.get('email')?.invalid && forgotPasswordForm.get('email')?.touched" />
-        @if (forgotPasswordForm.get('email')?.invalid && forgotPasswordForm.get('email')?.touched) {
-        <div class="invalid-feedback">
-          @if (forgotPasswordForm.get('email')?.errors?.['required']) {
-          <div>Email обязателен.</div>
-          }
-          @if (forgotPasswordForm.get('email')?.errors?.['email']) {
-          <div>Некорректный email.</div>
-          }
-        </div>
+    <div class="modal-body">
+        @if (forgotPasswordError) {
+            <div class="alert alert-danger mb-3" role="alert">
+                {{ forgotPasswordError }}
+            </div>
         }
-      </div>
-      <p class="text-muted small mb-3">
-        Мы отправим ссылку для восстановления пароля на указанный email адрес.
-      </p>
-      <button type="submit" class="btn btn-primary w-100" [disabled]="forgotPasswordForm.invalid || isSendingReset">
-        @if (isSendingReset) {
-        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-        <span>Отправляем...</span>
-        } @else {
-        <i class="fas fa-paper-plane me-2"></i>
-        <span>Отправить ссылку</span>
-        }
-      </button>
-    </form>
-    }
 
-    @if (forgotPasswordSuccess) {
-    <div class="text-center mt-3">
-      <button type="button" class="btn btn-secondary" (click)="closeForgotPasswordModal()">
-        <i class="fas fa-times me-2"></i>
-        Закрыть
-      </button>
+        @if (forgotPasswordSuccess) {
+            <div class="alert alert-success mb-3" role="alert">
+                {{ forgotPasswordSuccess }}
+            </div>
+        }
+
+        @if (!forgotPasswordSuccess) {
+            <form [formGroup]="forgotPasswordForm" (ngSubmit)="sendPasswordReset()">
+                <div class="mb-3">
+                    <label for="forgotEmail" class="form-label">Email</label>
+                    <input
+                        type="email"
+                        class="form-control"
+                        id="forgotEmail"
+                        formControlName="email"
+                        placeholder="Введите ваш email"
+                        [class.is-invalid]="forgotPasswordForm.get('email')?.invalid && forgotPasswordForm.get('email')?.touched"
+                    />
+                    @if (forgotPasswordForm.get('email')?.invalid && forgotPasswordForm.get('email')?.touched) {
+                        <div class="invalid-feedback">
+                            @if (forgotPasswordForm.get('email')?.errors?.['required']) {
+                                <div>Email обязателен.</div>
+                            }
+                            @if (forgotPasswordForm.get('email')?.errors?.['email']) {
+                                <div>Некорректный email.</div>
+                            }
+                        </div>
+                    }
+                </div>
+                <p class="text-muted small mb-3">Мы отправим ссылку для восстановления пароля на указанный email адрес.</p>
+                <button type="submit" class="btn btn-primary w-100" [disabled]="forgotPasswordForm.invalid || isSendingReset">
+                    @if (isSendingReset) {
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <span>Отправляем...</span>
+                    } @else {
+                        <i class="fas fa-paper-plane me-2"></i>
+                        <span>Отправить ссылку</span>
+                    }
+                </button>
+            </form>
+        }
+
+        @if (forgotPasswordSuccess) {
+            <div class="text-center mt-3">
+                <button type="button" class="btn btn-secondary" (click)="closeForgotPasswordModal()">
+                    <i class="fas fa-times me-2"></i>
+                    Закрыть
+                </button>
+            </div>
+        }
     </div>
-    }
-  </div>
 </ng-template>

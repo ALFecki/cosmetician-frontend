@@ -18,9 +18,10 @@ export class AuthService {
     private userClaims: BehaviorSubject<Claims | null> = new BehaviorSubject<Claims | null>(null);
     private currentUser: BehaviorSubject<PersonModel | null> = new BehaviorSubject<PersonModel | null>(null);
 
-    constructor(private http: HttpClient,
+    constructor(
+        private http: HttpClient,
         //  private cookieService: SsrCookieService
-        ) {}
+    ) {}
 
     login(loginData: LoginData): Observable<LoginResponse> {
         return this.http.post<LoginResponse>(`${environment.server_url}/login`, loginData, { withCredentials: true }).pipe(
@@ -53,62 +54,75 @@ export class AuthService {
     }
 
     forgotPassword(email: string): Observable<ForgotPasswordResponse> {
-        return this.http.get<ForgotPasswordResponse>(`${environment.server_url}/forgot_password`, { params: new HttpParams().set('email', email) }).pipe(
-            tap(() => {
-                console.log('Forgot password email sent');
-            }),
-            catchError(error => {
-                console.error('Forgot password error:', error);
-                return throwError(() => error);
-            })
-        );
+        return this.http
+            .get<ForgotPasswordResponse>(`${environment.server_url}/forgot_password`, { params: new HttpParams().set('email', email) })
+            .pipe(
+                tap(() => {
+                    console.log('Forgot password email sent');
+                }),
+                catchError(error => {
+                    console.error('Forgot password error:', error);
+                    return throwError(() => error);
+                }),
+            );
     }
 
     resetPassword(email: string, token: string, newPassword: string): Observable<PersonModel> {
-        return this.http.post<PersonModel>(`${environment.server_url}/reset_password`, { 
-            email,
-            token, 
-            newPassword: Md5.hashStr(newPassword)
-        }).pipe(
-            catchError(error => {
-                console.error('Reset password error:', error);
-                return throwError(() => error);
+        return this.http
+            .post<PersonModel>(`${environment.server_url}/reset_password`, {
+                email,
+                token,
+                newPassword: Md5.hashStr(newPassword),
             })
-        );
+            .pipe(
+                catchError(error => {
+                    console.error('Reset password error:', error);
+                    return throwError(() => error);
+                }),
+            );
     }
 
-    verifyResetToken(token: string, email: string): Observable<{valid: boolean}> {
-        return this.http.get<{valid: boolean}>(`${environment.server_url}/verify_reset_token`, { params: new HttpParams().set('token', token).set('email', email) }).pipe(
-            catchError(error => {
-                console.error('Verify reset token error:', error);
-                return throwError(() => error);
-            })
-        );
+    verifyResetToken(token: string, email: string): Observable<{ valid: boolean }> {
+        return this.http
+            .get<{
+                valid: boolean;
+            }>(`${environment.server_url}/verify_reset_token`, { params: new HttpParams().set('token', token).set('email', email) })
+            .pipe(
+                catchError(error => {
+                    console.error('Verify reset token error:', error);
+                    return throwError(() => error);
+                }),
+            );
     }
 
-    sendEmailVerification(): Observable<{result: string, code: string}> {
-        return this.http.get<{result: string, code: string}>(`${environment.server_url}/verify_email`, { withCredentials: true }).pipe(
+    sendEmailVerification(): Observable<{ result: string; code: string }> {
+        return this.http.get<{ result: string; code: string }>(`${environment.server_url}/verify_email`, { withCredentials: true }).pipe(
             catchError(error => {
                 console.error('Send email verification error:', error);
                 return throwError(() => error);
-            })
+            }),
         );
     }
 
     verifyEmail(code: string): Observable<PersonModel> {
-        return this.http.get<PersonModel>(`${environment.server_url}/email_verification`, { params: new HttpParams().set('code', code), withCredentials: true }).pipe(
-            tap(response => {
-                if (response) {
-                    console.log('Email verified successfully');
-                } else {
-                    console.log('Email verification failed');
-                }
-            }),
-            catchError(error => {
-                console.error('Verify email error:', error);
-                return throwError(() => error);
+        return this.http
+            .get<PersonModel>(`${environment.server_url}/email_verification`, {
+                params: new HttpParams().set('code', code),
+                withCredentials: true,
             })
-        );
+            .pipe(
+                tap(response => {
+                    if (response) {
+                        console.log('Email verified successfully');
+                    } else {
+                        console.log('Email verification failed');
+                    }
+                }),
+                catchError(error => {
+                    console.error('Verify email error:', error);
+                    return throwError(() => error);
+                }),
+            );
     }
 
     getCsrfToken(): string {
@@ -145,6 +159,10 @@ export class AuthService {
 
     getCurrentUser(): Observable<PersonModel | null> {
         return this.currentUser.asObservable();
+    }
+
+    getCurrentUserSync(): PersonModel | null {
+        return this.currentUser.value;
     }
 
     logout(): Observable<unknown> {

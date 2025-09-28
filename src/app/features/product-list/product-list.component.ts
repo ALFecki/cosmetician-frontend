@@ -5,6 +5,6 @@ import { ProductsComponent } from '../../shared/components/products/products.com
     selector: 'app-product-list',
     imports: [ProductsComponent],
     templateUrl: './product-list.component.html',
-    styleUrl: './product-list.component.scss'
+    styleUrl: './product-list.component.scss',
 })
 export class ProductListComponent {}

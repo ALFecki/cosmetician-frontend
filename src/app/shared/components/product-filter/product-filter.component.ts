@@ -1,4 +1,3 @@
-
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrandModel } from '../../models/brand.model';
@@ -13,7 +12,7 @@ import { CountryService } from '../../services/country.service';
     selector: 'app-product-filter',
     imports: [FormsModule],
     templateUrl: './product-filter.component.html',
-    styleUrls: ['./product-filter.component.scss']
+    styleUrls: ['./product-filter.component.scss'],
 })
 export class ProductFilterComponent implements OnInit {
     @Output() filterChange = new EventEmitter<FilterProductSchema>();

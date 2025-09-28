@@ -15,7 +15,7 @@ import { IconsModule } from '../../base/icons/icons.module';
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss',
-    imports: [ReactiveFormsModule, IconsModule]
+    imports: [ReactiveFormsModule, IconsModule],
 })
 export class LoginComponent {
     @Input() loginForm: FormGroup = new FormGroup({});
@@ -82,16 +82,14 @@ export class LoginComponent {
                 console.log('Login successful:', response);
                 if (!response.user.isEmailVerified) {
                     this.closeLoginModal();
-                    this.verifyEmailModalService.openVerifyEmailModal().subscribe(
-                        (verified) => {
-                            if (verified) {
-                                console.log('Email verification completed');
-                            }
+                    this.verifyEmailModalService.openVerifyEmailModal().subscribe(verified => {
+                        if (verified) {
+                            console.log('Email verification completed');
                         }
-                    );
+                    });
                     return;
                 }
-                
+
                 this.toastService.show('Успешный вход в систему', 'success');
                 this.closeLoginModal();
                 if (this.returnUrl && this.returnUrl !== '/') {
@@ -180,7 +178,6 @@ export class LoginComponent {
             surname: this.registrationForm.get('surname')?.value,
         } as RegistrationData;
 
-
         this.authService
             .register(registrationData)
             .pipe(
@@ -244,13 +241,13 @@ export class LoginComponent {
         const email = this.forgotPasswordForm.get('email')?.value;
 
         this.authService.forgotPassword(email).subscribe({
-            next: (response) => {
+            next: response => {
                 console.log('Password reset email sent:', response);
                 this.forgotPasswordSuccess = 'Ссылка для восстановления пароля отправлена на ваш email. Проверьте почту.';
                 this.toastService.show('Ссылка для восстановления отправлена', 'success');
                 this.isSendingReset = false;
             },
-            error: (error) => {
+            error: error => {
                 console.error('Password reset failed:', error);
                 if (error.status === 404) {
                     this.forgotPasswordError = 'Пользователь с таким email не найден';
@@ -260,7 +257,7 @@ export class LoginComponent {
                     this.forgotPasswordError = `Ошибка: ${error.message || 'Неизвестная ошибка'}`;
                 }
                 this.isSendingReset = false;
-            }
+            },
         });
     }
 

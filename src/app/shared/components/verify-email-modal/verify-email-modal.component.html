@@ -3,105 +3,112 @@
         <i class="fas fa-envelope-check modal-icon"></i>
         <h5 class="modal-title" id="verifyEmailModalLabel">Подтверждение Email</h5>
     </div>
-    <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
+    <button type="button" class="btn-close" aria-label="Close" (click)="close()">
+        <i-bs name="x-lg"></i-bs>
+    </button>
 </div>
 <div class="modal-body">
     @if (verifyEmailError) {
-    <div class="alert alert-danger mb-3" role="alert">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        {{ verifyEmailError }}
-    </div>
+        <div class="alert alert-danger mb-3" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {{ verifyEmailError }}
+        </div>
     }
 
     @if (verifyEmailSuccess) {
-    <div class="verification-success text-center">
-        <div class="success-icon-wrapper">
-            <i class="fas fa-check-circle success-icon"></i>
-            <div class="success-glow"></div>
+        <div class="verification-success text-center">
+            <div class="success-icon-wrapper">
+                <i class="fas fa-check-circle success-icon"></i>
+                <div class="success-glow"></div>
+            </div>
+            <h6 class="success-title">{{ verifyEmailSuccess }}</h6>
+            <p class="success-description">Ваш email адрес успешно подтвержден</p>
+            <div class="mt-4">
+                <button type="button" class="btn btn-primary btn-continue" (click)="close()">
+                    <i class="fas fa-check me-2"></i>
+                    Продолжить
+                </button>
+            </div>
         </div>
-        <h6 class="success-title">{{ verifyEmailSuccess }}</h6>
-        <p class="success-description">Ваш email адрес успешно подтвержден</p>
-        <div class="mt-4">
-            <button type="button" class="btn btn-primary btn-continue" (click)="close()">
-                <i class="fas fa-check me-2"></i>
-                Продолжить
-            </button>
-        </div>
-    </div>
     }
 
     @if (showVerifyEmailPrompt && !verifyEmailSuccess) {
-    <div class="verify-email-content">
-        <div class="verify-icon-wrapper">
-            <i class="fas fa-envelope-open verify-icon"></i>
-            <div class="icon-bg"></div>
+        <div class="verify-email-content">
+            <div class="verify-icon-wrapper">
+                <i class="fas fa-envelope-open verify-icon"></i>
+                <div class="icon-bg"></div>
+            </div>
+            <h6 class="verify-title">Требуется подтверждение email</h6>
+            <p class="verify-description">
+                Для завершения процесса необходимо подтвердить ваш email адрес. Мы отправим вам код подтверждения на указанный при
+                регистрации email.
+            </p>
+            <div class="d-grid gap-3">
+                <button type="button" class="btn btn-primary btn-send-code" (click)="sendVerificationCode()">
+                    <i class="fas fa-paper-plane me-2"></i>
+                    Отправить код подтверждения
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-skip" (click)="close()">
+                    <i class="fas fa-times me-2"></i>
+                    Пропустить
+                </button>
+            </div>
         </div>
-        <h6 class="verify-title">Требуется подтверждение email</h6>
-        <p class="verify-description">
-            Для завершения процесса необходимо подтвердить ваш email адрес.
-            Мы отправим вам код подтверждения на указанный при регистрации email.
-        </p>
-        <div class="d-grid gap-3">
-            <button type="button" class="btn btn-primary btn-send-code" (click)="sendVerificationCode()">
-                <i class="fas fa-paper-plane me-2"></i>
-                Отправить код подтверждения
-            </button>
-            <button type="button" class="btn btn-outline-secondary btn-skip" (click)="close()">
-                <i class="fas fa-times me-2"></i>
-                Пропустить
-            </button>
-        </div>
-    </div>
     }
 
     @if (!showVerifyEmailPrompt && !verifyEmailSuccess) {
-    <div class="verify-email-content">
-        <div class="verify-icon-wrapper">
-            <i class="fas fa-key verify-icon"></i>
-            <div class="icon-bg"></div>
+        <div class="verify-email-content">
+            <div class="verify-icon-wrapper">
+                <i class="fas fa-key verify-icon"></i>
+                <div class="icon-bg"></div>
+            </div>
+            <h6 class="verify-title">Введите код подтверждения</h6>
+            <p class="verify-description">На ваш email был отправлен код подтверждения. Пожалуйста, введите его ниже:</p>
+            <form [formGroup]="verifyEmailForm" (ngSubmit)="verifyEmail()" class="verification-form">
+                <div class="mb-4">
+                    <label for="verificationCode" class="form-label">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        Код подтверждения
+                    </label>
+                    <div class="input-wrapper">
+                        <input
+                            type="text"
+                            class="form-control verification-input"
+                            id="verificationCode"
+                            formControlName="code"
+                            placeholder="000000"
+                            required
+                            maxlength="6"
+                        />
+                        <i class="fas fa-keyboard input-icon"></i>
+                    </div>
+                    @if (
+                        verifyEmailForm.get('code')?.invalid && (verifyEmailForm.get('code')?.dirty || verifyEmailForm.get('code')?.touched)
+                    ) {
+                        <div class="error-message">
+                            @if (verifyEmailForm.get('code')?.errors?.['required']) {
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <span>Код подтверждения обязателен.</span>
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="d-grid gap-3">
+                    <button type="submit" class="btn btn-primary btn-verify" [disabled]="verifyEmailForm.invalid || isVerifyingEmail">
+                        @if (isVerifyingEmail) {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            <span>Проверяем...</span>
+                        } @else {
+                            <i class="fas fa-check-double me-2"></i>
+                            <span>Подтвердить Email</span>
+                        }
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-resend" (click)="sendVerificationCode()">
+                        <i class="fas fa-redo me-2"></i>
+                        Отправить код повторно
+                    </button>
+                </div>
+            </form>
         </div>
-        <h6 class="verify-title">Введите код подтверждения</h6>
-        <p class="verify-description">
-            На ваш email был отправлен код подтверждения. Пожалуйста, введите его ниже:
-        </p>
-        <form [formGroup]="verifyEmailForm" (ngSubmit)="verifyEmail()" class="verification-form">
-            <div class="mb-4">
-                <label for="verificationCode" class="form-label">
-                    <i class="fas fa-shield-alt me-2"></i>
-                    Код подтверждения
-                </label>
-                <div class="input-wrapper">
-                    <input type="text" class="form-control verification-input" id="verificationCode"
-                        formControlName="code" placeholder="000000" required maxlength="6" />
-                    <i class="fas fa-keyboard input-icon"></i>
-                </div>
-                @if (verifyEmailForm.get('code')?.invalid && (verifyEmailForm.get('code')?.dirty ||
-                verifyEmailForm.get('code')?.touched)) {
-                <div class="error-message">
-                    @if (verifyEmailForm.get('code')?.errors?.['required']) {
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    <span>Код подтверждения обязателен.</span>
-                    }
-                </div>
-                }
-            </div>
-            <div class="d-grid gap-3">
-                <button type="submit" class="btn btn-primary btn-verify"
-                    [disabled]="verifyEmailForm.invalid || isVerifyingEmail">
-                    @if (isVerifyingEmail) {
-                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    <span>Проверяем...</span>
-                    } @else {
-                    <i class="fas fa-check-double me-2"></i>
-                    <span>Подтвердить Email</span>
-                    }
-                </button>
-                <button type="button" class="btn btn-outline-secondary btn-resend" (click)="sendVerificationCode()">
-                    <i class="fas fa-redo me-2"></i>
-                    Отправить код повторно
-                </button>
-            </div>
-        </form>
-    </div>
     }
 </div>

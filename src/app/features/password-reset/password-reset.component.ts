@@ -1,4 +1,3 @@
-
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,7 +8,7 @@ import { ToastService } from '../../shared/services/toast.service';
     selector: 'app-password-reset',
     templateUrl: './password-reset.component.html',
     styleUrl: './password-reset.component.scss',
-    imports: [ReactiveFormsModule]
+    imports: [ReactiveFormsModule],
 })
 export class PasswordResetComponent implements OnInit {
     resetForm: FormGroup = new FormGroup({
@@ -49,12 +48,12 @@ export class PasswordResetComponent implements OnInit {
 
         this.isLoading = true;
         this.authService.verifyResetToken(this.token, this.email).subscribe({
-            next: (response) => {
+            next: response => {
                 console.log('Token verification successful:', response);
                 this.isTokenValid = true;
                 this.isLoading = false;
             },
-            error: (error) => {
+            error: error => {
                 console.error('Token verification failed:', error);
                 this.isLoading = false;
                 if (error.status === 400) {
@@ -64,7 +63,7 @@ export class PasswordResetComponent implements OnInit {
                 } else {
                     this.error = 'Ошибка при проверке ссылки';
                 }
-            }
+            },
         });
     }
 
@@ -96,17 +95,17 @@ export class PasswordResetComponent implements OnInit {
         this.error = null;
 
         this.authService.resetPassword(this.email, this.token, password).subscribe({
-            next: (response) => {
+            next: response => {
                 console.log('Password reset successful:', response);
                 this.success = 'Пароль успешно изменен. Теперь вы можете войти с новым паролем.';
                 this.toastService.show('Пароль успешно изменен', 'success');
                 this.isResetting = false;
-                
+
                 setTimeout(() => {
                     this.router.navigate(['/']);
                 }, 3000);
             },
-            error: (error) => {
+            error: error => {
                 console.error('Password reset failed:', error);
                 this.isResetting = false;
                 if (error.status === 400) {
@@ -116,7 +115,7 @@ export class PasswordResetComponent implements OnInit {
                 } else {
                     this.error = `Ошибка при смене пароля: ${error.message || 'Неизвестная ошибка'}`;
                 }
-            }
+            },
         });
     }
 

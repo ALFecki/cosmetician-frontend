@@ -1,0 +1,158 @@
+<div class="contacts-page">
+    <div class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-8">
+                    <h1 class="hero-title">Свяжитесь с нами</h1>
+                    <p class="hero-subtitle">Готовы помочь вам выбрать идеальную косметику. Свяжитесь с нами любым удобным способом!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="contact-cards-section">
+            <div class="row">
+                @for (contact of contacts; track contact.title) {
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="contact-card">
+                            <div class="contact-icon">
+                                <i-bs [name]="contact.icon"></i-bs>
+                            </div>
+                            <h5 class="contact-title">{{ contact.title }}</h5>
+                            <p class="contact-value">
+                                <a href="{{ contact.link }}">
+                                    {{ contact.value }}
+                                </a>
+                            </p>
+                            <p class="contact-subtitle">{{ contact.subtitle }}</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="info-card">
+                    <h3 class="section-title">
+                        <i-bs name="person-circle" class="me-2"></i-bs>
+                        О SkViDerm
+                    </h3>
+                    <p>
+                        SkViDerm — это больше чем просто магазин косметики. Мы предлагаем профессиональные консультации от врача-косметолога
+                        Виктории Скворцовой, кандидата медицинских наук. Наша миссия — помочь каждому клиенту найти идеальную косметику,
+                        которая подходит именно для их типа кожи и потребностей.
+                    </p>
+                    <p>
+                        С нами вы получаете не просто продукт, а комплексный подход к уходу за кожей с профессиональной поддержкой и
+                        индивидуальными рекомендациями.
+                    </p>
+                </div>
+
+                <div class="info-card">
+                    <h3 class="section-title">
+                        <i-bs name="star-fill" class="me-2"></i-bs>
+                        Наши услуги
+                    </h3>
+                    <div class="row">
+                        @for (service of services; track service.title) {
+                            <div class="col-md-6 mb-3">
+                                <div class="service-item">
+                                    <div class="service-icon">
+                                        <i-bs [name]="service.icon"></i-bs>
+                                    </div>
+                                    <div class="service-content">
+                                        <h6 class="service-title">{{ service.title }}</h6>
+                                        <p class="service-description">{{ service.description }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- FAQ Section -->
+                <div class="info-card">
+                    <h3 class="section-title">
+                        <i-bs name="question-circle-fill" class="me-2"></i-bs>
+                        Часто задаваемые вопросы
+                    </h3>
+                    <div class="faq-list">
+                        <div class="faq-item">
+                            <h6 class="faq-question">Как получить персональную консультацию?</h6>
+                            <p class="faq-answer">
+                                Просто свяжитесь с нами любым удобным способом для записи на консультацию. Виктория Скворцова проводит
+                                консультации при личной встрече по предварительной записи.
+                            </p>
+                        </div>
+                        <div class="faq-item">
+                            <h6 class="faq-question">Какие способы доставки доступны?</h6>
+                            <p class="faq-answer">
+                                Мы предлагаем курьерскую доставку по Минску, почтовую доставку по Беларуси (европочта), а также самовывоз из
+                                нашего офиса по предварительной договоренности.
+                            </p>
+                        </div>
+                        <div class="faq-item">
+                            <h6 class="faq-question">Как долго действует гарантия на продукцию?</h6>
+                            <p class="faq-answer">Вся наша продукция имеет гарантию качества согласно сроку годности производителя.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Working Hours -->
+                <div class="info-card">
+                    <h4 class="section-title">
+                        <i-bs name="clock-fill" class="me-2"></i-bs>
+                        Режим работы
+                    </h4>
+                    <div class="working-hours">
+                        @for (schedule of workingHours; track schedule.day) {
+                            <div class="schedule-item" [class.weekend]="schedule.hours === 'Выходной'">
+                                <span class="day">{{ schedule.day }}</span>
+                                <span class="hours">{{ schedule.hours }}</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Social Media -->
+                <div class="info-card">
+                    <h4 class="section-title">
+                        <i-bs name="share-fill" class="me-2"></i-bs>
+                        Мы в социальных сетях
+                    </h4>
+                    <div class="social-links">
+                        @for (social of socialLinks; track social.name) {
+                            <a [href]="social.url" target="_blank" rel="noopener" class="social-link" [style.--social-color]="social.color">
+                                <i-bs [name]="social.icon"></i-bs>
+                                <span>{{ social.name }}</span>
+                            </a>
+                        }
+                    </div>
+                </div>
+
+                <!-- Contact Form CTA -->
+                <div class="info-card cta-card">
+                    <div class="cta-content">
+                        <h5>Нужна помощь?</h5>
+                        <p>Наши эксперты готовы ответить на все ваши вопросы о косметике и уходе за кожей.</p>
+                        <div class="cta-buttons">
+                            <a href="tel:+375295987752" class="btn btn-primary">
+                                <i-bs name="telephone-fill" class="me-2"></i-bs>
+                                Позвонить
+                            </a>
+                            <a href="mailto:skviderm@gmail.com" class="btn btn-outline-primary">
+                                <i-bs name="envelope-fill" class="me-2"></i-bs>
+                                Написать
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
