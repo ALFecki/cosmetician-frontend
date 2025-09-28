@@ -1,9 +1,14 @@
 import { Component } from '@angular/core';
+import { ImageUrlPipe } from "../../../../shared/utils/image-url.pipe";
+import { IconsModule } from '../../../../shared/base/icons/icons.module';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
     selector: 'app-benefits',
     templateUrl: './benefits.component.html',
     styleUrl: './benefits.component.scss',
+    imports: [CommonModule, RouterModule, IconsModule, ImageUrlPipe],
 })
 export class BenefitsComponent {
     benefits = [

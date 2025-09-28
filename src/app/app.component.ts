@@ -4,7 +4,6 @@ import { Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, combineLatest, filter, map, of, startWith } from 'rxjs';
-import { HomeModule } from './features/home/home.module';
 import { FooterComponent } from './shared/components/footer/footer.component';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { ToastComponent } from './shared/components/toast/toast.component';
@@ -17,7 +16,7 @@ import { AuthService } from './shared/services/auth.service';
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
-    imports: [CommonModule, NgbModule, RouterOutlet, NavbarComponent, HomeModule, FooterComponent, ToastComponent],
+    imports: [CommonModule, NgbModule, RouterOutlet, NavbarComponent, FooterComponent, ToastComponent],
     providers: [
         {
             provide: HTTP_INTERCEPTORS,

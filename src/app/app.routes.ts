@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './features/home/home.component';
 import { AdminOrderDetailsComponent } from './shared/components/admin-order-details/admin-order-details.component';
 import { AdminGuard } from './shared/guards/admin.guard';
 import { AuthGuard } from './shared/guards/auth.guard';
@@ -13,8 +12,7 @@ export const routes: Routes = [
     },
     {
         path: '',
-        loadChildren: () => import('./features/home/home.module').then(m => m.HomeModule),
-        component: HomeComponent,
+        loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent),
         canActivate: [MaintenanceGuard],
         title: 'SkViDerm - Косметика и уход за кожей',
     },
