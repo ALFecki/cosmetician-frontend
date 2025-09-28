@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { IconsModule } from '../../base/icons/icons.module';
@@ -17,10 +17,12 @@ import { ImageUrlPipe } from '../../utils/image-url.pipe';
     templateUrl: './product-modal.component.html',
     styleUrl: './product-modal.component.scss',
 })
-export class ProductModalComponent {
+export class ProductModalComponent implements OnDestroy {
     selectedProduct: ProductModel | null = null;
     selectedVariantId: string | null = null;
     activeTab = 'description';
+    isPriceRevealed = false;
+    private priceTimeout: NodeJS.Timeout | null = null;
 
     constructor(
         private modalService: NgbModal,
@@ -80,5 +82,35 @@ export class ProductModalComponent {
     getSelectedVariantVolume(): number {
         const variant = this.getSelectedVariant();
         return variant?.volume || 0;
+    }
+
+    revealPrice(): void {
+        this.isPriceRevealed = true;
+        
+        if (this.priceTimeout) {
+            clearTimeout(this.priceTimeout);
+        }
+        
+        this.priceTimeout = setTimeout(() => {
+            const priceElement = document.querySelector('.modal-price.price-revealed');
+            if (priceElement) {
+                priceElement.classList.remove('animate-reveal');
+                priceElement.classList.add('animate-hide');
+                
+                setTimeout(() => {
+                    this.isPriceRevealed = false;
+                    this.priceTimeout = null;
+                }, 400);
+            } else {
+                this.isPriceRevealed = false;
+                this.priceTimeout = null;
+            }
+        }, 5000);
+    }
+
+    ngOnDestroy(): void {
+        if (this.priceTimeout) {
+            clearTimeout(this.priceTimeout);
+        }
     }
 }

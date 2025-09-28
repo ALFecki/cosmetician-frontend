@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IconsModule } from '../../base/icons/icons.module';
 import { ProductModel } from '../../models/product.model';
@@ -16,7 +16,7 @@ import { ProductCarouselComponent } from '../product-carousel/product-carousel.c
     templateUrl: './product-card.component.html',
     styleUrl: './product-card.component.scss',
 })
-export class ProductCardComponent implements OnInit {
+export class ProductCardComponent implements OnInit, OnDestroy {
     product!: ProductModel;
     loading = true;
     error = '';
@@ -28,6 +28,8 @@ export class ProductCardComponent implements OnInit {
     visibleCharacteristics: { label: string; value: string }[] = [];
     hiddenCharacteristics: { label: string; value: string }[] = [];
     showAllCharacteristics = false;
+    isPriceRevealed = false;
+    private priceTimeout: NodeJS.Timeout | null = null;
 
     constructor(
         private route: ActivatedRoute,
@@ -103,6 +105,36 @@ export class ProductCardComponent implements OnInit {
             }
         } else {
             this.loginModalService.openLoginModal();
+        }
+    }
+
+    revealPrice(): void {
+        this.isPriceRevealed = true;
+        
+        if (this.priceTimeout) {
+            clearTimeout(this.priceTimeout);
+        }
+        
+        this.priceTimeout = setTimeout(() => {
+            const priceElement = document.querySelector('.h3.price-revealed');
+            if (priceElement) {
+                priceElement.classList.remove('animate-reveal');
+                priceElement.classList.add('animate-hide');
+                
+                setTimeout(() => {
+                    this.isPriceRevealed = false;
+                    this.priceTimeout = null;
+                }, 400);
+            } else {
+                this.isPriceRevealed = false;
+                this.priceTimeout = null;
+            }
+        }, 5000);
+    }
+
+    ngOnDestroy(): void {
+        if (this.priceTimeout) {
+            clearTimeout(this.priceTimeout);
         }
     }
 }

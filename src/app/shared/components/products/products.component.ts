@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, of } from 'rxjs';
@@ -21,7 +21,7 @@ import { ProductModalComponent } from '../product-modal/product-modal.component'
     templateUrl: './products.component.html',
     styleUrl: './products.component.scss',
 })
-export class ProductsComponent implements OnInit {
+export class ProductsComponent implements OnInit, OnDestroy {
     products$!: Observable<ProductModel[]>;
     @Input() categoryId: string | undefined;
     @Input() brandId: string | undefined;
@@ -32,6 +32,7 @@ export class ProductsComponent implements OnInit {
     filterOptions: FilterProductSchema = {};
     private selectedVariants: Record<string, string> = {};
     private revealedPrices = new Set<string>();
+    private priceTimeouts = new Map<string, NodeJS.Timeout>();
 
     constructor(
         private route: ActivatedRoute,
@@ -59,7 +60,37 @@ export class ProductsComponent implements OnInit {
 
     revealPrice(productId: string): void {
         this.revealedPrices.add(productId);
+        
+        if (this.priceTimeouts.has(productId)) {
+            clearTimeout(this.priceTimeouts.get(productId));
+        }
+        
+        const timeout = setTimeout(() => {
+            const priceElement = document.querySelector(`[data-product-id="${productId}"] .price-revealed`);
+            if (priceElement) {
+                priceElement.classList.remove('animate-reveal');
+                priceElement.classList.add('animate-hide');
+
+                setTimeout(() => {
+                    this.revealedPrices.delete(productId);
+                    this.priceTimeouts.delete(productId);
+                }, 400);
+            } else {
+                this.revealedPrices.delete(productId);
+                this.priceTimeouts.delete(productId);
+            }
+        }, 5000);
+        
+        this.priceTimeouts.set(productId, timeout);
     }
+
+    ngOnDestroy(): void {
+        this.priceTimeouts.forEach((timeout) => {
+            clearTimeout(timeout);
+        });
+        this.priceTimeouts.clear();
+    }
+    
     resetFilters(): void {
         this.filterOptions = {};
         this.currentPage = 1;

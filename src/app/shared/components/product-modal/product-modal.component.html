@@ -1,10 +1,20 @@
 <div class="modal-header">
     <div class="modal-header-content">
-        <h4 class="modal-title">{{ selectedProduct?.fullTitle ? selectedProduct?.fullTitle : selectedProduct?.title }}</h4>
+        <h4 class="modal-title">{{ selectedProduct?.fullTitle ? selectedProduct?.fullTitle : selectedProduct?.title }}
+        </h4>
+        @if (selectedProduct?.isPriceHidden && !isPriceRevealed) {
         <div class="modal-price">
+            <button class="btn btn-outline-primary btn-sm" (click)="revealPrice()">
+                <i-bs name="eye" class="me-1"></i-bs>
+                Узнать цену
+            </button>
+        </div>
+        } @else {
+        <div class="modal-price price-revealed animate-reveal">
             <span class="price-label">Цена:</span>
             <span class="price-value">{{ getSelectedVariantPrice() | number: '1.2-2' }} р.</span>
         </div>
+        }
     </div>
     <button type="button" class="btn-close" (click)="closeModal()" aria-label="Закрыть">
         <i-bs name="x-lg"></i-bs>
@@ -16,21 +26,22 @@
 
         <div class="product-details-side">
             @if (selectedProduct?.variants && selectedProduct!.variants.length > 1) {
-                <div class="variant-selection">
-                    <h6><i-bs name="droplet" class="me-2"></i-bs>Выберите объем</h6>
-                    <div class="variant-buttons">
-                        @for (variant of selectedProduct?.variants; track variant) {
-                            <button
-                                class="btn btn-sm variant-btn"
-                                [class.active]="selectedVariantId === variant.id"
-                                (click)="selectVariant(variant.id)"
-                            >
-                                <div class="variant-volume">{{ variant.volume }}мл</div>
-                                <div class="variant-price">{{ variant.price | number: '1.2-2' }} р.</div>
-                            </button>
+            <div class="variant-selection">
+                <h6><i-bs name="droplet" class="me-2"></i-bs>Выберите объем</h6>
+                <div class="variant-buttons">
+                    @for (variant of selectedProduct?.variants; track variant) {
+                    <button class="btn btn-sm variant-btn" [class.active]="selectedVariantId === variant.id"
+                        (click)="selectVariant(variant.id)">
+                        <div class="variant-volume">{{ variant.volume }}мл</div>
+                        @if (selectedProduct?.isPriceHidden && !isPriceRevealed) {
+                        <div class="variant-price text-muted">Цена скрыта</div>
+                        } @else {
+                        <div class="variant-price">{{ variant.price | number: '1.2-2' }} р.</div>
                         }
-                    </div>
+                    </button>
+                    }
                 </div>
+            </div>
             }
 
             <div class="characteristics-compact">
@@ -62,41 +73,43 @@
     </div>
 
     @if (selectedProduct?.description || selectedProduct?.methodOfUse) {
-        <div class="info-tabs">
-            <div class="tab-buttons">
-                @if (selectedProduct?.description) {
-                    <button class="tab-btn" [class.active]="activeTab === 'description'" (click)="activeTab = 'description'">
-                        <i-bs name="card-text"></i-bs>
-                        <span>Описание</span>
-                    </button>
-                }
-                <button class="tab-btn" [class.active]="activeTab === 'composition'" (click)="activeTab = 'composition'">
-                    <i-bs name="list-ul"></i-bs>
-                    <span>Состав</span>
-                </button>
-                @if (selectedProduct?.methodOfUse) {
-                    <button class="tab-btn" [class.active]="activeTab === 'usage'" (click)="activeTab = 'usage'">
-                        <i-bs name="clipboard-check"></i-bs>
-                        <span>Применение</span>
-                    </button>
-                }
-            </div>
-            <div class="tab-content">
-                @if (selectedProduct?.description) {
-                    <div class="tab-pane" [class.show]="activeTab === 'description'" [class.active]="activeTab === 'description'">
-                        <p>{{ selectedProduct?.description }}</p>
-                    </div>
-                }
-                <div class="tab-pane" [class.show]="activeTab === 'composition'" [class.active]="activeTab === 'composition'">
-                    <p>{{ selectedProduct?.composition || 'Нет информации о составе' }}</p>
-                </div>
-                @if (selectedProduct?.methodOfUse) {
-                    <div class="tab-pane" [class.show]="activeTab === 'usage'" [class.active]="activeTab === 'usage'">
-                        <p>{{ selectedProduct?.methodOfUse }}</p>
-                    </div>
-                }
-            </div>
+    <div class="info-tabs">
+        <div class="tab-buttons">
+            @if (selectedProduct?.description) {
+            <button class="tab-btn" [class.active]="activeTab === 'description'" (click)="activeTab = 'description'">
+                <i-bs name="card-text"></i-bs>
+                <span>Описание</span>
+            </button>
+            }
+            <button class="tab-btn" [class.active]="activeTab === 'composition'" (click)="activeTab = 'composition'">
+                <i-bs name="list-ul"></i-bs>
+                <span>Состав</span>
+            </button>
+            @if (selectedProduct?.methodOfUse) {
+            <button class="tab-btn" [class.active]="activeTab === 'usage'" (click)="activeTab = 'usage'">
+                <i-bs name="clipboard-check"></i-bs>
+                <span>Применение</span>
+            </button>
+            }
         </div>
+        <div class="tab-content">
+            @if (selectedProduct?.description) {
+            <div class="tab-pane" [class.show]="activeTab === 'description'"
+                [class.active]="activeTab === 'description'">
+                <p>{{ selectedProduct?.description }}</p>
+            </div>
+            }
+            <div class="tab-pane" [class.show]="activeTab === 'composition'"
+                [class.active]="activeTab === 'composition'">
+                <p>{{ selectedProduct?.composition || 'Нет информации о составе' }}</p>
+            </div>
+            @if (selectedProduct?.methodOfUse) {
+            <div class="tab-pane" [class.show]="activeTab === 'usage'" [class.active]="activeTab === 'usage'">
+                <p>{{ selectedProduct?.methodOfUse }}</p>
+            </div>
+            }
+        </div>
+    </div>
     }
 
     <div class="action-buttons">
