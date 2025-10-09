@@ -102,5 +102,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/password-reset/password-reset.component').then(m => m.PasswordResetComponent),
         title: 'Восстановление пароля - SkViDerm',
     },
+    {
+        path: 'personal-data',
+        loadComponent: () => import('./features/personal-data/personal-data.component').then(m => m.PersonalDataRedirectComponent),
+        canActivate: [MaintenanceGuard],
+        title: 'Политика обработки персональных данных - SkViDerm',
+    },
     { path: '**', redirectTo: '' },
 ];

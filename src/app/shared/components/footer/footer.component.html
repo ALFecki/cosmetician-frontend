@@ -1,71 +1,151 @@
-<footer class="footer-main py-4 mt-5">
+<footer class="footer-main">
     <div class="container">
-        <div class="row">
-            <div class="col-6 col-md-2 mb-3">
-                <h6 class="footer-title">Компания</h6>
-                <ul class="list-unstyled">
-                    <li><a routerLink="/about" class="footer-link">О нас</a></li>
-                    <li><a routerLink="/delivery" class="footer-link">Доставка и оплата</a></li>
-                </ul>
-            </div>
-            <div class="col-6 col-md-3 mb-3">
-                <h6 class="footer-title">Категории</h6>
-                <ul class="list-unstyled">
-                    @for (cat of categories$ | async; track cat) {
-                        <li>
-                            <a [routerLink]="['/category', cat.id]" class="footer-link">{{ cat.title }}</a>
-                        </li>
-                    }
-                </ul>
-            </div>
-            <div class="col-6 col-md-3 mb-3">
-                <h6 class="footer-title">Бренды</h6>
-                <ul class="list-unstyled">
-                    @for (brand of brands$ | async; track brand) {
-                        <li>
-                            <a [routerLink]="['/brand', brand.id]" class="footer-link">{{ brand.title }}</a>
-                        </li>
-                    }
-                </ul>
-            </div>
-            <div class="col-6 col-md-2 mb-3">
-                <h6 class="footer-title">Контакты</h6>
-                <ul class="list-unstyled">
-                    <li><a href="tel:+375295987752" class="footer-link">+375 (29) 598-77-52</a></li>
-                    <li>
-                        <a href="mailto:skviderm@gmail.com" class="footer-link">{{ 'skviderm@gmail.com' }}</a>
-                    </li>
-                    <li>
+        <div class="footer-content">
+            <div class="row g-4">
+                <div class="col-12 col-lg-4 mb-4">
+                    <div class="footer-brand">
+                        <h5 class="brand-title">
+                            <i-bs name="heart-fill" class="brand-icon"></i-bs>
+                            SkViDerm
+                        </h5>
+                        <p class="brand-description">
+                            Ваш надежный партнер в мире красоты и косметики. Качественная продукция и быстрая доставка.
+                        </p>
                         <div class="footer-socials">
-                            <a href="https://t.me/vikskvor" target="_blank" class="footer-social me-2" aria-label="Telegram">
-                                <i-bs name="telegram"></i-bs>
-                            </a>
-                            <!-- <a href="viber://chat?number=%2B79999999999" target="_blank" class="footer-social me-2" aria-label="Viber">
-        <i-bs name="viber"></i-bs>
-      </a> -->
-                            <a
-                                href="https://www.instagram.com/viktoria_skvorcova"
-                                target="_blank"
-                                class="footer-social"
-                                aria-label="Instagram"
-                            >
-                                <i-bs name="instagram"></i-bs>
-                            </a>
+                            <span class="socials-label">Мы в соцсетях:</span>
+                            <div class="social-links">
+                                <a href="https://t.me/vikskvor" target="_blank" class="footer-social" aria-label="Telegram">
+                                    <i-bs name="telegram"></i-bs>
+                                </a>
+                                <a
+                                    href="https://www.instagram.com/viktoria_skvorcova"
+                                    target="_blank"
+                                    class="footer-social"
+                                    aria-label="Instagram"
+                                >
+                                    <i-bs name="instagram"></i-bs>
+                                </a>
+                            </div>
                         </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
+                    </div>
+                </div>
 
-        <div class="row mt-4 pt-3 border-top">
-            <div class="col-12">
-                <h6 class="footer-title text-center mb-3">Способы оплаты</h6>
-                <div class="payment-logos">
-                    @for (logo of paymentLogos; track logo) {
-                        <img [src]="logo" alt="Способ оплаты" class="payment-logo" />
-                    }
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="footer-section">
+                        <h6 class="footer-title">Компания</h6>
+                        <ul class="footer-links">
+                            <li><a routerLink="/about" class="footer-link">О нас</a></li>
+                            <li><a routerLink="/delivery" class="footer-link">Доставка и оплата</a></li>
+                            <li><a routerLink="/contacts" class="footer-link">Контакты</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="footer-section">
+                        <h6 class="footer-title">Категории</h6>
+                        <ul class="footer-links">
+                            @for (cat of categories$ | async; track cat) {
+                                <li>
+                                    <a [routerLink]="['/category', cat.id]" class="footer-link">{{ cat.title }}</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="footer-section">
+                        <h6 class="footer-title">Бренды</h6>
+                        <ul class="footer-links">
+                            @for (brand of brands$ | async; track brand) {
+                                <li>
+                                    <a [routerLink]="['/brand', brand.id]" class="footer-link">{{ brand.title }}</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-2">
+                    <div class="footer-section">
+                        <h6 class="footer-title">Контакты</h6>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <i-bs name="telephone-fill" class="contact-icon"></i-bs>
+                                <a href="tel:+375295987752" class="footer-link">+375 (29) 598-77-52</a>
+                            </div>
+                            <div class="contact-item">
+                                <i-bs name="envelope-fill" class="contact-icon"></i-bs>
+                                <a href="mailto:skviderm@gmail.com" class="footer-link">skviderm&#64;gmail.com</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <div class="footer-additional">
+            <div class="row g-4">
+                <div class="col-12 col-lg-6">
+                    <div class="company-details">
+                        <h6 class="details-title">Реквизиты компании</h6>
+                        <div class="details-grid">
+                            <div class="detail-item">
+                                <span class="detail-label">Наименование:</span>
+                                <span class="detail-value">ИП Скворцова Виктория Валерьевна</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">УНП:</span>
+                                <span class="detail-value">391948321</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Адрес:</span>
+                                <span class="detail-value">Республика Беларусь, г. Витебск, пр-т. Московский, д.13, к. 4, оф. 99</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Счет:</span>
+                                <span class="detail-value">BY16ALFA30132H45520010270000</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Банк:</span>
+                                <span class="detail-value">ЗАО "Альфа-Банк"</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">БИК:</span>
+                                <span class="detail-value">ALFABY2X</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-6">
+                    <div class="payment-section">
+                        <h6 class="payment-title">Способы оплаты</h6>
+                        <div class="payment-logos">
+                            @for (logo of paymentLogos; track logo) {
+                                <img [src]="logo" alt="Способ оплаты" class="payment-logo" loading="lazy" />
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="footer-bottom">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-6">
+                    <p class="copyright">
+                        © {{ currentYear }} SkViDerm. Все права защищены.
+                    </p>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="footer-bottom-links">
+                        <a routerLink="/privacy" class="bottom-link">Политика конфиденциальности</a>
+                        <a routerLink="/terms" class="bottom-link">Условия использования</a>
+                    </div>
+                </div>
+            </div>
+        </div> -->
     </div>
 </footer>

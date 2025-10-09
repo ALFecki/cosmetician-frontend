@@ -4,7 +4,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { catchError, throwError } from 'rxjs';
 import { Md5 } from 'ts-md5';
-import { environment } from '../../../../environments/environment';
 import { LoginData, RegistrationData } from '../../models/login.interface';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
@@ -262,6 +261,6 @@ export class LoginComponent {
     }
 
     getPersonalDataUrl(): string {
-        return `${environment.server_url}/images/skviderm-personal-data.pdf`;
+        return '/personal-data';
     }
 }

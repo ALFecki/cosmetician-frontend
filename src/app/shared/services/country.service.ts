@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DataService } from '../base/services/data.service';
-import { CreateCountrySchema, FilterCountrySchema, UpdateCountrySchema } from '../schemas/country.schema';
 import { CountryModel } from '../models/country.model';
+import { CreateCountrySchema, FilterCountrySchema, UpdateCountrySchema } from '../schemas/country.schema';
 
 @Injectable({
     providedIn: 'root',

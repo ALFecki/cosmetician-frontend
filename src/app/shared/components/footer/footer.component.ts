@@ -17,6 +17,7 @@ import { CategoryService } from '../../services/category.service';
 export class FooterComponent {
     categories$: Observable<CategoryModel[]>;
     brands$: Observable<BrandModel[]>;
+    currentYear = new Date().getFullYear();
 
     paymentLogos: string[] = [
         'assets/images/acquiring/color-21.png',
