@@ -56,5 +56,16 @@
                 </ul>
             </div>
         </div>
+
+        <div class="row mt-4 pt-3 border-top">
+            <div class="col-12">
+                <h6 class="footer-title text-center mb-3">Способы оплаты</h6>
+                <div class="payment-logos">
+                    @for (logo of paymentLogos; track logo) {
+                        <img [src]="logo" alt="Способ оплаты" class="payment-logo" />
+                    }
+                </div>
+            </div>
+        </div>
     </div>
 </footer>

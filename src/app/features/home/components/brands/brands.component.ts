@@ -5,6 +5,7 @@ import { BrandService } from '../../../../shared/services/brand.service';
 import { ImageUrlPipe } from '../../../../shared/utils/image-url.pipe';
 import { IconsModule } from '../../../../shared/base/icons/icons.module';
 import { CommonModule } from '@angular/common';
+import { map, Observable } from 'rxjs';
 
 @Component({
     selector: 'app-brands',
@@ -13,28 +14,32 @@ import { CommonModule } from '@angular/common';
     styleUrl: './brands.component.scss',
 })
 export class BrandsComponent implements OnInit {
-    brands: BrandModel[] = [];
+    brands$: Observable<BrandModel[]> = new Observable<BrandModel[]>();
     loading = false;
     error = '';
 
     constructor(private brandService: BrandService) {}
 
+    private getRandomUniqueElements<T>(arr: T[], count: number): T[] {
+        const shuffledArray = [...arr];
+
+        for (let i = shuffledArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]]; // Swap elements
+        }
+
+        return shuffledArray.slice(0, Math.min(count, shuffledArray.length));
+    }
+
     ngOnInit(): void {
         this.loading = true;
-        this.brandService.getBrandsList().subscribe({
-            next: brands => {
-                this.brands = brands
-                    .slice(0, 4)
-                    .sort((a, b) => a.title.localeCompare(b.title))
-                    .filter(brand => brand.image);
+        this.brands$ = this.brandService.getBrandsList().pipe(
+            map(brands => {
+                brands = brands.filter(b => b.image);
                 this.loading = false;
-            },
-            error: error => {
-                console.error('Error loading brands:', error);
-                this.error = 'Не удалось загрузить бренды';
-                this.loading = false;
-            },
-        });
+                return this.getRandomUniqueElements(brands, 4);
+            }),
+        );
     }
 
     getPlaceholderImage(): string {

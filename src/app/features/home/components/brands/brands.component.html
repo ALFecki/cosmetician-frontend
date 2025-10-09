@@ -18,7 +18,7 @@
     }
 
     <div class="brands-row row justify-content-center align-items-center">
-        @for (brand of brands; track brand) {
+        @for (brand of brands$ | async; track brand) {
             <div class="col-6 col-sm-4 col-md-3 mb-4">
                 <a [routerLink]="['/brand', brand.id]" class="brand-link">
                     <div class="brand-card">

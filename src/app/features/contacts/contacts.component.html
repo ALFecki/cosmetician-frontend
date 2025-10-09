@@ -135,7 +135,19 @@
                     </div>
                 </div>
 
-                <!-- Contact Form CTA -->
+                <div class="info-card">
+                    <h4 class="section-title">
+                        <i-bs name="credit-card-fill" class="me-2"></i-bs>
+                        Способы оплаты
+                    </h4>
+                    <div class="payment-methods">
+                        @for (logo of paymentLogos; track logo) {
+                            <img [src]="logo" alt="Способ оплаты" class="payment-logo" />
+                        }
+                    </div>
+                    <p class="payment-info">Мы принимаем все популярные способы оплаты для вашего удобства</p>
+                </div>
+
                 <div class="info-card cta-card">
                     <div class="cta-content">
                         <h5>Нужна помощь?</h5>

@@ -12,16 +12,6 @@
         margin-bottom: 1rem;
         position: relative;
         padding-bottom: 0.5rem;
-
-        &:after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 30px;
-            height: 2px;
-            background: var(--secondary);
-        }
     }
 
     .footer-link {
@@ -116,6 +106,43 @@
         .col-12.col-md-2 {
             order: -1;
             margin-bottom: 1.5rem;
+        }
+    }
+}
+
+.payment-logos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+
+    .payment-logo {
+        height: 32px;
+        width: 50px;
+        object-fit: contain;
+        transition: all 0.3s ease;
+        border-radius: 6px;
+        padding: 0.2rem;
+        background: var(--white);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        flex-shrink: 0;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary);
+        }
+    }
+
+    @media (max-width: 768px) {
+        gap: 0.5rem;
+
+        .payment-logo {
+            height: 28px;
+            width: 44px;
+            padding: 0.15rem;
         }
     }
 }

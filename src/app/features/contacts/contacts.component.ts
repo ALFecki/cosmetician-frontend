@@ -82,27 +82,27 @@ export class ContactsComponent {
         {
             icon: 'instagram',
             name: 'Instagram',
-            url: 'https://instagram.com/skviderm',
+            url: 'https://www.instagram.com/viktoria_skvorcova',
             color: '#E4405F',
         },
         {
             icon: 'telegram',
             name: 'Telegram',
-            url: 'https://t.me/skviderm',
+            url: 'https://t.me/vikskvor',
             color: '#0088cc',
         },
-        {
-            icon: 'facebook',
-            name: 'Facebook',
-            url: 'https://facebook.com/skviderm',
-            color: '#1877F2',
-        },
-        {
-            icon: 'whatsapp',
-            name: 'WhatsApp',
-            url: 'https://wa.me/375295987752',
-            color: '#25D366',
-        },
+        // {
+        //     icon: 'facebook',
+        //     name: 'Facebook',
+        //     url: 'https://facebook.com/skviderm',
+        //     color: '#1877F2',
+        // },
+        // {
+        //     icon: 'whatsapp',
+        //     name: 'WhatsApp',
+        //     url: 'https://wa.me/375295987752',
+        //     color: '#25D366',
+        // },
     ];
 
     workingHours = [
@@ -140,5 +140,17 @@ export class ContactsComponent {
             title: 'Индивидуальный подход',
             description: 'Заботимся о каждом клиенте как о близком человеке',
         },
+    ];
+
+    paymentLogos: string[] = [
+        'assets/images/acquiring/color-21.png',
+        'assets/images/acquiring/color-22.png',
+        'assets/images/acquiring/color-23.png',
+        'assets/images/acquiring/color-24.png',
+        'assets/images/acquiring/color-25.png',
+        'assets/images/acquiring/color-26.png',
+        'assets/images/acquiring/color-28.png',
+        'assets/images/acquiring/color-29.png',
+        'assets/images/acquiring/color-30.png',
     ];
 }
