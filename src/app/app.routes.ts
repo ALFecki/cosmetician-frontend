@@ -108,5 +108,11 @@ export const routes: Routes = [
         canActivate: [MaintenanceGuard],
         title: 'Политика обработки персональных данных - SkViDerm',
     },
+    {
+        path: 'policy',
+        loadComponent: () => import('./features/privacy-policy/privacy-policy.component').then(m => m.PrivacyPolicyComponent),
+        canActivate: [MaintenanceGuard],
+        title: 'Политика конфиденциальности - SkViDerm',
+    },
     { path: '**', redirectTo: '' },
 ];

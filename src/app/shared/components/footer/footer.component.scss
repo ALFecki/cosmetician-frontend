@@ -19,7 +19,7 @@
 
     // Основное содержимое футера
     .footer-content {
-        padding: 3rem 0 2rem;
+        padding: 2.5rem 1rem 1.5rem;
         position: relative;
     }
 
@@ -28,8 +28,8 @@
         .brand-title {
             color: var(--primary);
             font-weight: 700;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -42,10 +42,10 @@
 
         .brand-description {
             color: var(--gray-medium);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-            max-width: 350px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin-bottom: 1.2rem;
+            max-width: 300px;
         }
     }
 
@@ -120,17 +120,17 @@
         .footer-title {
             color: var(--primary);
             font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 1.2rem;
+            font-size: 1rem;
+            margin-bottom: 1rem;
             position: relative;
-            padding-bottom: 0.5rem;
+            padding-bottom: 0.4rem;
 
             &::after {
                 content: '';
                 position: absolute;
                 bottom: 0;
                 left: 0;
-                width: 30px;
+                width: 25px;
                 height: 2px;
                 background: linear-gradient(90deg, var(--secondary), var(--primary));
                 border-radius: 1px;
@@ -143,8 +143,27 @@
             margin: 0;
 
             li {
-                margin-bottom: 0.6rem;
+                margin-bottom: 0.5rem;
             }
+        }
+
+        .detail-item {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--gray-dark);
+            white-space: nowrap;
+        }
+
+        .detail-value {
+            color: var(--gray-medium);
+            word-break: break-word;
         }
     }
 
@@ -195,83 +214,16 @@
         }
     }
 
+    // Юридическая информация
+    .legal-info {
+        color: var(--gray-medium);
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+
     .footer-additional {
         border-top: 1px solid rgba(212, 80, 109, 0.1);
-        padding: 2rem 0;
-    }
-
-    .company-details {
-        .details-title {
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .details-grid {
-            display: grid;
-            gap: 0.5rem;
-        }
-
-        .detail-item {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 0.5rem;
-            font-size: 0.85rem;
-            line-height: 1.4;
-        }
-
-        .detail-label {
-            font-weight: 600;
-            color: var(--gray-dark);
-            white-space: nowrap;
-        }
-
-        .detail-value {
-            color: var(--gray-medium);
-            word-break: break-word;
-        }
-    }
-
-    .payment-section {
-        .payment-title {
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .payment-logos {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-            gap: 0.75rem;
-            align-items: center;
-        }
-
-        .payment-logo {
-            height: 45px;
-            width: 100%;
-            max-width: 70px;
-            object-fit: contain;
-            transition: all 0.3s ease;
-            border-radius: 8px;
-            padding: 0.3rem;
-            background: var(--white);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-
-            &:hover {
-                transform: translateY(-2px) scale(1.05);
-                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-                border-color: var(--primary);
-            }
-        }
-    }
-
-    .footer-bottom {
-        background: rgba(212, 80, 109, 0.05);
-        border-top: 1px solid rgba(212, 80, 109, 0.1);
-        padding: 1.5rem 0;
+        padding: 1.5rem 1rem;
 
         .copyright {
             color: var(--gray-medium);
@@ -299,6 +251,105 @@
             }
         }
     }
+
+    // Инлайновые способы оплаты в footer-additional
+    .payment-section-inline {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .payment-logos-inline {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .payment-logo-inline {
+            height: 30px;
+            width: auto;
+            max-width: 45px;
+            object-fit: contain;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            padding: 0.2rem;
+            background: var(--white);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+            &:hover {
+                transform: translateY(-2px) scale(1.05);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+                border-color: var(--primary);
+            }
+        }
+    }
+
+    .company-details {
+        .details-title {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .details-grid {
+            display: grid;
+            gap: 0.5rem;
+        }
+    }
+
+    .copyright-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+
+        .copyright {
+            color: var(--gray-medium);
+            font-size: 0.9rem;
+            margin: 0;
+            font-weight: 500;
+            text-align: center;
+        }
+    }
+
+    .payment-section {
+        .payment-title {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .payment-logos {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .payment-logo {
+            height: 35px;
+            width: 100%;
+            max-width: 55px;
+            object-fit: contain;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+            padding: 0.2rem;
+            background: var(--white);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+            &:hover {
+                transform: translateY(-2px) scale(1.05);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+                border-color: var(--primary);
+            }
+        }
+    }
+
 
     @media (max-width: 992px) {
         .footer-content {
@@ -364,6 +415,11 @@
             font-size: 0.85rem;
         }
 
+        .legal-info {
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
         .footer-additional {
             padding: 1.5rem 0;
         }
@@ -377,6 +433,31 @@
         .company-details .detail-label {
             font-weight: 700;
             color: var(--primary);
+        }
+
+        .copyright-section {
+            margin-top: 1rem;
+        }
+
+        .payment-section-inline {
+            margin: 1rem 0;
+            order: 2;
+
+            .payment-logos-inline {
+                justify-content: center;
+                gap: 0.4rem;
+            }
+
+            .payment-logo-inline {
+                height: 25px;
+                max-width: 35px;
+            }
+        }
+
+        .footer-bottom-links {
+            order: 3;
+            justify-content: center;
+            margin-top: 1rem;
         }
 
         .payment-section .payment-logos {
@@ -418,6 +499,10 @@
             font-size: 0.85rem;
         }
 
+        .legal-info {
+            font-size: 0.75rem;
+        }
+
         .company-details .detail-item {
             font-size: 0.8rem;
         }
@@ -425,10 +510,20 @@
         .payment-section .payment-logos {
             grid-template-columns: repeat(2, 1fr);
         }
+
+        .payment-logos-inline {
+            gap: 0.3rem;
+        }
+
+        .payment-logo-inline {
+            height: 22px;
+            max-width: 30px;
+        }
     }
 }
 
 @keyframes pulse {
+
     0%,
     100% {
         transform: scale(1);

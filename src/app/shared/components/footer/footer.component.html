@@ -1,8 +1,8 @@
 <footer class="footer-main">
-    <div class="container">
+    <div class="container-fluid">
         <div class="footer-content">
-            <div class="row g-4">
-                <div class="col-12 col-lg-4 mb-4">
+            <div class="row g-3">
+                <div class="col-12 col-lg-3 mb-4">
                     <div class="footer-brand">
                         <h5 class="brand-title">
                             <i-bs name="heart-fill" class="brand-icon"></i-bs>
@@ -14,15 +14,12 @@
                         <div class="footer-socials">
                             <span class="socials-label">Мы в соцсетях:</span>
                             <div class="social-links">
-                                <a href="https://t.me/vikskvor" target="_blank" class="footer-social" aria-label="Telegram">
+                                <a href="https://t.me/vikskvor" target="_blank" class="footer-social"
+                                    aria-label="Telegram">
                                     <i-bs name="telegram"></i-bs>
                                 </a>
-                                <a
-                                    href="https://www.instagram.com/viktoria_skvorcova"
-                                    target="_blank"
-                                    class="footer-social"
-                                    aria-label="Instagram"
-                                >
+                                <a href="https://www.instagram.com/viktoria_skvorcova" target="_blank"
+                                    class="footer-social" aria-label="Instagram">
                                     <i-bs name="instagram"></i-bs>
                                 </a>
                             </div>
@@ -41,7 +38,7 @@
                     </div>
                 </div>
 
-                <div class="col-6 col-md-4 col-lg-2">
+                <!-- <div class="col-6 col-md-4 col-lg-2">
                     <div class="footer-section">
                         <h6 class="footer-title">Категории</h6>
                         <ul class="footer-links">
@@ -65,7 +62,7 @@
                             }
                         </ul>
                     </div>
-                </div>
+                </div> -->
 
                 <div class="col-12 col-md-6 col-lg-2">
                     <div class="footer-section">
@@ -79,6 +76,42 @@
                                 <i-bs name="envelope-fill" class="contact-icon"></i-bs>
                                 <a href="mailto:skviderm@gmail.com" class="footer-link">skviderm&#64;gmail.com</a>
                             </div>
+                            <div class="contact-item">
+                                <i-bs name="clock-fill" class="contact-icon"></i-bs>
+                                <div class="legal-info">
+                                    <span>Пн-Пт: 9:00 - 21:00</span><br />
+                                    <span>Сб: 10:00 - 18:00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-5">
+                    <div class="footer-section">
+                        <h6 class="footer-title">Юридическая информация</h6>
+                        <div class="legal-info">
+                            ИП Скворцова Виктория Валерьевна. Свидетельство о государственной регистрации № 391948321 от
+                            19.08.2025 г.
+                            выдано Администрацией Первомайского района г. Витебска. Регистрация в торговом реестре от
+                            24.09.2025 г., № 758489.
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Адрес:</span>
+                            <span class="detail-value">Республика Беларусь, г. Витебск, пр-т. Московский, д.13, к. 4,
+                                оф. 99</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Счет:</span>
+                            <span class="detail-value">BY16ALFA30132H45520010270000</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Банк:</span>
+                            <span class="detail-value">ЗАО "Альфа-Банк"</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">БИК:</span>
+                            <span class="detail-value">ALFABY2X</span>
                         </div>
                     </div>
                 </div>
@@ -86,66 +119,29 @@
         </div>
 
         <div class="footer-additional">
-            <div class="row g-4">
-                <div class="col-12 col-lg-6">
-                    <div class="company-details">
-                        <h6 class="details-title">Реквизиты компании</h6>
-                        <div class="details-grid">
-                            <div class="detail-item">
-                                <span class="detail-label">Наименование:</span>
-                                <span class="detail-value">ИП Скворцова Виктория Валерьевна</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">УНП:</span>
-                                <span class="detail-value">391948321</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Адрес:</span>
-                                <span class="detail-value">Республика Беларусь, г. Витебск, пр-т. Московский, д.13, к. 4, оф. 99</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Счет:</span>
-                                <span class="detail-value">BY16ALFA30132H45520010270000</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Банк:</span>
-                                <span class="detail-value">ЗАО "Альфа-Банк"</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">БИК:</span>
-                                <span class="detail-value">ALFABY2X</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-12 col-lg-6">
-                    <div class="payment-section">
-                        <h6 class="payment-title">Способы оплаты</h6>
-                        <div class="payment-logos">
-                            @for (logo of paymentLogos; track logo) {
-                                <img [src]="logo" alt="Способ оплаты" class="payment-logo" loading="lazy" />
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- <div class="footer-bottom">
             <div class="row align-items-center">
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-md-3">
                     <p class="copyright">
                         © {{ currentYear }} SkViDerm. Все права защищены.
                     </p>
                 </div>
+
                 <div class="col-12 col-md-6">
+                    <div class="payment-section-inline">
+                        <div class="payment-logos-inline">
+                            @for (logo of paymentLogos; track logo) {
+                            <img [src]="logo" alt="Способ оплаты" class="payment-logo-inline" loading="lazy" />
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-3">
                     <div class="footer-bottom-links">
-                        <a routerLink="/privacy" class="bottom-link">Политика конфиденциальности</a>
-                        <a routerLink="/terms" class="bottom-link">Условия использования</a>
+                        <a routerLink="/policy" class="bottom-link">Политика конфиденциальности</a>
                     </div>
                 </div>
             </div>
-        </div> -->
+        </div>
     </div>
 </footer>

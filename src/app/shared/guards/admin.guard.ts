@@ -20,7 +20,6 @@ export class AdminGuard implements CanActivate {
                     return true;
                 }
 
-                // Redirect to home page if not admin
                 return this.router.createUrlTree(['/']);
             }),
         );
