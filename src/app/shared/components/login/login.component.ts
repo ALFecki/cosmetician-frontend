@@ -74,16 +74,13 @@ export class LoginComponent {
             password: Md5.hashStr(this.password.value!),
         } as LoginData;
 
-        console.log('Attempting login with data:', loginData);
-
         this.authService.login(loginData).subscribe({
             next: response => {
-                console.log('Login successful:', response);
                 if (!response.user.isEmailVerified) {
                     this.closeLoginModal();
                     this.verifyEmailModalService.openVerifyEmailModal().subscribe(verified => {
                         if (verified) {
-                            console.log('Email verification completed');
+                            this.toastService.show('Успешный вход в систему', 'success');
                         }
                     });
                     return;
@@ -200,8 +197,7 @@ export class LoginComponent {
                 }),
             )
             .subscribe({
-                next: response => {
-                    console.log('Registration successful:', response);
+                next: () => {
                     this.toastService.show('Регистрация успешно завершена!', 'success');
                     this.closeRegisterModal();
                 },
@@ -240,8 +236,7 @@ export class LoginComponent {
         const email = this.forgotPasswordForm.get('email')?.value;
 
         this.authService.forgotPassword(email).subscribe({
-            next: response => {
-                console.log('Password reset email sent:', response);
+            next: () => {
                 this.forgotPasswordSuccess = 'Ссылка для восстановления пароля отправлена на ваш email. Проверьте почту.';
                 this.toastService.show('Ссылка для восстановления отправлена', 'success');
                 this.isSendingReset = false;

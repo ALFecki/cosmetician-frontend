@@ -1,23 +1,51 @@
 <div class="card profile-sidebar">
     <div class="card-body text-center">
-        <div class="profile-avatar">
-            <i class="bi bi-person-circle display-1"></i>
+
+        <h5 class="card-title mt-3">
+            <span class="user-name">{{ (currentUser | async)?.firstName }} {{ (currentUser | async)?.secondName
+                }}</span>
+        </h5>
+        <p class="card-text">
+            <i class="fas fa-envelope me-2"></i>
+            <span class="user-email">{{ (currentUser | async)?.email }}</span>
+        </p>
+        @if ((currentUser | async)?.isEmailVerified) {
+        <div class="verified-badge">
+            <i class="fas fa-check-circle me-1"></i>
+            <span>Email подтверждён</span>
         </div>
-        <h5 class="card-title mt-3">{{ (currentUser | async)?.firstName }} {{ (currentUser | async)?.secondName }}</h5>
-        <p class="card-text text-muted">{{ (currentUser | async)?.email }}</p>
+        }
     </div>
     <div class="list-group list-group-flush">
-        <a routerLink="/profile" class="list-group-item list-group-item-action" [class.active]="activePage === 'profile'">
-            <i class="bi bi-person me-2"></i>Личные данные
+        <a routerLink="/profile" class="list-group-item list-group-item-action"
+            [class.active]="activePage === 'profile'">
+            <div class="menu-icon">
+                <i-bs name="person"></i-bs>
+            </div>
+            <span class="menu-text">Личные данные</span>
+            <i class="fas fa-chevron-right menu-arrow"></i>
         </a>
         <a routerLink="/orders" class="list-group-item list-group-item-action" [class.active]="activePage === 'orders'">
-            <i-bs name="list-ul" class="me-2"></i-bs>Мои заказы
+            <div class="menu-icon">
+                <i-bs name="list-ul"></i-bs>
+            </div>
+            <span class="menu-text">Мои заказы</span>
+            <i class="fas fa-chevron-right menu-arrow"></i>
         </a>
         <!-- <a routerLink="/favorites" class="list-group-item list-group-item-action" [class.active]="activePage === 'favorites'">
-            <i-bs name="heart" class="me-2"></i-bs>Избранное
+            <div class="menu-icon">
+                <i-bs name="heart"></i-bs>
+            </div>
+            <span class="menu-text">Избранное</span>
+            <i class="fas fa-chevron-right menu-arrow"></i>
         </a> -->
-        <a href="#" (click)="$event.preventDefault(); logout()" class="list-group-item list-group-item-action text-danger">
-            <i-bs name="box-arrow-right" class="me-2"></i-bs>Выйти
+        <a href="#" (click)="$event.preventDefault(); logout()"
+            class="list-group-item list-group-item-action logout-btn">
+            <div class="menu-icon">
+                <i-bs name="box-arrow-right"></i-bs>
+            </div>
+            <span class="menu-text">Выйти</span>
+            <i class="fas fa-sign-out-alt menu-arrow"></i>
         </a>
     </div>
 </div>

@@ -78,7 +78,6 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
     }
 
     async changeQuantity(variantId: string, quantity: number): Promise<OrderModel | null> {
-        console.log('Current order:', this.currentOrder);
         if (this.currentOrder) {
             const cartItem = this.currentOrder.products.find(item => item.variant.id === variantId);
             const newOrder = await firstValueFrom(
@@ -122,7 +121,6 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
                 this.http.delete<OrderModel>(`${environment.server_url}/${this.endpoint}/product/${productId}`),
             );
             this.currentOrder = newOrder;
-            console.log('Updated order after removing product:', this.currentOrder);
             this.toastService.show('Товар удален из заказа', 'success');
             return this.currentOrder;
         }

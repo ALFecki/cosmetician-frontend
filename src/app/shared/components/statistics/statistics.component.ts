@@ -100,12 +100,9 @@ export class StatisticsComponent implements OnInit {
             )
             .subscribe(response => {
                 if (response && response.data) {
-                    console.log('Statistics Summary:', response.data);
                     this.statisticsSummary = response.data;
                     this.brandProfitability = response.data.brandProfitability;
-                    console.log('Brand Profitability:', this.brandProfitability);
                     this.weightedROI = response.data.weightedROI;
-                    console.log('Weighted ROI:', this.weightedROI);
                     this.inventoryTurnover = response.data.inventoryTurnover;
                 } else {
                     this.error = 'Нет данных для отображения';

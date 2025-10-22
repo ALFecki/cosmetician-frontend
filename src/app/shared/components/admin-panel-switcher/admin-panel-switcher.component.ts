@@ -777,8 +777,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
             }
         });
 
-        console.log('Prepared form data:', formData);
-
         if (this.currentModel === 'product') {
             delete formData['variants'];
         }

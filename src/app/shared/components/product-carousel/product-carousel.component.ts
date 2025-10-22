@@ -64,8 +64,6 @@ export class ProductCarouselComponent implements OnInit {
     }
 
     openProductDetails(product: ProductModel): void {
-        console.log('!~!!!');
-        console.log(product.id);
         this.router.navigate([`/product/${product.id}`], { onSameUrlNavigation: 'reload' }).then(() => {
             window.location.reload();
         });

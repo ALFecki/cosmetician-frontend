@@ -40,12 +40,10 @@ export class VerifyEmailModalComponent {
         this.verifyEmailError = null;
 
         this.authService.sendEmailVerification().subscribe({
-            next: response => {
-                console.log('Verification code sent:', response);
+            next: () => {
                 this.toastService.show('Код подтверждения отправлен на ваш email', 'success');
             },
-            error: error => {
-                console.error('Sending verification code failed:', error);
+            error: () => {
                 this.verifyEmailError = 'Не удалось отправить код подтверждения. Попробуйте позже.';
                 this.toastService.show('Не удалось отправить код подтверждения', 'error');
             },
@@ -65,8 +63,7 @@ export class VerifyEmailModalComponent {
         const code = this.verifyEmailForm.get('code')?.value;
 
         this.authService.verifyEmail(code).subscribe({
-            next: response => {
-                console.log('Email verification successful:', response);
+            next: () => {
                 this.verifyEmailSuccess = 'Ваш email успешно подтверждён!';
                 this.toastService.show('Email подтверждён', 'success');
                 this.emailVerified.emit();

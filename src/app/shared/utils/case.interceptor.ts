@@ -5,7 +5,6 @@ import { map, Observable } from 'rxjs';
 @Injectable()
 export class SnakeToCamelInterceptor implements HttpInterceptor {
     intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-        console.log('Request URL:', req.url);
         return next.handle(req).pipe(
             map((event: HttpEvent<unknown>) => {
                 if (event instanceof HttpResponse) {

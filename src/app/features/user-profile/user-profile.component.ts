@@ -20,6 +20,7 @@ export class UserProfileComponent implements OnInit {
     profileForm!: FormGroup;
     currentUser: BehaviorSubject<PersonModel | null> = new BehaviorSubject<PersonModel | null>(null);
     loading = false;
+    initialLoading = true;
     emailVerificationLoading = false;
     error: string | null = null;
     success: string | null = null;
@@ -39,20 +40,16 @@ export class UserProfileComponent implements OnInit {
                 this.currentUser.next(user);
                 if (!user) {
                     this.router.navigate(['/']);
+                } else {
+                    this.initForm();
                 }
+                this.initialLoading = false;
             },
             error => {
                 this.error = 'Не удалось загрузить информацию о пользователе: ' + (error.message || 'Неизвестная ошибка');
-                this.loading = false;
+                this.initialLoading = false;
             },
         );
-
-        if (!this.currentUser.value) {
-            this.router.navigate(['/']);
-            return;
-        }
-
-        this.initForm();
     }
 
     private initForm(): void {
@@ -60,7 +57,7 @@ export class UserProfileComponent implements OnInit {
             firstName: [this.currentUser.value?.firstName, Validators.required],
             secondName: [this.currentUser.value?.secondName, Validators.required],
             surname: [this.currentUser.value?.surname],
-            email: [{ value: this.currentUser.value?.email, disabled: true }, [Validators.required, Validators.email]],
+            email: [this.currentUser.value?.email, [Validators.required, Validators.email]],
             phone: [this.currentUser.value?.phone],
         });
     }
@@ -82,7 +79,6 @@ export class UserProfileComponent implements OnInit {
 
         const updatedUser: UpdatePersonSchema = {
             ...this.profileForm.value,
-            email: this.currentUser.value?.email, // Keep original email
         };
 
         const result = await this.personService.update(this.currentUser.value!.id, updatedUser);

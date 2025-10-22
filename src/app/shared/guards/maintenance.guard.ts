@@ -26,7 +26,6 @@ export class MaintenanceGuard implements CanActivate {
                 return this.authService.isAdmin$().pipe(
                     take(1),
                     map(isAdmin => {
-                        console.log('Maintenance mode is enabled. User is admin:', isAdmin);
                         if (isAdmin) {
                             return true;
                         } else {

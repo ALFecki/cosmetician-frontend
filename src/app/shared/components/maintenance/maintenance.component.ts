@@ -74,9 +74,7 @@ export class MaintenanceComponent implements OnInit {
         };
 
         this.authService.login(loginData).subscribe({
-            next: response => {
-                console.log('Login successful:', response);
-
+            next: () => {
                 if (this.authService.isAdmin()) {
                     this.toastService.show('Успешный вход в систему администратора', 'success');
                     this.router.navigate(['/']);
