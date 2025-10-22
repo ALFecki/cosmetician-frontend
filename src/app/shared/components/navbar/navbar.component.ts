@@ -13,8 +13,8 @@ import { CartService } from '../../services/cart.service';
 import { CategoryService } from '../../services/category.service';
 import { LoginModalService } from '../../services/login-modal.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
-import { LoginComponent } from '../login/login.component';
 import { CartModalComponent } from '../cart-modal/cart-modal.component';
+import { LoginComponent } from '../login/login.component';
 
 @Component({
     selector: 'app-navbar',
@@ -91,6 +91,19 @@ export class NavbarComponent implements OnDestroy, OnInit {
 
     private isMobile(): boolean {
         return window.innerWidth <= 768;
+    }
+
+    closeNavbarOnMobile(): void {
+        if (window.innerWidth < 992) {
+            const navbarCollapse = document.getElementById('navbarSupportedContent');
+            if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+                const bsCollapse = document.querySelector('[data-bs-toggle="collapse"]');
+                if (bsCollapse) {
+                    bsCollapse.setAttribute('aria-expanded', 'false');
+                }
+                navbarCollapse.classList.remove('show');
+            }
+        }
     }
 
     navigateToCart(): void {

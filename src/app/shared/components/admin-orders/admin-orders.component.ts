@@ -3,17 +3,21 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { forkJoin, Observable, of } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { IconsModule } from '../../base/icons/icons.module';
-import { OrderModel } from '../../models/order.model';
+import { OrderMinimalModel, OrderModel } from '../../models/order.model';
 import { PersonModel } from '../../models/person.model';
+import { ProductModel } from '../../models/product.model';
 import { OrderService } from '../../services/order.service';
 import { PersonService } from '../../services/person.service';
 import { ToastService } from '../../services/toast.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
-import { ProductModel } from '../../models/product.model';
 import { ProductModalComponent } from '../product-modal/product-modal.component';
+
+interface OrderMinimalWithUser extends OrderMinimalModel {
+    user?: PersonModel;
+}
 
 interface OrderWithUser extends OrderModel {
     user?: PersonModel;
@@ -29,8 +33,8 @@ type SortDirection = 'asc' | 'desc';
     imports: [CommonModule, FormsModule, ImageUrlPipe, IconsModule],
 })
 export class AdminOrdersComponent implements OnInit {
-    orders$!: Observable<OrderWithUser[]>;
-    filteredOrders$!: Observable<OrderWithUser[]>;
+    orders$!: Observable<OrderMinimalWithUser[]>;
+    filteredOrders$!: Observable<OrderMinimalWithUser[]>;
     loading = true;
     error: string | null = null;
     selectedOrder: OrderWithUser | null = null;
@@ -67,17 +71,28 @@ export class AdminOrdersComponent implements OnInit {
     loadOrders(): void {
         this.loading = true;
         this.error = null;
-        this.orderService.getAll().subscribe({
+        this.orderService.getAllMinimal().subscribe({
             next: orders => {
-                const filteredOrders = orders.data.filter(order => order.status !== 'NotChecked');
+                const filteredOrders = orders.filter(order => order.status !== 'NotChecked');
 
-                // Load user information for each order
-                const ordersWithUsers$ = forkJoin(
-                    filteredOrders.map(order =>
-                        order.personId
-                            ? this.personService.getById(order.personId).pipe(map(userResponse => ({ ...order, user: userResponse.data })))
-                            : of({ ...order, user: undefined }),
+                const personIds = Array.from(new Set(filteredOrders.map(order => order.personId).filter(id => id)));
+                const personMap: Record<string, PersonModel> = {};
+
+                const personRequests = personIds.map(id =>
+                    this.personService.getById(id).pipe(
+                        map(response => {
+                            personMap[id] = response.data;
+                        }),
                     ),
+                );
+                
+                const ordersWithUsers$ = forkJoin(personRequests).pipe(
+                    map(() => {
+                        return filteredOrders.map(order => ({
+                            ...order,
+                            user: personMap[order.personId!]
+                        }));
+                    })
                 );
 
                 this.orders$ = ordersWithUsers$.pipe(map(orders => this.sortOrders(orders)));
@@ -128,7 +143,7 @@ export class AdminOrdersComponent implements OnInit {
         this.updateFilteredOrders();
     }
 
-    private sortOrders(orders: OrderWithUser[]): OrderWithUser[] {
+    private sortOrders(orders: OrderMinimalWithUser[]): OrderMinimalWithUser[] {
         return [...orders].sort((a, b) => {
             let aValue;
             let bValue;
@@ -202,8 +217,10 @@ export class AdminOrdersComponent implements OnInit {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    openOrderDetails(order: OrderWithUser, content: any): void {
-        this.selectedOrder = order;
+    openOrderDetails(order: OrderMinimalWithUser, content: any): void {
+        this.orderService.getById(order.id).toPromise().then(response => {
+            this.selectedOrder = { ...response!.data, user: order.user };
+        });
         this.modalService.open(content, { size: 'xl', centered: true });
     }
 
@@ -217,11 +234,11 @@ export class AdminOrdersComponent implements OnInit {
         activeModal.componentInstance.selectedProduct = product;
     }
 
-    viewOrderDetails(order: OrderWithUser): void {
+    viewOrderDetails(order: OrderMinimalWithUser): void {
         this.router.navigate(['/admin/order', order.id]);
     }
 
-    copyOrderLink(order: OrderWithUser): void {
+    copyOrderLink(order: OrderMinimalWithUser): void {
         const link = `${window.location.origin}/admin/order/${order.id}`;
         navigator.clipboard
             .writeText(link)
@@ -233,7 +250,7 @@ export class AdminOrdersComponent implements OnInit {
             });
     }
 
-    async updateOrderStatus(order: OrderModel, newStatus: string): Promise<void> {
+    async updateOrderStatus(order: OrderMinimalModel, newStatus: string): Promise<void> {
         if (this.updatingStatus || !order.id) return;
 
         this.updatingStatus = true;
@@ -263,6 +280,8 @@ export class AdminOrdersComponent implements OnInit {
                 return 'Банковская карта';
             case 'cash':
                 return 'Наличные';
+                            case 'online':
+                return 'Онлайн оплата';
             default:
                 return 'Не указано';
         }

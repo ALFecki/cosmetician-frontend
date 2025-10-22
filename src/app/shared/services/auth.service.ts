@@ -138,7 +138,6 @@ export class AuthService {
     }
 
     checkAuth(): Observable<LoginResponse | null> {
-        console.log('Checking authentication status...');
         // console.log('Platform ID:', this.cookieService.check('jwt'));
         // if (this.cookieService.check('jwt') === false) {
         //     return of(null);

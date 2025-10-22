@@ -203,8 +203,8 @@ export class CartService implements OnDestroy {
         this.totalPriceSubject.next(0);
     }
 
-    async checkout(): Promise<OrderModel | null> {
-        const order = await this.orderService.checkout();
+    async checkout(withPayment = false): Promise<OrderModel | null> {
+        const order = await this.orderService.checkout(withPayment);
         if (order) {
             this.cartItemsSubject.next([]);
             this.totalPriceSubject.next(0);

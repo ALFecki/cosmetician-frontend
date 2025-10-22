@@ -422,7 +422,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 .pipe(
                     tap(results => {
                         this.currentModelConfig.fields.forEach(field => {
-                            console.log(`Field: ${field.key}, Type: ${field.type}`);
                             if (field.type === 'select' || field.type === 'multiselect') {
                                 if (field.key === 'categoryIds' && results['categories']) {
                                     field.options = results['categories'].data;
@@ -750,7 +749,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
     }
 
     async saveItem() {
-        console.log(`Item Form Value:`, this.itemForm.value);
         if (this.itemForm.invalid || this.saving) {
             Object.keys(this.itemForm.controls).forEach(key => {
                 this.itemForm.get(key)?.markAsTouched();
@@ -768,7 +766,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
             }
 
             const value = this.itemForm.value[key];
-            console.log(`Processing field: ${key}, Value:`, value);
             if (value !== null && value !== undefined && value !== '') {
                 if (key === 'variants' || key === 'categoryIds' || key === 'countryIds' || key === 'productScopeIds') {
                     formData[key] = JSON.stringify(value);

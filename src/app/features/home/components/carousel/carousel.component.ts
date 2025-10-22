@@ -23,7 +23,7 @@ export class CarouselComponent implements OnInit, OnDestroy {
         {
             image: 'assets/images/carousel1.jpg',
             title: 'Мы открылись!',
-            subtitle: 'В первый месяц после открытия доставка БЕСПЛАТНО!',
+            subtitle: 'Первым 10 клиентам – подарок!',
             buttonText: 'Смотреть каталог',
             buttonLink: '/products',
         },
@@ -38,7 +38,7 @@ export class CarouselComponent implements OnInit, OnDestroy {
         {
             image: 'assets/images/carousel3.jpg',
             title: 'Скоро в продаже',
-            subtitle: 'Летние наборы для домашнего ухода',
+            subtitle: 'Индивидуальные наборы для домашнего ухода',
             buttonText: 'Смотреть каталог',
             buttonLink: '/products',
         },

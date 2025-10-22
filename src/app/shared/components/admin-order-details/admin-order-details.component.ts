@@ -170,6 +170,8 @@ export class AdminOrderDetailsComponent implements OnInit {
                 return 'Банковская карта';
             case 'cash':
                 return 'Наличные';
+            case 'online':
+                return 'Онлайн оплата';
             default:
                 return 'Не указано';
         }
