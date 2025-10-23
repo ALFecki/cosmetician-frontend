@@ -54,10 +54,6 @@ export class CartComponent {
         return this.cartService.getProductCount();
     }
 
-    async checkout(): Promise<void> {
-        await this.cartService.checkout();
-    }
-
     goToOrderConfirmation(): void {
         if (!this.authService.isLoggedIn()) {
             this.loginModalService.openLoginModal();

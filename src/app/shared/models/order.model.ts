@@ -4,6 +4,9 @@ export interface OrderMinimalModel {
     id: string;
     personId: string;
     status: string;
+    paymentStatus: string;
+    paymentId: string | null;
+    paymentFormUrl: string | null;
     totalPrice: number;
     createdAt: Date;
     updatedAt: Date;

@@ -44,7 +44,7 @@ export class OrderHistoryComponent implements OnInit {
 
     loadOrders(): void {
         this.loading = true;
-        this.orders$ = this.orderService.getUserMinimalOrders().pipe(
+        this.orders$ = this.orderService.getUserMinimalOrders(this.currentUser.value!.id).pipe(
             map(orders => {
                 const filteredOrders = orders.filter(order => order.status !== 'NotChecked');
                 filteredOrders.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
@@ -77,18 +77,17 @@ export class OrderHistoryComponent implements OnInit {
     getOrderStatusText(status: string): string {
         switch (status?.toLowerCase()) {
             case 'completed':
-            case 'сompleted':
                 return 'Выполнен';
             case 'checked':
                 return 'Оформлен';
             case 'cancelled':
-            case 'сancelled':
                 return 'Отменен';
-            case 'pending':
-            case 'new':
-                return 'Ожидает обработки';
             case 'processing':
                 return 'В обработке';
+            case 'indelivery':
+                return 'В доставке';
+            case 'delivered':
+                return 'Доставлен';
             default:
                 return 'Неизвестный статус';
         }

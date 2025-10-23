@@ -21,7 +21,6 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
                     if (filter[key] instanceof Date) {
                         params = params.append(String(key), filter[key].toISOString());
                     } else if (Array.isArray(filter[key])) {
-                        console.log('Array filter:', filter[key]);
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const values = filter[key] as any[];
                         params = params.append(String(key), values.join(','));
@@ -74,21 +73,18 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
             this.http.post<{ status: string; data: { path: string } }>(`${this.apiUrl}/upload/image`, formData),
         );
 
-        console.log('Image upload response:', response);
 
         return response.data.path;
     }
 
     async create(data: CreateSchema): Promise<SingleResponse<Model>> {
         const processedData = { ...(data as CreateSchema) };
-        console.log('Processed data:', processedData);
 
         for (const key in processedData) {
             if (key.includes('image') && processedData[key] instanceof File) {
                 processedData[key] = (await this.uploadImage(processedData[key])) as (typeof processedData)[typeof key];
             }
         }
-        console.log('Processed create data:', processedData);
 
         return firstValueFrom(this.http.post<SingleResponse<Model>>(`${this.apiUrl}/${this.endpoint}`, processedData));
     }
@@ -101,7 +97,6 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
                 processedData[key] = (await this.uploadImage(processedData[key])) as (typeof processedData)[typeof key];
             }
         }
-        console.log('Processed update data:', processedData);
 
         return firstValueFrom(this.http.patch<SingleResponse<Model>>(`${this.apiUrl}/${this.endpoint}/${id}`, processedData));
     }

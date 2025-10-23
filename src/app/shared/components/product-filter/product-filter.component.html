@@ -1,123 +1,101 @@
-<div class="filter-container mb-4">
+<div class="filter-container">
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">
-                <i class="bi bi-funnel me-2"></i>
-                Фильтр товаров
-            </h5>
+            <div class="filter-grid">
+                <div class="filter-item">
+                    <label for="searchName" class="form-label">
+                        <i class="bi bi-search me-1"></i>
+                        Поиск
+                    </label>
+                    <input type="text" class="form-control" id="searchName" placeholder="Название товара..."
+                        [(ngModel)]="filterData.title" />
+                </div>
 
-            <div class="mb-3">
-                <label for="searchName" class="form-label">
-                    <i class="bi bi-search me-1"></i>
-                    Поиск по названию
-                </label>
-                <input
-                    type="text"
-                    class="form-control"
-                    id="searchName"
-                    placeholder="Введите название товара..."
-                    [(ngModel)]="filterData.title"
-                />
-            </div>
-
-            <div class="mb-3">
-                <label for="brandsFilter" class="form-label d-block">
-                    <i class="bi bi-tag me-1"></i>
-                    Бренды
-                </label>
-                <div id="brandsFilter" class="filter-scroll-container">
-                    @for (brand of brands; track brand) {
+                <div class="filter-item">
+                    <label for="brandsFilter" class="form-label">
+                        <i class="bi bi-tag me-1"></i>
+                        Бренды
+                    </label>
+                    <div id="brandsFilter" class="filter-scroll-container">
+                        @for (brand of brands; track brand) {
                         <div class="form-check">
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                [id]="'brand-' + brand.id"
-                                [checked]="isBrandSelected(brand.id)"
-                                (change)="toggleBrand(brand.id)"
-                            />
+                            <input class="form-check-input" type="checkbox" [id]="'brand-' + brand.id"
+                                [checked]="isBrandSelected(brand.id)" (change)="toggleBrand(brand.id)" />
                             <label class="form-check-label" [for]="'brand-' + brand.id">
                                 {{ brand.title }}
                             </label>
                         </div>
-                    }
+                        }
+                    </div>
                 </div>
-            </div>
 
-            <div class="mb-3">
-                <label for="categoriesFilter" class="form-label d-block">
-                    <i class="bi bi-grid-3x3-gap me-1"></i>
-                    Категории
-                </label>
-                <div id="categoriesFilter" class="filter-scroll-container">
-                    @for (category of categories; track category) {
+                <div class="filter-item">
+                    <label for="categoriesFilter" class="form-label">
+                        <i class="bi bi-grid-3x3-gap me-1"></i>
+                        Категории
+                    </label>
+                    <div id="categoriesFilter" class="filter-scroll-container">
+                        @for (category of categories; track category) {
                         <div class="form-check">
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                [id]="'category-' + category.id"
-                                [checked]="isCategorySelected(category.id)"
-                                (change)="toggleCategory(category.id)"
-                            />
+                            <input class="form-check-input" type="checkbox" [id]="'category-' + category.id"
+                                [checked]="isCategorySelected(category.id)" (change)="toggleCategory(category.id)" />
                             <label class="form-check-label" [for]="'category-' + category.id">
                                 {{ category.title }}
                             </label>
                         </div>
-                    }
+                        }
+                    </div>
                 </div>
-            </div>
 
-            <div class="mb-3">
-                <label for="countriesFilter" class="form-label d-block">
-                    <i class="bi bi-globe me-1"></i>
-                    Страны
-                </label>
-                <div id="countriesFilter" class="filter-scroll-container">
-                    @for (country of countries; track country) {
+                <div class="filter-item">
+                    <label for="productScopesFilter" class="form-label">
+                        <i class="bi bi-globe me-1"></i>
+                        Области применения
+                    </label>
+                    <div id="productScopesFilter" class="filter-scroll-container">
+                        @for (productScope of productScopes; track productScope) {
                         <div class="form-check">
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                [id]="'country-' + country.id"
-                                [checked]="isCountrySelected(country.id)"
-                                (change)="toggleCountry(country.id)"
-                            />
-                            <label class="form-check-label" [for]="'country-' + country.id">
-                                {{ country.name }}
+                            <input class="form-check-input" type="checkbox" [id]="'productScope-' + productScope.id"
+                                [checked]="isProductScopeSelected(productScope.id)"
+                                (change)="toggleProductScope(productScope.id)" />
+                            <label class="form-check-label" [for]="'productScope-' + productScope.id">
+                                {{ productScope.title }}
                             </label>
                         </div>
-                    }
+                        }
+                    </div>
                 </div>
-            </div>
 
-            <div class="row mb-3">
-                <div class="col-md-6">
+                <div class="filter-item filter-item-compact">
                     <label for="minPrice" class="form-label">
                         <i class="bi bi-currency-exchange me-1"></i>
-                        Мин. цена
+                        Цена
                     </label>
-                    <input type="number" class="form-control" id="minPrice" placeholder="От" [(ngModel)]="filterData.minPrice" />
+                    <div class="input-group-range">
+                        <input type="number" class="form-control" id="minPrice" placeholder="От"
+                            [(ngModel)]="filterData.minPrice" />
+                        <span class="range-separator">—</span>
+                        <input type="number" class="form-control" id="maxPrice" placeholder="До"
+                            [(ngModel)]="filterData.maxPrice" />
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label for="maxPrice" class="form-label">Макс. цена</label>
-                    <input type="number" class="form-control" id="maxPrice" placeholder="До" [(ngModel)]="filterData.maxPrice" />
-                </div>
-            </div>
 
-            <div class="row mb-3">
-                <div class="col-md-6">
+                <div class="filter-item filter-item-compact">
                     <label for="minVolume" class="form-label">
                         <i class="bi bi-droplet me-1"></i>
-                        Мин. объем (мл)
+                        Объем (мл)
                     </label>
-                    <input type="number" class="form-control" id="minVolume" placeholder="От" [(ngModel)]="filterData.minVolume" />
-                </div>
-                <div class="col-md-6">
-                    <label for="maxVolume" class="form-label">Макс. объем (мл)</label>
-                    <input type="number" class="form-control" id="maxVolume" placeholder="До" [(ngModel)]="filterData.maxVolume" />
+                    <div class="input-group-range">
+                        <input type="number" class="form-control" id="minVolume" placeholder="От"
+                            [(ngModel)]="filterData.minVolume" />
+                        <span class="range-separator">—</span>
+                        <input type="number" class="form-control" id="maxVolume" placeholder="До"
+                            [(ngModel)]="filterData.maxVolume" />
+                    </div>
                 </div>
             </div>
 
-            <div class="d-flex justify-content-between">
+            <div class="filter-actions">
                 <button class="btn btn-secondary" (click)="resetFilter()">
                     <i class="bi bi-arrow-clockwise me-1"></i>
                     Сбросить

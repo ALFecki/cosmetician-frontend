@@ -13,7 +13,7 @@ import { RouterModule } from '@angular/router';
 export class BenefitsComponent {
     benefits = [
         {
-            title: 'Проефссиональный подбор косметики',
+            title: 'Профессиональный подбор косметики',
             description: 'Консультация врача, кандидата медицинских наук, практикующего косметолога Виктории Скворцовой.',
             icon: 'assets/icons/variety.png',
         },

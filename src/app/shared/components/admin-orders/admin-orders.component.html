@@ -74,7 +74,7 @@
                                     Клиент
                                     <i-bs [name]="getSortIcon('user')" class="sort-icon ms-1"></i-bs>
                                 </th>
-                                <th>Товаров</th>
+                                <!-- <th>Товаров</th> -->
                                 <th class="sortable-header" (click)="sortBy('totalPrice')">
                                     Сумма
                                     <i-bs [name]="getSortIcon('totalPrice')" class="sort-icon ms-1"></i-bs>
@@ -90,16 +90,16 @@
                             @for (order of orders; track order) {
                                 <tr>
                                     <td class="fw-bold">#{{ order.id }}</td>
-                                    <td>{{ order.updatedAt | date: 'dd.MM.yyyy HH:mm' }}</td>
+                                    <td>{{ order.createdAt | date: 'dd.MM.yyyy HH:mm': 'GMT+3' }}</td>
                                     <td>
                                         <div class="customer-info">
                                             <div class="fw-medium">{{ order.user?.firstName }} {{ order.user?.secondName }}</div>
                                             <small class="text-muted">{{ order.user?.email }}</small>
                                         </div>
                                     </td>
-                                    <td>
+                                    <!-- <td>
                                         <span class="badge bg-light text-dark">{{ getOrderItemsCount(order) }} шт.</span>
-                                    </td>
+                                    </td> -->
                                     <td class="fw-bold">{{ order.totalPrice | number: '1.2-2' }} р.</td>
                                     <td>
                                         <span class="badge {{ getOrderStatusClass(order.status) }}">

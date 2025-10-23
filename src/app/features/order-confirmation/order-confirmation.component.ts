@@ -15,6 +15,7 @@ import { OrderService } from '../../shared/services/order.service';
 import { PostService } from '../../shared/services/post.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
+import { PaymentService } from '../../shared/services/payment.service';
 
 @Component({
     selector: 'app-order-confirmation',
@@ -43,6 +44,7 @@ export class OrderConfirmationComponent implements OnInit {
         private toastService: ToastService,
         private router: Router,
         private postService: PostService,
+        private paymentService: PaymentService,
     ) {
         this.currentUser$ = this.authService.getCurrentUser();
         this.getPostPlacements().subscribe(data => {
@@ -162,12 +164,10 @@ export class OrderConfirmationComponent implements OnInit {
         this.isSubmitting = true;
 
         let deliveryAddress = null;
-        console.log(`Confirmation form value:`, this.confirmationForm.value);
         if (
             this.confirmationForm.get('deliveryMethod')?.value === 'standart' ||
             (this.confirmationForm.get('deliveryMethod')?.value === 'post' && this.confirmationForm.get('courierDelivery')?.value)
         ) {
-            console.log(this.confirmationForm.value);
             deliveryAddress = `${this.confirmationForm.get('city')?.value}, ${this.confirmationForm.get('street')?.value}, ${this.confirmationForm.get('house')?.value}`;
             if (this.confirmationForm.get('building')?.value) {
                 deliveryAddress += `, корпус ${this.confirmationForm.get('building')?.value}`;
@@ -196,10 +196,22 @@ export class OrderConfirmationComponent implements OnInit {
         } as UpdateOrderSchema);
 
         try {
-            const result = await this.cartService.checkout();
+            const result = await this.cartService.checkout(this.confirmationForm.get('paymentMethod')?.value === 'online');
 
             if (result) {
                 this.toastService.show('Заказ успешно оформлен!', 'success');
+                if (this.confirmationForm.get('paymentMethod')?.value === 'online') {
+                    const paymentResponse = await this.paymentService.processPayment(
+                        this.currentOrder!
+                    ).toPromise();
+                    if (paymentResponse && paymentResponse.formUrl) {
+                        window.location.href = paymentResponse.formUrl;
+                        this.orderService.update(this.currentOrder!.id, { paymentStatus: 'Processing' } as UpdateOrderSchema);
+                        return;
+                    } else {
+                        this.toastService.show('Ошибка при переходе к оплате', 'error');
+                    }
+                }
                 this.router.navigate(['/products']);
             } else {
                 this.toastService.show('Произошла ошибка при оформлении заказа', 'error');

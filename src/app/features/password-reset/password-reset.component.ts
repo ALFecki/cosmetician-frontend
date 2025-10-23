@@ -48,13 +48,11 @@ export class PasswordResetComponent implements OnInit {
 
         this.isLoading = true;
         this.authService.verifyResetToken(this.token, this.email).subscribe({
-            next: response => {
-                console.log('Token verification successful:', response);
-                this.isTokenValid = true;
+            next: (response) => {
+                this.isTokenValid = response.valid;
                 this.isLoading = false;
             },
             error: error => {
-                console.error('Token verification failed:', error);
                 this.isLoading = false;
                 if (error.status === 400) {
                     this.error = 'Ссылка для восстановления пароля недействительна или истекла';
@@ -95,8 +93,7 @@ export class PasswordResetComponent implements OnInit {
         this.error = null;
 
         this.authService.resetPassword(this.email, this.token, password).subscribe({
-            next: response => {
-                console.log('Password reset successful:', response);
+            next: () => {
                 this.success = 'Пароль успешно изменен. Теперь вы можете войти с новым паролем.';
                 this.toastService.show('Пароль успешно изменен', 'success');
                 this.isResetting = false;

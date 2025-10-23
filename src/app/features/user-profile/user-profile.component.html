@@ -5,92 +5,159 @@
         </div>
 
         <div class="col-md-9">
-            <div class="card">
-                <div class="card-header bg-white">
-                    <h4 class="mb-0">Личные данные</h4>
+            @if (initialLoading) {
+            <div class="card loading-card">
+                <div class="loading-container">
+                    <div class="spinner-wrapper">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Загрузка...</span>
+                        </div>
+                        <p class="loading-text mt-3">Загрузка профиля...</p>
+                    </div>
+                </div>
+            </div>
+            }
+
+            @if (!initialLoading) {
+            <div class="card profile-card">
+                <div class="card-header">
+                    <div class="header-content">
+                        <div class="header-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <h4 class="mb-0">Личные данные</h4>
+                    </div>
                 </div>
                 <div class="card-body">
                     @if (currentUser.value && !currentUser.value.isEmailVerified) {
-                        <div class="alert alert-warning d-flex justify-content-between align-items-center mb-3">
-                            <div>
-                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                <strong>Внимание!</strong> Ваш email не подтвержден. Подтвердите email для полного доступа к функциям сайта.
+                    <div
+                        class="alert alert-warning d-flex justify-content-between align-items-center mb-4 animated-alert">
+                        <div class="d-flex align-items-center">
+                            <div class="alert-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
                             </div>
-                            <button
-                                type="button"
-                                class="btn btn-outline-warning btn-sm"
-                                (click)="sendEmailVerification()"
-                                [disabled]="emailVerificationLoading"
-                            >
-                                @if (emailVerificationLoading) {
-                                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                                }
-                                Отправить подтверждение
-                            </button>
+                            <div>
+                                <strong>Внимание!</strong> Ваш email не подтвержден. Подтвердите email для полного
+                                доступа к функциям сайта.
+                            </div>
                         </div>
+                        <button type="button" class="btn btn-outline-warning btn-sm" (click)="sendEmailVerification()"
+                            [disabled]="emailVerificationLoading">
+                            @if (emailVerificationLoading) {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            }
+                            Отправить подтверждение
+                        </button>
+                    </div>
                     }
 
-                    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+                    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
                         @if (success) {
-                            <div class="alert alert-success">{{ success }}</div>
+                        <div class="alert alert-success animated-alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            {{ success }}
+                        </div>
                         }
                         @if (error) {
-                            <div class="alert alert-danger">{{ error }}</div>
+                        <div class="alert alert-danger animated-alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            {{ error }}
+                        </div>
                         }
 
-                        <div class="mb-3 row">
-                            <label for="firstName" class="col-md-3 col-form-label">Имя</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" id="firstName" formControlName="firstName" />
-                                @if (profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched) {
-                                    <div class="form-text text-danger">Имя обязательно для заполнения</div>
-                                }
+                        <div class="form-section">
+                            <h5 class="section-title">Основная информация</h5>
+
+                            <div class="mb-4 row align-items-center">
+                                <label for="firstName" class="col-md-3 col-form-label">
+                                    <i class="fas fa-user me-2 text-muted"></i>Имя
+                                </label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="firstName" formControlName="firstName"
+                                        placeholder="Введите имя" />
+                                    @if (profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched)
+                                    {
+                                    <div class="form-text text-danger">
+                                        <i class="fas fa-info-circle me-1"></i>Имя обязательно для заполнения
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="mb-4 row align-items-center">
+                                <label for="secondName" class="col-md-3 col-form-label">
+                                    <i class="fas fa-user me-2 text-muted"></i>Фамилия
+                                </label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="secondName" formControlName="secondName"
+                                        placeholder="Введите фамилию" />
+                                    @if (profileForm.get('secondName')?.invalid &&
+                                    profileForm.get('secondName')?.touched) {
+                                    <div class="form-text text-danger">
+                                        <i class="fas fa-info-circle me-1"></i>Фамилия обязательна для заполнения
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="mb-4 row align-items-center">
+                                <label for="surname" class="col-md-3 col-form-label">
+                                    <i class="fas fa-user me-2 text-muted"></i>Отчество
+                                </label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="surname" formControlName="surname"
+                                        placeholder="Введите отчество (необязательно)" />
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mb-3 row">
-                            <label for="secondName" class="col-md-3 col-form-label">Фамилия</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" id="secondName" formControlName="secondName" />
-                                @if (profileForm.get('secondName')?.invalid && profileForm.get('secondName')?.touched) {
-                                    <div class="form-text text-danger">Фамилия обязательна для заполнения</div>
-                                }
+                        <div class="form-section">
+                            <h5 class="section-title">Контактные данные</h5>
+
+                            <div class="mb-4 row align-items-center">
+                                <label for="email" class="col-md-3 col-form-label">
+                                    <i class="fas fa-envelope me-2 text-muted"></i>Email
+                                </label>
+                                <div class="col-md-9">
+                                    <div class="input-group">
+                                        <input type="email" class="form-control" id="email" formControlName="email" />
+                                        @if (currentUser.value?.isEmailVerified) {
+                                        <span class="input-group-text verified-badge">
+                                            <i class="fas fa-check-circle text-success"></i>
+                                        </span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4 row align-items-center">
+                                <label for="phone" class="col-md-3 col-form-label">
+                                    <i class="fas fa-phone me-2 text-muted"></i>Телефон
+                                </label>
+                                <div class="col-md-9">
+                                    <input type="tel" class="form-control" id="phone" formControlName="phone"
+                                        placeholder="+7 (___) ___-__-__" />
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mb-3 row">
-                            <label for="surname" class="col-md-3 col-form-label">Отчество</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" id="surname" formControlName="surname" />
-                            </div>
-                        </div>
-
-                        <div class="mb-3 row">
-                            <label for="email" class="col-md-3 col-form-label">Email</label>
-                            <div class="col-md-9">
-                                <input type="email" class="form-control" id="email" formControlName="email" [disabled]="true" />
-                                <div class="form-text">Для изменения email обратитесь в службу поддержки</div>
-                            </div>
-                        </div>
-
-                        <div class="mb-3 row">
-                            <label for="phone" class="col-md-3 col-form-label">Телефон</label>
-                            <div class="col-md-9">
-                                <input type="tel" class="form-control" id="phone" formControlName="phone" />
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || loading">
+                        <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                            <button type="submit" class="btn btn-primary btn-lg save-btn"
+                                [disabled]="profileForm.invalid || loading">
                                 @if (loading) {
-                                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                <span class="spinner-border spinner-border-sm me-2" role="status"
+                                    aria-hidden="true"></span>
+                                <span>Сохранение...</span>
+                                } @else {
+                                <i class="fas fa-save me-2"></i>
+                                <span>Сохранить изменения</span>
                                 }
-                                Сохранить изменения
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
+            }
         </div>
     </div>
 </div>

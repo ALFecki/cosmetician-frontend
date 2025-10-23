@@ -53,9 +53,9 @@ export class ContactsComponent {
         {
             icon: 'geo-alt-fill',
             title: 'Адрес',
-            value: 'г. Минск, ул. Примерная, 123',
-            subtitle: 'Самовывоз по предварительной записи',
-            link: 'https://maps.google.com/?q=Минск',
+            value: 'г. Минск, ул. Красноармейская, 36',
+            subtitle: 'Самовывоз по предварительной договоренности',
+            link: 'https://yandex.by/maps/-/CLbFr6lp',
         },
         // {
         //     icon: 'chat-dots-fill',
@@ -111,7 +111,7 @@ export class ContactsComponent {
         { day: 'Среда', hours: '9:00 - 21:00' },
         { day: 'Четверг', hours: '9:00 - 21:00' },
         { day: 'Пятница', hours: '9:00 - 21:00' },
-        { day: 'Суббота', hours: '10:00 - 18:00' },
+        { day: 'Суббота', hours: '10:00 - 17:00' },
         { day: 'Воскресенье', hours: 'Выходной' },
     ];
 

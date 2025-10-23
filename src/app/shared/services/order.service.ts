@@ -78,7 +78,6 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
     }
 
     async changeQuantity(variantId: string, quantity: number): Promise<OrderModel | null> {
-        console.log('Current order:', this.currentOrder);
         if (this.currentOrder) {
             const cartItem = this.currentOrder.products.find(item => item.variant.id === variantId);
             const newOrder = await firstValueFrom(
@@ -122,7 +121,6 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
                 this.http.delete<OrderModel>(`${environment.server_url}/${this.endpoint}/product/${productId}`),
             );
             this.currentOrder = newOrder;
-            console.log('Updated order after removing product:', this.currentOrder);
             this.toastService.show('Товар удален из заказа', 'success');
             return this.currentOrder;
         }
@@ -139,10 +137,10 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
         return this.currentOrder;
     }
 
-    async checkout(): Promise<OrderModel | null> {
+    async checkout(withPayment = false): Promise<OrderModel | null> {
         try {
             const order = await firstValueFrom(
-                this.http.get<OrderModel>(`${environment.server_url}/${this.endpoint}/person/checkout`, {
+                this.http.get<OrderModel>(`${environment.server_url}/${this.endpoint}/person/checkout?withPayment=${withPayment}`, {
                     withCredentials: true,
                 }),
             );
@@ -159,12 +157,12 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
         }
     }
 
-    getUserMinimalOrders(): Observable<OrderMinimalModel[]> {
-        return this.getAllMinimal({ personId: this.currentOrder?.personId });
+    getUserMinimalOrders(personId: string): Observable<OrderMinimalModel[]> {
+        return this.getAllMinimal({ personId });
     }
 
     getUserOrders(): Observable<OrderModel[]> {
-        return this.getAll({ personId: this.currentOrder?.personId }).pipe(
+        return this.getAll({ personId: this.currentOrder!.personId }).pipe(
             map(response => {
                 if (response.status) {
                     return response.data;

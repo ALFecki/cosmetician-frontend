@@ -27,8 +27,7 @@ export class MaintenanceService {
                     this.initialized = true;
                 }),
                 map(response => response.enabled),
-                catchError(error => {
-                    console.error('Error checking maintenance status:', error);
+                catchError(() => {
                     this.maintenanceStatusSubject.next({ enabled: true, ttl: undefined });
                     this.loadingSubject.next(false);
                     this.initialized = true;
@@ -48,8 +47,7 @@ export class MaintenanceService {
                     this.initialized = true;
                 }),
                 map(response => response),
-                catchError(error => {
-                    console.error('Error checking maintenance status:', error);
+                catchError(() => {
                     this.maintenanceStatusSubject.next({ enabled: true, ttl: undefined });
                     this.loadingSubject.next(false);
                     this.initialized = true;

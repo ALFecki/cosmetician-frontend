@@ -9,6 +9,7 @@ import { FilterBrandSchema } from '../../schemas/brand.schema';
 import { FilterCategorySchema } from '../../schemas/category.schema';
 import { FilterCountrySchema } from '../../schemas/country.schema';
 import { FilterProductScopeSchema, FilterProductTypeSchema } from '../../schemas/product.schema';
+import { CreateProductVariantSchema } from '../../schemas/product_variant.schema';
 import { BrandService } from '../../services/brand.service';
 import { CategoryService } from '../../services/category.service';
 import { CountryService } from '../../services/country.service';
@@ -16,7 +17,7 @@ import { MaintenanceService } from '../../services/maintenance.service';
 import { PersonService } from '../../services/person.service';
 import { ProductVariantService } from '../../services/product-variant.service';
 import { ProductService } from '../../services/product.service';
-import { ProductScopeSevice } from '../../services/product_scope.service';
+import { ProductScopeService } from '../../services/product_scope.service';
 import { ProductTypeSevice } from '../../services/product_type.service';
 import { StatisticsService } from '../../services/statistics.service';
 import { ToastService } from '../../services/toast.service';
@@ -24,7 +25,6 @@ import { ImageUrlPipe } from '../../utils/image-url.pipe';
 import { AdminOrdersComponent } from '../admin-orders/admin-orders.component';
 import { GenericTableComponent } from '../generic-table/generic-table.component';
 import { StatisticsComponent } from '../statistics/statistics.component';
-import { CreateProductVariantSchema } from '../../schemas/product_variant.schema';
 
 interface ModelConfig {
     key: string;
@@ -105,7 +105,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
         private fb: FormBuilder,
         private modalService: NgbModal,
         private productService: ProductService,
-        private productScopeService: ProductScopeSevice,
+        private productScopeService: ProductScopeService,
         private productTypeService: ProductTypeSevice,
         private categoryService: CategoryService,
         private brandService: BrandService,
@@ -422,7 +422,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 .pipe(
                     tap(results => {
                         this.currentModelConfig.fields.forEach(field => {
-                            console.log(`Field: ${field.key}, Type: ${field.type}`);
                             if (field.type === 'select' || field.type === 'multiselect') {
                                 if (field.key === 'categoryIds' && results['categories']) {
                                     field.options = results['categories'].data;
@@ -750,7 +749,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
     }
 
     async saveItem() {
-        console.log(`Item Form Value:`, this.itemForm.value);
         if (this.itemForm.invalid || this.saving) {
             Object.keys(this.itemForm.controls).forEach(key => {
                 this.itemForm.get(key)?.markAsTouched();
@@ -768,7 +766,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
             }
 
             const value = this.itemForm.value[key];
-            console.log(`Processing field: ${key}, Value:`, value);
             if (value !== null && value !== undefined && value !== '') {
                 if (key === 'variants' || key === 'categoryIds' || key === 'countryIds' || key === 'productScopeIds') {
                     formData[key] = JSON.stringify(value);
@@ -779,8 +776,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 }
             }
         });
-
-        console.log('Prepared form data:', formData);
 
         if (this.currentModel === 'product') {
             delete formData['variants'];
