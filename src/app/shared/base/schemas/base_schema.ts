@@ -2,6 +2,7 @@ export interface FilterOptions {
     page?: number;
     limit?: number;
     includeDeleted?: boolean;
+    sort?: string;
 }
 
 export interface ListResponse<Model> {

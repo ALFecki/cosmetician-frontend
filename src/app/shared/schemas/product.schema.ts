@@ -9,6 +9,7 @@ export interface FilterProductSchema extends FilterOptions {
     title?: string;
     brandId?: string[];
     categoryId?: string[];
+    productScopeId?: string[];
     countryId?: string[];
     minPrice?: number;
     maxPrice?: number;

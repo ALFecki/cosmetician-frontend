@@ -6,7 +6,7 @@ import { CreateProductScopeSchema, FilterProductScopeSchema, UpdateProductScopeS
 @Injectable({
     providedIn: 'root',
 })
-export class ProductScopeSevice extends DataService<
+export class ProductScopeService extends DataService<
     ProductScopeModel,
     CreateProductScopeSchema,
     UpdateProductScopeSchema,

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, of } from 'rxjs';
@@ -17,7 +18,7 @@ import { ProductModalComponent } from '../product-modal/product-modal.component'
 @Component({
     selector: 'app-products',
     providers: [],
-    imports: [CommonModule, PaginationComponent, ProductFilterComponent, ImageUrlPipe],
+    imports: [CommonModule, FormsModule, PaginationComponent, ProductFilterComponent, ImageUrlPipe],
     templateUrl: './products.component.html',
     styleUrl: './products.component.scss',
 })
@@ -30,6 +31,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
     currentPage = 1;
     totalItems$: Observable<number> = of(0);
     filterOptions: FilterProductSchema = {};
+    sortBy: 'title' | 'price-asc' | 'price-desc' | 'createdAt' = 'title';
+    showFilters = false;
     private selectedVariants: Record<string, string> = {};
     private revealedPrices = new Set<string>();
     private priceTimeouts = new Map<string, NodeJS.Timeout>();
@@ -98,11 +101,29 @@ export class ProductsComponent implements OnInit, OnDestroy {
     }
 
     loadProducts(): void {
+        // Prepare sort parameter for server
+        let sortParam: string | undefined;
+        switch (this.sortBy) {
+            case 'title':
+                sortParam = 'title';
+                break;
+            case 'price-asc':
+                sortParam = 'price';
+                break;
+            case 'price-desc':
+                sortParam = '-price';
+                break;
+            case 'createdAt':
+                sortParam = '-createdAt';
+                break;
+        }
+
         this.productService
             .getAll({
                 ...this.filterOptions,
                 page: this.currentPage,
                 limit: this.itemsPerPage,
+                sort: sortParam,
             })
             .subscribe(data => {
                 this.products$ = of(data.data);
@@ -114,6 +135,28 @@ export class ProductsComponent implements OnInit, OnDestroy {
                     }
                 }
             });
+    }
+
+    toggleFilters(): void {
+        this.showFilters = !this.showFilters;
+    }
+
+    get activeFiltersCount(): number {
+        let count = 0;
+        if (this.filterOptions.title) count++;
+        if (this.filterOptions.brandId && this.filterOptions.brandId.length > 0) count += this.filterOptions.brandId.length;
+        if (this.filterOptions.categoryId && this.filterOptions.categoryId.length > 0) count += this.filterOptions.categoryId.length;
+        if (this.filterOptions.productScopeId && this.filterOptions.productScopeId.length > 0) count += this.filterOptions.productScopeId.length;
+        if (this.filterOptions.minPrice !== undefined) count++;
+        if (this.filterOptions.maxPrice !== undefined) count++;
+        if (this.filterOptions.minVolume !== undefined) count++;
+        if (this.filterOptions.maxVolume !== undefined) count++;
+        return count;
+    }
+
+    onSortChange(sortValue: string): void {
+        this.sortBy = sortValue as 'title' | 'price-asc' | 'price-desc' | 'createdAt';
+        this.loadProducts();
     }
 
     onFilterChange(filterData: FilterProductSchema): void {

@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrandModel } from '../../models/brand.model';
 import { CategoryModel } from '../../models/category.model';
-import { CountryModel } from '../../models/country.model';
+import { ProductScopeModel } from '../../models/product.model';
 import { FilterProductSchema } from '../../schemas/product.schema';
 import { BrandService } from '../../services/brand.service';
 import { CategoryService } from '../../services/category.service';
-import { CountryService } from '../../services/country.service';
+import { ProductScopeService } from '../../services/product_scope.service';
+
 
 @Component({
     selector: 'app-product-filter',
@@ -22,6 +23,7 @@ export class ProductFilterComponent implements OnInit {
         title: '',
         brandId: [],
         categoryId: [],
+        productScopeId: [],
         countryId: [],
         minPrice: undefined,
         maxPrice: undefined,
@@ -31,13 +33,12 @@ export class ProductFilterComponent implements OnInit {
 
     brands: BrandModel[] = [];
     categories: CategoryModel[] = [];
-    countries: CountryModel[] = [];
-    showFilter = false;
+    productScopes: ProductScopeModel[] = [];
 
     constructor(
         private brandService: BrandService,
         private categoryService: CategoryService,
-        private countryService: CountryService,
+        private productScopeService: ProductScopeService,
     ) {}
 
     ngOnInit(): void {
@@ -56,13 +57,23 @@ export class ProductFilterComponent implements OnInit {
             this.categories = data.data;
         });
 
-        this.countryService.getAll().subscribe(data => {
-            this.countries = data.data;
+        this.productScopeService.getAll().subscribe(data => {
+            this.productScopes = data.data;
         });
     }
 
-    toggleFilter(): void {
-        this.showFilter = !this.showFilter;
+    get activeFiltersCount(): number {
+        let count = 0;
+        if (this.filterData.title) count++;
+        if (this.filterData.brandId && this.filterData.brandId.length > 0) count += this.filterData.brandId.length;
+        if (this.filterData.categoryId && this.filterData.categoryId.length > 0) count += this.filterData.categoryId.length;
+        if (this.filterData.productScopeId && this.filterData.productScopeId.length > 0)
+            count += this.filterData.productScopeId.length;
+        if (this.filterData.minPrice !== undefined) count++;
+        if (this.filterData.maxPrice !== undefined) count++;
+        if (this.filterData.minVolume !== undefined) count++;
+        if (this.filterData.maxVolume !== undefined) count++;
+        return count;
     }
 
     applyFilter(): void {
@@ -76,6 +87,7 @@ export class ProductFilterComponent implements OnInit {
             brandId: [],
             categoryId: [],
             countryId: [],
+            productScopeId: [],
             minPrice: undefined,
             maxPrice: undefined,
             minVolume: undefined,
@@ -121,12 +133,12 @@ export class ProductFilterComponent implements OnInit {
         }
     }
 
-    toggleCountry(countryId: string): void {
-        const index = this.filterData.countryId?.indexOf(countryId) ?? -1;
+    toggleProductScope(productScopeId: string): void {
+        const index = this.filterData.productScopeId?.indexOf(productScopeId) ?? -1;
         if (index === -1) {
-            this.filterData.countryId = [...(this.filterData.countryId || []), countryId];
+            this.filterData.productScopeId = [...(this.filterData.productScopeId || []), productScopeId];
         } else {
-            this.filterData.countryId = (this.filterData.countryId || []).filter(id => id !== countryId);
+            this.filterData.productScopeId = (this.filterData.productScopeId || []).filter(id => id !== productScopeId);
         }
     }
 
@@ -138,7 +150,7 @@ export class ProductFilterComponent implements OnInit {
         return this.filterData.categoryId?.includes(categoryId) || false;
     }
 
-    isCountrySelected(countryId: string): boolean {
-        return this.filterData.countryId?.includes(countryId) || false;
+    isProductScopeSelected(productScopeId: string): boolean {
+        return this.filterData.productScopeId?.includes(productScopeId) || false;
     }
 }
