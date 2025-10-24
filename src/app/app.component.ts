@@ -5,18 +5,19 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, combineLatest, filter, map, of, shareReplay, startWith } from 'rxjs';
 import { FooterComponent } from './shared/components/footer/footer.component';
+import { LoaderComponent } from './shared/components/loader/loader.component';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { ToastComponent } from './shared/components/toast/toast.component';
+import { AuthService } from './shared/services/auth.service';
 import { MaintenanceService } from './shared/services/maintenance.service';
 import { AuthInterceptor } from './shared/utils/auth.interceptor';
 import { SnakeToCamelInterceptor } from './shared/utils/case.interceptor';
-import { AuthService } from './shared/services/auth.service';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
-    imports: [CommonModule, NgbModule, RouterOutlet, NavbarComponent, FooterComponent, ToastComponent],
+    imports: [CommonModule, NgbModule, RouterOutlet, NavbarComponent, FooterComponent, ToastComponent, LoaderComponent],
     providers: [
         {
             provide: HTTP_INTERCEPTORS,
