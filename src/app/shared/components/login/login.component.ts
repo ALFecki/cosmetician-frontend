@@ -90,6 +90,8 @@ export class LoginComponent {
                 this.closeLoginModal();
                 if (this.returnUrl && this.returnUrl !== '/') {
                     this.router.navigate([this.returnUrl]);
+                } else {
+                    this.router.navigate(['/']);
                 }
             },
             error: error => {

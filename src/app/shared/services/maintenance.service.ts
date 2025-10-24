@@ -9,7 +9,7 @@ import { MaintenanceResponse, MaintenanceStatus } from '../base/schemas/base_sch
 })
 export class MaintenanceService {
     private readonly apiUrl = `${environment.server_url}/maintenance`;
-    private maintenanceStatusSubject = new BehaviorSubject<MaintenanceStatus>({ enabled: true, ttl: undefined });
+    private maintenanceStatusSubject = new BehaviorSubject<MaintenanceStatus>({ enabled: false, ttl: undefined });
     private loadingSubject = new BehaviorSubject<boolean>(true);
     private initialized = false;
     private statusCache$?: Observable<MaintenanceStatus>;
