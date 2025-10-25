@@ -71,6 +71,6 @@ export class AppComponent implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
-        this.maintenanceService.getMaintenanceStatus().subscribe();
+        await this.maintenanceService.checkMaintenanceStatus();
     }
 }
