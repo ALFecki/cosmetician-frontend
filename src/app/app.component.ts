@@ -1,17 +1,17 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser, ViewportScroller } from '@angular/common';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { Observable, combineLatest, filter, map, of, startWith } from 'rxjs';
+import { combineLatest, filter, map, Observable, of, startWith } from 'rxjs';
 import { FooterComponent } from './shared/components/footer/footer.component';
+import { LoaderComponent } from './shared/components/loader/loader.component';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { ToastComponent } from './shared/components/toast/toast.component';
+import { AuthService } from './shared/services/auth.service';
 import { MaintenanceService } from './shared/services/maintenance.service';
 import { AuthInterceptor } from './shared/utils/auth.interceptor';
 import { SnakeToCamelInterceptor } from './shared/utils/case.interceptor';
-import { AuthService } from './shared/services/auth.service';
-import { LoaderComponent } from './shared/components/loader/loader.component';
 
 @Component({
     selector: 'app-root',
@@ -40,8 +40,23 @@ export class AppComponent {
         private router: Router,
         private maintenanceService: MaintenanceService,
         private authService: AuthService,
+        private viewportScroller: ViewportScroller,
+        @Inject(PLATFORM_ID) private platformId: object,
     ) {
         this.isLoading$ = this.maintenanceService.isLoading();
+
+        this.router.events.pipe(
+            filter(event => event instanceof NavigationEnd)
+        ).subscribe(() => {
+            if (isPlatformBrowser(this.platformId)) {
+                setTimeout(() => {
+                    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+                    document.body.scrollTop = 0;
+                    document.documentElement.scrollTop = 0;
+                    this.viewportScroller.scrollToPosition([0, 0]);
+                }, 200);
+            }
+        });
 
         this.showNavbarAndFooter$ = combineLatest([
             this.maintenanceService.isMaintenanceModeEnabled(),
@@ -68,5 +83,27 @@ export class AppComponent {
                 return true;
             }),
         );
+    }
+
+    onActivate() {
+        if (isPlatformBrowser(this.platformId)) {
+            const scrollToTop = () => {
+                window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+                
+                const scrollableElements = document.querySelectorAll('*');
+                scrollableElements.forEach((el) => {
+                    const element = el as HTMLElement;
+                    if (element.scrollTop && element.scrollTop > 0) {
+                        element.scrollTop = 0;
+                    }
+                });
+                
+                this.viewportScroller.scrollToPosition([0, 0]);
+            };
+            
+            scrollToTop();
+        }
     }
 }
