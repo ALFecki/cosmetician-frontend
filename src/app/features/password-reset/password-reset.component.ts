@@ -48,7 +48,7 @@ export class PasswordResetComponent implements OnInit {
 
         this.isLoading = true;
         this.authService.verifyResetToken(this.token, this.email).subscribe({
-            next: (response) => {
+            next: response => {
                 this.isTokenValid = response.valid;
                 this.isLoading = false;
             },

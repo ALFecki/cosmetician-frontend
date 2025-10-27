@@ -1,24 +1,21 @@
 <div class="card profile-sidebar">
     <div class="card-body text-center">
-
         <h5 class="card-title mt-3">
-            <span class="user-name">{{ (currentUser | async)?.firstName }} {{ (currentUser | async)?.secondName
-                }}</span>
+            <span class="user-name">{{ (currentUser | async)?.firstName }} {{ (currentUser | async)?.secondName }}</span>
         </h5>
         <p class="card-text">
             <i class="fas fa-envelope me-2"></i>
             <span class="user-email">{{ (currentUser | async)?.email }}</span>
         </p>
         @if ((currentUser | async)?.isEmailVerified) {
-        <div class="verified-badge">
-            <i class="fas fa-check-circle me-1"></i>
-            <span>Email подтверждён</span>
-        </div>
+            <div class="verified-badge">
+                <i class="fas fa-check-circle me-1"></i>
+                <span>Email подтверждён</span>
+            </div>
         }
     </div>
     <div class="list-group list-group-flush">
-        <a routerLink="/profile" class="list-group-item list-group-item-action"
-            [class.active]="activePage === 'profile'">
+        <a routerLink="/profile" class="list-group-item list-group-item-action" [class.active]="activePage === 'profile'">
             <div class="menu-icon">
                 <i-bs name="person"></i-bs>
             </div>
@@ -39,8 +36,7 @@
             <span class="menu-text">Избранное</span>
             <i class="fas fa-chevron-right menu-arrow"></i>
         </a> -->
-        <a href="#" (click)="$event.preventDefault(); logout()"
-            class="list-group-item list-group-item-action logout-btn">
+        <a href="#" (click)="$event.preventDefault(); logout()" class="list-group-item list-group-item-action logout-btn">
             <div class="menu-icon">
                 <i-bs name="box-arrow-right"></i-bs>
             </div>

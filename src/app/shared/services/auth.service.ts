@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { Md5 } from 'ts-md5';
@@ -17,9 +17,7 @@ export class AuthService {
     private userClaims: BehaviorSubject<Claims | null> = new BehaviorSubject<Claims | null>(null);
     private currentUser: BehaviorSubject<PersonModel | null> = new BehaviorSubject<PersonModel | null>(null);
 
-    constructor(
-        private http: HttpClient,
-    ) {}
+    constructor(private http: HttpClient) {}
 
     login(loginData: LoginData): Observable<LoginResponse> {
         return this.http.post<LoginResponse>(`${environment.server_url}/login`, loginData, { withCredentials: true }).pipe(
@@ -35,15 +33,16 @@ export class AuthService {
         );
     }
 
-    register(registrationData: RegistrationData): Observable<LoginResponse | null> {
+    register(registrationData: RegistrationData): Observable<LoginResponse> {
         return this.http.post<LoginResponse>(`${environment.server_url}/register`, registrationData, { withCredentials: true }).pipe(
             tap((response: LoginResponse) => {
                 this.csrfToken.next(response.claims.csrf_token);
+                this.userClaims.next(response.claims);
+                this.currentUser.next(response.user);
                 this.onLogin.next(true);
-            }),
-            catchError((error: HttpErrorResponse) => {
-                console.error('Registration error:', error);
-                return of(null);
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('isAuthenticated', 'true');
+                }
             }),
         );
     }
@@ -134,7 +133,7 @@ export class AuthService {
 
     checkAuth(): Observable<LoginResponse | null> {
         if (typeof window !== 'undefined' && !localStorage.getItem('isAuthenticated')) {
-        return of(null);
+            return of(null);
         }
         return this.http.get<LoginResponse>(`${environment.server_url}/check_auth`, { withCredentials: true }).pipe(
             tap((response: LoginResponse) => {
@@ -144,7 +143,7 @@ export class AuthService {
             }),
             catchError(() => {
                 if (typeof window !== 'undefined') {
-                localStorage.removeItem('isAuthenticated');
+                    localStorage.removeItem('isAuthenticated');
                 }
                 return of(null);
             }),
@@ -167,8 +166,8 @@ export class AuthService {
                 this.currentUser.next(null);
                 this.onLogout.next(true);
                 if (typeof window !== 'undefined') {
-                localStorage.removeItem('isAuthenticated');
-            }
+                    localStorage.removeItem('isAuthenticated');
+                }
             }),
         );
     }

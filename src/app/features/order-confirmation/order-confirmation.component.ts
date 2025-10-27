@@ -201,9 +201,7 @@ export class OrderConfirmationComponent implements OnInit {
             if (result) {
                 this.toastService.show('Заказ успешно оформлен!', 'success');
                 if (this.confirmationForm.get('paymentMethod')?.value === 'online') {
-                    const paymentResponse = await this.paymentService.processPayment(
-                        this.currentOrder!
-                    ).toPromise();
+                    const paymentResponse = await this.paymentService.processPayment(this.currentOrder!).toPromise();
                     if (paymentResponse && paymentResponse.formUrl) {
                         window.location.href = paymentResponse.formUrl;
                         this.orderService.update(this.currentOrder!.id, { paymentStatus: 'Processing' } as UpdateOrderSchema);

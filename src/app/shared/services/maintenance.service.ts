@@ -21,7 +21,7 @@ export class MaintenanceService {
 
     setStatusTimeout(seconds: number): void {
         this.statusTimeoutMs = Math.max(0, Math.floor(seconds)) * 1000;
-    }    
+    }
 
     async checkMaintenanceStatus(): Promise<boolean> {
         if (this.maintenanceStatusSubject.value.enabled) {
@@ -46,9 +46,7 @@ export class MaintenanceService {
                     this.loadingSubject.next(false);
                     this.initialized = true;
                     return of(status);
-                }
-
-                ),
+                }),
                 shareReplay(1),
             ),
         );

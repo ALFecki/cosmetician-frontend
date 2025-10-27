@@ -2,7 +2,7 @@ import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { catchError, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { Md5 } from 'ts-md5';
 import { LoginData, RegistrationData } from '../../models/login.interface';
 import { AuthService } from '../../services/auth.service';
@@ -29,7 +29,7 @@ export class LoginComponent {
     registrationForm: FormGroup = new FormGroup({
         firstName: new FormControl('', [Validators.required]),
         secondName: new FormControl('', [Validators.required]),
-        surname: new FormControl('', [Validators.required]),
+        surname: new FormControl('', []),
         email: new FormControl('', [Validators.required, Validators.email]),
         phone: new FormControl('', [Validators.required]),
         password: new FormControl('', [Validators.required, Validators.minLength(6)]),
@@ -176,37 +176,30 @@ export class LoginComponent {
             surname: this.registrationForm.get('surname')?.value,
         } as RegistrationData;
 
-        this.authService
-            .register(registrationData)
-            .pipe(
-                catchError(error => {
-                    console.error('Registration failed:', error);
+        this.authService.register(registrationData).subscribe({
+            next: () => {
+                this.toastService.show('Регистрация успешно завершена!', 'success');
+                this.closeRegisterModal();
+            },
+            error: error => {
+                console.error('Registration failed:', error);
 
-                    if (error.status === 409) {
-                        this.registrationError = 'Пользователь с таким email уже существует';
-                    } else if (error.status === 400) {
-                        this.registrationError = 'Некорректные данные для регистрации';
-                    } else if (error.status === 0) {
-                        this.registrationError = 'Не удалось подключиться к серверу';
-                    } else {
-                        this.registrationError = `Ошибка регистрации: ${error.message || 'Неизвестная ошибка'}`;
-                    }
+                if (error.status === 409) {
+                    this.registrationError = 'Пользователь с таким email уже существует';
+                } else if (error.status === 400) {
+                    this.registrationError = 'Некорректные данные для регистрации';
+                } else if (error.status === 0) {
+                    this.registrationError = 'Не удалось подключиться к серверу';
+                } else {
+                    this.registrationError = `Ошибка регистрации: ${error.message || 'Неизвестная ошибка'}`;
+                }
 
-                    this.toastService.show(this.registrationError, 'error');
-                    this.isRegistering = false;
+                this.toastService.show(this.registrationError, 'error');
+                this.isRegistering = false;
 
-                    return throwError(() => error);
-                }),
-            )
-            .subscribe({
-                next: () => {
-                    this.toastService.show('Регистрация успешно завершена!', 'success');
-                    this.closeRegisterModal();
-                },
-                complete: () => {
-                    this.isRegistering = false;
-                },
-            });
+                return throwError(() => error);
+            },
+        });
     }
 
     openForgotPasswordModal(content: unknown) {

@@ -22,19 +22,21 @@ export class MaintenanceGuard implements CanActivate {
             return true;
         }
 
-        return firstValueFrom(this.authService.isAdmin$().pipe(
-            take(1),
-            map(isAdmin => {
-                if (isAdmin) {
-                    return true;
-                } else {
-                    return this.router.createUrlTree(['/maintenance']);
-                }
-            }),
-            catchError(() => {
-                return of(this.router.createUrlTree(['/maintenance']));
-            }),
-        ));
+        return firstValueFrom(
+            this.authService.isAdmin$().pipe(
+                take(1),
+                map(isAdmin => {
+                    if (isAdmin) {
+                        return true;
+                    } else {
+                        return this.router.createUrlTree(['/maintenance']);
+                    }
+                }),
+                catchError(() => {
+                    return of(this.router.createUrlTree(['/maintenance']));
+                }),
+            ),
+        );
 
         // .pipe(
         //     switchMap(isMaintenanceMode => {

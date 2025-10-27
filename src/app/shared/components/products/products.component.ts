@@ -146,7 +146,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
         if (this.filterOptions.title) count++;
         if (this.filterOptions.brandId && this.filterOptions.brandId.length > 0) count += this.filterOptions.brandId.length;
         if (this.filterOptions.categoryId && this.filterOptions.categoryId.length > 0) count += this.filterOptions.categoryId.length;
-        if (this.filterOptions.productScopeId && this.filterOptions.productScopeId.length > 0) count += this.filterOptions.productScopeId.length;
+        if (this.filterOptions.productScopeId && this.filterOptions.productScopeId.length > 0)
+            count += this.filterOptions.productScopeId.length;
         if (this.filterOptions.minPrice !== undefined) count++;
         if (this.filterOptions.maxPrice !== undefined) count++;
         if (this.filterOptions.minVolume !== undefined) count++;
@@ -177,14 +178,20 @@ export class ProductsComponent implements OnInit, OnDestroy {
     }
 
     openProductDetails(product: ProductModel) {
-        this.modalService.dismissAll();
-        const activeModal = this.modalService.open(ProductModalComponent, {
-            size: 'lg',
-            centered: true,
-            scrollable: true,
-        });
-        activeModal.componentInstance.selectedProduct = product;
-        activeModal.componentInstance.selectedVariantId = this.getSelectedVariant(product);
+        const isMobile = window.innerWidth < 768;
+
+        if (isMobile) {
+            this.router.navigate([`/product/${product.id}`]);
+        } else {
+            this.modalService.dismissAll();
+            const activeModal = this.modalService.open(ProductModalComponent, {
+                size: 'lg',
+                centered: true,
+                scrollable: true,
+            });
+            activeModal.componentInstance.selectedProduct = product;
+            activeModal.componentInstance.selectedVariantId = this.getSelectedVariant(product);
+        }
     }
 
     async addToCart(product: ProductModel | null) {

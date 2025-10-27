@@ -85,14 +85,14 @@ export class AdminOrdersComponent implements OnInit {
                         }),
                     ),
                 );
-                
+
                 const ordersWithUsers$ = forkJoin(personRequests).pipe(
                     map(() => {
                         return filteredOrders.map(order => ({
                             ...order,
-                            user: personMap[order.personId!]
+                            user: personMap[order.personId!],
                         }));
-                    })
+                    }),
                 );
 
                 this.orders$ = ordersWithUsers$.pipe(map(orders => this.sortOrders(orders)));
@@ -218,20 +218,29 @@ export class AdminOrdersComponent implements OnInit {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     openOrderDetails(order: OrderMinimalWithUser, content: any): void {
-        this.orderService.getById(order.id).toPromise().then(response => {
-            this.selectedOrder = { ...response!.data, user: order.user };
-        });
+        this.orderService
+            .getById(order.id)
+            .toPromise()
+            .then(response => {
+                this.selectedOrder = { ...response!.data, user: order.user };
+            });
         this.modalService.open(content, { size: 'xl', centered: true });
     }
 
     openProductDetails(product: ProductModel) {
-        this.modalService.dismissAll();
-        const activeModal = this.modalService.open(ProductModalComponent, {
-            size: 'lg',
-            centered: true,
-            scrollable: true,
-        });
-        activeModal.componentInstance.selectedProduct = product;
+        const isMobile = window.innerWidth < 768;
+
+        if (isMobile) {
+            this.router.navigate([`/product/${product.id}`]);
+        } else {
+            this.modalService.dismissAll();
+            const activeModal = this.modalService.open(ProductModalComponent, {
+                size: 'lg',
+                centered: true,
+                scrollable: true,
+            });
+            activeModal.componentInstance.selectedProduct = product;
+        }
     }
 
     viewOrderDetails(order: OrderMinimalWithUser): void {
@@ -280,7 +289,7 @@ export class AdminOrdersComponent implements OnInit {
                 return 'Банковская карта';
             case 'cash':
                 return 'Наличные';
-                            case 'online':
+            case 'online':
                 return 'Онлайн оплата';
             default:
                 return 'Не указано';

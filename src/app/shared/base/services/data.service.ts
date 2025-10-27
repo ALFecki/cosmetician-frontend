@@ -73,7 +73,6 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
             this.http.post<{ status: string; data: { path: string } }>(`${this.apiUrl}/upload/image`, formData),
         );
 
-
         return response.data.path;
     }
 

@@ -155,13 +155,19 @@ export class AdminOrderDetailsComponent implements OnInit {
     }
 
     openProductDetails(product: ProductModel) {
-        this.modalService.dismissAll();
-        const activeModal = this.modalService.open(ProductModalComponent, {
-            size: 'lg',
-            centered: true,
-            scrollable: true,
-        });
-        activeModal.componentInstance.selectedProduct = product;
+        const isMobile = window.innerWidth < 768;
+
+        if (isMobile) {
+            this.router.navigate([`/product/${product.id}`]);
+        } else {
+            this.modalService.dismissAll();
+            const activeModal = this.modalService.open(ProductModalComponent, {
+                size: 'lg',
+                centered: true,
+                scrollable: true,
+            });
+            activeModal.componentInstance.selectedProduct = product;
+        }
     }
 
     getPaymentMethodText(method: string): string {

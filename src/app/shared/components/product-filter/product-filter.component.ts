@@ -8,7 +8,6 @@ import { BrandService } from '../../services/brand.service';
 import { CategoryService } from '../../services/category.service';
 import { ProductScopeService } from '../../services/product_scope.service';
 
-
 @Component({
     selector: 'app-product-filter',
     imports: [FormsModule],
@@ -67,8 +66,7 @@ export class ProductFilterComponent implements OnInit {
         if (this.filterData.title) count++;
         if (this.filterData.brandId && this.filterData.brandId.length > 0) count += this.filterData.brandId.length;
         if (this.filterData.categoryId && this.filterData.categoryId.length > 0) count += this.filterData.categoryId.length;
-        if (this.filterData.productScopeId && this.filterData.productScopeId.length > 0)
-            count += this.filterData.productScopeId.length;
+        if (this.filterData.productScopeId && this.filterData.productScopeId.length > 0) count += this.filterData.productScopeId.length;
         if (this.filterData.minPrice !== undefined) count++;
         if (this.filterData.maxPrice !== undefined) count++;
         if (this.filterData.minVolume !== undefined) count++;

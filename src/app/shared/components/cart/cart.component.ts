@@ -76,12 +76,21 @@ export class CartComponent {
     }
 
     openProductDetails(product: ProductModel) {
-        this.modalService.dismissAll();
-        const activeModal = this.modalService.open(ProductModalComponent, {
-            size: 'lg',
-            centered: true,
-            scrollable: true,
-        });
-        activeModal.componentInstance.selectedProduct = product;
+        // Проверяем ширину экрана
+        const isMobile = window.innerWidth < 768;
+
+        if (isMobile) {
+            // На мобильных устройствах переходим на страницу продукта
+            this.router.navigate([`/product/${product.id}`]);
+        } else {
+            // На десктопе открываем модальное окно
+            this.modalService.dismissAll();
+            const activeModal = this.modalService.open(ProductModalComponent, {
+                size: 'lg',
+                centered: true,
+                scrollable: true,
+            });
+            activeModal.componentInstance.selectedProduct = product;
+        }
     }
 }

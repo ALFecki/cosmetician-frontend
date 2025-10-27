@@ -14,12 +14,15 @@
                         <div class="footer-socials">
                             <span class="socials-label">Мы в соцсетях:</span>
                             <div class="social-links">
-                                <a href="https://t.me/vikskvor" target="_blank" class="footer-social"
-                                    aria-label="Telegram">
+                                <a href="https://t.me/vikskvor" target="_blank" class="footer-social" aria-label="Telegram">
                                     <i-bs name="telegram"></i-bs>
                                 </a>
-                                <a href="https://www.instagram.com/viktoria_skvorcova" target="_blank"
-                                    class="footer-social" aria-label="Instagram">
+                                <a
+                                    href="https://www.instagram.com/viktoria_skvorcova"
+                                    target="_blank"
+                                    class="footer-social"
+                                    aria-label="Instagram"
+                                >
                                     <i-bs name="instagram"></i-bs>
                                 </a>
                             </div>
@@ -91,15 +94,13 @@
                     <div class="footer-section">
                         <h6 class="footer-title">Юридическая информация</h6>
                         <div class="legal-info">
-                            ИП Скворцова Виктория Валерьевна. Свидетельство о государственной регистрации № 391948321 от
-                            19.08.2025 г.
-                            выдано Администрацией Первомайского района г. Витебска. Регистрация в торговом реестре от
-                            24.09.2025 г., № 758489.
+                            ИП Скворцова Виктория Валерьевна. Свидетельство о государственной регистрации № 391948321 от 19.08.2025 г.
+                            выдано Администрацией Первомайского района г. Витебска. Регистрация в торговом реестре от 24.09.2025 г., №
+                            758489.
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">Адрес:</span>
-                            <span class="detail-value">Республика Беларусь, г. Витебск, пр-т. Московский, д.13, к. 4,
-                                оф. 99</span>
+                            <span class="detail-value">Республика Беларусь, г. Витебск, пр-т. Московский, д.13, к. 4, оф. 99</span>
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">Счет:</span>
@@ -121,16 +122,14 @@
         <div class="footer-additional">
             <div class="row align-items-center">
                 <div class="col-12 col-md-3">
-                    <p class="copyright">
-                        © {{ currentYear }} SkViDerm. Все права защищены.
-                    </p>
+                    <p class="copyright">© {{ currentYear }} SkViDerm. Все права защищены.</p>
                 </div>
 
                 <div class="col-12 col-md-6">
                     <div class="payment-section-inline">
                         <div class="payment-logos-inline">
                             @for (logo of paymentLogos; track logo) {
-                            <img [src]="logo" alt="Способ оплаты" class="payment-logo-inline" loading="lazy" />
+                                <img [src]="logo" alt="Способ оплаты" class="payment-logo-inline" loading="lazy" />
                             }
                         </div>
                     </div>

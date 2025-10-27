@@ -90,7 +90,7 @@
                             @for (order of orders; track order) {
                                 <tr>
                                     <td class="fw-bold">#{{ order.id }}</td>
-                                    <td>{{ order.createdAt | date: 'dd.MM.yyyy HH:mm': 'GMT+3' }}</td>
+                                    <td>{{ order.createdAt | date: 'dd.MM.yyyy HH:mm' : 'GMT+3' }}</td>
                                     <td>
                                         <div class="customer-info">
                                             <div class="fw-medium">{{ order.user?.firstName }} {{ order.user?.secondName }}</div>

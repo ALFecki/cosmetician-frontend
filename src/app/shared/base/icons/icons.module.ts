@@ -213,7 +213,6 @@ const icons = {
     heartFill,
     whatsapp,
     facebook,
-    
 };
 
 @NgModule({

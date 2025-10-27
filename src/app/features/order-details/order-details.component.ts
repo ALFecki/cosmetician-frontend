@@ -243,8 +243,10 @@ export class OrderDetailsComponent implements OnInit {
         const order = this.order.value;
         if (!order) return false;
 
-        return order.paymentMethod?.toLowerCase() === 'online' && 
-               (order.paymentStatus?.toLowerCase() === 'failed' || order.paymentStatus?.toLowerCase() === 'pending');
+        return (
+            order.paymentMethod?.toLowerCase() === 'online' &&
+            (order.paymentStatus?.toLowerCase() === 'failed' || order.paymentStatus?.toLowerCase() === 'pending')
+        );
     }
 
     canRetryPayment(): boolean {
@@ -278,7 +280,7 @@ export class OrderDetailsComponent implements OnInit {
             (error: Error) => {
                 this.toastService.show('Ошибка при смене способа оплаты: ' + (error.message || 'Неизвестная ошибка'), 'error');
                 this.changingPaymentMethod = false;
-            }
+            },
         );
     }
 
