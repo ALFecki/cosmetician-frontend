@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, catchError, firstValueFrom, map, of, shareReplay, tap } from 'rxjs';
+import { timeout } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { MaintenanceResponse, MaintenanceStatus } from '../base/schemas/base_schema';
 
@@ -14,20 +15,30 @@ export class MaintenanceService {
     private initialized = false;
     private statusCache$?: Observable<MaintenanceStatus>;
 
-    constructor(private http: HttpClient) {
-        this.checkMaintenanceStatus();
-    }
+    private statusTimeoutMs = 5000;
+
+    constructor(private http: HttpClient) {}
+
+    setStatusTimeout(seconds: number): void {
+        this.statusTimeoutMs = Math.max(0, Math.floor(seconds)) * 1000;
+    }    
 
     async checkMaintenanceStatus(): Promise<boolean> {
+        if (this.maintenanceStatusSubject.value.enabled) {
+            this.loadingSubject.next(false);
+            return this.isMaintenanceMode();
+        }
         return firstValueFrom(
             this.http.get<MaintenanceResponse>(`${this.apiUrl}/status`).pipe(
+                timeout(this.statusTimeoutMs),
                 tap(response => {
                     this.maintenanceStatusSubject.next({ enabled: response.enabled, ttl: response.ttl });
                     this.loadingSubject.next(false);
                     this.initialized = true;
                 }),
                 map(response => response.enabled),
-                catchError(() => {
+                catchError(error => {
+                    console.log('Maintenance status check failed:', error);
                     this.maintenanceStatusSubject.next({ enabled: true, ttl: undefined });
                     this.loadingSubject.next(false);
                     this.initialized = true;
@@ -41,13 +52,15 @@ export class MaintenanceService {
     getMaintenanceStatus(): Observable<MaintenanceStatus> {
         if (!this.statusCache$) {
             this.statusCache$ = this.http.get<MaintenanceResponse>(`${this.apiUrl}/status`).pipe(
+                timeout(this.statusTimeoutMs),
                 tap(response => {
                     this.maintenanceStatusSubject.next({ enabled: response.enabled, ttl: response.ttl });
                     this.loadingSubject.next(false);
                     this.initialized = true;
                 }),
                 map(response => response),
-                catchError(() => {
+                catchError(error => {
+                    console.log('Maintenance status fetch failed', error);
                     this.maintenanceStatusSubject.next({ enabled: true, ttl: undefined });
                     this.loadingSubject.next(false);
                     this.initialized = true;

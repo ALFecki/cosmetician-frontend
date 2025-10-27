@@ -5,7 +5,7 @@ import { BrandService } from '../../../../shared/services/brand.service';
 import { ImageUrlPipe } from '../../../../shared/utils/image-url.pipe';
 import { IconsModule } from '../../../../shared/base/icons/icons.module';
 import { CommonModule } from '@angular/common';
-import { map, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 
 @Component({
     selector: 'app-brands',
@@ -15,7 +15,7 @@ import { map, Observable } from 'rxjs';
 })
 export class BrandsComponent implements OnInit {
     brands$: Observable<BrandModel[]> = new Observable<BrandModel[]>();
-    loading = false;
+    loading$ = new BehaviorSubject<boolean>(false);
     error = '';
 
     constructor(private brandService: BrandService) {}
@@ -32,11 +32,11 @@ export class BrandsComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.loading = true;
+        this.loading$.next(true);
         this.brands$ = this.brandService.getBrandsList().pipe(
             map(brands => {
                 brands = brands.filter(b => b.image);
-                this.loading = false;
+                this.loading$.next(false);
                 return this.getRandomUniqueElements(brands, 4);
             }),
         );

@@ -31,7 +31,7 @@ import { LoaderComponent } from './shared/components/loader/loader.component';
         },
     ],
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
     title = 'proskin-frontend';
     showNavbarAndFooter$: Observable<boolean> = of(false);
     isLoading$: Observable<boolean> = of(true);
@@ -70,7 +70,4 @@ export class AppComponent implements OnInit {
         );
     }
 
-    async ngOnInit(): Promise<void> {
-        await this.maintenanceService.checkMaintenanceStatus();
-    }
 }

@@ -3,7 +3,7 @@
         <h2 class="text-center section-title">Мы работаем с брендами</h2>
     </div>
 
-    @if (loading) {
+    @if (loading$ | async) {
         <div class="text-center my-4">
             <div class="spinner-border" role="status">
                 <span class="visually-hidden">Загрузка...</span>

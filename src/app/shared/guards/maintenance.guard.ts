@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
@@ -16,7 +16,7 @@ export class MaintenanceGuard implements CanActivate {
     ) {}
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {
         return this.maintenanceService.getMaintenanceStatus().pipe(
             switchMap(isMaintenanceMode => {
                 if (!isMaintenanceMode.enabled) {
@@ -29,8 +29,7 @@ export class MaintenanceGuard implements CanActivate {
                         if (isAdmin) {
                             return true;
                         } else {
-                            this.router.navigate(['/maintenance']);
-                            return false;
+                            return this.router.createUrlTree(['/maintenance']);
                         }
                     }),
                 );

@@ -1,6 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-// import { SsrCookieService } from 'ngx-cookie-service-ssr';
 import { BehaviorSubject, catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { Md5 } from 'ts-md5';
 import { environment } from '../../../environments/environment';
@@ -20,7 +19,6 @@ export class AuthService {
 
     constructor(
         private http: HttpClient,
-        //  private cookieService: SsrCookieService
     ) {}
 
     login(loginData: LoginData): Observable<LoginResponse> {
@@ -30,13 +28,10 @@ export class AuthService {
                 this.userClaims.next(response.claims);
                 this.currentUser.next(response.user);
                 this.onLogin.next(true);
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('isAuthenticated', 'true');
+                }
             }),
-            // catchError((error: HttpErrorResponse) => {
-            //     console.error('Login error:', error);
-            //     return new Observable<LoginResponse>(observer => {
-            //         observer.error(error);
-            //     });
-            // }),
         );
     }
 
@@ -138,21 +133,21 @@ export class AuthService {
     }
 
     checkAuth(): Observable<LoginResponse | null> {
-        // console.log('Platform ID:', this.cookieService.check('jwt'));
-        // if (this.cookieService.check('jwt') === false) {
-        //     return of(null);
-        // }
+        if (typeof window !== 'undefined' && !localStorage.getItem('isAuthenticated')) {
+        return of(null);
+        }
         return this.http.get<LoginResponse>(`${environment.server_url}/check_auth`, { withCredentials: true }).pipe(
             tap((response: LoginResponse) => {
-                // console.log('Auth check response:', response);
                 this.csrfToken.next(response.claims.csrf_token);
                 this.userClaims.next(response.claims as Claims);
                 this.currentUser.next(response.user);
             }),
-            // catchError((error) => {
-            //     console.error('Auth check error:', error);
-            //     return of(null);
-            // }),
+            catchError(() => {
+                if (typeof window !== 'undefined') {
+                localStorage.removeItem('isAuthenticated');
+                }
+                return of(null);
+            }),
         );
     }
 
@@ -171,6 +166,9 @@ export class AuthService {
                 this.userClaims.next(null);
                 this.currentUser.next(null);
                 this.onLogout.next(true);
+                if (typeof window !== 'undefined') {
+                localStorage.removeItem('isAuthenticated');
+            }
             }),
         );
     }
