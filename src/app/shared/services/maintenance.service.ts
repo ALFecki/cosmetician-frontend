@@ -38,12 +38,17 @@ export class MaintenanceService {
                 }),
                 map(response => response.enabled),
                 catchError(error => {
-                    console.log('Maintenance status check failed:', error);
-                    this.maintenanceStatusSubject.next({ enabled: true, ttl: undefined });
+                    let status = false;
+                    if (error.status !== 0) {
+                        status = true;
+                    }
+                    this.maintenanceStatusSubject.next({ enabled: status, ttl: undefined });
                     this.loadingSubject.next(false);
                     this.initialized = true;
-                    return of(true);
-                }),
+                    return of(status);
+                }
+
+                ),
                 shareReplay(1),
             ),
         );
@@ -60,7 +65,7 @@ export class MaintenanceService {
                 }),
                 map(response => response),
                 catchError(error => {
-                    console.log('Maintenance status fetch failed', error);
+                    console.debug('Maintenance status fetch failed', error);
                     this.maintenanceStatusSubject.next({ enabled: true, ttl: undefined });
                     this.loadingSubject.next(false);
                     this.initialized = true;
