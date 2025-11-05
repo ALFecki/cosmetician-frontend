@@ -34,7 +34,6 @@ import { SnakeToCamelInterceptor } from './shared/utils/case.interceptor';
 export class AppComponent {
     title = 'proskin-frontend';
     showNavbarAndFooter$: Observable<boolean> = of(false);
-    isLoading$: Observable<boolean> = of(true);
 
     constructor(
         private router: Router,
@@ -43,8 +42,6 @@ export class AppComponent {
         private viewportScroller: ViewportScroller,
         @Inject(PLATFORM_ID) private platformId: object,
     ) {
-        this.isLoading$ = this.maintenanceService.isLoading();
-
         this.router.events.pipe(
             filter(event => event instanceof NavigationEnd)
         ).subscribe(() => {
@@ -60,18 +57,13 @@ export class AppComponent {
 
         this.showNavbarAndFooter$ = combineLatest([
             this.maintenanceService.isMaintenanceModeEnabled(),
-            this.maintenanceService.isLoading(),
             this.router.events.pipe(
                 filter(event => event instanceof NavigationEnd),
                 map((event: NavigationEnd) => event.url),
                 startWith(this.router.url),
             ),
         ]).pipe(
-            map(([isMaintenanceMode, isLoading, currentUrl]) => {
-                if (isLoading) {
-                    return false;
-                }
-
+            map(([isMaintenanceMode, currentUrl]) => {
                 if (currentUrl.includes('/maintenance')) {
                     return false;
                 }
@@ -91,7 +83,7 @@ export class AppComponent {
                 window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
                 document.body.scrollTop = 0;
                 document.documentElement.scrollTop = 0;
-                
+
                 const scrollableElements = document.querySelectorAll('*');
                 scrollableElements.forEach((el) => {
                     const element = el as HTMLElement;
@@ -99,10 +91,10 @@ export class AppComponent {
                         element.scrollTop = 0;
                     }
                 });
-                
+
                 this.viewportScroller.scrollToPosition([0, 0]);
             };
-            
+
             scrollToTop();
         }
     }

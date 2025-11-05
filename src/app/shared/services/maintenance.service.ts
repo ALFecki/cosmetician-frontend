@@ -11,21 +11,19 @@ import { MaintenanceResponse, MaintenanceStatus } from '../base/schemas/base_sch
 export class MaintenanceService {
     private readonly apiUrl = `${environment.server_url}/maintenance`;
     private maintenanceStatusSubject = new BehaviorSubject<MaintenanceStatus>({ enabled: false, ttl: undefined });
-    private loadingSubject = new BehaviorSubject<boolean>(true);
     private initialized = false;
     private statusCache$?: Observable<MaintenanceStatus>;
 
     private statusTimeoutMs = 5000;
 
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient) { }
 
     setStatusTimeout(seconds: number): void {
         this.statusTimeoutMs = Math.max(0, Math.floor(seconds)) * 1000;
     }
 
     async checkMaintenanceStatus(): Promise<boolean> {
-        if (this.maintenanceStatusSubject.value.enabled) {
-            this.loadingSubject.next(false);
+        if (this.initialized) {
             return this.isMaintenanceMode();
         }
         return firstValueFrom(
@@ -33,7 +31,6 @@ export class MaintenanceService {
                 timeout(this.statusTimeoutMs),
                 tap(response => {
                     this.maintenanceStatusSubject.next({ enabled: response.enabled, ttl: response.ttl });
-                    this.loadingSubject.next(false);
                     this.initialized = true;
                 }),
                 map(response => response.enabled),
@@ -43,7 +40,6 @@ export class MaintenanceService {
                         status = true;
                     }
                     this.maintenanceStatusSubject.next({ enabled: status, ttl: undefined });
-                    this.loadingSubject.next(false);
                     this.initialized = true;
                     return of(status);
                 }),
@@ -58,14 +54,12 @@ export class MaintenanceService {
                 timeout(this.statusTimeoutMs),
                 tap(response => {
                     this.maintenanceStatusSubject.next({ enabled: response.enabled, ttl: response.ttl });
-                    this.loadingSubject.next(false);
                     this.initialized = true;
                 }),
                 map(response => response),
                 catchError(error => {
                     console.debug('Maintenance status fetch failed', error);
                     this.maintenanceStatusSubject.next({ enabled: true, ttl: undefined });
-                    this.loadingSubject.next(false);
                     this.initialized = true;
                     return of({ enabled: true, ttl: undefined });
                 }),
@@ -81,10 +75,6 @@ export class MaintenanceService {
 
     isMaintenanceModeEnabled(): Observable<boolean> {
         return this.maintenanceStatusSubject.asObservable().pipe(map(status => status.enabled));
-    }
-
-    isLoading(): Observable<boolean> {
-        return this.loadingSubject.asObservable();
     }
 
     isInitialized(): boolean {
