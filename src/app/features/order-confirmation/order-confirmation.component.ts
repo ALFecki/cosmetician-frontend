@@ -119,6 +119,34 @@ export class OrderConfirmationComponent implements OnInit {
             this.confirmationForm.get('apartment')?.updateValueAndValidity();
         });
 
+        this.confirmationForm.get('courierDelivery')?.valueChanges.subscribe(value => {
+            if (this.confirmationForm.get('deliveryMethod')?.value === 'post' && value) {
+                    this.confirmationForm.get('city')?.setValidators([Validators.required, Validators.minLength(2)]);
+                    this.confirmationForm.get('street')?.setValidators([Validators.required, Validators.minLength(2)]);
+                    this.confirmationForm.get('house')?.setValidators([Validators.required]);
+                    this.confirmationForm.get('building')?.clearValidators();
+                    this.confirmationForm.get('building')?.setValue('');
+                    this.confirmationForm.get('apartment')?.setValidators([Validators.required]);
+            } else {
+                this.confirmationForm.get('city')?.clearValidators();
+                this.confirmationForm.get('city')?.setValue('');
+                this.confirmationForm.get('street')?.clearValidators();
+                this.confirmationForm.get('street')?.setValue('');
+                this.confirmationForm.get('house')?.clearValidators();
+                this.confirmationForm.get('house')?.setValue('');
+                this.confirmationForm.get('building')?.clearValidators();
+                this.confirmationForm.get('building')?.setValue('');
+                this.confirmationForm.get('apartment')?.clearValidators();
+                this.confirmationForm.get('apartment')?.setValue('');
+            }
+
+            this.confirmationForm.get('city')?.updateValueAndValidity();
+            this.confirmationForm.get('street')?.updateValueAndValidity();
+            this.confirmationForm.get('house')?.updateValueAndValidity();
+            this.confirmationForm.get('building')?.updateValueAndValidity();
+            this.confirmationForm.get('apartment')?.updateValueAndValidity();
+        });
+
         this.confirmationForm.get('postPlacementFilter')?.valueChanges.subscribe(filterText => {
             this.filterPostPlacements(filterText || '');
         });

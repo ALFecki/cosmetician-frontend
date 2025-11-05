@@ -36,10 +36,10 @@ export class BrandsComponent implements OnInit {
         this.brands$ = this.brandService.getBrandsList().pipe(
             map(brands => {
                 brands = brands.filter(b => b.image);
-                this.loading$.next(false);
                 return this.getRandomUniqueElements(brands, 4);
-            }),
+            })
         );
+        this.loading$.next(false);
     }
 
     getPlaceholderImage(): string {

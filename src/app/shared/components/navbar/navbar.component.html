@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg" [class.scrolled]="isScrolled">
+<nav class="navbar navbar-expand-lg" >
     <div class="container-fluid">
         <!-- Brand -->
         <a class="navbar-brand" href="#" routerLink="/">
@@ -6,150 +6,125 @@
         </a>
 
         <!-- Mobile toggle -->
-        <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-        >
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <!-- Navigation Links -->
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a
-                        class="nav-link"
-                        aria-current="page"
-                        routerLink="/"
-                        routerLinkActive="active"
-                        [routerLinkActiveOptions]="{ exact: true }"
-                        (click)="closeNavbarOnMobile()"
-                    >
+                    <a class="nav-link" aria-current="page" routerLink="/" routerLinkActive="active"
+                        [routerLinkActiveOptions]="{ exact: true }" (click)="closeNavbarOnMobile()">
                         <i-bs name="house-door"></i-bs>
                         <span>Главная</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" routerLink="/products" routerLinkActive="active" (click)="closeNavbarOnMobile()">
+                    <a class="nav-link" routerLink="/products" routerLinkActive="active"
+                        (click)="closeNavbarOnMobile()">
                         <i-bs name="grid"></i-bs>
                         <span>Каталог</span>
                     </a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
                         <i-bs name="tags"></i-bs>
                         <span>Категории</span>
                     </a>
                     <div class="dropdown-menu animate__animated animate__fadeIn">
                         <div class="dropdown-grid">
                             @for (category of categories$ | async; track category; let i = $index) {
-                                <div class="dropdown-item-container">
-                                    <a
-                                        class="dropdown-item animate__animated animate__fadeInRight"
-                                        [style.animation-delay]="i * 50 + 'ms'"
-                                        href="/category/{{ category.id }}"
-                                        role="menuitem"
-                                        (click)="closeNavbarOnMobile()"
-                                    >
-                                        <i-bs name="dot" class="me-2"></i-bs>
-                                        {{ category.title }}
-                                    </a>
-                                </div>
+                            <div class="dropdown-item-container">
+                                <a class="dropdown-item animate__animated animate__fadeInRight"
+                                    [style.animation-delay]="i * 50 + 'ms'" href="/category/{{ category.id }}"
+                                    role="menuitem" (click)="closeNavbarOnMobile()">
+                                    <i-bs name="dot" class="me-2"></i-bs>
+                                    {{ category.title }}
+                                </a>
+                            </div>
                             }
                         </div>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
                         <i-bs name="award"></i-bs>
                         <span>Бренды</span>
                     </a>
                     <div class="dropdown-menu animate__animated animate__fadeIn">
                         <div class="dropdown-grid">
                             @for (brand of brands$ | async; track brand; let i = $index) {
-                                <div class="dropdown-item-container">
-                                    <a
-                                        class="dropdown-item animate__animated animate__fadeInRight"
-                                        [style.animation-delay]="i * 50 + 'ms'"
-                                        href="/brand/{{ brand.id }}"
-                                        role="menuitem"
-                                        (click)="closeNavbarOnMobile()"
-                                    >
-                                        <img
-                                            [src]="brand.image | imageUrl"
-                                            [alt]="brand.title"
-                                            class="brand-logo-small"
-                                            onerror="this.src='assets/images/products/no-image.png'"
-                                        />
-                                        {{ brand.title }}
-                                    </a>
-                                </div>
+                            <div class="dropdown-item-container">
+                                <a class="dropdown-item animate__animated animate__fadeInRight"
+                                    [style.animation-delay]="i * 50 + 'ms'" href="/brand/{{ brand.id }}" role="menuitem"
+                                    (click)="closeNavbarOnMobile()">
+                                    <img [src]="brand.image | imageUrl" [alt]="brand.title" class="brand-logo-small"
+                                        onerror="this.src='assets/images/products/no-image.png'" />
+                                    {{ brand.title }}
+                                </a>
+                            </div>
                             }
                         </div>
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" routerLink="/delivery" routerLinkActive="active" (click)="closeNavbarOnMobile()">
+                    <a class="nav-link" routerLink="/delivery" routerLinkActive="active"
+                        (click)="closeNavbarOnMobile()">
                         <i-bs name="truck"></i-bs>
                         <span>Доставка и оплата</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" routerLink="/contacts" routerLinkActive="active" (click)="closeNavbarOnMobile()">
+                    <a class="nav-link" routerLink="/contacts" routerLinkActive="active"
+                        (click)="closeNavbarOnMobile()">
                         <i-bs name="telephone-fill"></i-bs>
                         <span>Контакты</span>
                     </a>
                 </li>
                 @if (authService.isAdmin()) {
-                    <li class="nav-item">
-                        <a class="nav-link admin-link" routerLink="/admin" routerLinkActive="active" (click)="closeNavbarOnMobile()">
-                            <i-bs name="gear"></i-bs>
-                            <span>Админ панель</span>
-                        </a>
-                    </li>
+                <li class="nav-item">
+                    <a class="nav-link admin-link" routerLink="/admin" routerLinkActive="active"
+                        (click)="closeNavbarOnMobile()">
+                        <i-bs name="gear"></i-bs>
+                        <span>Админ панель</span>
+                    </a>
+                </li>
                 }
             </ul>
 
-            <div class="navbar-actions">
+            <div class="navbar-actions ms-auto">
                 <div class="action-item cart-action">
                     <button class="btn btn-cart position-relative" (click)="navigateToCart(); closeNavbarOnMobile()">
                         <i-bs name="cart3"></i-bs>
                         <span class="cart-label">Корзина</span>
                         @if ((getProductCount() | async) ?? 0 > 0) {
-                            <span class="cart-badge badge rounded-pill">
-                                {{ getProductCount() | async }}
-                                <span class="visually-hidden">товаров в корзине</span>
-                            </span>
+                        <span class="cart-badge badge rounded-pill">
+                            {{ getProductCount() | async }}
+                            <span class="visually-hidden">товаров в корзине</span>
+                        </span>
                         }
                     </button>
                 </div>
 
                 @if (!authService.isLoggedIn()) {
-                    <div class="action-item user-action">
-                        <button class="btn btn-user" (click)="openLoginModal(); closeNavbarOnMobile()">
-                            <i-bs name="person-plus"></i-bs>
-                            <span class="user-label d-none d-md-inline">Войти</span>
-                        </button>
-                    </div>
+                <div class="action-item user-action">
+                    <button class="btn btn-user" (click)="openLoginModal(); closeNavbarOnMobile()">
+                        <i-bs name="person-plus"></i-bs>
+                        <span class="user-label">Войти</span>
+                    </button>
+                </div>
                 } @else {
-                    <div class="action-item user-action">
-                        <button
-                            class="btn btn-user-profile"
-                            type="button"
-                            id="userDropdown"
-                            (click)="navigateToProfile(); closeNavbarOnMobile()"
-                            aria-expanded="false"
-                            title="Личный кабинет"
-                        >
-                            <i-bs name="person-circle"></i-bs>
-                            <span class="user-label d-none d-lg-inline">{{ getUserDisplayName() }}</span>
-                        </button>
-                    </div>
+                <div class="action-item user-action">
+                    <button class="btn btn-user-profile" type="button" id="userDropdown"
+                        (click)="navigateToProfile(); closeNavbarOnMobile()" aria-expanded="false"
+                        title="Личный кабинет">
+                        <i-bs name="person-circle"></i-bs>
+                        <span class="user-label">{{ getUserDisplayName() }}</span>
+                    </button>
+                </div>
                 }
             </div>
         </div>
