@@ -53,9 +53,9 @@ export class ContactsComponent {
         {
             icon: 'geo-alt-fill',
             title: 'Адрес',
-            value: 'г. Минск, ул. Красноармейская, 36',
+            value: 'г. Минск, ул. Ульяновская, 4',
             subtitle: 'Самовывоз по предварительной договоренности',
-            link: 'https://yandex.by/maps/-/CLbFr6lp',
+            link: 'https://yandex.by/maps/-/CLCWzEZo',
         },
         // {
         //     icon: 'chat-dots-fill',
