@@ -66,6 +66,7 @@ export class VerifyEmailModalComponent {
             next: () => {
                 this.verifyEmailSuccess = 'Ваш email успешно подтверждён!';
                 this.toastService.show('Email подтверждён', 'success');
+                this.authService.setEmailVerified(true);
                 this.emailVerified.emit();
 
                 setTimeout(() => {

@@ -119,6 +119,14 @@ export class AuthService {
             );
     }
 
+    setEmailVerified(isVerified: boolean): void {
+        const currentUser = this.currentUser.value;
+        if (currentUser) {
+            const updatedUser = { ...currentUser, is_email_verified: isVerified };
+            this.currentUser.next(updatedUser);
+        }
+    }
+
     getCsrfToken(): string {
         return this.csrfToken.value;
     }
