@@ -2,11 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, firstValueFrom, from, map, Observable, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { ListResponse, SingleResponse } from '../base/schemas/base_schema';
 import { DataService } from '../base/services/data.service';
 import { OrderMinimalModel, OrderModel } from '../models/order.model';
 import { CreateOrderSchema, FilterOrderSchema, UpdateOrderSchema } from '../schemas/order.schema';
 import { ToastService } from './toast.service';
-import { ListResponse, SingleResponse } from '../base/schemas/base_schema';
 
 @Injectable({
     providedIn: 'root',
@@ -39,6 +39,21 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
                 }
             }),
         );
+    }
+
+    getMinimalById(id: string): Observable<OrderMinimalModel | null> {
+        return this.http
+            .get<SingleResponse<OrderMinimalModel>>(`${environment.server_url}/${this.endpoint}_minimal/${id}`)
+            .pipe(
+                map(response => {
+                    if (response.status) {
+                        return response.data;
+                    } else {
+                        this.toastService.show('Ошибка получения заказа', 'error');
+                        return null;
+                    }
+                }),
+            );
     }
 
     async addProductToOrder(variantId: string): Promise<OrderModel | null> {
@@ -174,7 +189,44 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
         );
     }
 
-    updateStatus(orderId: string, status: string): Observable<OrderModel | null> {
+    updateStatus(to: string, orderId: string, status: string): Observable<OrderModel | null> {
+        let statusString;
+        switch (status) {
+            case 'Checked':
+                statusString = 'Подтвержден';
+                break;
+            case 'Processing':
+                statusString = 'В обработке';
+                break;
+            case 'InDelivery':
+                statusString = 'В доставке';
+                break;
+            case 'Delivered':
+                statusString = 'Доставлен';
+                break;
+            case 'Completed':
+                statusString = 'Завершен';
+                break;
+            case 'Cancelled':
+                statusString = 'Отменен';
+                break;
+            default:
+                this.toastService.show('Недопустимый статус заказа', 'error');
+                return of(null);
+        }
+        this.http.get(`${environment.server_url}/email/send_status_update`, {
+            params: {
+                to,
+                orderId,
+                status: statusString,
+            },
+            withCredentials: true,
+        }).pipe(
+            catchError(error => {
+                console.error('Error sending status update email:', error);
+                return of(null);
+            })
+        ).subscribe();
         return from(this.update(orderId, { status })).pipe(
             map(response => {
                 if ((response as SingleResponse<OrderModel>).status) {

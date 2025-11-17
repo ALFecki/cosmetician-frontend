@@ -150,6 +150,13 @@
     }
 }
 
+.card-content-vertical-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
 .highlight-card {
     background: linear-gradient(135deg, var(--soft-pink) 0%, var(--warm-white) 100%);
     border-color: var(--secondary);

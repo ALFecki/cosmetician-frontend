@@ -64,7 +64,7 @@
                                             }
                                             @if (canRetryPayment() || canChangePaymentMethod()) {
                                                 <div class="payment-actions mt-3">
-                                                    @if (canRetryPayment() && (order | async)?.paymentMethod?.toLowerCase() === 'online') {
+                                                    <!-- @if (canRetryPayment() && (order | async)?.paymentMethod?.toLowerCase() === 'online') {
                                                         <button
                                                             class="btn btn-retry-payment me-2"
                                                             (click)="retryPayment()"
@@ -76,7 +76,7 @@
                                                             }
                                                             Повторить оплату
                                                         </button>
-                                                    }
+                                                    } -->
 
                                                     @if (canChangePaymentMethod()) {
                                                         <button

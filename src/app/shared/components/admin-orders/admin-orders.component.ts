@@ -264,7 +264,7 @@ export class AdminOrdersComponent implements OnInit {
 
         this.updatingStatus = true;
         try {
-            await this.orderService.updateStatus(order.id, newStatus).toPromise();
+            await this.orderService.updateStatus(order.personId, order.id, newStatus).toPromise();
             order.status = newStatus;
             this.toastService.show('Статус заказа успешно обновлен', 'success');
         } catch (error) {

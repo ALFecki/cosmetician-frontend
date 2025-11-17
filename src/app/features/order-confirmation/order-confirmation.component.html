@@ -1,384 +1,319 @@
 <div class="container my-4">
     @if (loading) {
-        <div class="text-center my-5">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Загрузка...</span>
-            </div>
+    <div class="text-center my-5">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Загрузка...</span>
         </div>
+    </div>
     }
 
     @if (!loading) {
-        <div class="order-confirmation-page">
-            <div class="page-header mb-3">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <h1 class="page-title">
-                            <i-bs name="check-circle-fill" class="text-success me-2"></i-bs>
-                            Подтверждение заказа
-                        </h1>
-                        <p class="page-subtitle">Проверьте данные и подтвердите заказ</p>
-                    </div>
-                    <button class="btn btn-outline-secondary btn-sm" (click)="goBackToCart()">
-                        <i class="bi bi-arrow-left me-1"></i>
-                        К корзине
-                    </button>
+    <div class="order-confirmation-page">
+        <div class="page-header mb-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h1 class="page-title">
+                        <i-bs name="check-circle-fill" class="text-success me-2"></i-bs>
+                        Подтверждение заказа
+                    </h1>
+                    <p class="page-subtitle">Проверьте данные и подтвердите заказ</p>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-4 order-lg-2 mb-3">
-                    <div class="order-summary-sticky">
-                        <div class="order-summary-card">
-                            <h5 class="summary-title">
-                                <i class="bi bi-bag-check me-2"></i>
-                                Состав заказа
-                            </h5>
-                            @if (cartItems$ | async; as cartItems) {
-                                <div class="order-items">
-                                    @for (item of cartItems; track item) {
-                                        <div class="order-item">
-                                            <img [src]="item.product.image | imageUrl" [alt]="item.product.title" class="item-image" />
-                                            <div class="item-details">
-                                                <a type="button" class="item-title" [routerLink]="['/product', item.product.id]">
-                                                    {{ item.product.title }}
-                                                </a>
-                                                <div class="item-meta">
-                                                    <span class="item-quantity"
-                                                        >{{ item.quantity }} × {{ item.variant.price | number: '1.2-2' }} р.</span
-                                                    >
-                                                    <span class="item-volume">{{ item.variant.volume }} мл</span>
-                                                </div>
-                                            </div>
-                                            <div class="item-total">{{ item.variant.price * item.quantity | number: '1.2-2' }} р.</div>
-                                        </div>
-                                    }
-                                </div>
-                            }
-                            <div class="order-totals">
-                                <div class="total-row">
-                                    <span>Товары:</span>
-                                    <span>{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
-                                </div>
-                                <div class="total-row">
-                                    <span>Доставка:</span>
-                                    <span>{{ getDeliveryPrice() | number: '1.2-2' }} р.</span>
-                                </div>
-                                <div class="total-row final-total">
-                                    <span>Итого:</span>
-                                    <span>{{ getTotalWithDelivery() | number: '1.2-2' }} р.</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-8 order-lg-1">
-                    <form [formGroup]="confirmationForm" (ngSubmit)="confirmOrder()">
-                        <div class="form-section mb-3">
-                            <h5 class="section-title">
-                                <i class="bi bi-person me-2"></i>
-                                Контактные данные
-                            </h5>
-                            <div class="row g-2">
-                                <div class="col-md-6">
-                                    <label for="firstName" class="form-label">Имя *</label>
-                                    <input
-                                        type="text"
-                                        class="form-control form-control-sm"
-                                        id="firstName"
-                                        formControlName="firstName"
-                                        [class.is-invalid]="getFieldError('firstName')"
-                                    />
-                                    @if (getFieldError('firstName')) {
-                                        <div class="invalid-feedback">
-                                            {{ getFieldError('firstName') }}
-                                        </div>
-                                    }
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="lastName" class="form-label">Фамилия *</label>
-                                    <input
-                                        type="text"
-                                        class="form-control form-control-sm"
-                                        id="lastName"
-                                        formControlName="lastName"
-                                        [class.is-invalid]="getFieldError('lastName')"
-                                    />
-                                    @if (getFieldError('lastName')) {
-                                        <div class="invalid-feedback">
-                                            {{ getFieldError('lastName') }}
-                                        </div>
-                                    }
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="email" class="form-label">Email *</label>
-                                    <input
-                                        type="email"
-                                        class="form-control form-control-sm"
-                                        id="email"
-                                        formControlName="email"
-                                        [class.is-invalid]="getFieldError('email')"
-                                    />
-                                    @if (getFieldError('email')) {
-                                        <div class="invalid-feedback">
-                                            {{ getFieldError('email') }}
-                                        </div>
-                                    }
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="phone" class="form-label">Телефон *</label>
-                                    <input
-                                        type="tel"
-                                        class="form-control form-control-sm"
-                                        id="phone"
-                                        formControlName="phone"
-                                        placeholder="+375 (29) 999-99-99"
-                                        [class.is-invalid]="getFieldError('phone')"
-                                    />
-                                    @if (getFieldError('phone')) {
-                                        <div class="invalid-feedback">
-                                            {{ getFieldError('phone') }}
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-section mb-3">
-                            <h5 class="section-title">
-                                <i class="bi bi-truck me-2"></i>
-                                Способ доставки
-                            </h5>
-                            <div class="delivery-methods">
-                                <label class="form-check delivery-option" for="standart">
-                                    <input
-                                        class="form-check-input"
-                                        type="radio"
-                                        value="standart"
-                                        id="standart"
-                                        formControlName="deliveryMethod"
-                                    />
-                                    <div class="option-content">
-                                        <div class="option-title">Стандартная</div>
-                                        <div class="option-description">
-                                            Сегодня - завтра • 10-15 р. в зависимости от местоположения (от 250 р. бесплатно)
-                                        </div>
-                                    </div>
-                                </label>
-                                <label class="form-check delivery-option" for="post">
-                                    <input class="form-check-input" type="radio" value="post" id="post" formControlName="deliveryMethod" />
-                                    <div class="option-content">
-                                        <div class="option-title">Европочта</div>
-                                        <div class="option-description">До 3 дней • По тарифам Европочты(от 250 р. бесплатно)</div>
-                                    </div>
-                                </label>
-                                <label class="form-check delivery-option" for="pickup">
-                                    <input
-                                        class="form-check-input"
-                                        type="radio"
-                                        value="pickup"
-                                        id="pickup"
-                                        formControlName="deliveryMethod"
-                                    />
-                                    <div class="option-content">
-                                        <div class="option-title">Самовывоз</div>
-                                        <div class="option-description">Бесплатно. г. Минск, ул. Ульяновская, 4</div>
-                                    </div>
-                                </label>
-                            </div>
-                            @if (confirmationForm.get('deliveryMethod')?.value === 'post') {
-                                <div class="post-placement-select mt-2">
-                                    <label for="postPlacement" class="form-label">Пункт выдачи</label>
-                                    <div class="custom-dropdown-container position-relative">
-                                        <input
-                                            type="text"
-                                            class="form-control form-control-sm"
-                                            id="postPlacement"
-                                            formControlName="postPlacementFilter"
-                                            placeholder="Введите адрес..."
-                                            (focus)="onFilterFocus()"
-                                            (blur)="onFilterBlur()"
-                                            [class.is-invalid]="getFieldError('postPlacementFilter')"
-                                            autocomplete="off"
-                                        />
-                                        @if (showDropdown && (filteredPostPlacements$ | async)?.length) {
-                                            <div class="dropdown-list">
-                                                @for (placement of filteredPostPlacements$ | async; track placement.id) {
-                                                    <div
-                                                        class="dropdown-item"
-                                                        tabindex="0"
-                                                        role="button"
-                                                        (click)="selectPostPlacement(placement)"
-                                                        (keyup.enter)="selectPostPlacement(placement)"
-                                                        (keyup.space)="selectPostPlacement(placement)"
-                                                    >
-                                                        <strong>Отделение №{{ placement.number }}</strong>
-                                                        <div class="placement-address">{{ placement.address }}</div>
-                                                    </div>
-                                                }
-                                            </div>
-                                        }
-                                        @if (showDropdown && (filteredPostPlacements$ | async)?.length === 0) {
-                                            <div class="dropdown-list">
-                                                <div class="dropdown-item no-results">Ничего не найдено</div>
-                                            </div>
-                                        }
-                                    </div>
-                                    @if (getFieldError('postPlacementFilter')) {
-                                        <div class="invalid-feedback">
-                                            {{ getFieldError('postPlacementFilter') }}
-                                        </div>
-                                    }
-
-                                    <div class="courier-delivery-option mt-2">
-                                        <input
-                                            type="checkbox"
-                                            id="courierDelivery"
-                                            formControlName="courierDelivery"
-                                            class="form-check-input"
-                                        />
-                                        <label for="courierDelivery" class="form-check-label">Курьер до двери (+10 р.)</label>
-                                    </div>
-                                </div>
-                            }
-                            @if (
-                                confirmationForm.get('deliveryMethod')?.value === 'standart' ||
-                                (confirmationForm.get('deliveryMethod')?.value === 'post' && confirmationForm.get('courierDelivery')?.value)
-                            ) {
-                                <div class="address-fields mt-2">
-                                    <div class="row g-2">
-                                        <div class="col-md-6">
-                                            <label for="city" class="form-label">Город *</label>
-                                            <input
-                                                type="text"
-                                                class="form-control form-control-sm"
-                                                id="city"
-                                                formControlName="city"
-                                                [class.is-invalid]="getFieldError('city')"
-                                            />
-                                            @if (getFieldError('city')) {
-                                                <div class="invalid-feedback">
-                                                    {{ getFieldError('city') }}
-                                                </div>
-                                            }
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="street" class="form-label">Улица *</label>
-                                            <input
-                                                type="text"
-                                                class="form-control form-control-sm"
-                                                id="street"
-                                                formControlName="street"
-                                                [class.is-invalid]="getFieldError('street')"
-                                            />
-                                            @if (getFieldError('street')) {
-                                                <div class="invalid-feedback">
-                                                    {{ getFieldError('street') }}
-                                                </div>
-                                            }
-                                        </div>
-                                        <div class="col-4 col-md-4">
-                                            <label for="house" class="form-label">Дом *</label>
-                                            <input
-                                                type="text"
-                                                class="form-control form-control-sm"
-                                                id="house"
-                                                formControlName="house"
-                                                [class.is-invalid]="getFieldError('house')"
-                                            />
-                                            @if (getFieldError('house')) {
-                                                <div class="invalid-feedback">
-                                                    {{ getFieldError('house') }}
-                                                </div>
-                                            }
-                                        </div>
-                                        <div class="col-4 col-md-4">
-                                            <label for="building" class="form-label">Корпус</label>
-                                            <input
-                                                type="text"
-                                                class="form-control form-control-sm"
-                                                id="building"
-                                                formControlName="building"
-                                                [class.is-invalid]="getFieldError('building')"
-                                            />
-                                            @if (getFieldError('building')) {
-                                                <div class="invalid-feedback">
-                                                    {{ getFieldError('building') }}
-                                                </div>
-                                            }
-                                        </div>
-                                        <div class="col-4 col-md-4">
-                                            <label for="apartment" class="form-label">Квартира *</label>
-                                            <input
-                                                type="text"
-                                                class="form-control form-control-sm"
-                                                id="apartment"
-                                                formControlName="apartment"
-                                                [class.is-invalid]="getFieldError('apartment')"
-                                            />
-                                            @if (getFieldError('apartment')) {
-                                                <div class="invalid-feedback">
-                                                    {{ getFieldError('apartment') }}
-                                                </div>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                        <div class="form-section mb-3">
-                            <h5 class="section-title">
-                                <i class="bi bi-credit-card me-2"></i>
-                                Оплата
-                            </h5>
-                            <div class="payment-methods">
-                                <div class="form-check payment-option">
-                                    <input
-                                        class="form-check-input"
-                                        type="radio"
-                                        value="online"
-                                        id="online"
-                                        formControlName="paymentMethod"
-                                    />
-                                    <label class="form-check-label" for="online"> Онлайн картой </label>
-                                </div>
-                                <div class="form-check payment-option">
-                                    <input class="form-check-input" type="radio" value="card" id="card" formControlName="paymentMethod" />
-                                    <label class="form-check-label" for="card"> Картой при получении </label>
-                                </div>
-                                <div class="form-check payment-option">
-                                    <input class="form-check-input" type="radio" value="cash" id="cash" formControlName="paymentMethod" />
-                                    <label class="form-check-label" for="cash"> Наличными </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-section mb-3">
-                            <h5 class="section-title">
-                                <i class="bi bi-chat-text me-2"></i>
-                                Комментарий
-                            </h5>
-                            <textarea
-                                class="form-control form-control-sm"
-                                id="comments"
-                                formControlName="comments"
-                                rows="2"
-                                placeholder="Дополнительные пожелания..."
-                            ></textarea>
-                        </div>
-                    </form>
-                    <button
-                        type="button"
-                        class="btn btn-primary w-100"
-                        (click)="confirmOrder()"
-                        [disabled]="isSubmitting || confirmationForm.invalid"
-                    >
-                        @if (isSubmitting) {
-                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                        }
-                        @if (!isSubmitting) {
-                            <i class="bi bi-check-lg me-2"></i>
-                        }
-                        {{ isSubmitting ? 'Оформляем...' : 'Подтвердить заказ' }}
-                    </button>
-                </div>
+                <button class="btn btn-outline-secondary btn-sm" (click)="goBackToCart()">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    К корзине
+                </button>
             </div>
         </div>
+        <div class="row">
+            <div class="col-lg-4 order-lg-2 mb-3">
+                <div class="order-summary-sticky">
+                    <div class="order-summary-card">
+                        <h5 class="summary-title">
+                            <i class="bi bi-bag-check me-2"></i>
+                            Состав заказа
+                        </h5>
+                        @if (cartItems$ | async; as cartItems) {
+                        <div class="order-items">
+                            @for (item of cartItems; track item) {
+                            <div class="order-item">
+                                <img [src]="item.product.image | imageUrl" [alt]="item.product.title"
+                                    class="item-image" />
+                                <div class="item-details">
+                                    <a type="button" class="item-title" [routerLink]="['/product', item.product.id]">
+                                        {{ item.product.title }}
+                                    </a>
+                                    <div class="item-meta">
+                                        <span class="item-quantity">{{ item.quantity }} × {{ item.variant.price |
+                                            number: '1.2-2' }} р.</span>
+                                        <span class="item-volume">{{ item.variant.volume }} мл</span>
+                                    </div>
+                                </div>
+                                <div class="item-total">{{ item.variant.price * item.quantity | number: '1.2-2' }} р.
+                                </div>
+                            </div>
+                            }
+                        </div>
+                        }
+                        <div class="order-totals">
+                            <div class="total-row">
+                                <span>Товары:</span>
+                                <span>{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
+                            </div>
+                            <div class="total-row">
+                                <span>Доставка:</span>
+                                @if (this.currentOrder?.totalPrice && this.currentOrder!.totalPrice >= 250) {
+                                <span>Бесплатно</span>
+                                }
+                                @else if (this.confirmationForm.get('deliveryMethod')?.value === 'pickup') {
+                                <span>Бесплатно</span>
+                                } @else if (this.confirmationForm.get('deliveryMethod')?.value === 'post' &&
+                                this.confirmationForm.get('courierDelivery')?.value) {
+                                <span>По тарифам Европочты + 10 р.</span>
+                                } @else if (this.confirmationForm.get('deliveryMethod')?.value === 'post') {
+                                <span>По тарифам Европочты</span>
+                                }
+                                @else {
+                                <span>{{ getDeliveryPrice() | number: '1.2-2' }} р.</span>
+                                }
+                            </div>
+                            <div class="total-row final-total">
+                                <span>Итого:</span>
+                                <span>{{ getTotalWithDelivery() | number: '1.2-2' }} р.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 order-lg-1">
+                <form [formGroup]="confirmationForm" (ngSubmit)="confirmOrder()">
+                    <div class="form-section mb-3">
+                        <h5 class="section-title">
+                            <i class="bi bi-person me-2"></i>
+                            Контактные данные
+                        </h5>
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label for="firstName" class="form-label">Имя *</label>
+                                <input type="text" class="form-control form-control-sm" id="firstName"
+                                    formControlName="firstName" [class.is-invalid]="getFieldError('firstName')" />
+                                @if (getFieldError('firstName')) {
+                                <div class="invalid-feedback">
+                                    {{ getFieldError('firstName') }}
+                                </div>
+                                }
+                            </div>
+                            <div class="col-md-6">
+                                <label for="lastName" class="form-label">Фамилия *</label>
+                                <input type="text" class="form-control form-control-sm" id="lastName"
+                                    formControlName="lastName" [class.is-invalid]="getFieldError('lastName')" />
+                                @if (getFieldError('lastName')) {
+                                <div class="invalid-feedback">
+                                    {{ getFieldError('lastName') }}
+                                </div>
+                                }
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control form-control-sm" id="email"
+                                    formControlName="email" [class.is-invalid]="getFieldError('email')" />
+                                @if (getFieldError('email')) {
+                                <div class="invalid-feedback">
+                                    {{ getFieldError('email') }}
+                                </div>
+                                }
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label">Телефон *</label>
+                                <input type="tel" class="form-control form-control-sm" id="phone"
+                                    formControlName="phone" placeholder="+375 (29) 999-99-99"
+                                    [class.is-invalid]="getFieldError('phone')" />
+                                @if (getFieldError('phone')) {
+                                <div class="invalid-feedback">
+                                    {{ getFieldError('phone') }}
+                                </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-section mb-3">
+                        <h5 class="section-title">
+                            <i class="bi bi-truck me-2"></i>
+                            Способ доставки
+                        </h5>
+                        <div class="delivery-methods">
+                            <label class="form-check delivery-option" for="standart">
+                                <input class="form-check-input" type="radio" value="standart" id="standart"
+                                    formControlName="deliveryMethod" />
+                                <div class="option-content">
+                                    <div class="option-title">Стандартная</div>
+                                    <div class="option-description">
+                                        Сегодня - завтра • 10 р. (от 250 р. бесплатно)
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="form-check delivery-option" for="post">
+                                <input class="form-check-input" type="radio" value="post" id="post"
+                                    formControlName="deliveryMethod" />
+                                <div class="option-content">
+                                    <div class="option-title">Европочта</div>
+                                    <div class="option-description">До 3 дней • По тарифам Европочты(от 250 р.
+                                        бесплатно)</div>
+                                </div>
+                            </label>
+                            <label class="form-check delivery-option" for="pickup">
+                                <input class="form-check-input" type="radio" value="pickup" id="pickup"
+                                    formControlName="deliveryMethod" />
+                                <div class="option-content">
+                                    <div class="option-title">Самовывоз</div>
+                                    <div class="option-description">Бесплатно. г. Минск, ул. Ульяновская, 4</div>
+                                </div>
+                            </label>
+                        </div>
+                        @if (confirmationForm.get('deliveryMethod')?.value === 'post') {
+                        <div class="post-placement-select mt-2">
+                            <label for="postPlacement" class="form-label">Пункт выдачи</label>
+                            <div class="custom-dropdown-container position-relative">
+                                <input type="text" class="form-control form-control-sm" id="postPlacement"
+                                    formControlName="postPlacementFilter" placeholder="Введите адрес..."
+                                    (focus)="onFilterFocus()" (blur)="onFilterBlur()"
+                                    [class.is-invalid]="getFieldError('postPlacementFilter')" autocomplete="off" />
+                                @if (showDropdown && (filteredPostPlacements$ | async)?.length) {
+                                <div class="dropdown-list">
+                                    @for (placement of filteredPostPlacements$ | async; track placement.id) {
+                                    <div class="dropdown-item" tabindex="0" role="button"
+                                        (click)="selectPostPlacement(placement)"
+                                        (keyup.enter)="selectPostPlacement(placement)"
+                                        (keyup.space)="selectPostPlacement(placement)">
+                                        <strong>Отделение №{{ placement.number }}</strong>
+                                        <div class="placement-address">{{ placement.address }}</div>
+                                    </div>
+                                    }
+                                </div>
+                                }
+                                @if (showDropdown && (filteredPostPlacements$ | async)?.length === 0) {
+                                <div class="dropdown-list">
+                                    <div class="dropdown-item no-results">Ничего не найдено</div>
+                                </div>
+                                }
+                            </div>
+                            @if (getFieldError('postPlacementFilter')) {
+                            <div class="invalid-feedback">
+                                {{ getFieldError('postPlacementFilter') }}
+                            </div>
+                            }
+
+                            <div class="courier-delivery-option mt-2">
+                                <input type="checkbox" id="courierDelivery" formControlName="courierDelivery"
+                                    class="form-check-input" />
+                                <label for="courierDelivery" class="form-check-label">Курьер до двери (+10 р.)</label>
+                            </div>
+                        </div>
+                        }
+                        @if (
+                        confirmationForm.get('deliveryMethod')?.value === 'standart' ||
+                        (confirmationForm.get('deliveryMethod')?.value === 'post' &&
+                        confirmationForm.get('courierDelivery')?.value)
+                        ) {
+                        <div class="address-fields mt-2">
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label for="city" class="form-label">Город *</label>
+                                    <input type="text" class="form-control form-control-sm" id="city"
+                                        formControlName="city" [class.is-invalid]="getFieldError('city')" />
+                                    @if (getFieldError('city')) {
+                                    <div class="invalid-feedback">
+                                        {{ getFieldError('city') }}
+                                    </div>
+                                    }
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="street" class="form-label">Улица *</label>
+                                    <input type="text" class="form-control form-control-sm" id="street"
+                                        formControlName="street" [class.is-invalid]="getFieldError('street')" />
+                                    @if (getFieldError('street')) {
+                                    <div class="invalid-feedback">
+                                        {{ getFieldError('street') }}
+                                    </div>
+                                    }
+                                </div>
+                                <div class="col-4 col-md-4">
+                                    <label for="house" class="form-label">Дом *</label>
+                                    <input type="text" class="form-control form-control-sm" id="house"
+                                        formControlName="house" [class.is-invalid]="getFieldError('house')" />
+                                    @if (getFieldError('house')) {
+                                    <div class="invalid-feedback">
+                                        {{ getFieldError('house') }}
+                                    </div>
+                                    }
+                                </div>
+                                <div class="col-4 col-md-4">
+                                    <label for="building" class="form-label">Корпус</label>
+                                    <input type="text" class="form-control form-control-sm" id="building"
+                                        formControlName="building" [class.is-invalid]="getFieldError('building')" />
+                                    @if (getFieldError('building')) {
+                                    <div class="invalid-feedback">
+                                        {{ getFieldError('building') }}
+                                    </div>
+                                    }
+                                </div>
+                                <div class="col-4 col-md-4">
+                                    <label for="apartment" class="form-label">Квартира *</label>
+                                    <input type="text" class="form-control form-control-sm" id="apartment"
+                                        formControlName="apartment" [class.is-invalid]="getFieldError('apartment')" />
+                                    @if (getFieldError('apartment')) {
+                                    <div class="invalid-feedback">
+                                        {{ getFieldError('apartment') }}
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    <div class="form-section mb-3">
+                        <h5 class="section-title">
+                            <i class="bi bi-credit-card me-2"></i>
+                            Оплата
+                        </h5>
+                        <div class="payment-methods">
+                            <div class="form-check payment-option">
+                                <input class="form-check-input" type="radio" value="online" id="online"
+                                    formControlName="paymentMethod" />
+                                <label class="form-check-label" for="online"> Онлайн картой </label>
+                            </div>
+                            <div class="form-check payment-option">
+                                <input class="form-check-input" type="radio" value="card" id="card"
+                                    formControlName="paymentMethod" />
+                                <label class="form-check-label" for="card"> Картой при получении </label>
+                            </div>
+                            <div class="form-check payment-option">
+                                <input class="form-check-input" type="radio" value="cash" id="cash"
+                                    formControlName="paymentMethod" />
+                                <label class="form-check-label" for="cash"> Наличными </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-section mb-3">
+                        <h5 class="section-title">
+                            <i class="bi bi-chat-text me-2"></i>
+                            Комментарий
+                        </h5>
+                        <textarea class="form-control form-control-sm" id="comments" formControlName="comments" rows="2"
+                            placeholder="Дополнительные пожелания..."></textarea>
+                    </div>
+                </form>
+                <button type="button" class="btn btn-primary w-100" (click)="confirmOrder()"
+                    [disabled]="isSubmitting || confirmationForm.invalid">
+                    @if (isSubmitting) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    }
+                    @if (!isSubmitting) {
+                    <i class="bi bi-check-lg me-2"></i>
+                    }
+                    {{ isSubmitting ? 'Оформляем...' : 'Подтвердить заказ' }}
+                </button>
+            </div>
+        </div>
+    </div>
     }
 </div>

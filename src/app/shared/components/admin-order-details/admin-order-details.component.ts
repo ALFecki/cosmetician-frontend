@@ -106,7 +106,7 @@ export class AdminOrderDetailsComponent implements OnInit {
 
         this.updatingStatus = true;
         try {
-            await this.orderService.updateStatus(currentOrder.id, newStatus).toPromise();
+            await this.orderService.updateStatus(currentOrder.personId, currentOrder.id, newStatus).toPromise();
             currentOrder.status = newStatus;
             this.order.next(currentOrder);
             this.toastService.show('Статус заказа успешно обновлен', 'success');

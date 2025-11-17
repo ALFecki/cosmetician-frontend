@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
 import { IconsModule } from '../../shared/base/icons/icons.module';
 import { ListResponse } from '../../shared/base/schemas/base_schema';
 import { OrderModel, OrderProductModel } from '../../shared/models/order.model';
@@ -220,6 +220,7 @@ export class OrderConfirmationComponent implements OnInit {
             paymentMethod: this.confirmationForm.get('paymentMethod')?.value,
             deliveryAddress: deliveryAddress,
             deliveryPostAddress: postAddress,
+            deliveryCost: this.getDeliveryPrice(),
             comment: this.confirmationForm.get('comments')?.value,
         } as UpdateOrderSchema);
 
@@ -229,7 +230,10 @@ export class OrderConfirmationComponent implements OnInit {
             if (result) {
                 this.toastService.show('Заказ успешно оформлен!', 'success');
                 if (this.confirmationForm.get('paymentMethod')?.value === 'online') {
-                    const paymentResponse = await this.paymentService.processPayment(this.currentOrder!).toPromise();
+                    const orderMinimal = await firstValueFrom(
+                        this.orderService.getMinimalById(this.currentOrder!.id)
+                    );
+                    const paymentResponse = await this.paymentService.processPayment(orderMinimal!).toPromise();
                     if (paymentResponse && paymentResponse.formUrl) {
                         window.location.href = paymentResponse.formUrl;
                         this.orderService.update(this.currentOrder!.id, { paymentStatus: 'Processing' } as UpdateOrderSchema);
@@ -292,11 +296,19 @@ export class OrderConfirmationComponent implements OnInit {
     }
 
     getDeliveryPrice(): number {
+        if (this.currentOrder?.totalPrice && this.currentOrder.totalPrice >= 250) {
+            return 0;
+        }
         const method = this.confirmationForm.get('deliveryMethod')?.value;
         switch (method) {
-            case 'express':
-                return 15;
+            case 'standart':
+                return 10;
             case 'pickup':
+                return 0;
+            case 'post':
+                if (this.confirmationForm.get('courierDelivery')?.value) {
+                    return 10;
+                }
                 return 0;
             default:
                 return 5;
