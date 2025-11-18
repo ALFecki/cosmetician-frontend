@@ -36,7 +36,7 @@
                                     <div class="col-lg-6 mb-3 mb-lg-0">
                                         <div class="order-number-wrapper">
                                             <span class="order-label">Заказ</span>
-                                            <h5 class="order-number">№{{ (order | async)?.id }}</h5>
+                                            <h5 class="order-number">№{{ (order | async)?.orderId ?? (order | async)?.id }}</h5>
                                             <div class="order-date">
                                                 <i class="bi bi-calendar3 me-2"></i>
                                                 {{ (order | async)?.createdAt | date: 'dd MMMM yyyy, HH:mm' }}

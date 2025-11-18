@@ -51,7 +51,7 @@
                                     <tbody>
                                         @for (order of orders; track order) {
                                             <tr class="order-row">
-                                                <td class="order-id">#{{ order.id }}</td>
+                                                <td class="order-id">#{{ order.orderId ?? order.id }}</td>
                                                 <td>{{ order.createdAt | date: 'dd.MM.yyyy HH:mm' }}</td>
                                                 <td class="order-price">{{ order.totalPrice | number: '1.2-2' }} р.</td>
                                                 <td>

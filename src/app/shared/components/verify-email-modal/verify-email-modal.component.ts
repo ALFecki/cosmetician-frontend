@@ -86,6 +86,7 @@ export class VerifyEmailModalComponent {
             },
             complete: () => {
                 this.isVerifyingEmail = false;
+                window.location.reload();
             },
         });
     }

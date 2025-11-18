@@ -3,6 +3,7 @@ import { ProductModel, ProductVariantModel } from './product.model';
 export interface OrderMinimalModel {
     id: string;
     personId: string;
+    orderId: string | null;
     status: string;
     paymentStatus: string;
     paymentId: string | null;
