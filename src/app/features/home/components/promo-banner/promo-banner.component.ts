@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
     styleUrl: './promo-banner.component.scss',
 })
 export class PromoBannerComponent {
-    constructor(private router: Router) { }
+    constructor(private router: Router) {}
 
     navigateToPromotions(): void {
         this.router.navigate(['/products'], { queryParams: { promo: 'true' } });
