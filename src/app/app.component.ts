@@ -42,9 +42,7 @@ export class AppComponent {
         private viewportScroller: ViewportScroller,
         @Inject(PLATFORM_ID) private platformId: object,
     ) {
-        this.router.events.pipe(
-            filter(event => event instanceof NavigationEnd)
-        ).subscribe(() => {
+        this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe(() => {
             if (isPlatformBrowser(this.platformId)) {
                 setTimeout(() => {
                     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -85,7 +83,7 @@ export class AppComponent {
                 document.documentElement.scrollTop = 0;
 
                 const scrollableElements = document.querySelectorAll('*');
-                scrollableElements.forEach((el) => {
+                scrollableElements.forEach(el => {
                     const element = el as HTMLElement;
                     if (element.scrollTop && element.scrollTop > 0) {
                         element.scrollTop = 0;

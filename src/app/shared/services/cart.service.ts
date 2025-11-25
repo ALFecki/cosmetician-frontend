@@ -1,10 +1,10 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, debounceTime, map, Observable, Subject } from 'rxjs';
 import { CartModel } from '../models/cart.model';
+import { LoginResponse } from '../models/login.interface';
+import { OrderModel } from '../models/order.model';
 import { AuthService } from './auth.service';
 import { OrderService } from './order.service';
-import { OrderModel } from '../models/order.model';
-import { LoginResponse } from '../models/login.interface';
 
 @Injectable({
     providedIn: 'root',
@@ -12,6 +12,7 @@ import { LoginResponse } from '../models/login.interface';
 export class CartService implements OnDestroy {
     private cartItemsSubject = new BehaviorSubject<CartModel[]>([]);
     private totalPriceSubject = new BehaviorSubject<number>(0);
+    private discountAmountSubject = new BehaviorSubject<number>(0);
     private quantitySubject = new Subject<CartModel[]>();
     private pendingUpdates: CartModel[] = [];
 
@@ -49,10 +50,11 @@ export class CartService implements OnDestroy {
                     product: item.product,
                     variant: item.variant,
                     quantity: item.quantity,
-                    totalPrice: item.quantity * item.variant.price,
+                    totalPrice: order.totalPrice,
                 }));
                 this.cartItemsSubject.next(updatedItems);
                 this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
+                this.discountAmountSubject.next(Number((order.discountAmount || 0).toFixed(2)));
             }
 
             this.pendingUpdates = [];
@@ -83,10 +85,11 @@ export class CartService implements OnDestroy {
                             product: item.product,
                             variant: item.variant,
                             quantity: item.quantity,
-                            totalPrice: item.quantity * item.variant.price,
+                            totalPrice: order.totalPrice,
                         }));
                         this.cartItemsSubject.next(items);
                         this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
+                        this.discountAmountSubject.next(Number((order.discountAmount || 0).toFixed(2)));
                     }
                 }
             },
@@ -112,6 +115,17 @@ export class CartService implements OnDestroy {
         return this.totalPriceSubject.asObservable();
     }
 
+    getDiscountAmount(): Observable<number> {
+        return this.discountAmountSubject.asObservable();
+    }
+
+    getTotalWithoutDiscount(): Observable<number> {
+        return new Observable<number>(observer => {
+            observer.next(this.totalPriceSubject.value + this.discountAmountSubject.value);
+            observer.complete();
+        });
+    }
+
     async addProductToCart(variantId: string): Promise<void> {
         const order = await this.orderService.addProductToOrder(variantId);
         if (order) {
@@ -119,10 +133,11 @@ export class CartService implements OnDestroy {
                 product: item.product,
                 variant: item.variant,
                 quantity: item.quantity,
-                totalPrice: item.quantity * item.variant.price,
+                totalPrice: order.totalPrice,
             }));
             this.cartItemsSubject.next(updatedItems);
             this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
+            this.discountAmountSubject.next(Number((order.discountAmount || 0).toFixed(2)));
             this.updateTotalPrice(updatedItems);
         } else {
             console.error('Error adding product to cart');
@@ -185,10 +200,11 @@ export class CartService implements OnDestroy {
                 product: item.product,
                 variant: item.variant,
                 quantity: item.quantity,
-                totalPrice: item.quantity * item.variant.price,
+                totalPrice: order.totalPrice,
             }));
             this.cartItemsSubject.next(updatedItems);
             this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
+            this.discountAmountSubject.next(Number((order.discountAmount || 0).toFixed(2)));
         }
     }
 
@@ -201,6 +217,7 @@ export class CartService implements OnDestroy {
         await this.orderService.syncOrder();
         this.cartItemsSubject.next([]);
         this.totalPriceSubject.next(0);
+        this.discountAmountSubject.next(0);
     }
 
     async checkout(withPayment = false): Promise<OrderModel | null> {
@@ -208,6 +225,7 @@ export class CartService implements OnDestroy {
         if (order) {
             this.cartItemsSubject.next([]);
             this.totalPriceSubject.next(0);
+            this.discountAmountSubject.next(0);
             this.pendingUpdates = [];
         } else {
             console.error('Error during checkout');
@@ -219,5 +237,6 @@ export class CartService implements OnDestroy {
         this.quantitySubject.complete();
         this.cartItemsSubject.complete();
         this.totalPriceSubject.complete();
+        this.discountAmountSubject.complete();
     }
 }

@@ -1,0 +1,52 @@
+<div
+    class="promo-banner"
+    (click)="navigateToPromotions()"
+    tabindex="0"
+    role="button"
+    (keydown.enter)="navigateToPromotions()"
+    (keydown.space)="navigateToPromotions(); $event.preventDefault()"
+>
+    <div class="promo-banner-overlay"></div>
+    <div class="promo-banner-content">
+        <div class="promo-banner-badge">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <circle cx="12" cy="8" r="6"></circle>
+                <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path>
+            </svg>
+            <span>АКЦИЯ</span>
+        </div>
+        <h2 class="promo-banner-title">Черная пятница для бренда Germaine de Capuccini</h2>
+        <p class="promo-banner-description">Скидки до 30% на наборы бренда Germaine de Capuccini только до 28.11.2025</p>
+        <div class="promo-banner-cta">
+            <span class="promo-banner-link">Посмотреть товары</span>
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+        </div>
+    </div>
+    <div class="promo-banner-decoration">
+        <div class="promo-banner-circle promo-banner-circle-1"></div>
+        <div class="promo-banner-circle promo-banner-circle-2"></div>
+        <div class="promo-banner-circle promo-banner-circle-3"></div>
+    </div>
+</div>

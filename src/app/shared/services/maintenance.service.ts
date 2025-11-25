@@ -16,7 +16,7 @@ export class MaintenanceService {
 
     private statusTimeoutMs = 5000;
 
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient) {}
 
     setStatusTimeout(seconds: number): void {
         this.statusTimeoutMs = Math.max(0, Math.floor(seconds)) * 1000;

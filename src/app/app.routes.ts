@@ -92,7 +92,8 @@ export const routes: Routes = [
     },
     {
         path: 'admin/order/:id',
-        loadComponent: () => import('./shared/components/admin-order-details/admin-order-details.component').then(m => m.AdminOrderDetailsComponent),
+        loadComponent: () =>
+            import('./shared/components/admin-order-details/admin-order-details.component').then(m => m.AdminOrderDetailsComponent),
         canActivate: [AuthGuard, AdminGuard],
         title: 'Детали заказа - Админ',
     },

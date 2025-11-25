@@ -161,6 +161,14 @@
                                     </table>
                                 </div>
                                 <div class="order-total">
+                                    @if ((order | async)?.discountAmount && (order | async)?.discountAmount! > 0) {
+                                        <div class="total-row discount-row">
+                                            <span class="total-label">Скидка:</span>
+                                            <span class="total-amount discount-amount"
+                                                >-{{ (order | async)?.discountAmount | number: '1.2-2' }} р.</span
+                                            >
+                                        </div>
+                                    }
                                     <div class="total-row">
                                         <span class="total-label">Итого к оплате:</span>
                                         <span class="total-amount">{{ (order | async)?.totalPrice | number: '1.2-2' }} р.</span>

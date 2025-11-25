@@ -1,6 +1,8 @@
 import { BrandModel } from './brand.model';
 import { CategoryModel } from './category.model';
 import { CountryModel } from './country.model';
+import { PromocodeModel } from './promocode.model';
+import { PromotionModel } from './promotion.model';
 
 export interface ProductModel {
     id: string;
@@ -18,8 +20,10 @@ export interface ProductModel {
     productTypeId: string;
     productType: ProductTypeModel;
     countries: CountryModel[];
-    categoryId: string;
     categories: CategoryModel[];
+
+    promotions: PromotionModel[];
+    promoCodes: PromocodeModel[];
 
     variants: ProductVariantModel[];
 

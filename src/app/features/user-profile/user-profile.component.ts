@@ -32,7 +32,7 @@ export class UserProfileComponent implements OnInit {
         private router: Router,
         private toastService: ToastService,
         private verifyEmailModalService: VerifyEmailModalService,
-    ) { }
+    ) {}
 
     ngOnInit(): void {
         this.authService.getCurrentUser().subscribe(
@@ -74,9 +74,8 @@ export class UserProfileComponent implements OnInit {
         const updatedUser: UpdatePersonSchema = {
             ...this.currentUser.value,
             ...this.profileForm.value,
-            isEmailVerified: this.currentUser.value!.email === this.profileForm.value.email
-                ? Boolean(this.currentUser.value?.isEmailVerified)
-                : false,
+            isEmailVerified:
+                this.currentUser.value!.email === this.profileForm.value.email ? Boolean(this.currentUser.value?.isEmailVerified) : false,
         };
 
         const result = await this.personService.update(this.currentUser.value!.id, updatedUser);

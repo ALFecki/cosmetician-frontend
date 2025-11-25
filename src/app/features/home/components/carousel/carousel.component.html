@@ -1,5 +1,4 @@
 <div id="carouselExample" class="carousel slide" (mouseenter)="pauseCarousel()" (mouseleave)="resumeCarousel()">
-    <!-- Background blur layer -->
     <div class="carousel-background">
         @for (slide of slides; track slide; let i = $index) {
             <div
@@ -16,17 +15,25 @@
                 @for (piece of puzzlePieces; track piece) {
                     <div class="puzzle-piece">
                         <div class="puzzle-inner">
-                            <img [src]="slide.image | imageUrl" alt="{{ slide.title }}" />
+                            <img [src]="slide.image! | imageUrl" alt="{{ slide.title }}" />
                         </div>
                     </div>
                 }
-                <div class="overlay">
-                    <div class="slide-content">
-                        <h2 class="slide-title">{{ slide.title }}</h2>
-                        <p class="slide-description">{{ slide.subtitle }}</p>
-                        <a type="button" class="btn btn-shop" href="{{ slide.buttonLink }}">{{ slide.buttonText }}</a>
+                @if (slide.isPromo) {
+                    <div class="overlay">
+                        <div class="promo-slide-container">
+                            <app-promo-banner></app-promo-banner>
+                        </div>
                     </div>
-                </div>
+                } @else {
+                    <div class="overlay">
+                        <div class="slide-content">
+                            <h2 class="slide-title">{{ slide.title }}</h2>
+                            <p class="slide-description">{{ slide.subtitle }}</p>
+                            <a type="button" class="btn btn-shop" href="{{ slide.buttonLink }}">{{ slide.buttonText }}</a>
+                        </div>
+                    </div>
+                }
             </div>
         }
     </div>

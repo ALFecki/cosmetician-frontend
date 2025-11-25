@@ -35,7 +35,20 @@
                                         {{ item.product.title }}
                                     </a>
                                     <div class="item-volume-modal">{{ item.variant.volume || '-' }} мл</div>
-                                    <div class="item-price-modal">{{ item.variant.price | number: '1.2-2' }} р.</div>
+                                    @let priceInfo = getItemPriceInfo(item);
+                                    @if (priceInfo.hasDiscount) {
+                                        <div class="item-price-with-discount-modal">
+                                            <span class="item-price-original-modal"
+                                                >{{ priceInfo.originalPrice | number: '1.2-2' }} р.</span
+                                            >
+                                            <span class="item-price-discounted-modal"
+                                                >{{ priceInfo.discountedPrice | number: '1.2-2' }} р.
+                                                <span class="discount-badge-modal">{{ priceInfo.discountLabel }}</span></span
+                                            >
+                                        </div>
+                                    } @else {
+                                        <div class="item-price-modal">{{ item.variant.price | number: '1.2-2' }} р.</div>
+                                    }
                                 </div>
                                 <button class="remove-btn-modal" type="button" (click)="removeProduct(item)" title="Удалить">
                                     <i-bs name="trash"></i-bs>
@@ -61,7 +74,7 @@
                                     />
                                     <button class="quantity-btn-modal" type="button" (click)="increaseQuantity(item)">+</button>
                                 </div>
-                                <div class="item-total-modal">{{ item.variant.price * item.quantity | number: '1.2-2' }} р.</div>
+                                <div class="item-total-modal">{{ getItemTotal(item) | number: '1.2-2' }} р.</div>
                             </div>
                         </div>
                     }
@@ -75,8 +88,14 @@
             <div class="cart-summary-modal">
                 <div class="summary-row-modal">
                     <span class="summary-label-modal">Товары: </span>
-                    <span class="summary-value-modal">{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
+                    <span class="summary-value-modal">{{ getTotalWithoutDiscount() | async | number: '1.2-2' }} р.</span>
                 </div>
+                @if ((discountAmount$ | async) && (discountAmount$ | async)! > 0) {
+                    <div class="summary-row-modal discount-row-modal">
+                        <span class="summary-label-modal">Скидка: </span>
+                        <span class="summary-value-modal discount-value">-{{ discountAmount$ | async | number: '1.2-2' }} р.</span>
+                    </div>
+                }
                 <div class="summary-row-modal">
                     <span class="summary-label-modal">Доставка:</span>
                     <span class="summary-value-modal">Рассчитается при оформлении</span>

@@ -1,0 +1,41 @@
+@if (promotions && promotions.length > 0) {
+    @if (variant === 'compact') {
+        <div class="promotion-badges-compact">
+            @for (promotion of promotions.slice(0, 2); track promotion.id) {
+                <span class="promotion-badge" [ngClass]="getBadgeClass(promotion)" [title]="promotion.title">
+                    <span class="badge-icon">🔥</span>
+                    {{ getPromotionDescription(promotion) }}
+                </span>
+            }
+            @if (promotions.length > 2) {
+                <span class="promotion-badge badge-more" title="Ещё {{ promotions.length - 2 }} акции(й)">
+                    +{{ promotions.length - 2 }}
+                </span>
+            }
+        </div>
+    }
+
+    @if (variant === 'full') {
+        <div class="promotion-badges-full">
+            @for (promotion of promotions; track promotion.id) {
+                <div class="promotion-card" [ngClass]="getBadgeClass(promotion)">
+                    <div class="promotion-header">
+                        <span class="promotion-icon">🎁</span>
+                        <span class="promotion-discount">{{ getDiscountText(promotion) }}</span>
+                    </div>
+                    <div class="promotion-title">{{ promotion.title }}</div>
+                    @if (promotion.description) {
+                        <div class="promotion-description">{{ promotion.description }}</div>
+                    }
+                    @if (promotion.buyQuantity && promotion.getQuantity) {
+                        <div class="promotion-details">Купи {{ promotion.buyQuantity }}, получи {{ promotion.getQuantity }} в подарок</div>
+                    }
+                    @if (promotion.minQuantity) {
+                        <div class="promotion-details">От {{ promotion.minQuantity }} шт.</div>
+                    }
+                    <div class="promotion-validity">Действует до {{ promotion.validUntil | date: 'dd.MM.yyyy' }}</div>
+                </div>
+            }
+        </div>
+    }
+}

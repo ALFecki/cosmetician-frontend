@@ -37,7 +37,7 @@ export class BrandsComponent implements OnInit {
             map(brands => {
                 brands = brands.filter(b => b.image);
                 return this.getRandomUniqueElements(brands, 4);
-            })
+            }),
         );
         this.loading$.next(false);
     }

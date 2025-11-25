@@ -1,6 +1,30 @@
+<!-- Кнопка поиска -->
+<div class="search-trigger-wrapper" [class.hidden]="!isSearchVisible">
+    <button class="search-trigger-button" (click)="openSearch()" type="button" aria-label="Открыть поиск">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4.35-4.35"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            />
+        </svg>
+        <span class="search-trigger-text">Поиск продуктов...</span>
+        <div class="search-trigger-shortcuts">
+            <kbd>/</kbd>
+            <span>или</span>
+            <kbd>Ctrl</kbd><kbd>K</kbd>
+        </div>
+    </button>
+</div>
+
 <app-carousel></app-carousel>
 
 <app-brands></app-brands>
 <app-benefits></app-benefits>
 <app-product-carousel></app-product-carousel>
 <app-about-me></app-about-me>
+
+<!-- Модальное окно поиска -->
+<app-product-search *ngIf="isSearchOpen" (closeSearch)="closeSearch()"></app-product-search>

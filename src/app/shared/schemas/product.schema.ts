@@ -16,6 +16,7 @@ export interface FilterProductSchema extends FilterOptions {
     minVolume?: number;
     maxVolume?: number;
     isDeleted?: boolean;
+    hasPromotion?: boolean;
 }
 
 export type CreateProductScopeSchema = Omit<ProductScopeModel, 'id' | 'createdAt' | 'updatedAt'>;

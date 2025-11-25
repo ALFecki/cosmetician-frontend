@@ -136,7 +136,20 @@
                                                     class="price-revealed"
                                                     [class.animate-reveal]="product.isPriceHidden && isPriceRevealed(product.id)"
                                                 >
-                                                    <div class="price">{{ getSelectedVariantPrice(product) | number: '1.2-2' }} р.</div>
+                                                    @let priceInfo = getProductPriceInfo(product);
+                                                    @if (priceInfo.hasDiscount) {
+                                                        <div class="price-with-discount">
+                                                            <div class="price-original">
+                                                                {{ priceInfo.originalPrice | number: '1.2-2' }} р.
+                                                            </div>
+                                                            <div class="price-discounted">
+                                                                {{ priceInfo.discountedPrice | number: '1.2-2' }} р.
+                                                                <span class="discount-badge">{{ priceInfo.discountLabel }}</span>
+                                                            </div>
+                                                        </div>
+                                                    } @else {
+                                                        <div class="price">{{ getSelectedVariantPrice(product) | number: '1.2-2' }} р.</div>
+                                                    }
                                                     @if (!product.variants || product.variants.length === 1) {
                                                         <div class="volume-info">{{ getSelectedVariantVolume(product) }}мл</div>
                                                     }

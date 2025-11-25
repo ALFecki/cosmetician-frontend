@@ -42,18 +42,16 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
     }
 
     getMinimalById(id: string): Observable<OrderMinimalModel | null> {
-        return this.http
-            .get<SingleResponse<OrderMinimalModel>>(`${environment.server_url}/${this.endpoint}_minimal/${id}`)
-            .pipe(
-                map(response => {
-                    if (response.status) {
-                        return response.data;
-                    } else {
-                        this.toastService.show('Ошибка получения заказа', 'error');
-                        return null;
-                    }
-                }),
-            );
+        return this.http.get<SingleResponse<OrderMinimalModel>>(`${environment.server_url}/${this.endpoint}_minimal/${id}`).pipe(
+            map(response => {
+                if (response.status) {
+                    return response.data;
+                } else {
+                    this.toastService.show('Ошибка получения заказа', 'error');
+                    return null;
+                }
+            }),
+        );
     }
 
     async addProductToOrder(variantId: string): Promise<OrderModel | null> {
@@ -214,19 +212,22 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
                 this.toastService.show('Недопустимый статус заказа', 'error');
                 return of(null);
         }
-        this.http.get(`${environment.server_url}/email/send_status_update`, {
-            params: {
-                to,
-                orderId,
-                status: statusString,
-            },
-            withCredentials: true,
-        }).pipe(
-            catchError(error => {
-                console.error('Error sending status update email:', error);
-                return of(null);
+        this.http
+            .get(`${environment.server_url}/email/send_status_update`, {
+                params: {
+                    to,
+                    orderId,
+                    status: statusString,
+                },
+                withCredentials: true,
             })
-        ).subscribe();
+            .pipe(
+                catchError(error => {
+                    console.error('Error sending status update email:', error);
+                    return of(null);
+                }),
+            )
+            .subscribe();
         return from(this.update(orderId, { status })).pipe(
             map(response => {
                 if ((response as SingleResponse<OrderModel>).status) {
@@ -238,5 +239,21 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
                 }
             }),
         );
+    }
+
+    applyPromocode(promoCode: string): Observable<OrderModel | null> {
+        return this.http
+            .post<SingleResponse<OrderModel>>(`${environment.server_url}/${this.endpoint}/apply-promo-code`, { promoCode })
+            .pipe(
+                map(response => {
+                    if (response.status) {
+                        this.toastService.show('Промокод успешно применён', 'success');
+                        return response.data;
+                    } else {
+                        this.toastService.show('Ошибка при применении промокода', 'error');
+                        return null;
+                    }
+                }),
+            );
     }
 }

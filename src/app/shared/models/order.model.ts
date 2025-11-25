@@ -19,6 +19,8 @@ export interface OrderModel extends OrderMinimalModel {
     deliveryDate: Date;
     deliveryAddress: string;
     deliveryPostAddress: string;
+    promoCodeId: string | null;
+    discountAmount: number | null;
     deliveryCost: number;
     isCourierDelivery: boolean;
     paymentMethod: string;
