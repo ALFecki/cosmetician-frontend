@@ -2,12 +2,12 @@ export enum TargetType {
     PRODUCT = 'product',
     BRAND = 'brand',
     CATEGORY = 'category',
-    ALL = 'all'
+    ALL = 'all',
 }
 
 export enum DiscountType {
     PERCENTAGE = 'percentage',
-    FIXED = 'fixed'
+    FIXED = 'fixed',
 }
 
 export interface PromotionModel {

@@ -32,7 +32,7 @@ export class ProductModalComponent implements OnDestroy {
         private cartService: CartService,
         private toastService: ToastService,
         private loginModalService: LoginModalService,
-    ) { }
+    ) {}
 
     moreInfo() {
         this.modalService.dismissAll();

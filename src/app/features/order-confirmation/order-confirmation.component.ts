@@ -251,9 +251,7 @@ export class OrderConfirmationComponent implements OnInit {
             if (result) {
                 this.toastService.show('Заказ успешно оформлен!', 'success');
                 if (this.confirmationForm.get('paymentMethod')?.value === 'online') {
-                    const orderMinimal = await firstValueFrom(
-                        this.orderService.getMinimalById(this.currentOrder!.id)
-                    );
+                    const orderMinimal = await firstValueFrom(this.orderService.getMinimalById(this.currentOrder!.id));
                     const paymentResponse = await this.paymentService.processPayment(orderMinimal!).toPromise();
                     if (paymentResponse && paymentResponse.formUrl) {
                         window.location.href = paymentResponse.formUrl;

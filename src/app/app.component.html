@@ -1,12 +1,12 @@
 <div>
     @if (showNavbarAndFooter$ | async) {
-    <app-navbar></app-navbar>
+        <app-navbar></app-navbar>
     }
     <main>
         <router-outlet (activate)="onActivate()"></router-outlet>
     </main>
     @if (showNavbarAndFooter$ | async) {
-    <app-footer></app-footer>
+        <app-footer></app-footer>
     }
     <app-toast></app-toast>
     <app-loader></app-loader>

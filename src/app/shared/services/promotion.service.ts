@@ -1,10 +1,10 @@
-import { Injectable } from "@angular/core";
-import { DataService } from "../base/services/data.service";
-import { PromotionModel } from "../models/promotion.model";
-import { CreatePromotionSchema, FilterPromotionSchema, UpdatePromotionSchema } from "../schemas/promotion.schema";
-import { Observable } from "rxjs";
-import { ListResponse } from "../base/schemas/base_schema";
-import { PromocodeModel } from "../models/promocode.model";
+import { Injectable } from '@angular/core';
+import { DataService } from '../base/services/data.service';
+import { PromotionModel } from '../models/promotion.model';
+import { CreatePromotionSchema, FilterPromotionSchema, UpdatePromotionSchema } from '../schemas/promotion.schema';
+import { Observable } from 'rxjs';
+import { ListResponse } from '../base/schemas/base_schema';
+import { PromocodeModel } from '../models/promocode.model';
 
 @Injectable({
     providedIn: 'root',

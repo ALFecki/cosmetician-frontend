@@ -142,12 +142,7 @@
                         <input [type]="field.type" class="form-control" [id]="field.key" [formControlName]="field.key" />
                     }
                     @if (field.type === 'datetime-local') {
-                        <input 
-                            type="datetime-local" 
-                            class="form-control" 
-                            [id]="field.key" 
-                            [formControlName]="field.key" 
-                        />
+                        <input type="datetime-local" class="form-control" [id]="field.key" [formControlName]="field.key" />
                         <small class="text-muted">Выберите дату и время</small>
                     }
                     @if (field.type === 'product-search') {
@@ -158,9 +153,9 @@
                                     @for (product of selectedProducts[field.key]; track product.id) {
                                         <span class="badge bg-primary me-1 mb-1 selected-product-badge">
                                             {{ product.title }}
-                                            <button 
-                                                type="button" 
-                                                class="btn-close btn-close-white btn-sm ms-1" 
+                                            <button
+                                                type="button"
+                                                class="btn-close btn-close-white btn-sm ms-1"
                                                 (click)="removeSelectedProduct(field.key, product.id)"
                                                 aria-label="Удалить"
                                             ></button>
@@ -168,42 +163,42 @@
                                     }
                                 </div>
                             }
-                            
+
                             <!-- Search input -->
                             <div class="input-group">
-                                <input 
-                                    type="text" 
-                                    class="form-control" 
+                                <input
+                                    type="text"
+                                    class="form-control"
                                     [id]="field.key + '-search'"
                                     [(ngModel)]="productSearchText[field.key]"
-                                    [ngModelOptions]="{standalone: true}"
+                                    [ngModelOptions]="{ standalone: true }"
                                     (input)="onProductSearchChange(field.key, productSearchText[field.key])"
                                     (focus)="toggleProductDropdown(field.key, true)"
                                     placeholder="Начните вводить название товара..."
                                 />
-                                <button 
-                                    class="btn btn-outline-secondary" 
+                                <button
+                                    class="btn btn-outline-secondary"
                                     type="button"
                                     (click)="toggleProductDropdown(field.key, !showProductDropdown[field.key])"
                                 >
                                     <i-bs name="search"></i-bs>
                                 </button>
                             </div>
-                            
+
                             <!-- Product dropdown -->
                             @if (showProductDropdown[field.key] && filteredProducts[field.key]) {
                                 <div class="product-dropdown">
                                     <div class="list-group">
                                         @for (product of filteredProducts[field.key]; track product.id) {
-                                            <button 
+                                            <button
                                                 type="button"
                                                 class="list-group-item list-group-item-action"
                                                 (click)="selectProduct(field.key, product)"
                                             >
                                                 <div class="d-flex align-items-center">
                                                     @if (product.image) {
-                                                        <img 
-                                                            [src]="product.image | imageUrl" 
+                                                        <img
+                                                            [src]="product.image | imageUrl"
                                                             [alt]="product.title"
                                                             class="product-thumbnail me-2"
                                                         />
@@ -226,13 +221,9 @@
                                     </div>
                                 </div>
                             }
-                            
+
                             <!-- Hidden input for form control -->
-                            <input 
-                                type="hidden" 
-                                [id]="field.key" 
-                                [formControlName]="field.key" 
-                            />
+                            <input type="hidden" [id]="field.key" [formControlName]="field.key" />
                         </div>
                     }
                     @if (field.type === 'boolean') {

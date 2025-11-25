@@ -31,7 +31,7 @@ export class HomeComponent {
     private lastScrollTop = 0;
     private scrollThreshold = 50; // Минимальная прокрутка для срабатывания
 
-    constructor(private cdr: ChangeDetectorRef) { }
+    constructor(private cdr: ChangeDetectorRef) {}
 
     @HostListener('window:scroll', [])
     onWindowScroll(): void {
@@ -63,10 +63,7 @@ export class HomeComponent {
     @HostListener('document:keydown', ['$event'])
     handleKeyboardShortcut(event: KeyboardEvent): void {
         // Открываем поиск по нажатию / или Ctrl+K (Cmd+K на Mac)
-        if (
-            (event.key === '/' && !this.isInputFocused()) ||
-            ((event.ctrlKey || event.metaKey) && event.key === 'k')
-        ) {
+        if ((event.key === '/' && !this.isInputFocused()) || ((event.ctrlKey || event.metaKey) && event.key === 'k')) {
             event.preventDefault();
             this.openSearch();
         }

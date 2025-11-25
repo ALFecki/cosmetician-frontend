@@ -1,4 +1,4 @@
-import { DiscountType } from "./promotion.model";
+import { DiscountType } from './promotion.model';
 
 export interface PromocodeModel {
     id: string;

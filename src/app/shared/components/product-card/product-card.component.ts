@@ -40,7 +40,7 @@ export class ProductCardComponent implements OnInit, OnDestroy {
         private cartService: CartService,
         private authService: AuthService,
         private loginModalService: LoginModalService,
-    ) { }
+    ) {}
 
     ngOnInit() {
         let productId = '';

@@ -26,15 +26,15 @@ export class ProductSearchComponent implements OnInit, OnDestroy {
 
     constructor(
         private productService: ProductService,
-        private router: Router
-    ) { }
+        private router: Router,
+    ) {}
 
     ngOnInit(): void {
         // Настраиваем debounce для поиска
         this.subscription = this.searchSubject
             .pipe(
                 debounceTime(300), // Задержка 300мс после последнего ввода
-                distinctUntilChanged() // Игнорируем повторяющиеся запросы
+                distinctUntilChanged(), // Игнорируем повторяющиеся запросы
             )
             .subscribe(query => {
                 this.performSearch(query);
@@ -101,10 +101,7 @@ export class ProductSearchComponent implements OnInit, OnDestroy {
                 break;
             case 'ArrowDown':
                 event.preventDefault();
-                this.selectedIndex = Math.min(
-                    this.selectedIndex + 1,
-                    this.searchResults.length - 1
-                );
+                this.selectedIndex = Math.min(this.selectedIndex + 1, this.searchResults.length - 1);
                 this.scrollToSelected();
                 break;
             case 'ArrowUp':

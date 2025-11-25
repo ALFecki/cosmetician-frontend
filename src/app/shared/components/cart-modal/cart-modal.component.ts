@@ -38,7 +38,7 @@ export class CartModalComponent implements OnInit {
         private toastService: ToastService,
         private verifyEmailModalService: VerifyEmailModalService,
         private promotionService: PromotionService,
-    ) { }
+    ) {}
 
     ngOnInit(): void {
         this.cartItems$ = this.cartService.getCartItems();

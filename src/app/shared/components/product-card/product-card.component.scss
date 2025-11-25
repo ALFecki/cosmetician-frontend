@@ -46,7 +46,7 @@
             font-weight: 600;
         }
 
-        +.breadcrumb-item::before {
+        + .breadcrumb-item::before {
             color: var(--secondary);
             font-weight: 600;
         }
@@ -527,7 +527,7 @@
         border-radius: 16px;
         margin-bottom: 1.5rem;
 
-        .row>div {
+        .row > div {
             margin-bottom: 1.5rem;
         }
     }

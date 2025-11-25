@@ -150,7 +150,7 @@ export class CartComponent {
 
     getTotalWithDiscount(): number {
         let total = 0;
-        this.totalPrice$.subscribe(price => total = price).unsubscribe();
+        this.totalPrice$.subscribe(price => (total = price)).unsubscribe();
         return Math.max(0, total - this.promocodeDiscount);
     }
 
@@ -183,12 +183,14 @@ export class CartComponent {
     getDiscount(): Observable<number> {
         return this.cartService.getDiscountAmount();
     }
-        
+
     getCartTotal(): number {
         let total = 0;
-        this.cartItems$.subscribe(items => {
-            total = items.reduce((sum, item) => sum + this.getItemTotal(item), 0);
-        }).unsubscribe();
+        this.cartItems$
+            .subscribe(items => {
+                total = items.reduce((sum, item) => sum + this.getItemTotal(item), 0);
+            })
+            .unsubscribe();
         return total;
     }
 

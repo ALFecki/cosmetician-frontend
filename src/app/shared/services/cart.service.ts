@@ -50,7 +50,7 @@ export class CartService implements OnDestroy {
                     product: item.product,
                     variant: item.variant,
                     quantity: item.quantity,
-                    totalPrice: order.totalPrice
+                    totalPrice: order.totalPrice,
                 }));
                 this.cartItemsSubject.next(updatedItems);
                 this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
@@ -85,7 +85,7 @@ export class CartService implements OnDestroy {
                             product: item.product,
                             variant: item.variant,
                             quantity: item.quantity,
-                            totalPrice: order.totalPrice
+                            totalPrice: order.totalPrice,
                         }));
                         this.cartItemsSubject.next(items);
                         this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
@@ -133,7 +133,7 @@ export class CartService implements OnDestroy {
                 product: item.product,
                 variant: item.variant,
                 quantity: item.quantity,
-                totalPrice: order.totalPrice
+                totalPrice: order.totalPrice,
             }));
             this.cartItemsSubject.next(updatedItems);
             this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));

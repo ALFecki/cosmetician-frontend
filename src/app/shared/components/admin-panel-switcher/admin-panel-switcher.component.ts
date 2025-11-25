@@ -35,7 +35,19 @@ interface ModelConfig {
     fields: {
         key: string;
         label: string;
-        type: 'text' | 'number' | 'textarea' | 'select' | 'file' | 'image' | 'email' | 'boolean' | 'multiselect' | 'variants' | 'datetime-local' | 'product-search';
+        type:
+            | 'text'
+            | 'number'
+            | 'textarea'
+            | 'select'
+            | 'file'
+            | 'image'
+            | 'email'
+            | 'boolean'
+            | 'multiselect'
+            | 'variants'
+            | 'datetime-local'
+            | 'product-search';
         required?: boolean;
         options?: any[];
     }[];
@@ -126,7 +138,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
         private productVariantService: ProductVariantService,
         private promotionService: PromotionService,
         private promocodeService: PromocodeService,
-    ) { }
+    ) {}
 
     ngOnInit(): void {
         this.setupModelConfigs();
@@ -1039,10 +1051,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
         const searchLower = searchText.toLowerCase().trim();
         this.filteredProducts[fieldKey] = this.allProducts
-            .filter(product =>
-                product.title.toLowerCase().includes(searchLower) ||
-                product.fullTitle?.toLowerCase().includes(searchLower)
-            )
+            .filter(product => product.title.toLowerCase().includes(searchLower) || product.fullTitle?.toLowerCase().includes(searchLower))
             .slice(0, 20);
     }
 

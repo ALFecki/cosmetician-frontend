@@ -351,8 +351,8 @@
         box-shadow: 0 2px 8px rgba(212, 80, 109, 0.1);
     }
 
-    .form-check-input:checked~.option-content,
-    .form-check-input:checked~.form-check-label {
+    .form-check-input:checked ~ .option-content,
+    .form-check-input:checked ~ .form-check-label {
         color: var(--primary);
     }
 
