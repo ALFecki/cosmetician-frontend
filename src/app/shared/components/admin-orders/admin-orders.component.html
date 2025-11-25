@@ -354,6 +354,13 @@
                                 }
                             </tbody>
                             <tfoot>
+                                @if (selectedOrder.discountAmount && selectedOrder.discountAmount > 0) {
+                                <tr class="table-light">
+                                    <td colspan="4" class="text-end fw-semibold">Скидка:</td>
+                                    <td class="fw-semibold text-success">-{{ selectedOrder.discountAmount | number:
+                                        '1.2-2' }} р.</td>
+                                </tr>
+                                }
                                 <tr class="table-light">
                                     <td colspan="4" class="text-end fw-bold">Итого:</td>
                                     <td class="fw-bold">{{ selectedOrder.totalPrice | number: '1.2-2' }} р.</td>

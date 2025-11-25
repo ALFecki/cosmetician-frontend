@@ -1,0 +1,85 @@
+<div class="search-overlay" (click)="close()" role="dialog" aria-modal="true" tabindex="-1">
+    // eslint-disable-next-line @angular-eslint/template/click-events-have-key-events
+    <div class="search-modal" (click)="$event.stopPropagation()" role="search">
+        <div class="search-header">
+            <div class="search-input-wrapper">
+                <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4.35-4.35" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <input type="text" class="search-input" [(ngModel)]="searchQuery" (input)="onSearchInput(searchQuery)"
+                    placeholder="Поиск продуктов..." autocomplete="off" spellcheck="false" />
+                <button class="close-button" (click)="close()" type="button" aria-label="Закрыть поиск">
+                    <span>ESC</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="search-results">
+            <div *ngIf="isLoading" class="search-loading">
+                <div class="spinner"></div>
+                <p>Поиск продуктов...</p>
+            </div>
+
+            <div *ngIf="!isLoading && searchQuery.length === 0" class="search-empty">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.35-4.35" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <p>Начните вводить название продукта</p>
+                <span class="hint">Попробуйте поискать крем, маску или сыворотку</span>
+            </div>
+
+            <div *ngIf="!isLoading && searchQuery.length > 0 && searchResults.length === 0" class="search-no-results">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                    <path d="M8 15s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" />
+                </svg>
+                <p>Ничего не найдено по запросу "{{ searchQuery }}"</p>
+                <span class="hint">Попробуйте изменить запрос или проверьте правильность написания</span>
+            </div>
+
+            <div *ngIf="!isLoading && searchResults.length > 0" class="search-results-list">
+                <div class="results-header">
+                    <span>Найдено продуктов: {{ searchResults.length }}</span>
+                </div>
+                <div *ngFor="let product of searchResults; let i = index" class="search-result-item"
+                    [class.selected]="i === selectedIndex" (click)="selectProduct(product)"
+                    (keydown.enter)="selectProduct(product)" (mouseenter)="selectedIndex = i" tabindex="0" role="button"
+                    [attr.aria-label]="'Открыть ' + product.title">
+                    <div class="product-image">
+                        <img [src]="getProductImage(product)" [alt]="product.title" />
+                    </div>
+                    <div class="product-info">
+                        <h4 class="product-title">{{ product.title }}</h4>
+                        <p class="product-brand">{{ product.brand.title }}</p>
+                        <p class="product-description">{{ product.description }}</p>
+                    </div>
+                    <div class="product-price">
+                        <span>{{ getProductPrice(product) }}</span>
+                        <svg class="arrow-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-footer">
+            <div class="keyboard-hints">
+                <span class="hint-item">
+                    <kbd>↑</kbd><kbd>↓</kbd> навигация
+                </span>
+                <span class="hint-item">
+                    <kbd>Enter</kbd> выбрать
+                </span>
+                <span class="hint-item">
+                    <kbd>Esc</kbd> закрыть
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

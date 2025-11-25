@@ -8,11 +8,13 @@ import { CartService } from '../../services/cart.service';
 import { LoginModalService } from '../../services/login-modal.service';
 import { ProductService } from '../../services/product.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
+import { calculateDiscountedPrice, PriceInfo } from '../../utils/promotion.utils';
 import { ProductCarouselComponent } from '../product-carousel/product-carousel.component';
+import { PromotionBadgeComponent } from '../promotion-badge/promotion-badge.component';
 
 @Component({
     selector: 'app-product-card',
-    imports: [CommonModule, RouterModule, ProductCarouselComponent, IconsModule, ImageUrlPipe],
+    imports: [CommonModule, RouterModule, ProductCarouselComponent, PromotionBadgeComponent, IconsModule, ImageUrlPipe],
     templateUrl: './product-card.component.html',
     styleUrl: './product-card.component.scss',
 })
@@ -38,7 +40,7 @@ export class ProductCardComponent implements OnInit, OnDestroy {
         private cartService: CartService,
         private authService: AuthService,
         private loginModalService: LoginModalService,
-    ) {}
+    ) { }
 
     ngOnInit() {
         let productId = '';
@@ -76,6 +78,16 @@ export class ProductCardComponent implements OnInit, OnDestroy {
     getSelectedVariantPrice(): number {
         const variant = this.getSelectedVariant();
         return variant?.price || 0;
+    }
+
+    getSelectedVariantPriceInfo(): PriceInfo {
+        const variant = this.getSelectedVariant();
+        const basePrice = variant?.price || 0;
+        return calculateDiscountedPrice(basePrice, this.product.promotions || []);
+    }
+
+    getVariantPriceInfo(price: number): PriceInfo {
+        return calculateDiscountedPrice(price, this.product.promotions || []);
     }
 
     getSelectedVariantVolume(): number {
@@ -136,5 +148,6 @@ export class ProductCardComponent implements OnInit, OnDestroy {
         if (this.priceTimeout) {
             clearTimeout(this.priceTimeout);
         }
+        this.priceTimeout = null;
     }
 }

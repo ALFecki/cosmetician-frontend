@@ -1,27 +1,32 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
 import { IconsModule } from '../../shared/base/icons/icons.module';
 import { ListResponse } from '../../shared/base/schemas/base_schema';
 import { OrderModel, OrderProductModel } from '../../shared/models/order.model';
 import { PersonModel } from '../../shared/models/person.model';
+import { PromocodeModel } from '../../shared/models/promocode.model';
+import { PromotionModel } from '../../shared/models/promotion.model';
 import { PostPlacement } from '../../shared/models/utils.interface';
 import { UpdateOrderSchema } from '../../shared/schemas/order.schema';
 import { AuthService } from '../../shared/services/auth.service';
 import { CartService } from '../../shared/services/cart.service';
 import { OrderService } from '../../shared/services/order.service';
+import { PaymentService } from '../../shared/services/payment.service';
 import { PostService } from '../../shared/services/post.service';
+import { PromocodeService } from '../../shared/services/promocode.service';
+import { PromotionService } from '../../shared/services/promotion.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
-import { PaymentService } from '../../shared/services/payment.service';
+import { calculateDiscountedPrice, PriceInfo } from '../../shared/utils/promotion.utils';
 
 @Component({
     selector: 'app-order-confirmation',
     templateUrl: './order-confirmation.component.html',
     styleUrl: './order-confirmation.component.scss',
-    imports: [CommonModule, ReactiveFormsModule, RouterModule, IconsModule, ImageUrlPipe],
+    imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, IconsModule, ImageUrlPipe],
 })
 export class OrderConfirmationComponent implements OnInit {
     confirmationForm: FormGroup;
@@ -36,6 +41,12 @@ export class OrderConfirmationComponent implements OnInit {
     selectedPlacementText = '';
     currentOrder: OrderModel | null = null;
 
+    promocode = '';
+    appliedPromocode: PromocodeModel | null = null;
+    promocodeDiscount = 0;
+    applyingPromocode = false;
+    private productPromotions: Record<string, PromotionModel[]> = {};
+
     constructor(
         private formBuilder: FormBuilder,
         private orderService: OrderService,
@@ -45,6 +56,8 @@ export class OrderConfirmationComponent implements OnInit {
         private router: Router,
         private postService: PostService,
         private paymentService: PaymentService,
+        private promocodeService: PromocodeService,
+        private promotionService: PromotionService,
     ) {
         this.currentUser$ = this.authService.getCurrentUser();
         this.getPostPlacements().subscribe(data => {
@@ -106,7 +119,8 @@ export class OrderConfirmationComponent implements OnInit {
                     this.confirmationForm.get('house')?.setValidators([Validators.required]);
                     this.confirmationForm.get('building')?.clearValidators();
                     this.confirmationForm.get('building')?.setValue('');
-                    this.confirmationForm.get('apartment')?.setValidators([Validators.required]);
+                    this.confirmationForm.get('apartment')?.clearValidators();
+                    this.confirmationForm.get('apartment')?.setValue('');
                 }
             }
 
@@ -121,12 +135,13 @@ export class OrderConfirmationComponent implements OnInit {
 
         this.confirmationForm.get('courierDelivery')?.valueChanges.subscribe(value => {
             if (this.confirmationForm.get('deliveryMethod')?.value === 'post' && value) {
-                    this.confirmationForm.get('city')?.setValidators([Validators.required, Validators.minLength(2)]);
-                    this.confirmationForm.get('street')?.setValidators([Validators.required, Validators.minLength(2)]);
-                    this.confirmationForm.get('house')?.setValidators([Validators.required]);
-                    this.confirmationForm.get('building')?.clearValidators();
-                    this.confirmationForm.get('building')?.setValue('');
-                    this.confirmationForm.get('apartment')?.setValidators([Validators.required]);
+                this.confirmationForm.get('city')?.setValidators([Validators.required, Validators.minLength(2)]);
+                this.confirmationForm.get('street')?.setValidators([Validators.required, Validators.minLength(2)]);
+                this.confirmationForm.get('house')?.setValidators([Validators.required]);
+                this.confirmationForm.get('building')?.clearValidators();
+                this.confirmationForm.get('building')?.setValue('');
+                this.confirmationForm.get('apartment')?.clearValidators();
+                this.confirmationForm.get('apartment')?.setValue('');
             } else {
                 this.confirmationForm.get('city')?.clearValidators();
                 this.confirmationForm.get('city')?.setValue('');
@@ -160,6 +175,12 @@ export class OrderConfirmationComponent implements OnInit {
             if (order) {
                 this.cartItems$.next(order.products);
                 this.totalPrice$.next(Number(order.totalPrice.toFixed(2)));
+                // Load promotions for each product
+                order.products.forEach(item => {
+                    if (item.product?.id) {
+                        this.loadProductPromotions(item.product.id);
+                    }
+                });
             }
         });
     }
@@ -318,7 +339,90 @@ export class OrderConfirmationComponent implements OnInit {
     getTotalWithDelivery(): number {
         let cartTotal = 0;
         this.totalPrice$.subscribe(total => (cartTotal = total)).unsubscribe();
-        return cartTotal + this.getDeliveryPrice();
+        const totalWithDiscount = Math.max(0, cartTotal - this.promocodeDiscount);
+        return totalWithDiscount + this.getDeliveryPrice();
+    }
+
+    loadProductPromotions(productId: string): void {
+        this.promotionService.getProductPromotions(productId).subscribe({
+            next: promotions => {
+                this.productPromotions[productId] = promotions.data.filter(p => p.isActive);
+            },
+            error: () => {
+                this.productPromotions[productId] = [];
+            },
+        });
+    }
+
+    getItemPriceInfo(item: OrderProductModel): PriceInfo {
+        if (!item.product?.id) {
+            return {
+                originalPrice: item.variant.price,
+                discountedPrice: null,
+                hasDiscount: false,
+                activePromotion: null,
+                discountAmount: 0,
+                discountLabel: '',
+            };
+        }
+        const promotions = this.productPromotions[item.product.id] || [];
+        return calculateDiscountedPrice(item.variant.price, promotions);
+    }
+
+    getItemTotal(item: OrderProductModel): number {
+        const priceInfo = this.getItemPriceInfo(item);
+        const price = priceInfo.hasDiscount ? priceInfo.discountedPrice! : priceInfo.originalPrice;
+        return price * item.quantity;
+    }
+
+    getCartTotal(): number {
+        let total = 0;
+        const items = this.cartItems$.value;
+        total = items.reduce((sum, item) => sum + this.getItemTotal(item), 0);
+        return total;
+    }
+
+    getCartTotalWithPromocode(): number {
+        const total = this.getCartTotal();
+        return Math.max(0, total - this.promocodeDiscount);
+    }
+
+    getTotalWithDeliveryAndPromotions(): number {
+        const cartTotal = this.getCartTotal();
+        const totalWithDiscount = Math.max(0, cartTotal - this.promocodeDiscount);
+        return totalWithDiscount + this.getDeliveryPrice();
+    }
+
+    async applyPromocode(): Promise<void> {
+        if (!this.promocode.trim()) {
+            this.toastService.show('Введите промокод', 'warning');
+            return;
+        }
+
+        this.applyingPromocode = true;
+
+        try {
+            const response = await this.orderService.applyPromocode(this.promocode.trim()).toPromise();
+
+            if (response) {
+                // this.appliedPromocode = this.promocode;
+                this.promocodeDiscount = response.discountAmount!;
+                this.toastService.show(`Промокод применён! Скидка: ${response.discountAmount} р.`, 'success');
+            }
+        } catch (error: unknown) {
+            console.error('Error applying promocode:', error);
+            const errorMessage = (error as { error?: { message?: string } })?.error?.message || 'Промокод недействителен';
+            this.toastService.show(errorMessage, 'error');
+        } finally {
+            this.applyingPromocode = false;
+        }
+    }
+
+    removePromocode(): void {
+        this.promocode = '';
+        this.appliedPromocode = null;
+        this.promocodeDiscount = 0;
+        this.toastService.show('Промокод удалён', 'info');
     }
 
     filterPostPlacements(filterText: string): void {

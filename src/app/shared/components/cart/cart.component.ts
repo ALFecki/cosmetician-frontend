@@ -7,12 +7,18 @@ import { Observable, of } from 'rxjs';
 import { IconsModule } from '../../base/icons/icons.module';
 import { CartModel } from '../../models/cart.model';
 import { ProductModel } from '../../models/product.model';
+import { PromocodeModel } from '../../models/promocode.model';
+import { PromotionModel } from '../../models/promotion.model';
 import { AuthService } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
 import { LoginModalService } from '../../services/login-modal.service';
+import { OrderService } from '../../services/order.service';
+import { PromocodeService } from '../../services/promocode.service';
+import { PromotionService } from '../../services/promotion.service';
 import { ToastService } from '../../services/toast.service';
 import { VerifyEmailModalService } from '../../services/verify-email-modal.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
+import { calculateDiscountedPrice, PriceInfo } from '../../utils/promotion.utils';
 import { ProductModalComponent } from '../product-modal/product-modal.component';
 
 @Component({
@@ -25,17 +31,33 @@ export class CartComponent {
     cartItems$: Observable<CartModel[]> = new Observable<CartModel[]>();
     totalPrice$: Observable<number> = of(0);
 
+    promocode = '';
+    appliedPromocode: PromocodeModel | null = null;
+    promocodeDiscount = 0;
+    applyingPromocode = false;
+    private productPromotions: Record<string, PromotionModel[]> = {};
+
     constructor(
         private cartService: CartService,
+        private orderService: OrderService,
         private authService: AuthService,
         private toastService: ToastService,
         private modalService: NgbModal,
         private router: Router,
         private loginModalService: LoginModalService,
         private verifyEmailModalService: VerifyEmailModalService,
+        private promocodeService: PromocodeService,
+        private promotionService: PromotionService,
     ) {
         this.cartItems$ = this.cartService.getCartItems();
         this.totalPrice$ = this.cartService.getTotalPrice();
+
+        // Load promotions for cart items
+        this.cartItems$.subscribe(items => {
+            items.forEach(item => {
+                this.loadProductPromotions(item.product.id);
+            });
+        });
     }
 
     increaseQuantity(cartItem: CartModel): void {
@@ -92,5 +114,86 @@ export class CartComponent {
             });
             activeModal.componentInstance.selectedProduct = product;
         }
+    }
+
+    async applyPromocode(): Promise<void> {
+        if (!this.promocode.trim()) {
+            this.toastService.show('Введите промокод', 'warning');
+            return;
+        }
+
+        this.applyingPromocode = true;
+
+        try {
+            const response = await this.orderService.applyPromocode(this.promocode.trim()).toPromise();
+
+            if (response) {
+                // this.appliedPromocode = this.promocode;
+                this.promocodeDiscount = response.discountAmount!;
+                this.toastService.show(`Промокод применён! Скидка: ${response.discountAmount} р.`, 'success');
+            }
+        } catch (error: unknown) {
+            console.error('Error applying promocode:', error);
+            const errorMessage = (error as { error?: { message?: string } })?.error?.message || 'Промокод недействителен';
+            this.toastService.show(errorMessage, 'error');
+        } finally {
+            this.applyingPromocode = false;
+        }
+    }
+
+    removePromocode(): void {
+        this.promocode = '';
+        this.appliedPromocode = null;
+        this.promocodeDiscount = 0;
+        this.toastService.show('Промокод удалён', 'info');
+    }
+
+    getTotalWithDiscount(): number {
+        let total = 0;
+        this.totalPrice$.subscribe(price => total = price).unsubscribe();
+        return Math.max(0, total - this.promocodeDiscount);
+    }
+
+    loadProductPromotions(productId: string): void {
+        this.promotionService.getProductPromotions(productId).subscribe({
+            next: promotions => {
+                this.productPromotions[productId] = promotions.data.filter(p => p.isActive);
+            },
+            error: () => {
+                this.productPromotions[productId] = [];
+            },
+        });
+    }
+
+    getItemPriceInfo(item: CartModel): PriceInfo {
+        const promotions = this.productPromotions[item.product.id] || [];
+        return calculateDiscountedPrice(item.variant.price, promotions);
+    }
+
+    getItemTotal(item: CartModel): number {
+        const priceInfo = this.getItemPriceInfo(item);
+        const price = priceInfo.hasDiscount ? priceInfo.discountedPrice! : priceInfo.originalPrice;
+        return price * item.quantity;
+    }
+
+    getTotalWithoutDiscount(): Observable<number> {
+        return this.cartService.getTotalWithoutDiscount();
+    }
+
+    getDiscount(): Observable<number> {
+        return this.cartService.getDiscountAmount();
+    }
+        
+    getCartTotal(): number {
+        let total = 0;
+        this.cartItems$.subscribe(items => {
+            total = items.reduce((sum, item) => sum + this.getItemTotal(item), 0);
+        }).unsubscribe();
+        return total;
+    }
+
+    getCartTotalWithDiscount(): number {
+        const total = this.getCartTotal();
+        return Math.max(0, total - this.promocodeDiscount);
     }
 }

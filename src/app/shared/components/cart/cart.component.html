@@ -9,114 +9,158 @@
         </div>
 
         @if (cartItems$ | async; as cartItems) {
-            @if (cartItems.length === 0) {
-                <div class="empty-cart-section">
-                    <i class="bi bi-bag-x empty-cart-icon"></i>
-                    <h3>Ваша корзина пуста</h3>
-                    <p>Добавьте товары в корзину, чтобы оформить заказ</p>
-                    <a routerLink="/products" class="btn btn-primary">
-                        <i class="bi bi-arrow-left me-2"></i>
-                        Перейти к покупкам
-                    </a>
-                </div>
-            }
-            @if (cartItems.length > 0) {
-                <div class="row">
-                    <div class="col-lg-8 mb-4">
-                        <div class="cart-content">
-                            <div class="cart-items-section">
-                                <h3 class="section-title">
-                                    <i class="bi bi-list-ul"></i>
-                                    Товары в корзине ({{ getCartItemsCount() | async }})
-                                </h3>
-                                @for (item of cartItems; track item) {
-                                    <div
-                                        class="cart-item"
-                                        (click)="openProductDetails(item.product)"
-                                        (keyup.enter)="openProductDetails(item.product)"
-                                        (keyup.space)="openProductDetails(item.product)"
-                                        tabindex="0"
-                                        role="button"
-                                    >
-                                        <img [src]="item.product.image | imageUrl" [alt]="item.product.title" class="item-image" />
-                                        <div class="item-details">
-                                            <a
-                                                class="item-title"
-                                                (click)="openProductDetails(item.product)"
-                                                (keyup.enter)="openProductDetails(item.product)"
-                                                (keyup.space)="openProductDetails(item.product)"
-                                                tabindex="0"
-                                                role="link"
-                                            >
-                                                {{ item.product.title }}
-                                            </a>
-                                            <div class="item-volume">{{ item.variant.volume || '-' }} мл</div>
-                                            <div class="item-price">{{ item.variant.price | number: '1.2-2' }} р. за шт.</div>
-                                        </div>
-                                        <div class="quantity-controls">
-                                            <button
-                                                class="quantity-btn"
-                                                type="button"
-                                                (click)="decreaseQuantity(item); $event.stopPropagation()"
-                                                [disabled]="item.quantity <= 1"
-                                            >
-                                                -
-                                            </button>
-                                            <span class="quantity-display">{{ item.quantity }}</span>
-                                            <button
-                                                class="quantity-btn"
-                                                type="button"
-                                                (click)="increaseQuantity(item); $event.stopPropagation()"
-                                            >
-                                                +
-                                            </button>
-                                        </div>
-                                        <div class="item-total">{{ item.variant.price * item.quantity | number: '1.2-2' }} р.</div>
-                                        <button
-                                            class="remove-btn"
-                                            type="button"
-                                            (click)="removeProduct(item); $event.stopPropagation()"
-                                            title="Удалить товар"
-                                        >
-                                            <i-bs name="trash"></i-bs>
-                                        </button>
-                                    </div>
+        @if (cartItems.length === 0) {
+        <div class="empty-cart-section">
+            <i class="bi bi-bag-x empty-cart-icon"></i>
+            <h3>Ваша корзина пуста</h3>
+            <p>Добавьте товары в корзину, чтобы оформить заказ</p>
+            <a routerLink="/products" class="btn btn-primary">
+                <i class="bi bi-arrow-left me-2"></i>
+                Перейти к покупкам
+            </a>
+        </div>
+        }
+        @if (cartItems.length > 0) {
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="cart-content">
+                    <div class="cart-items-section">
+                        <h3 class="section-title">
+                            <i class="bi bi-list-ul"></i>
+                            Товары в корзине ({{ getCartItemsCount() | async }})
+                        </h3>
+                        @for (item of cartItems; track item) {
+                        <div class="cart-item" (click)="openProductDetails(item.product)"
+                            (keyup.enter)="openProductDetails(item.product)"
+                            (keyup.space)="openProductDetails(item.product)" tabindex="0" role="button">
+                            <img [src]="item.product.image | imageUrl" [alt]="item.product.title" class="item-image" />
+                            <div class="item-details">
+                                <a class="item-title" (click)="openProductDetails(item.product)"
+                                    (keyup.enter)="openProductDetails(item.product)"
+                                    (keyup.space)="openProductDetails(item.product)" tabindex="0" role="link">
+                                    {{ item.product.title }}
+                                </a>
+                                <div class="item-volume">{{ item.variant.volume || '-' }} мл</div>
+                                @let priceInfo = getItemPriceInfo(item);
+                                @if (priceInfo.hasDiscount) {
+                                <div class="item-price-with-discount">
+                                    <span class="item-price-original">{{ priceInfo.originalPrice | number: '1.2-2' }} р.
+                                        за шт.</span>
+                                    <span class="item-price-discounted">{{ priceInfo.discountedPrice | number: '1.2-2'
+                                        }} р. за шт. <span class="discount-badge-cart">{{ priceInfo.discountLabel
+                                            }}</span></span>
+                                </div>
+                                } @else {
+                                <div class="item-price">{{ item.variant.price | number: '1.2-2' }} р. за шт.</div>
                                 }
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="cart-content">
-                            <div class="cart-summary">
-                                <h3 class="summary-title">
-                                    <i class="bi bi-calculator"></i>
-                                    Итого
-                                </h3>
-                                <div class="summary-row">
-                                    <span class="summary-label">Товары ({{ getCartItemsCount() | async }}):</span>
-                                    <span class="summary-value">{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
-                                </div>
-                                <div class="summary-row">
-                                    <span class="summary-label">Доставка:</span>
-                                    <span class="summary-value">Рассчитается при оформлении</span>
-                                </div>
-                                <div class="summary-row">
-                                    <span class="summary-label">К оплате:</span>
-                                    <span class="summary-value total-value">{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
-                                </div>
-                                <button class="btn checkout-btn" (click)="goToOrderConfirmation()">
-                                    <i class="bi bi-credit-card"></i>
-                                    Оформить заказ
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" type="button"
+                                    (click)="decreaseQuantity(item); $event.stopPropagation()"
+                                    [disabled]="item.quantity <= 1">
+                                    -
                                 </button>
-                                <a routerLink="/products" class="continue-shopping">
-                                    <i class="bi bi-arrow-left"></i>
-                                    Продолжить покупки
-                                </a>
+                                <span class="quantity-display">{{ item.quantity }}</span>
+                                <button class="quantity-btn" type="button"
+                                    (click)="increaseQuantity(item); $event.stopPropagation()">
+                                    +
+                                </button>
                             </div>
+                            <div class="item-total">{{ getItemTotal(item) | number: '1.2-2' }} р.</div>
+                            <button class="remove-btn" type="button"
+                                (click)="removeProduct(item); $event.stopPropagation()" title="Удалить товар">
+                                <i-bs name="trash"></i-bs>
+                            </button>
                         </div>
+                        }
                     </div>
                 </div>
-            }
+            </div>
+            <div class="col-lg-4">
+                <div class="cart-content">
+                    <div class="cart-summary">
+                        <h3 class="summary-title">
+                            <i class="bi bi-calculator"></i>
+                            Итого
+                        </h3>
+
+                        <!-- Promocode Section -->
+                        <!-- <div class="promocode-section">
+                            <div class="promocode-label">
+                                <i class="bi bi-tag"></i>
+                                Промокод
+                            </div>
+                            @if (!appliedPromocode) {
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Введите промокод"
+                                    [(ngModel)]="promocode" [disabled]="applyingPromocode" />
+                                <button class="btn btn-outline-primary" type="button" (click)="applyPromocode()"
+                                    [disabled]="applyingPromocode || !promocode.trim()">
+                                    @if (applyingPromocode) {
+                                    <span class="spinner-border spinner-border-sm"></span>
+                                    } @else {
+                                    Применить
+                                    }
+                                </button>
+                            </div>
+                            } @else {
+                            <div class="applied-promocode">
+                                <div class="promocode-info">
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                    <span class="promocode-code">{{ appliedPromocode.code }}</span>
+                                    <span class="promocode-discount">-{{ promocodeDiscount | number: '1.2-2' }}
+                                        р.</span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-danger" type="button" (click)="removePromocode()">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                            }
+                        </div> -->
+
+                        <div class="summary-row">
+                            <span class="summary-label">Товары ({{ getCartItemsCount() | async }}):</span>
+                            <span class="summary-value">{{ getTotalWithoutDiscount() | async | number: '1.2-2' }} р.</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Скидка:</span>
+                            <span class="summary-value text-success">-{{ getDiscount() | async | number: '1.2-2' }} р.
+                            </span>
+                        </div>
+                        @if (appliedPromocode) {
+                        <div class="summary-row discount-row">
+                            <span class="summary-label">Скидка по промокоду:</span>
+                            <span class="summary-value text-success">-{{ promocodeDiscount | number: '1.2-2' }}
+                                р.</span>
+                        </div>
+                        }
+                        <div class="summary-row">
+                            <span class="summary-label">Доставка:</span>
+                            <span class="summary-value">Рассчитается при оформлении</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">К оплате:</span>
+                            <span class="summary-value total-value">
+                                @if (appliedPromocode) {
+                                {{ getCartTotalWithDiscount() | number: '1.2-2' }} р.
+                                } @else {
+                                {{ getCartTotal() | number: '1.2-2' }} р.
+                                }
+                            </span>
+                        </div>
+                        <button class="btn checkout-btn" (click)="goToOrderConfirmation()">
+                            <i class="bi bi-credit-card"></i>
+                            Оформить заказ
+                        </button>
+                        <a routerLink="/products" class="continue-shopping">
+                            <i class="bi bi-arrow-left"></i>
+                            Продолжить покупки
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
         }
     </div>
 </div>

@@ -3,7 +3,7 @@
         <h4 class="modal-title">
             Корзина
             @if (((getTotalItemsCount() | async) || 0) > 0) {
-                <span class="cart-count">{{ getTotalItemsCount() | async }}</span>
+            <span class="cart-count">{{ getTotalItemsCount() | async }}</span>
             }
         </h4>
         <button type="button" class="btn-close" (click)="activeModal.dismiss()">
@@ -13,95 +13,103 @@
 
     <div class="modal-body">
         @if (cartItems$ | async; as cartItems) {
-            @if (cartItems.length === 0) {
-                <div class="empty-cart-modal">
-                    <span class="empty-icon"><i-bs name="cart-x"></i-bs></span>
-                    <h4>Корзина пуста</h4>
-                    <p>Добавьте товары для оформления заказа</p>
-                    <button class="btn btn-primary" (click)="continueShopping()">
-                        <i-bs name="arrow-left"></i-bs>
-                        К покупкам
+        @if (cartItems.length === 0) {
+        <div class="empty-cart-modal">
+            <span class="empty-icon"><i-bs name="cart-x"></i-bs></span>
+            <h4>Корзина пуста</h4>
+            <p>Добавьте товары для оформления заказа</p>
+            <button class="btn btn-primary" (click)="continueShopping()">
+                <i-bs name="arrow-left"></i-bs>
+                К покупкам
+            </button>
+        </div>
+        }
+        @if (cartItems.length > 0) {
+        <div class="cart-items-container">
+            @for (item of cartItems; track trackByProductId($index, item)) {
+            <div class="cart-item-modal">
+                <div class="item-info-row">
+                    <img [src]="item.product.image | imageUrl" [alt]="item.product.title" class="item-image-modal" />
+                    <div class="item-details-modal">
+                        <a [routerLink]="['/product', item.product.id]" class="item-title-modal"
+                            (click)="activeModal.close()">
+                            {{ item.product.title }}
+                        </a>
+                        <div class="item-volume-modal">{{ item.variant.volume || '-' }} мл</div>
+                        @let priceInfo = getItemPriceInfo(item);
+                        @if (priceInfo.hasDiscount) {
+                        <div class="item-price-with-discount-modal">
+                            <span class="item-price-original-modal">{{ priceInfo.originalPrice | number: '1.2-2' }}
+                                р.</span>
+                            <span class="item-price-discounted-modal">{{ priceInfo.discountedPrice | number: '1.2-2' }}
+                                р. <span class="discount-badge-modal">{{ priceInfo.discountLabel }}</span></span>
+                        </div>
+                        } @else {
+                        <div class="item-price-modal">{{ item.variant.price | number: '1.2-2' }} р.</div>
+                        }
+                    </div>
+                    <button class="remove-btn-modal" type="button" (click)="removeProduct(item)" title="Удалить">
+                        <i-bs name="trash"></i-bs>
                     </button>
                 </div>
-            }
-            @if (cartItems.length > 0) {
-                <div class="cart-items-container">
-                    @for (item of cartItems; track trackByProductId($index, item)) {
-                        <div class="cart-item-modal">
-                            <div class="item-info-row">
-                                <img [src]="item.product.image | imageUrl" [alt]="item.product.title" class="item-image-modal" />
-                                <div class="item-details-modal">
-                                    <a [routerLink]="['/product', item.product.id]" class="item-title-modal" (click)="activeModal.close()">
-                                        {{ item.product.title }}
-                                    </a>
-                                    <div class="item-volume-modal">{{ item.variant.volume || '-' }} мл</div>
-                                    <div class="item-price-modal">{{ item.variant.price | number: '1.2-2' }} р.</div>
-                                </div>
-                                <button class="remove-btn-modal" type="button" (click)="removeProduct(item)" title="Удалить">
-                                    <i-bs name="trash"></i-bs>
-                                </button>
-                            </div>
-                            <div class="item-controls-row">
-                                <div class="quantity-controls-modal">
-                                    <button
-                                        class="quantity-btn-modal"
-                                        type="button"
-                                        (click)="decreaseQuantity(item)"
-                                        [disabled]="item.quantity <= 1"
-                                    >
-                                        -
-                                    </button>
-                                    <input
-                                        type="number"
-                                        class="quantity-input-modal"
-                                        [(ngModel)]="item.quantity"
-                                        (change)="updateQuantity(item, $event)"
-                                        min="1"
-                                        max="99"
-                                    />
-                                    <button class="quantity-btn-modal" type="button" (click)="increaseQuantity(item)">+</button>
-                                </div>
-                                <div class="item-total-modal">{{ item.variant.price * item.quantity | number: '1.2-2' }} р.</div>
-                            </div>
-                        </div>
-                    }
+                <div class="item-controls-row">
+                    <div class="quantity-controls-modal">
+                        <button class="quantity-btn-modal" type="button" (click)="decreaseQuantity(item)"
+                            [disabled]="item.quantity <= 1">
+                            -
+                        </button>
+                        <input type="number" class="quantity-input-modal" [(ngModel)]="item.quantity"
+                            (change)="updateQuantity(item, $event)" min="1" max="99" />
+                        <button class="quantity-btn-modal" type="button" (click)="increaseQuantity(item)">+</button>
+                    </div>
+                    <div class="item-total-modal">{{ getItemTotal(item) | number: '1.2-2' }} р.</div>
                 </div>
+            </div>
             }
+        </div>
+        }
         }
     </div>
 
     @if ((cartItems$ | async)!.length > 0) {
-        <div class="modal-footer">
-            <div class="cart-summary-modal">
-                <div class="summary-row-modal">
-                    <span class="summary-label-modal">Товары: </span>
-                    <span class="summary-value-modal">{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
-                </div>
-                <div class="summary-row-modal">
-                    <span class="summary-label-modal">Доставка:</span>
-                    <span class="summary-value-modal">Рассчитается при оформлении</span>
-                </div>
-                <div class="summary-row-modal total-row">
-                    <span class="summary-label-modal">Итого: </span>
-                    <span class="summary-value-modal total-price">{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
-                </div>
+    <div class="modal-footer">
+        <div class="cart-summary-modal">
+            <div class="summary-row-modal">
+                <span class="summary-label-modal">Товары: </span>
+                <span class="summary-value-modal">{{ getTotalWithoutDiscount() | async | number: '1.2-2' }} р.</span>
             </div>
-            <div class="modal-actions">
-                <div class="action-row">
-                    <button class="btn btn-outline-secondary" (click)="continueShopping()">
-                        <i-bs name="arrow-left"></i-bs>
-                        <span class="btn-text">Продолжить</span>
-                    </button>
-                    <button class="btn btn-secondary" (click)="goToCart()">
-                        <i-bs name="bag"></i-bs>
-                        <span class="btn-text">Перейти в корзину</span>
-                    </button>
-                </div>
-                <button class="btn btn-primary checkout-btn" (click)="goToOrderConfirmation()">
-                    <i-bs name="credit-card"></i-bs>
-                    Заказать
-                </button>
+            @if ((discountAmount$ | async) && (discountAmount$ | async)! > 0) {
+            <div class="summary-row-modal discount-row-modal">
+                <span class="summary-label-modal">Скидка: </span>
+                <span class="summary-value-modal discount-value">-{{ discountAmount$ | async | number: '1.2-2' }}
+                    р.</span>
+            </div>
+            }
+            <div class="summary-row-modal">
+                <span class="summary-label-modal">Доставка:</span>
+                <span class="summary-value-modal">Рассчитается при оформлении</span>
+            </div>
+            <div class="summary-row-modal total-row">
+                <span class="summary-label-modal">Итого: </span>
+                <span class="summary-value-modal total-price">{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
             </div>
         </div>
+        <div class="modal-actions">
+            <div class="action-row">
+                <button class="btn btn-outline-secondary" (click)="continueShopping()">
+                    <i-bs name="arrow-left"></i-bs>
+                    <span class="btn-text">Продолжить</span>
+                </button>
+                <button class="btn btn-secondary" (click)="goToCart()">
+                    <i-bs name="bag"></i-bs>
+                    <span class="btn-text">Перейти в корзину</span>
+                </button>
+            </div>
+            <button class="btn btn-primary checkout-btn" (click)="goToOrderConfirmation()">
+                <i-bs name="credit-card"></i-bs>
+                Заказать
+            </button>
+        </div>
+    </div>
     }
 </div>

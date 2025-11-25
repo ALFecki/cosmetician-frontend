@@ -390,6 +390,12 @@
         justify-content: space-between;
         align-items: center;
 
+        &:not(:last-child) {
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--powder-pink);
+        }
+
         .total-label {
             color: var(--gray-dark);
             font-weight: 600;
@@ -400,6 +406,17 @@
             color: var(--primary);
             font-weight: 700;
             font-size: 1.75rem;
+        }
+
+        &.discount-row {
+            .total-label {
+                font-size: 1rem;
+            }
+
+            .discount-amount {
+                color: #198754;
+                font-size: 1.25rem;
+            }
         }
     }
 }

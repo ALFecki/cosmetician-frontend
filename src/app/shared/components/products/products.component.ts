@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, of } from 'rxjs';
+import { IconsModule } from '../../base/icons/icons.module';
 import { ProductModel } from '../../models/product.model';
 import { FilterProductSchema } from '../../schemas/product.schema';
 import { AuthService } from '../../services/auth.service';
@@ -11,6 +12,7 @@ import { CartService } from '../../services/cart.service';
 import { LoginModalService } from '../../services/login-modal.service';
 import { ProductService } from '../../services/product.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
+import { calculateDiscountedPrice, PriceInfo } from '../../utils/promotion.utils';
 import { PaginationComponent } from '../pagination/pagination.component';
 import { ProductFilterComponent } from '../product-filter/product-filter.component';
 import { ProductModalComponent } from '../product-modal/product-modal.component';
@@ -18,7 +20,7 @@ import { ProductModalComponent } from '../product-modal/product-modal.component'
 @Component({
     selector: 'app-products',
     providers: [],
-    imports: [CommonModule, FormsModule, PaginationComponent, ProductFilterComponent, ImageUrlPipe],
+    imports: [CommonModule, FormsModule, PaginationComponent, ProductFilterComponent, ImageUrlPipe, IconsModule],
     templateUrl: './products.component.html',
     styleUrl: './products.component.scss',
 })
@@ -45,7 +47,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
         private modalService: NgbModal,
         private authService: AuthService,
         private loginModalService: LoginModalService,
-    ) {}
+    ) { }
 
     ngOnInit(): void {
         if (this.categoryId) {
@@ -253,5 +255,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
         if (container) {
             container.classList.remove('loading');
         }
+    }
+
+    getProductPriceInfo(product: ProductModel): PriceInfo {
+        const variant = this.getSelectedVariant(product);
+        const basePrice = variant?.price || 0;
+        const promotions = product.promotions || [];
+        return calculateDiscountedPrice(basePrice, promotions);
     }
 }

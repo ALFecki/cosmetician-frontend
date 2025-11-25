@@ -10,6 +10,7 @@ import { CartService } from '../../services/cart.service';
 import { LoginModalService } from '../../services/login-modal.service';
 import { ToastService } from '../../services/toast.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
+import { calculateDiscountedPrice, PriceInfo } from '../../utils/promotion.utils';
 
 @Component({
     selector: 'app-product-modal',
@@ -31,7 +32,7 @@ export class ProductModalComponent implements OnDestroy {
         private cartService: CartService,
         private toastService: ToastService,
         private loginModalService: LoginModalService,
-    ) {}
+    ) { }
 
     moreInfo() {
         this.modalService.dismissAll();
@@ -112,5 +113,15 @@ export class ProductModalComponent implements OnDestroy {
         if (this.priceTimeout) {
             clearTimeout(this.priceTimeout);
         }
+    }
+
+    getSelectedVariantPriceInfo(): PriceInfo {
+        const variant = this.getSelectedVariant();
+        const basePrice = variant?.price || 0;
+        return calculateDiscountedPrice(basePrice, this.selectedProduct?.promotions || []);
+    }
+
+    getVariantPriceInfo(price: number): PriceInfo {
+        return calculateDiscountedPrice(price, this.selectedProduct?.promotions || []);
     }
 }

@@ -239,4 +239,21 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
             }),
         );
     }
+
+    applyPromocode(promoCode: string): Observable<OrderModel | null> {
+        return this.http.post<SingleResponse<OrderModel>>(
+            `${environment.server_url}/${this.endpoint}/apply-promo-code`,
+            { promoCode },
+        ).pipe(
+            map(response => {
+                if (response.status) {
+                    this.toastService.show('Промокод успешно применён', 'success');
+                    return response.data;
+                } else {
+                    this.toastService.show('Ошибка при применении промокода', 'error');
+                    return null;
+                }
+            }),
+        );
+    }
 }

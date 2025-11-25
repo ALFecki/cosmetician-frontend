@@ -43,22 +43,75 @@
                                         {{ item.product.title }}
                                     </a>
                                     <div class="item-meta">
+                                        @let priceInfo = getItemPriceInfo(item);
+                                        @if (priceInfo.hasDiscount) {
+                                        <span class="item-quantity">{{ item.quantity }} ×
+                                            <span class="price-original-inline">{{ priceInfo.originalPrice | number:
+                                                '1.2-2' }} р.</span>
+                                            <span class="price-discounted-inline">{{ priceInfo.discountedPrice | number:
+                                                '1.2-2' }} р.</span>
+                                            <span class="discount-badge-inline">{{ priceInfo.discountLabel }}</span>
+                                        </span>
+                                        } @else {
                                         <span class="item-quantity">{{ item.quantity }} × {{ item.variant.price |
                                             number: '1.2-2' }} р.</span>
+                                        }
                                         <span class="item-volume">{{ item.variant.volume }} мл</span>
                                     </div>
                                 </div>
-                                <div class="item-total">{{ item.variant.price * item.quantity | number: '1.2-2' }} р.
+                                <div class="item-total">{{ getItemTotal(item) | number: '1.2-2' }} р.
                                 </div>
                             </div>
                             }
                         </div>
                         }
                         <div class="order-totals">
+                            <!-- Promocode Section -->
+                            <!-- <div class="promocode-section mb-2">
+                                <div class="promocode-label">
+                                    <i class="bi bi-tag"></i>
+                                    Промокод
+                                </div>
+                                @if (!appliedPromocode) {
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control" placeholder="Введите промокод"
+                                        [(ngModel)]="promocode" [ngModelOptions]="{standalone: true}"
+                                        [disabled]="applyingPromocode" />
+                                    <button class="btn btn-outline-primary" type="button" (click)="applyPromocode()"
+                                        [disabled]="applyingPromocode || !promocode.trim()">
+                                        @if (applyingPromocode) {
+                                        <span class="spinner-border spinner-border-sm"></span>
+                                        } @else {
+                                        Применить
+                                        }
+                                    </button>
+                                </div>
+                                } @else {
+                                <div class="applied-promocode">
+                                    <div class="promocode-info">
+                                        <i class="bi bi-check-circle-fill text-success"></i>
+                                        <span class="promocode-code">{{ appliedPromocode.code }}</span>
+                                        <span class="promocode-discount">-{{ promocodeDiscount | number: '1.2-2' }}
+                                            р.</span>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-danger" type="button"
+                                        (click)="removePromocode()">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                                }
+                            </div> -->
+
                             <div class="total-row">
                                 <span>Товары:</span>
-                                <span>{{ totalPrice$ | async | number: '1.2-2' }} р.</span>
+                                <span>{{ getCartTotal() | number: '1.2-2' }} р.</span>
                             </div>
+                            @if (appliedPromocode) {
+                            <div class="total-row discount-row">
+                                <span>Скидка по промокоду:</span>
+                                <span class="text-success">-{{ promocodeDiscount | number: '1.2-2' }} р.</span>
+                            </div>
+                            }
                             <div class="total-row">
                                 <span>Доставка:</span>
                                 @if (this.currentOrder?.totalPrice && this.currentOrder!.totalPrice >= 250) {
@@ -78,7 +131,7 @@
                             </div>
                             <div class="total-row final-total">
                                 <span>Итого:</span>
-                                <span>{{ getTotalWithDelivery() | number: '1.2-2' }} р.</span>
+                                <span>{{ getTotalWithDeliveryAndPromotions() | number: '1.2-2' }} р.</span>
                             </div>
                         </div>
                     </div>

@@ -352,9 +352,52 @@
         color: var(--primary);
         font-weight: 600;
         font-size: 0.95rem;
+        margin-top: 0.35rem;
 
         @media (max-width: 575px) {
             font-size: 0.8rem;
+        }
+    }
+
+    .item-price-with-discount-modal {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        margin-top: 0.35rem;
+
+        .item-price-original-modal {
+            color: var(--gray-medium);
+            font-size: 0.8rem;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .item-price-discounted-modal {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+
+            .discount-badge-modal {
+                font-size: 0.7rem;
+                background: var(--primary);
+                color: white;
+                padding: 0.15rem 0.4rem;
+                border-radius: 4px;
+                font-weight: 700;
+                white-space: nowrap;
+            }
+
+            @media (max-width: 575px) {
+                font-size: 0.8rem;
+
+                .discount-badge-modal {
+                    font-size: 0.65rem;
+                    padding: 0.1rem 0.3rem;
+                }
+            }
         }
     }
 }
@@ -495,6 +538,17 @@
             align-items: center;
             margin-bottom: 0.75rem;
             width: 100%;
+
+            &.discount-row-modal {
+                .summary-label-modal {
+                    color: var(--success);
+                }
+
+                .discount-value {
+                    color: var(--success);
+                    font-weight: 700;
+                }
+            }
 
             &.total-row {
                 border-top: 2px solid var(--primary);
@@ -759,6 +813,7 @@
 }
 
 @keyframes bounce {
+
     0%,
     20%,
     50%,
