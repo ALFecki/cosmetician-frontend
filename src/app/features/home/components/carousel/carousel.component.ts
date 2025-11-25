@@ -1,25 +1,33 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ImageUrlPipe } from '../../../../shared/utils/image-url.pipe';
 import { CommonModule } from '@angular/common';
-import { IconsModule } from '../../../../shared/base/icons/icons.module';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { IconsModule } from '../../../../shared/base/icons/icons.module';
+import { ImageUrlPipe } from '../../../../shared/utils/image-url.pipe';
+import { PromoBannerComponent } from '../promo-banner/promo-banner.component';
 
 interface Slide {
-    image: string;
-    title: string;
+    image?: string;
+    title?: string;
     subtitle?: string;
     buttonText?: string;
     buttonLink?: string;
+    isPromo?: boolean;
 }
 
 @Component({
     selector: 'app-carousel',
     templateUrl: './carousel.component.html',
     styleUrls: ['./carousel.component.scss'],
-    imports: [ImageUrlPipe, CommonModule, IconsModule, RouterModule],
+    imports: [ImageUrlPipe, CommonModule, IconsModule, RouterModule, PromoBannerComponent],
 })
 export class CarouselComponent implements OnInit, OnDestroy {
     slides: Slide[] = [
+        {
+            // title: 'Акция от бренда Germaine de Capuccini',
+            // subtitle: 'Скидка до 30% на наборы бренда Germaine de Capuccini',
+            image: 'assets/images/carousel4.jpg',
+            isPromo: true,
+        },
         {
             image: 'assets/images/carousel1.jpg',
             title: 'Мы открылись!',

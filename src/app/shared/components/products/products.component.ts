@@ -47,7 +47,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
         private modalService: NgbModal,
         private authService: AuthService,
         private loginModalService: LoginModalService,
-    ) {}
+    ) { }
 
     ngOnInit(): void {
         if (this.categoryId) {
@@ -56,6 +56,14 @@ export class ProductsComponent implements OnInit, OnDestroy {
         if (this.brandId) {
             this.filterOptions.brandId = [this.brandId];
         }
+
+        // Check for promo query parameter
+        this.route.queryParams.subscribe(params => {
+            if (params['promo'] === 'true') {
+                this.filterOptions.hasPromotion = true;
+            }
+        });
+
         this.loadProducts();
     }
 
