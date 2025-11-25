@@ -12,10 +12,16 @@ import { DiscountType, PromotionModel } from '../../models/promotion.model';
 export class PromotionBadgeComponent {
     @Input() promotions: PromotionModel[] = [];
     @Input() variant: 'compact' | 'full' = 'compact';
+    @Input() basePrice?: number;
 
     getDiscountText(promotion: PromotionModel): string {
         if (promotion.discountType === DiscountType.PERCENTAGE) {
             return `-${promotion.discountValue}%`;
+        }
+        // For fixed discount, calculate percentage equivalent if basePrice is provided
+        if (this.basePrice && this.basePrice > 0) {
+            const percentageEquivalent = Math.round((promotion.discountValue / this.basePrice) * 100);
+            return `-${percentageEquivalent}%`;
         }
         return `-${promotion.discountValue} р.`;
     }

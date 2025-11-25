@@ -6,12 +6,13 @@ import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ProductModel } from '../../../../shared/models/product.model';
 import { ProductService } from '../../../../shared/services/product.service';
+import { ImageUrlPipe } from "../../../../shared/utils/image-url.pipe";
 
 @Component({
     selector: 'app-product-search',
     templateUrl: './product-search.component.html',
     styleUrls: ['./product-search.component.scss'],
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, ImageUrlPipe],
 })
 export class ProductSearchComponent implements OnInit, OnDestroy {
     @Output() closeSearch = new EventEmitter<void>();

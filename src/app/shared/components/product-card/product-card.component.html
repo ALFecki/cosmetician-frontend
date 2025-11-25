@@ -1,314 +1,313 @@
 <div class="container mt-4">
     @if (loading) {
-        <div class="text-center py-5">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Загрузка...</span>
-            </div>
-            <p class="mt-3 text-muted">Загружаем информацию о товаре...</p>
+    <div class="text-center py-5">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Загрузка...</span>
         </div>
+        <p class="mt-3 text-muted">Загружаем информацию о товаре...</p>
+    </div>
     }
 
     @if (error) {
-        <div class="alert alert-danger" role="alert">
-            <i-bs name="exclamation-triangle-fill" class="me-2"></i-bs>
-            {{ error }}
-        </div>
+    <div class="alert alert-danger" role="alert">
+        <i-bs name="exclamation-triangle-fill" class="me-2"></i-bs>
+        {{ error }}
+    </div>
     }
 
     @if (product) {
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a routerLink="/">
-                        <i-bs name="house-fill" class="me-1"></i-bs>
-                        Главная
-                    </a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a [routerLink]="['/products']">
-                        <i-bs name="grid-3x3-gap-fill" class="me-1"></i-bs>
-                        Каталог
-                    </a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a [routerLink]="['/brand', product.brand.id]">{{ product.brand.title }}</a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a [routerLink]="['/category', product.categories[0].id]">{{ product.categories[0].title }}</a>
-                </li>
-                <li class="breadcrumb-item active" aria-current="page">
-                    {{ product.title }}
-                </li>
-            </ol>
-        </nav>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a routerLink="/">
+                    <i-bs name="house-fill" class="me-1"></i-bs>
+                    Главная
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a [routerLink]="['/products']">
+                    <i-bs name="grid-3x3-gap-fill" class="me-1"></i-bs>
+                    Каталог
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a [routerLink]="['/brand', product.brand.id]">{{ product.brand.title }}</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a [routerLink]="['/category', product.categories[0].id]">{{ product.categories[0].title }}</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                {{ product.title }}
+            </li>
+        </ol>
+    </nav>
     }
 
     @if (!loading && !error && product) {
-        <div class="product-main-card p-4">
-            <div class="row g-4 align-items-start">
-                <div class="col-lg-5 d-flex align-items-center justify-content-center">
-                    <img [src]="product.image | imageUrl" [alt]="product.title" class="product-main-image" loading="lazy" />
-                </div>
-                <div class="col-lg-4">
-                    <div class="product-info-section">
-                        <h1 class="card-title">{{ product.fullTitle ? product.fullTitle : product.title }}</h1>
+    <div class="product-main-card p-4">
+        <div class="row g-4 align-items-start">
+            <div class="col-lg-5 d-flex align-items-center justify-content-center">
+                <img [src]="product.image | imageUrl" [alt]="product.title" class="product-main-image" loading="lazy" />
+            </div>
+            <div class="col-lg-4">
+                <div class="product-info-section">
+                    <h1 class="card-title">{{ product.fullTitle ? product.fullTitle : product.title }}</h1>
 
-                        @if (this.product.promotions && this.product.promotions.length > 0) {
-                            <app-promotion-badge [promotions]="this.product.promotions" [variant]="'full'"></app-promotion-badge>
-                        }
+                    @if (this.product.promotions && this.product.promotions.length > 0) {
+                    <app-promotion-badge [promotions]="this.product.promotions" [variant]="'full'"
+                        [basePrice]="getSelectedVariantPrice()"></app-promotion-badge>
+                    }
 
-                        <div class="product-meta mb-4">
-                            <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
-                                <a [routerLink]="['/brand', product.brand.id]" class="brand-link">
-                                    @if (product.brand.image) {
-                                        <img [src]="product.brand.image | imageUrl" [alt]="product.brand.title" class="brand-img me-2" />
-                                    }
-                                    <span>{{ product.brand.title }}</span>
-                                </a>
-                                @for (category of product.categories; track category) {
-                                    <div>
-                                        <a [routerLink]="['/category', category.id]" class="category-link">
-                                            <i-bs name="tag-fill" class="me-1"></i-bs>
-                                            {{ category.title }}
-                                        </a>
-                                    </div>
+                    <div class="product-meta mb-4">
+                        <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
+                            <a [routerLink]="['/brand', product.brand.id]" class="brand-link">
+                                @if (product.brand.image) {
+                                <img [src]="product.brand.image | imageUrl" [alt]="product.brand.title"
+                                    class="brand-img me-2" />
                                 }
+                                <span>{{ product.brand.title }}</span>
+                            </a>
+                            @for (category of product.categories; track category) {
+                            <div>
+                                <a [routerLink]="['/category', category.id]" class="category-link">
+                                    <i-bs name="tag-fill" class="me-1"></i-bs>
+                                    {{ category.title }}
+                                </a>
                             </div>
-                            <!-- <div class="text-muted mb-3">
+                            }
+                        </div>
+                        <!-- <div class="text-muted mb-3">
               <i-bs name="upc-scan" class="me-2"></i-bs>
               Артикул: <span class="fw-semibold">{{ product.id || '—' }}</span>
             </div> -->
-                        </div>
-                        @if (product.variants && product.variants.length > 1) {
-                            <div class="variant-selection-detail">
-                                <h6>
-                                    <i-bs name="droplet-fill" class="me-2"></i-bs>
-                                    Выберите объем:
-                                </h6>
-                                <div class="variant-buttons-detail">
-                                    @for (variant of product.variants; track variant) {
-                                        <button
-                                            class="btn variant-btn-detail"
-                                            [class.active]="selectedVariantId === variant.id"
-                                            (click)="selectVariant(variant.id)"
-                                        >
-                                            <div class="variant-volume">{{ variant.volume }}мл</div>
-                                            @if (product.isPriceHidden && !isPriceRevealed) {
-                                                <div class="variant-price text-muted">Цена скрыта</div>
-                                            } @else {
-                                                @if (this.product.promotions && this.product.promotions.length > 0) {
-                                                    @let priceInfo = getVariantPriceInfo(variant.price);
-                                                    @if (priceInfo.hasDiscount) {
-                                                        <div class="variant-price-container">
-                                                            <div class="variant-price-original">
-                                                                {{ priceInfo.originalPrice | number: '1.2-2' }} р.
-                                                            </div>
-                                                            <div class="variant-price-discounted">
-                                                                {{ priceInfo.discountedPrice | number: '1.2-2' }} р.
-                                                                <span class="discount-badge">{{ priceInfo.discountLabel }}</span>
-                                                            </div>
-                                                        </div>
-                                                    } @else {
-                                                        <div class="variant-price">{{ variant.price | number: '1.2-2' }} р.</div>
-                                                    }
-                                                } @else {
-                                                    <div class="variant-price">{{ variant.price | number: '1.2-2' }} р.</div>
-                                                }
-                                            }
-                                        </button>
-                                    }
-                                </div>
-                            </div>
-                        }
-                        <div class="characteristics-list">
-                            <h6 class="mb-3">
-                                <i-bs name="list-check" class="me-2"></i-bs>
-                                Основные характеристики
-                            </h6>
-                            @for (char of visibleCharacteristics; track char) {
-                                <div>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="text-muted">{{ char.label }}</span>
-                                        <span class="fw-semibold">{{ char.value }}</span>
+                    </div>
+                    @if (product.variants && product.variants.length > 1) {
+                    <div class="variant-selection-detail">
+                        <h6>
+                            <i-bs name="droplet-fill" class="me-2"></i-bs>
+                            Выберите объем:
+                        </h6>
+                        <div class="variant-buttons-detail">
+                            @for (variant of product.variants; track variant) {
+                            <button class="btn variant-btn-detail" [class.active]="selectedVariantId === variant.id"
+                                (click)="selectVariant(variant.id)">
+                                <div class="variant-volume">{{ variant.volume }}мл</div>
+                                @if (product.isPriceHidden && !isPriceRevealed) {
+                                <div class="variant-price text-muted">Цена скрыта</div>
+                                } @else {
+                                @if (this.product.promotions && this.product.promotions.length > 0) {
+                                @let priceInfo = getVariantPriceInfo(variant.price);
+                                @if (priceInfo.hasDiscount) {
+                                <div class="variant-price-container">
+                                    <div class="variant-price-original">
+                                        {{ priceInfo.originalPrice | number: '1.2-2' }} р.
+                                    </div>
+                                    <div class="variant-price-discounted">
+                                        {{ priceInfo.discountedPrice | number: '1.2-2' }} р.
+                                        <span class="discount-badge">{{ priceInfo.discountLabel }}</span>
                                     </div>
                                 </div>
-                            }
-                            @if (hiddenCharacteristics.length && !showAllCharacteristics) {
-                                <div class="mt-3">
-                                    <button class="btn btn-link p-0" (click)="showAllCharacteristics = true">
-                                        <i-bs name="chevron-down" class="me-1"></i-bs>
-                                        Показать все характеристики
-                                    </button>
-                                </div>
-                            }
-                            @if (showAllCharacteristics) {
-                                <div>
-                                    @for (char of hiddenCharacteristics; track char) {
-                                        <div>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <span class="text-muted">{{ char.label }}</span>
-                                                <span class="fw-semibold">{{ char.value }}</span>
-                                            </div>
-                                        </div>
-                                    }
-                                    <button class="btn btn-link p-0 mt-2" (click)="showAllCharacteristics = false">
-                                        <i-bs name="chevron-up" class="me-1"></i-bs>
-                                        Скрыть
-                                    </button>
-                                </div>
+                                } @else {
+                                <div class="variant-price">{{ variant.price | number: '1.2-2' }} р.</div>
+                                }
+                                } @else {
+                                <div class="variant-price">{{ variant.price | number: '1.2-2' }} р.</div>
+                                }
+                                }
+                            </button>
                             }
                         </div>
                     </div>
-                </div>
-                <div class="col-lg-3">
-                    <div class="right-panel">
-                        <div class="price-block">
-                            @if (product.isPriceHidden && !isPriceRevealed) {
-                                <button class="btn btn-outline-primary mb-2" (click)="revealPrice()">
-                                    <i-bs name="eye" class="me-2"></i-bs>
-                                    Узнать цену
-                                </button>
-                                <div class="text-muted">
-                                    <i-bs name="droplet" class="me-1"></i-bs>
-                                    Объем: {{ getSelectedVariantVolume() }} мл
+                    }
+                    <div class="characteristics-list">
+                        <h6 class="mb-3">
+                            <i-bs name="list-check" class="me-2"></i-bs>
+                            Основные характеристики
+                        </h6>
+                        @for (char of visibleCharacteristics; track char) {
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">{{ char.label }}</span>
+                                <span class="fw-semibold">{{ char.value }}</span>
+                            </div>
+                        </div>
+                        }
+                        @if (hiddenCharacteristics.length && !showAllCharacteristics) {
+                        <div class="mt-3">
+                            <button class="btn btn-link p-0" (click)="showAllCharacteristics = true">
+                                <i-bs name="chevron-down" class="me-1"></i-bs>
+                                Показать все характеристики
+                            </button>
+                        </div>
+                        }
+                        @if (showAllCharacteristics) {
+                        <div>
+                            @for (char of hiddenCharacteristics; track char) {
+                            <div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">{{ char.label }}</span>
+                                    <span class="fw-semibold">{{ char.value }}</span>
                                 </div>
-                            } @else {
-                                @let priceInfo = getSelectedVariantPriceInfo();
-                                @if (priceInfo.hasDiscount) {
-                                    <div class="price-block-with-discount animate-reveal">
-                                        <div class="original-price">
-                                            {{ priceInfo.originalPrice | number: '1.2-2' }}
-                                            <span class="currency">р.</span>
-                                        </div>
-                                        <div class="discounted-price">
-                                            {{ priceInfo.discountedPrice | number: '1.2-2' }}
-                                            <span class="currency">р.</span>
-                                        </div>
-                                        <div class="discount-label-large">{{ priceInfo.discountLabel }}</div>
-                                    </div>
-                                } @else {
-                                    <div class="h3 price-revealed animate-reveal">
-                                        {{ getSelectedVariantPrice() | number: '1.2-2' }}
-                                        <span class="currency">р.</span>
-                                    </div>
-                                }
-                                <div class="text-muted">
-                                    <i-bs name="droplet" class="me-1"></i-bs>
-                                    Объем: {{ getSelectedVariantVolume() }} мл
-                                </div>
+                            </div>
                             }
+                            <button class="btn btn-link p-0 mt-2" (click)="showAllCharacteristics = false">
+                                <i-bs name="chevron-up" class="me-1"></i-bs>
+                                Скрыть
+                            </button>
                         </div>
-                        <button class="btn btn-primary w-100 mb-3" (click)="addToCart()">
-                            <i-bs name="cart-plus" class="me-2"></i-bs>
-                            Добавить в корзину
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="right-panel">
+                    <div class="price-block">
+                        @if (product.isPriceHidden && !isPriceRevealed) {
+                        <button class="btn btn-outline-primary mb-2" (click)="revealPrice()">
+                            <i-bs name="eye" class="me-2"></i-bs>
+                            Узнать цену
                         </button>
-                        <div class="features">
-                            <h6 class="mb-3 text-center">
-                                <i-bs name="award-fill" class="me-2"></i-bs>
-                                Наши гарантии
-                            </h6>
-                            <div class="feature-item">
-                                <i-bs name="truck"></i-bs>
-                                <span>Быстрая доставка по Беларуси</span>
-                            </div>
-                            <div class="feature-item">
-                                <i-bs name="shield-check"></i-bs>
-                                <span>100% оригинальная продукция</span>
-                            </div>
-                            <div class="feature-item">
-                                <i-bs name="credit-card"></i-bs>
-                                <span>Удобные способы оплаты</span>
-                            </div>
+                        <div class="text-muted">
+                            <i-bs name="droplet" class="me-1"></i-bs>
+                            Объем: {{ getSelectedVariantVolume() }} мл
                         </div>
-                        <div class="consultation-box">
-                            <h5>
-                                <i-bs name="headset" class="me-2"></i-bs>
-                                Нужна консультация?
-                            </h5>
-                            <div class="contact-item">
-                                <i-bs name="telephone-fill"></i-bs>
-                                <span>+375 (29) 598-77-52</span>
+                        } @else {
+                        @let priceInfo = getSelectedVariantPriceInfo();
+                        @if (priceInfo.hasDiscount) {
+                        <div class="price-block-with-discount animate-reveal">
+                            <div class="original-price">
+                                {{ priceInfo.originalPrice | number: '1.2-2' }}
+                                <span class="currency">р.</span>
                             </div>
-                            <div class="contact-item">
-                                <i-bs name="envelope-fill"></i-bs>
-                                <span>{{ 'skviderm@gmail.com' }}</span>
+                            <div class="discounted-price">
+                                {{ priceInfo.discountedPrice | number: '1.2-2' }}
+                                <span class="currency">р.</span>
                             </div>
+                            <div class="discount-label-large">{{ priceInfo.discountLabel }}</div>
+                        </div>
+                        } @else {
+                        <div class="h3 price-revealed animate-reveal">
+                            {{ getSelectedVariantPrice() | number: '1.2-2' }}
+                            <span class="currency">р.</span>
+                        </div>
+                        }
+                        <div class="text-muted">
+                            <i-bs name="droplet" class="me-1"></i-bs>
+                            Объем: {{ getSelectedVariantVolume() }} мл
+                        </div>
+                        }
+                    </div>
+                    <button class="btn btn-primary w-100 mb-3" (click)="addToCart()">
+                        <i-bs name="cart-plus" class="me-2"></i-bs>
+                        Добавить в корзину
+                    </button>
+                    <div class="features">
+                        <h6 class="mb-3 text-center">
+                            <i-bs name="award-fill" class="me-2"></i-bs>
+                            Наши гарантии
+                        </h6>
+                        <div class="feature-item">
+                            <i-bs name="truck"></i-bs>
+                            <span>Быстрая доставка по Беларуси</span>
+                        </div>
+                        <div class="feature-item">
+                            <i-bs name="shield-check"></i-bs>
+                            <span>100% оригинальная продукция</span>
+                        </div>
+                        <div class="feature-item">
+                            <i-bs name="credit-card"></i-bs>
+                            <span>Удобные способы оплаты</span>
+                        </div>
+                    </div>
+                    <div class="consultation-box">
+                        <h5>
+                            <i-bs name="headset" class="me-2"></i-bs>
+                            Нужна консультация?
+                        </h5>
+                        <div class="contact-item">
+                            <i-bs name="telephone-fill"></i-bs>
+                            <span>+375 (29) 598-77-52</span>
+                        </div>
+                        <div class="contact-item">
+                            <i-bs name="envelope-fill"></i-bs>
+                            <span>{{ 'skviderm@gmail.com' }}</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
     }
 
     @if (!loading && !error && product) {
-        <div class="card">
-            <div class="card-body">
-                <ul class="nav nav-tabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" [class.active]="activeTab === 'desc'" (click)="activeTab = 'desc'" type="button">
-                            <i-bs name="card-text" class="me-2"></i-bs>
-                            Описание
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button
-                            class="nav-link"
-                            [class.active]="activeTab === 'composition'"
-                            (click)="activeTab = 'composition'"
-                            type="button"
-                        >
-                            <i-bs name="list-ul" class="me-2"></i-bs>
-                            Состав
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" [class.active]="activeTab === 'chars'" (click)="activeTab = 'chars'" type="button">
-                            <i-bs name="gear-fill" class="me-2"></i-bs>
-                            Характеристики
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" [class.active]="activeTab === 'use'" (click)="activeTab = 'use'" type="button">
-                            <i-bs name="clipboard-check" class="me-2"></i-bs>
-                            Применение
-                        </button>
-                    </li>
-                </ul>
-                <div class="tab-content">
-                    <div class="tab-pane fade" [class.show]="activeTab === 'desc'" [class.active]="activeTab === 'desc'">
-                        <div class="content-wrapper">
-                            <h5 class="mb-3">О товаре</h5>
-                            <p>{{ product.description || 'Описание товара будет добавлено позже.' }}</p>
-                        </div>
+    <div class="card">
+        <div class="card-body">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" [class.active]="activeTab === 'desc'" (click)="activeTab = 'desc'"
+                        type="button">
+                        <i-bs name="card-text" class="me-2"></i-bs>
+                        Описание
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" [class.active]="activeTab === 'composition'"
+                        (click)="activeTab = 'composition'" type="button">
+                        <i-bs name="list-ul" class="me-2"></i-bs>
+                        Состав
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" [class.active]="activeTab === 'chars'" (click)="activeTab = 'chars'"
+                        type="button">
+                        <i-bs name="gear-fill" class="me-2"></i-bs>
+                        Характеристики
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" [class.active]="activeTab === 'use'" (click)="activeTab = 'use'"
+                        type="button">
+                        <i-bs name="clipboard-check" class="me-2"></i-bs>
+                        Применение
+                    </button>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade" [class.show]="activeTab === 'desc'" [class.active]="activeTab === 'desc'">
+                    <div class="content-wrapper">
+                        <h5 class="mb-3">О товаре</h5>
+                        <p>{{ product.description || 'Описание товара будет добавлено позже.' }}</p>
                     </div>
-                    <div class="tab-pane fade" [class.show]="activeTab === 'composition'" [class.active]="activeTab === 'composition'">
-                        <div class="content-wrapper">
-                            <h5 class="mb-3">Состав продукта</h5>
-                            <p>{{ product.composition || 'Информация о составе будет добавлена позже.' }}</p>
-                        </div>
+                </div>
+                <div class="tab-pane fade" [class.show]="activeTab === 'composition'"
+                    [class.active]="activeTab === 'composition'">
+                    <div class="content-wrapper">
+                        <h5 class="mb-3">Состав продукта</h5>
+                        <p>{{ product.composition || 'Информация о составе будет добавлена позже.' }}</p>
                     </div>
-                    <div class="tab-pane fade" [class.show]="activeTab === 'chars'" [class.active]="activeTab === 'chars'">
-                        <div class="content-wrapper">
-                            <h5 class="mb-3">Полные характеристики</h5>
-                            <div class="characteristics-table">
-                                @for (char of allCharacteristics; track char) {
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="text-muted">{{ char.label }}</span>
-                                        <span class="fw-semibold">{{ char.value }}</span>
-                                    </div>
-                                }
+                </div>
+                <div class="tab-pane fade" [class.show]="activeTab === 'chars'" [class.active]="activeTab === 'chars'">
+                    <div class="content-wrapper">
+                        <h5 class="mb-3">Полные характеристики</h5>
+                        <div class="characteristics-table">
+                            @for (char of allCharacteristics; track char) {
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">{{ char.label }}</span>
+                                <span class="fw-semibold">{{ char.value }}</span>
                             </div>
+                            }
                         </div>
                     </div>
-                    <div class="tab-pane fade" [class.show]="activeTab === 'use'" [class.active]="activeTab === 'use'">
-                        <div class="content-wrapper">
-                            <h5 class="mb-3">Способ применения</h5>
-                            <p>{{ product.methodOfUse || 'Инструкция по применению будет добавлена позже.' }}</p>
-                        </div>
+                </div>
+                <div class="tab-pane fade" [class.show]="activeTab === 'use'" [class.active]="activeTab === 'use'">
+                    <div class="content-wrapper">
+                        <h5 class="mb-3">Способ применения</h5>
+                        <p>{{ product.methodOfUse || 'Инструкция по применению будет добавлена позже.' }}</p>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
     }
 </div>
 

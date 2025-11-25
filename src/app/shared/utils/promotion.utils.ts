@@ -66,7 +66,9 @@ export function calculateDiscountedPrice(originalPrice: number, promotions: Prom
         // Apply fixed discount
         discountAmount = promotion.discountValue;
         discountedPrice = originalPrice - discountAmount;
-        discountLabel = `-${discountAmount.toFixed(2)} р.`;
+        // Calculate the nearest whole percentage for display
+        const percentageEquivalent = Math.round((discountAmount / originalPrice) * 100);
+        discountLabel = `-${percentageEquivalent}%`;
     }
 
     // Ensure price doesn't go below 0
