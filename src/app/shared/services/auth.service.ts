@@ -127,6 +127,20 @@ export class AuthService {
         }
     }
 
+    getOAuthUrl(provider: string, redirectUrl: string): Observable<string> {
+        return this.http
+            .get<{ url: string }>(`${environment.server_url}/oauth_url_${provider}`, {
+                params: new HttpParams().set('redirectUri', redirectUrl),
+            })
+            .pipe(
+                map(response => response.url),
+                catchError(error => {
+                    console.error('Get OAuth URL error:', error);
+                    return throwError(() => error);
+                }),
+            );
+    }
+
     getCsrfToken(): string {
         return this.csrfToken.value;
     }

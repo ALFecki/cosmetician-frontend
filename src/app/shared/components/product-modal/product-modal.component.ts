@@ -5,16 +5,18 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { IconsModule } from '../../base/icons/icons.module';
 import { CountryModel } from '../../models/country.model';
 import { ProductModel } from '../../models/product.model';
+import { PromotionModel } from '../../models/promotion.model';
 import { AuthService } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
 import { LoginModalService } from '../../services/login-modal.service';
+import { PromotionService } from '../../services/promotion.service';
 import { ToastService } from '../../services/toast.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
-import { calculateDiscountedPrice, PriceInfo } from '../../utils/promotion.utils';
+import { PromotionBadgeComponent } from '../promotion-badge/promotion-badge.component';
 
 @Component({
     selector: 'app-product-modal',
-    imports: [CommonModule, IconsModule, ImageUrlPipe],
+    imports: [CommonModule, PromotionBadgeComponent, IconsModule, ImageUrlPipe],
     templateUrl: './product-modal.component.html',
     styleUrl: './product-modal.component.scss',
 })
@@ -24,6 +26,7 @@ export class ProductModalComponent implements OnDestroy {
     activeTab = 'description';
     isPriceRevealed = false;
     private priceTimeout: NodeJS.Timeout | null = null;
+    productPromotions: PromotionModel[] = [];
 
     constructor(
         private modalService: NgbModal,
@@ -32,7 +35,8 @@ export class ProductModalComponent implements OnDestroy {
         private cartService: CartService,
         private toastService: ToastService,
         private loginModalService: LoginModalService,
-    ) {}
+        private promotionService: PromotionService,
+    ) { }
 
     moreInfo() {
         this.modalService.dismissAll();
@@ -113,15 +117,5 @@ export class ProductModalComponent implements OnDestroy {
         if (this.priceTimeout) {
             clearTimeout(this.priceTimeout);
         }
-    }
-
-    getSelectedVariantPriceInfo(): PriceInfo {
-        const variant = this.getSelectedVariant();
-        const basePrice = variant?.price || 0;
-        return calculateDiscountedPrice(basePrice, this.selectedProduct?.promotions || []);
-    }
-
-    getVariantPriceInfo(price: number): PriceInfo {
-        return calculateDiscountedPrice(price, this.selectedProduct?.promotions || []);
     }
 }

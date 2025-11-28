@@ -9,6 +9,7 @@ import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { VerifyEmailModalService } from '../../services/verify-email-modal.service';
 import { IconsModule } from '../../base/icons/icons.module';
+import { get } from 'http';
 
 @Component({
     selector: 'app-login',
@@ -24,6 +25,7 @@ export class LoginComponent {
     email = new FormControl('');
     password = new FormControl('');
     rememberMe = new FormControl(false);
+    isLoggingInWithGoogle = false;
 
     // Registration form controls
     registrationForm: FormGroup = new FormGroup({
@@ -107,6 +109,29 @@ export class LoginComponent {
             },
             complete: () => {
                 this.isLoggingIn = false;
+            },
+        });
+    }
+
+    loginWithGoogle(): void {
+        if (this.isLoggingInWithGoogle) return;
+        this.isLoggingInWithGoogle = true;
+        let googleOAuthUrl: string | null = null;
+
+        this.authService.getOAuthUrl('google', this.returnUrl || '/').subscribe({
+            next: url => {
+                googleOAuthUrl = url;
+            },
+            error: error => {
+                console.error('Failed to get Google OAuth URL:', error);
+                this.toastService.show('Не удалось подключиться к серверу для входа через Google', 'error');
+                this.isLoggingInWithGoogle = false;
+            },
+            complete: () => {
+                this.isLoggingInWithGoogle = false;
+                if (googleOAuthUrl) {
+                    window.location.href = googleOAuthUrl;
+                }
             },
         });
     }

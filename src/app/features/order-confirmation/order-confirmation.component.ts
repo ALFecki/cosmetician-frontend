@@ -391,6 +391,10 @@ export class OrderConfirmationComponent implements OnInit {
         return totalWithDiscount + this.getDeliveryPrice();
     }
 
+    getTotalWithoutPromo(): Observable<number> {
+        return this.cartService.getTotalWithoutDiscount();
+    }
+
     async applyPromocode(): Promise<void> {
         if (!this.promocode.trim()) {
             this.toastService.show('Введите промокод', 'warning');

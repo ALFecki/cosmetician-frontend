@@ -64,6 +64,18 @@
             }
         </button>
 
+        <div class="oauth-login">
+            <button type="button" class="btn btn-primary" (click)="loginWithGoogle()" [disabled]="isLoggingInWithGoogle">
+                @if (isLoggingInWithGoogle) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <span>Входим с Google...</span>
+                } @else {
+                    <i class="fab fa-google me-2"></i>
+                    <span>Войти с Google</span>
+                }
+            </button>
+        </div>
+
         <div class="register-links">
             <a href="#" class="btn btn-link" (click)="openForgotPasswordModal(forgotPasswordModal); $event.preventDefault()"
                 >Забыли пароль?</a

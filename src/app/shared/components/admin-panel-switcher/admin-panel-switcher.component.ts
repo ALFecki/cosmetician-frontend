@@ -35,19 +35,7 @@ interface ModelConfig {
     fields: {
         key: string;
         label: string;
-        type:
-            | 'text'
-            | 'number'
-            | 'textarea'
-            | 'select'
-            | 'file'
-            | 'image'
-            | 'email'
-            | 'boolean'
-            | 'multiselect'
-            | 'variants'
-            | 'datetime-local'
-            | 'product-search';
+        type: 'text' | 'number' | 'textarea' | 'select' | 'file' | 'image' | 'email' | 'boolean' | 'multiselect' | 'variants';
         required?: boolean;
         options?: any[];
     }[];
@@ -115,13 +103,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
     filePreviewUrls: Record<string, string> = {};
     selectedFiles: Record<string, File> = {};
 
-    // Product search
-    productSearchText: Record<string, string> = {};
-    allProducts: any[] = [];
-    filteredProducts: Record<string, any[]> = {};
-    selectedProducts: Record<string, any[]> = {};
-    showProductDropdown: Record<string, boolean> = {};
-
     constructor(
         private fb: FormBuilder,
         private modalService: NgbModal,
@@ -138,7 +119,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
         private productVariantService: ProductVariantService,
         private promotionService: PromotionService,
         private promocodeService: PromocodeService,
-    ) {}
+    ) { }
 
     ngOnInit(): void {
         this.setupModelConfigs();
@@ -424,8 +405,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'buyQuantity', label: 'Купи N товаров', type: 'number', required: false },
                 { key: 'getQuantity', label: 'Получи M товаров', type: 'number', required: false },
                 { key: 'priority', label: 'Приоритет (чем выше, тем приоритетнее)', type: 'number', required: true },
-                { key: 'validFrom', label: 'Действительна с', type: 'datetime-local', required: true },
-                { key: 'validUntil', label: 'Действительна до', type: 'datetime-local', required: true },
+                { key: 'validFrom', label: 'Действительна с', type: 'text', required: true },
+                { key: 'validUntil', label: 'Действительна до', type: 'text', required: true },
                 {
                     key: 'isActive',
                     label: 'Активна',
@@ -476,8 +457,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'minOrderAmount', label: 'Минимальная сумма заказа', type: 'number', required: false },
                 { key: 'maxDiscountAmount', label: 'Максимальная сумма скидки', type: 'number', required: false },
                 { key: 'usageLimit', label: 'Лимит использований (0 = безлимит)', type: 'number', required: false },
-                { key: 'validFrom', label: 'Действителен с', type: 'datetime-local', required: true },
-                { key: 'validUntil', label: 'Действителен до', type: 'datetime-local', required: true },
+                { key: 'validFrom', label: 'Действителен с', type: 'text', required: true },
+                { key: 'validUntil', label: 'Действителен до', type: 'text', required: true },
                 {
                     key: 'isActive',
                     label: 'Активен',
@@ -557,11 +538,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
             observables['productScopes'] = this.productScopeService.getAll({ includeDeleted: true } as FilterProductScopeSchema);
         }
 
-        // Load products for promotions model
-        if (this.currentModel === 'promotions') {
-            observables['products'] = this.productService.getAll({ includeDeleted: false });
-        }
-
         if (Object.keys(observables).length > 0) {
             forkJoin(observables)
                 .pipe(
@@ -581,11 +557,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
                                 }
                             }
                         });
-
-                        // Load products for product-search fields
-                        if (results['products']) {
-                            this.allProducts = results['products'].data;
-                        }
                     }),
                     catchError(error => {
                         console.error('Error loading options:', error);
@@ -663,15 +634,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
                     value = item.countries?.map((country: any) => country.id) || [];
                 } else if (field.key === 'productScopeIds') {
                     value = item.productScopes?.map((scope: any) => scope.id) || [];
-                } else if (field.type === 'datetime-local' && item[field.key]) {
-                    // Convert date to datetime-local format (YYYY-MM-DDTHH:mm)
-                    const date = new Date(item[field.key]);
-                    value = date.toISOString().slice(0, 16);
-                } else if (field.type === 'product-search' && item[field.key]) {
-                    // Convert array of IDs to comma-separated string for internal use
-                    const productIds = Array.isArray(item[field.key]) ? item[field.key] : [];
-                    value = productIds.join(',');
-                    this.initializeProductSearch(field.key, value);
                 } else {
                     value = field.key.includes('.') ? this.getNestedProperty(item, field.key) : item[field.key] || '';
                 }
@@ -680,10 +642,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
                     value = [];
                 } else if (field.type === 'multiselect') {
                     value = [];
-                } else if (field.type === 'product-search') {
-                    this.selectedProducts[field.key] = [];
-                    this.productSearchText[field.key] = '';
-                    this.showProductDropdown[field.key] = false;
                 }
             }
 
@@ -747,9 +705,6 @@ export class AdminPanelSwitcherComponent implements OnInit {
     resetFileUploads() {
         this.filePreviewUrls = {};
         this.selectedFiles = {};
-        // Reset product search state
-        this.productSearchText = {};
-        this.showProductDropdown = {};
     }
 
     onFileSelected(event: Event, fieldKey: string) {
@@ -932,18 +887,9 @@ export class AdminPanelSwitcherComponent implements OnInit {
             }
 
             const value = this.itemForm.value[key];
-            const field = this.currentModelFields.find(f => f.key === key);
-
             if (value !== null && value !== undefined && value !== '') {
-                if (key === 'variants' || key === 'categoryIds' || key === 'countryIds' || key === 'productScopeIds') {
+                if (key === 'variants' || key === 'categoryIds' || key === 'countryIds' || key === 'productScopeIds' || key === "targetIds" || key === 'applicableTo') {
                     formData[key] = JSON.stringify(value);
-                } else if (field?.type === 'datetime-local') {
-                    // Convert datetime-local to ISO string for backend
-                    formData[key] = new Date(value).toISOString();
-                } else if (field?.type === 'product-search') {
-                    // Convert comma-separated string to array and stringify like categoryIds
-                    const productIds = value.split(',').filter((id: string) => id.trim());
-                    formData[key] = JSON.stringify(productIds);
                 } else if (typeof value === 'object' && !Array.isArray(value)) {
                     formData[key] = JSON.stringify(value);
                 } else {
@@ -1038,64 +984,5 @@ export class AdminPanelSwitcherComponent implements OnInit {
         }
 
         return `Выбрано: ${selectedIds.length}`;
-    }
-
-    // Product search methods
-    onProductSearchChange(fieldKey: string, searchText: string): void {
-        this.productSearchText[fieldKey] = searchText;
-
-        if (!searchText.trim()) {
-            this.filteredProducts[fieldKey] = this.allProducts.slice(0, 20);
-            return;
-        }
-
-        const searchLower = searchText.toLowerCase().trim();
-        this.filteredProducts[fieldKey] = this.allProducts
-            .filter(product => product.title.toLowerCase().includes(searchLower) || product.fullTitle?.toLowerCase().includes(searchLower))
-            .slice(0, 20);
-    }
-
-    toggleProductDropdown(fieldKey: string, show: boolean): void {
-        this.showProductDropdown[fieldKey] = show;
-        if (show && !this.filteredProducts[fieldKey]) {
-            this.filteredProducts[fieldKey] = this.allProducts.slice(0, 20);
-        }
-    }
-
-    selectProduct(fieldKey: string, product: any): void {
-        if (!this.selectedProducts[fieldKey]) {
-            this.selectedProducts[fieldKey] = [];
-        }
-
-        const exists = this.selectedProducts[fieldKey].find(p => p.id === product.id);
-        if (!exists) {
-            this.selectedProducts[fieldKey].push(product);
-            this.updateProductFormValue(fieldKey);
-        }
-
-        this.productSearchText[fieldKey] = '';
-        this.showProductDropdown[fieldKey] = false;
-    }
-
-    removeSelectedProduct(fieldKey: string, productId: string): void {
-        if (this.selectedProducts[fieldKey]) {
-            this.selectedProducts[fieldKey] = this.selectedProducts[fieldKey].filter(p => p.id !== productId);
-            this.updateProductFormValue(fieldKey);
-        }
-    }
-
-    updateProductFormValue(fieldKey: string): void {
-        const productIds = this.selectedProducts[fieldKey]?.map(p => p.id) || [];
-        this.itemForm.get(fieldKey)?.setValue(productIds.join(','));
-    }
-
-    initializeProductSearch(fieldKey: string, currentValue: string): void {
-        if (!currentValue) {
-            this.selectedProducts[fieldKey] = [];
-            return;
-        }
-
-        const productIds = currentValue.split(',').filter(id => id.trim());
-        this.selectedProducts[fieldKey] = this.allProducts.filter(p => productIds.includes(p.id));
     }
 }
