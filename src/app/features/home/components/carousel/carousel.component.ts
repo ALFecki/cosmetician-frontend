@@ -22,12 +22,12 @@ interface Slide {
 })
 export class CarouselComponent implements OnInit, OnDestroy {
     slides: Slide[] = [
-        {
-            // title: 'Акция от бренда Germaine de Capuccini',
-            // subtitle: 'Скидка до 30% на наборы бренда Germaine de Capuccini',
-            image: 'assets/images/carousel4.jpg',
-            isPromo: true,
-        },
+        // {
+        //     // title: 'Акция от бренда Germaine de Capuccini',
+        //     // subtitle: 'Скидка до 30% на наборы бренда Germaine de Capuccini',
+        //     image: 'assets/images/carousel4.jpg',
+        //     isPromo: true,
+        // },
         {
             image: 'assets/images/carousel1.jpg',
             title: 'Мы открылись!',
