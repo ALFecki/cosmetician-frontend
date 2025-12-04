@@ -22,12 +22,10 @@ interface Slide {
 })
 export class CarouselComponent implements OnInit, OnDestroy {
     slides: Slide[] = [
-        // {
-        //     // title: 'Акция от бренда Germaine de Capuccini',
-        //     // subtitle: 'Скидка до 30% на наборы бренда Germaine de Capuccini',
-        //     image: 'assets/images/carousel4.jpg',
-        //     isPromo: true,
-        // },
+        {
+            image: 'assets/images/carousel4.jpg',
+            isPromo: true,
+        },
         {
             image: 'assets/images/carousel1.jpg',
             title: 'Мы открылись!',
@@ -45,8 +43,8 @@ export class CarouselComponent implements OnInit, OnDestroy {
         },
         {
             image: 'assets/images/carousel3.jpg',
-            title: 'Скоро в продаже',
-            subtitle: 'Индивидуальные наборы для домашнего ухода',
+            title: 'Индивидуальные наборы для домашнего ухода',
+            subtitle: 'Новые индивидуальные наборы для домашнего ухода уже в продаже!',
             buttonText: 'Смотреть каталог',
             buttonLink: '/products',
         },
