@@ -26,13 +26,13 @@ export class CarouselComponent implements OnInit, OnDestroy {
             image: 'assets/images/carousel4.jpg',
             isPromo: true,
         },
-        {
-            image: 'assets/images/carousel1.jpg',
-            title: 'Мы открылись!',
-            subtitle: 'Первым 10 клиентам – подарок!',
-            buttonText: 'Смотреть каталог',
-            buttonLink: '/products',
-        },
+        // {
+        //     image: 'assets/images/carousel1.jpg',
+        //     title: 'Мы открылись!',
+        //     subtitle: 'Первым 10 клиентам – подарок!',
+        //     buttonText: 'Смотреть каталог',
+        //     buttonLink: '/products',
+        // },
         {
             image: 'assets/images/carousel2.jpg',
             title: 'Профессиональные консультации',
