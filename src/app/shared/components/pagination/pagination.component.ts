@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { IconsModule } from '../../base/icons/icons.module';
 
 @Component({
     selector: 'app-pagination',
     templateUrl: './pagination.component.html',
     styleUrls: ['./pagination.component.scss'],
-    imports: [FormsModule],
+    imports: [FormsModule, IconsModule],
 })
 export class PaginationComponent implements OnChanges {
     @Input() totalItems = 0;

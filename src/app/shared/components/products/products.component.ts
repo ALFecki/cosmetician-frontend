@@ -47,7 +47,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
         private modalService: NgbModal,
         private authService: AuthService,
         private loginModalService: LoginModalService,
-    ) {}
+    ) { }
 
     ngOnInit(): void {
         if (this.categoryId) {
@@ -104,10 +104,21 @@ export class ProductsComponent implements OnInit, OnDestroy {
         this.priceTimeouts.clear();
     }
 
+    private scrollToTop(): void {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+    }
+
     resetFilters(): void {
         this.filterOptions = {};
         this.currentPage = 1;
         this.loadProducts();
+        this.scrollToTop();
     }
 
     loadProducts(): void {
@@ -179,12 +190,15 @@ export class ProductsComponent implements OnInit, OnDestroy {
     onPageChange(page: number): void {
         this.currentPage = page;
         this.loadProducts();
+        this.scrollToTop();
     }
 
     onItemsPerPageChange(itemsPerPage: number): void {
         this.itemsPerPage = itemsPerPage;
+        this.currentPage = 1;
         console.log('Items per page changed:', itemsPerPage);
         this.loadProducts();
+        this.scrollToTop();
     }
 
     openProductDetails(product: ProductModel) {
