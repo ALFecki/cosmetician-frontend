@@ -36,7 +36,7 @@ export class BrandsComponent implements OnInit {
         this.brands$ = this.brandService.getBrandsList().pipe(
             map(brands => {
                 brands = brands.filter(b => b.image);
-                const germaine = brands.find(b => b.title.toLowerCase() === 'germaine de capuccini');
+                const germaine = brands.find(b => b.title.toLowerCase() === 'germaine de cappuccini');
                 if (germaine) {
                     brands = brands.filter(b => b.id !== germaine!.id);
                     return [this.getRandomUniqueElements(brands, 3), germaine].flat();
