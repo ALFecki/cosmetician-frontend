@@ -15,6 +15,9 @@ export class PromotionBadgeComponent {
     @Input() basePrice?: number;
 
     getDiscountText(promotion: PromotionModel): string {
+        if (promotion.discountValue == 0) {
+            return '';
+        }
         if (promotion.discountType === DiscountType.PERCENTAGE) {
             return `-${promotion.discountValue}%`;
         }
