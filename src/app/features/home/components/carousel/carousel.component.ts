@@ -22,10 +22,10 @@ interface Slide {
 })
 export class CarouselComponent implements OnInit, OnDestroy {
     slides: Slide[] = [
-        {
-            image: 'assets/images/carousel5.jpg',
-            isPromo: true,
-        },
+        // {
+        //     image: 'assets/images/carousel5.jpg',
+        //     isPromo: true,
+        // },
         // {
         //     image: 'assets/images/carousel1.jpg',
         //     title: 'Мы открылись!',
