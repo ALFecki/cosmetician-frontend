@@ -618,7 +618,9 @@ export class AdminPanelSwitcherComponent implements OnInit {
     }
 
     onSearchChange() {
+        console.log('On search change');
         if (!this.searchText.trim()) {
+            console.log('return1');
             this.filteredData = [...this.currentModelData];
             return;
         }
@@ -626,19 +628,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
         const searchLower = this.searchText.toLowerCase().trim();
 
         this.filteredData = this.currentModelData.filter(item => {
-            return this.currentModelColumns.some(column => {
-                const keys = column.key.split('.');
-                let value = item;
-
-                for (const key of keys) {
-                    if (value === undefined || value === null) return false;
-                    value = value[key];
-                }
-
-                if (value === undefined || value === null) return false;
-
-                return String(value).toLowerCase().includes(searchLower);
-            });
+            return String(item['title']).toLowerCase().includes(searchLower);
         });
     }
 

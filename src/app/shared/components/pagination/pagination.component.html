@@ -4,10 +4,14 @@
             <i-bs name="list-ul" class="me-1"></i-bs>
             Показывать:
         </label>
-        <select id="itemsPerPage" class="form-select form-select-sm d-inline-block w-auto"
-            (change)="onItemsPerPageChange($event)" [value]="itemsPerPage">
+        <select
+            id="itemsPerPage"
+            class="form-select form-select-sm d-inline-block w-auto"
+            (change)="onItemsPerPageChange($event)"
+            [value]="itemsPerPage"
+        >
             @for (size of pageSizeOptions; track size) {
-            <option [value]="size">{{ size }}</option>
+                <option [value]="size">{{ size }}</option>
             }
         </select>
     </div>
@@ -15,8 +19,13 @@
     <nav aria-label="Навигация по страницам">
         <ul class="pagination mb-0">
             <li class="page-item first-page" [class.disabled]="currentPage === 1">
-                <a class="page-link" href="javascript:void(0)" (click)="onPageChange(1)" aria-label="Первая"
-                    [attr.tabindex]="currentPage === 1 ? -1 : 0">
+                <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="onPageChange(1)"
+                    aria-label="Первая"
+                    [attr.tabindex]="currentPage === 1 ? -1 : 0"
+                >
                     <span class="double-chevron">
                         <i-bs name="chevron-left"></i-bs>
                         <i-bs name="chevron-left"></i-bs>
@@ -24,30 +33,49 @@
                 </a>
             </li>
             <li class="page-item prev-page" [class.disabled]="currentPage === 1">
-                <a class="page-link" href="javascript:void(0)" (click)="onPageChange(currentPage - 1)"
-                    aria-label="Предыдущая" [attr.tabindex]="currentPage === 1 ? -1 : 0">
+                <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="onPageChange(currentPage - 1)"
+                    aria-label="Предыдущая"
+                    [attr.tabindex]="currentPage === 1 ? -1 : 0"
+                >
                     <i-bs name="chevron-left"></i-bs>
                 </a>
             </li>
 
             @for (page of getPageRange(); track page) {
-            <li class="page-item page-number" [class.active]="page === currentPage">
-                <a class="page-link" href="javascript:void(0)" (click)="onPageChange(page)"
-                    [attr.aria-current]="page === currentPage ? 'page' : null">
-                    {{ page }}
-                </a>
-            </li>
+                <li class="page-item page-number" [class.active]="page === currentPage">
+                    <a
+                        class="page-link"
+                        href="javascript:void(0)"
+                        (click)="onPageChange(page)"
+                        [attr.aria-current]="page === currentPage ? 'page' : null"
+                    >
+                        {{ page }}
+                    </a>
+                </li>
             }
 
             <li class="page-item next-page" [class.disabled]="currentPage === totalPages">
-                <a class="page-link" href="javascript:void(0)" (click)="onPageChange(currentPage + 1)"
-                    aria-label="Следующая" [attr.tabindex]="currentPage === totalPages ? -1 : 0">
+                <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="onPageChange(currentPage + 1)"
+                    aria-label="Следующая"
+                    [attr.tabindex]="currentPage === totalPages ? -1 : 0"
+                >
                     <i-bs name="chevron-right"></i-bs>
                 </a>
             </li>
             <li class="page-item last-page" [class.disabled]="currentPage === totalPages">
-                <a class="page-link" href="javascript:void(0)" (click)="onPageChange(totalPages)" aria-label="Последняя"
-                    [attr.tabindex]="currentPage === totalPages ? -1 : 0">
+                <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="onPageChange(totalPages)"
+                    aria-label="Последняя"
+                    [attr.tabindex]="currentPage === totalPages ? -1 : 0"
+                >
                     <span class="double-chevron">
                         <i-bs name="chevron-right"></i-bs>
                         <i-bs name="chevron-right"></i-bs>

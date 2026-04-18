@@ -110,9 +110,9 @@
             <app-admin-orders> </app-admin-orders>
         }
 
-        @if (!loading && currentModelData.length > 0 && currentModel !== 'statistics' && currentModel !== 'orders') {
+        @if (!loading && filteredData.length > 0 && currentModel !== 'statistics' && currentModel !== 'orders') {
             <app-generic-table
-                [data]="currentModelData"
+                [data]="filteredData"
                 [columns]="currentModelColumns"
                 [key]="currentModel"
                 (editItem)="editItem($event)"
@@ -122,7 +122,7 @@
             </app-generic-table>
         }
 
-        @if (!loading && currentModelData.length === 0) {
+        @if (!loading && filteredData.length === 0) {
             <div class="p-5 text-center text-muted">Нет данных для отображения</div>
         }
     </div>

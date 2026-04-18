@@ -47,7 +47,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
         private modalService: NgbModal,
         private authService: AuthService,
         private loginModalService: LoginModalService,
-    ) { }
+    ) {}
 
     ngOnInit(): void {
         if (this.categoryId) {
@@ -107,7 +107,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private scrollToTop(): void {
         window.scrollTo({
             top: 0,
-            behavior: 'smooth'
+            behavior: 'smooth',
         });
 
         document.documentElement.scrollTop = 0;

@@ -6,7 +6,7 @@ import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ProductModel } from '../../../../shared/models/product.model';
 import { ProductService } from '../../../../shared/services/product.service';
-import { ImageUrlPipe } from "../../../../shared/utils/image-url.pipe";
+import { ImageUrlPipe } from '../../../../shared/utils/image-url.pipe';
 
 @Component({
     selector: 'app-product-search',
@@ -31,17 +31,10 @@ export class ProductSearchComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
-        // Настраиваем debounce для поиска
-        this.subscription = this.searchSubject
-            .pipe(
-                debounceTime(300), // Задержка 300мс после последнего ввода
-                distinctUntilChanged(), // Игнорируем повторяющиеся запросы
-            )
-            .subscribe(query => {
-                this.performSearch(query);
-            });
+        this.subscription = this.searchSubject.pipe(debounceTime(300), distinctUntilChanged()).subscribe(query => {
+            this.performSearch(query);
+        });
 
-        // Фокусируемся на input при открытии
         setTimeout(() => {
             const input = document.querySelector('.search-input') as HTMLInputElement;
             input?.focus();
@@ -69,7 +62,7 @@ export class ProductSearchComponent implements OnInit, OnDestroy {
     private performSearch(query: string): void {
         const filters = {
             title: query,
-            limit: 8, // Показываем до 8 результатов
+            limit: 8,
         };
 
         this.productService.getAll(filters).subscribe({
