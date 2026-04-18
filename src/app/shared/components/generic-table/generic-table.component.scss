@@ -66,6 +66,43 @@
 
 .table {
     margin-bottom: 0;
+
+    thead th {
+        white-space: nowrap;
+        user-select: none;
+
+        &.sortable {
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.05);
+            }
+        }
+
+        &.sorted-asc,
+        &.sorted-desc {
+            background-color: rgba(13, 110, 253, 0.08);
+            color: #0d6efd;
+        }
+    }
+}
+
+.th-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.sort-icon {
+    font-size: 0.75rem;
+    opacity: 0.35;
+    transition: opacity 0.15s ease;
+
+    &--active {
+        opacity: 1;
+        color: #0d6efd;
+    }
 }
 
 .btn-group {

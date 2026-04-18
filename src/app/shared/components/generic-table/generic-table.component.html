@@ -11,13 +11,30 @@
         <thead>
             <tr>
                 @for (column of columns; track column) {
-                    <th>{{ column.title }}</th>
+                    <th
+                        [class.sortable]="!isUnsortable(column.type)"
+                        [class.sorted-asc]="sortColumn === column.key && sortDirection === 'asc'"
+                        [class.sorted-desc]="sortColumn === column.key && sortDirection === 'desc'"
+                        (click)="sortBy(column.key, column.type)"
+                    >
+                        <span class="th-content">
+                            {{ column.title }}
+                            @if (!isUnsortable(column.type)) {
+                                <i-bs
+                                    [name]="getSortIcon(column.key, column.type)"
+                                    class="sort-icon"
+                                    [class.sort-icon--active]="sortColumn === column.key"
+                                ></i-bs>
+                            }
+                        </span>
+                    </th>
                 }
                 <th class="text-end">Действия</th>
             </tr>
         </thead>
+
         <tbody>
-            @for (item of data; track item) {
+            @for (item of sortedData; track item) {
                 <tr>
                     @for (column of columns; track column) {
                         <td>
