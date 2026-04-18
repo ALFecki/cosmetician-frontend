@@ -25,6 +25,7 @@ export class GenericTableComponent {
     isDragging = false;
     startX = 0;
     scrollLeft = 0;
+    expandedCells = new Set<string>();
 
     startDrag(e: MouseEvent): void {
         this.isDragging = true;
@@ -65,5 +66,24 @@ export class GenericTableComponent {
 
     getNestedProperty(obj: any, path: string): any {
         return path.split('.').reduce((o, p) => (o ? o[p] : undefined), obj);
+    }
+
+    truncateText(text: string, maxLength = 100): string {
+        if (!text) return '—';
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
+    }
+
+    toggleCell(itemId: string | number, columnKey: string): void {
+        const key = `${itemId}_${columnKey}`;
+        if (this.expandedCells.has(key)) {
+            this.expandedCells.delete(key);
+        } else {
+            this.expandedCells.add(key);
+        }
+    }
+
+    isCellExpanded(itemId: string | number, columnKey: string): boolean {
+        return this.expandedCells.has(`${itemId}_${columnKey}`);
     }
 }

@@ -214,7 +214,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'image', title: 'Изображение', type: 'image' },
                 { key: 'title', title: 'Название' },
                 { key: 'fullTitle', title: 'Полное название' },
-                { key: 'description', title: 'Описание' },
+                { key: 'description', title: 'Описание', type: 'text' },
                 { key: 'variants', title: 'Варианты (Объем/Себестоимость/Цена)', type: 'variants' },
                 { key: 'categories', title: 'Категории', type: 'array' },
                 { key: 'brand.title', title: 'Бренд' },

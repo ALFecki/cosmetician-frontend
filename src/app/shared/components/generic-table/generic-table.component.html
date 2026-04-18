@@ -108,6 +108,22 @@
                                         <span>—</span>
                                     }
                                 }
+                                @case ('text') {
+                                    @let value = getNestedProperty(item, column.key);
+                                    @if (value && value.length > 75) {
+                                        <div class="textarea-cell">
+                                            <span>
+                                                {{ isCellExpanded(item.id, column.key) ? value : truncateText(value) }}
+                                            </span>
+                                            <button class="btn-toggle-text" (click)="toggleCell(item.id, column.key)">
+                                                {{ isCellExpanded(item.id, column.key) ? 'Свернуть' : 'Читать далее' }}
+                                            </button>
+                                        </div>
+                                    }
+                                    @if (!value || value.length <= 75) {
+                                        <span>{{ value || '—' }}</span>
+                                    }
+                                }
                                 @default {
                                     {{ getNestedProperty(item, column.key) || '—' }}
                                 }

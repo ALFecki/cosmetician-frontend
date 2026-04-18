@@ -86,3 +86,31 @@ th,
 td {
     vertical-align: middle;
 }
+
+.textarea-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 300px;
+
+    span {
+        word-break: break-word;
+        white-space: pre-wrap;
+        line-height: 1.4;
+    }
+
+    .btn-toggle-text {
+        align-self: flex-start;
+        background: none;
+        border: none;
+        padding: 0;
+        color: #0d6efd;
+        cursor: pointer;
+        font-size: 0.8rem;
+        text-decoration: underline;
+
+        &:hover {
+            color: #0a58ca;
+        }
+    }
+}
