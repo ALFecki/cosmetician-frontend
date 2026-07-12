@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { map, Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 import { IconsModule } from '../../base/icons/icons.module';
 import { BrandModel } from '../../models/brand.model';
 import { CategoryModel } from '../../models/category.model';
@@ -18,6 +19,7 @@ export class FooterComponent {
     categories$: Observable<CategoryModel[]>;
     brands$: Observable<BrandModel[]>;
     currentYear = new Date().getFullYear();
+    publicOfferUrl = environment.public_offer_url;
 
     paymentLogos: string[] = [
         'assets/images/acquiring/color-21.png',

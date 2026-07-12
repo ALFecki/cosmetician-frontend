@@ -764,3 +764,38 @@
         font-size: 0.875rem;
     }
 }
+
+.offer-consent {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    .form-check-input {
+        margin-top: 0.2rem;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .invalid-feedback {
+        flex-basis: 100%;
+        margin-top: 0.15rem;
+    }
+
+    .form-check-label {
+        font-size: 0.85rem;
+        color: var(--gray-medium);
+        line-height: 1.4;
+        cursor: pointer;
+
+        a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}

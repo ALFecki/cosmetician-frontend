@@ -200,6 +200,9 @@
                                         id="phone"
                                         formControlName="phone"
                                         placeholder="+375 (29) 999-99-99"
+                                        inputmode="tel"
+                                        maxlength="19"
+                                        (input)="onPhoneInput($event)"
                                         [class.is-invalid]="getFieldError('phone')"
                                     />
                                     @if (getFieldError('phone')) {
@@ -289,7 +292,7 @@
                                         }
                                     </div>
                                     @if (getFieldError('postPlacementFilter')) {
-                                        <div class="invalid-feedback">
+                                        <div class="invalid-feedback d-block">
                                             {{ getFieldError('postPlacementFilter') }}
                                         </div>
                                     }
@@ -372,7 +375,7 @@
                                             }
                                         </div>
                                         <div class="col-4 col-md-4">
-                                            <label for="apartment" class="form-label">Квартира *</label>
+                                            <label for="apartment" class="form-label">Квартира</label>
                                             <input
                                                 type="text"
                                                 class="form-control form-control-sm"
@@ -429,13 +432,28 @@
                                 placeholder="Дополнительные пожелания..."
                             ></textarea>
                         </div>
+                        <div class="form-section mb-3">
+                            <div class="form-check offer-consent">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    id="offerConsent"
+                                    formControlName="offerConsent"
+                                    [class.is-invalid]="getFieldError('offerConsent')"
+                                />
+                                <label class="form-check-label" for="offerConsent">
+                                    Я ознакомлен(а) и согласен(а) с условиями
+                                    <a [href]="publicOfferUrl" target="_blank" rel="noopener">договора публичной оферты</a>.
+                                </label>
+                                @if (getFieldError('offerConsent')) {
+                                    <div class="invalid-feedback d-block">
+                                        {{ getFieldError('offerConsent') }}
+                                    </div>
+                                }
+                            </div>
+                        </div>
                     </form>
-                    <button
-                        type="button"
-                        class="btn btn-primary w-100"
-                        (click)="confirmOrder()"
-                        [disabled]="isSubmitting || confirmationForm.invalid"
-                    >
+                    <button type="button" class="btn btn-primary w-100" (click)="confirmOrder()" [disabled]="isSubmitting">
                         @if (isSubmitting) {
                             <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                         }

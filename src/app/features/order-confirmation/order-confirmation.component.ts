@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { IconsModule } from '../../shared/base/icons/icons.module';
 import { ListResponse } from '../../shared/base/schemas/base_schema';
 import { OrderModel, OrderProductModel } from '../../shared/models/order.model';
@@ -31,6 +32,7 @@ import { calculateDiscountedPrice, PriceInfo } from '../../shared/utils/promotio
 export class OrderConfirmationComponent implements OnInit {
     confirmationForm: FormGroup;
     isSubmitting = false;
+    publicOfferUrl = environment.public_offer_url;
     currentUser$: Observable<PersonModel | null> = new Observable<PersonModel | null>();
     cartItems$: BehaviorSubject<OrderProductModel[]> = new BehaviorSubject<OrderProductModel[]>([]);
     totalPrice$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
@@ -71,7 +73,7 @@ export class OrderConfirmationComponent implements OnInit {
             firstName: ['', [Validators.required, Validators.minLength(2)]],
             lastName: ['', [Validators.required, Validators.minLength(2)]],
             email: ['', [Validators.required, Validators.email]],
-            phone: ['', [Validators.required, Validators.pattern(/^\+?[0-9]\d{1,14}$/)]],
+            phone: ['', [Validators.required, Validators.pattern(/^\+375 \(\d{2}\) \d{3}-\d{2}-\d{2}$/)]],
             city: [''],
             street: [''],
             house: [''],
@@ -83,6 +85,7 @@ export class OrderConfirmationComponent implements OnInit {
             postPlacement: [''],
             postPlacementFilter: [''],
             comments: [''],
+            offerConsent: [false, Validators.requiredTrue],
         });
 
         this.confirmationForm.get('deliveryMethod')?.valueChanges.subscribe(value => {
@@ -197,7 +200,7 @@ export class OrderConfirmationComponent implements OnInit {
                     firstName: user.firstName || '',
                     lastName: user.secondName || '',
                     email: user.email || '',
-                    phone: user.phone || '',
+                    phone: this.formatBelarusPhone(user.phone || ''),
                 });
             }
             this.loading = false;
@@ -205,8 +208,14 @@ export class OrderConfirmationComponent implements OnInit {
     }
 
     async confirmOrder(): Promise<void> {
-        if (this.confirmationForm.invalid || this.isSubmitting) {
+        if (this.isSubmitting) {
+            return;
+        }
+
+        if (this.confirmationForm.invalid) {
             this.markFormGroupTouched();
+            this.toastService.show('Пожалуйста, проверьте правильность заполнения формы', 'error');
+            setTimeout(() => this.scrollToFirstError(), 0);
             return;
         }
 
@@ -235,7 +244,7 @@ export class OrderConfirmationComponent implements OnInit {
             firstName: this.confirmationForm.get('firstName')?.value,
             secondName: this.confirmationForm.get('lastName')?.value,
             email: this.confirmationForm.get('email')?.value,
-            phone: this.confirmationForm.get('phone')?.value,
+            phone: this.normalizePhone(this.confirmationForm.get('phone')?.value),
             deliveryMethod: this.confirmationForm.get('deliveryMethod')?.value,
             isCourierDelivery: this.confirmationForm.get('courierDelivery')?.value,
             paymentMethod: this.confirmationForm.get('paymentMethod')?.value,
@@ -281,7 +290,66 @@ export class OrderConfirmationComponent implements OnInit {
         Object.keys(this.confirmationForm.controls).forEach(key => {
             const control = this.confirmationForm.get(key);
             control?.markAsTouched();
+            control?.updateValueAndValidity({ emitEvent: false });
         });
+    }
+
+    private scrollToFirstError(): void {
+        const firstInvalid = document.querySelector<HTMLElement>(
+            '.form-control.is-invalid, .form-check-input.is-invalid, .is-invalid',
+        );
+        if (firstInvalid) {
+            firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            firstInvalid.focus({ preventScroll: true });
+        }
+    }
+
+    onPhoneInput(event: Event): void {
+        const inputEl = event.target as HTMLInputElement;
+        const formatted = this.formatBelarusPhone(inputEl.value);
+        inputEl.value = formatted;
+        this.confirmationForm.get('phone')?.setValue(formatted, { emitEvent: false });
+    }
+
+    /** Приводит любой ввод к виду «+375 (29) 123-45-67», форматируя по мере набора. */
+    private formatBelarusPhone(value: string): string {
+        let digits = (value || '').replace(/\D/g, '');
+        if (digits.startsWith('375')) {
+            digits = digits.slice(3);
+        } else if (digits.startsWith('80')) {
+            digits = digits.slice(2);
+        }
+        digits = digits.slice(0, 9);
+
+        if (!digits) {
+            return '';
+        }
+
+        const op = digits.slice(0, 2);
+        const a = digits.slice(2, 5);
+        const b = digits.slice(5, 7);
+        const c = digits.slice(7, 9);
+
+        let result = '+375';
+        if (op) {
+            result += ` (${op}`;
+        }
+        if (a) {
+            result += `) ${a}`;
+        }
+        if (b) {
+            result += `-${b}`;
+        }
+        if (c) {
+            result += `-${c}`;
+        }
+        return result;
+    }
+
+    /** Нормализует телефон к «+375XXXXXXXXX» для отправки на сервер. */
+    private normalizePhone(value: string): string {
+        const digits = (value || '').replace(/\D/g, '');
+        return digits ? `+${digits}` : '';
     }
 
     getFieldError(fieldName: string): string | null {
@@ -291,6 +359,9 @@ export class OrderConfirmationComponent implements OnInit {
         }
 
         if (control.errors['required']) {
+            if (fieldName === 'offerConsent') {
+                return 'Необходимо принять условия договора публичной оферты';
+            }
             return 'Это поле обязательно для заполнения';
         }
         if (control.errors['email']) {
@@ -306,12 +377,13 @@ export class OrderConfirmationComponent implements OnInit {
             if (fieldName === 'postalCode') {
                 return 'Введите корректный почтовый индекс';
             }
+            return 'Некорректный формат';
         }
         if (control.errors['invalidPostPlacement']) {
             return 'Выберите пункт выдачи из списка';
         }
 
-        return null;
+        return 'Некорректное значение';
     }
 
     getDeliveryPrice(): number {
