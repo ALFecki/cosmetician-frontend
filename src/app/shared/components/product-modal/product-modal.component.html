@@ -73,6 +73,18 @@
                         <span class="char-label">Бренд:</span>
                         <span class="char-value">{{ selectedProduct?.brand?.title || '—' }}</span>
                     </div>
+                    @if (selectedProduct?.brand?.manufacturer; as manufacturer) {
+                        <div class="char-item">
+                            <span class="char-label">Производитель:</span>
+                            <span class="char-value">{{ manufacturer }}</span>
+                        </div>
+                    }
+                    @if (selectedProduct?.brand?.importer; as importer) {
+                        <div class="char-item">
+                            <span class="char-label">Импортёр:</span>
+                            <span class="char-value">{{ importer }}</span>
+                        </div>
+                    }
                     <div class="char-item">
                         <span class="char-label">Страна:</span>
                         <span class="char-value">{{ getCountryNames(selectedProduct) || '—' }}</span>

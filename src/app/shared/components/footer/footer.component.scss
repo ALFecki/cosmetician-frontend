@@ -221,6 +221,27 @@
         line-height: 1.5;
     }
 
+    .legal-info-appeals {
+        margin-top: 1rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid rgba(212, 80, 109, 0.1);
+        font-size: 0.78rem;
+        line-height: 1.45;
+        opacity: 0.85;
+
+        p {
+            margin-bottom: 0.5rem;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        .footer-link {
+            font-size: inherit;
+        }
+    }
+
     .footer-additional {
         border-top: 1px solid rgba(212, 80, 109, 0.1);
         padding: 1.5rem 1rem;

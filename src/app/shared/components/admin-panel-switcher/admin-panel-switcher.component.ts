@@ -292,6 +292,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
             fields: [
                 { key: 'title', label: 'Название', type: 'text', required: true },
                 { key: 'description', label: 'Описание', type: 'textarea', required: true },
+                { key: 'manufacturer', label: 'Производитель', type: 'text', required: false },
+                { key: 'importer', label: 'Импортёр', type: 'text', required: false },
                 { key: 'image', label: 'Изображение', type: 'image', required: false },
             ],
             columns: [
@@ -299,6 +301,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'image', title: 'Изображение', type: 'image' },
                 { key: 'title', title: 'Название' },
                 { key: 'description', title: 'Описание' },
+                { key: 'manufacturer', title: 'Производитель' },
+                { key: 'importer', title: 'Импортёр' },
                 { key: 'isDeleted', title: 'Удален' },
                 { key: 'createdAt', title: 'Дата создания', type: 'date' },
                 { key: 'updatedAt', title: 'Дата обновления', type: 'date' },
