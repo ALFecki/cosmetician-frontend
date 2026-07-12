@@ -20,6 +20,7 @@ export class FooterComponent {
     brands$: Observable<BrandModel[]>;
     currentYear = new Date().getFullYear();
     publicOfferUrl = environment.public_offer_url;
+    receiptExampleUrl = environment.receipt_example_url;
 
     paymentLogos: string[] = [
         'assets/images/acquiring/color-21.png',
