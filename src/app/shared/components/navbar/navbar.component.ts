@@ -11,6 +11,7 @@ import { AuthService } from '../../services/auth.service';
 import { BrandService } from '../../services/brand.service';
 import { CartService } from '../../services/cart.service';
 import { CategoryService } from '../../services/category.service';
+import { FeedbackModalService } from '../../services/feedback-modal.service';
 import { LoginModalService } from '../../services/login-modal.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
 import { CartModalComponent } from '../cart-modal/cart-modal.component';
@@ -38,6 +39,7 @@ export class NavbarComponent implements OnDestroy, OnInit {
         private readonly modalService: NgbModal,
         private router: Router,
         private loginModalService: LoginModalService,
+        private feedbackModalService: FeedbackModalService,
     ) {
         this.categories$ = this.categoryService.getCategoriesList();
         this.brands$ = this.brandService.getBrandsList();
@@ -76,6 +78,10 @@ export class NavbarComponent implements OnDestroy, OnInit {
             centered: true,
             scrollable: true,
         });
+    }
+
+    openFeedbackModal() {
+        this.feedbackModalService.openFeedbackModal();
     }
 
     getProductCount(): Observable<number> {

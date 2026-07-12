@@ -1,0 +1,166 @@
+<div class="modal-header">
+    <div class="modal-title-wrapper">
+        <i-bs name="chat-dots-fill" class="modal-icon"></i-bs>
+        <h5 class="modal-title">Обратная связь</h5>
+    </div>
+    <button type="button" class="btn-close" aria-label="Закрыть" (click)="close()">
+        <i-bs name="x-lg"></i-bs>
+    </button>
+</div>
+
+<div class="modal-body">
+    @if (!submitted) {
+        <p class="feedback-intro">
+            Напишите нам своё обращение — мы ответим на указанный вами email. Поля, отмеченные
+            <span class="required-mark">*</span>, обязательны для заполнения.
+        </p>
+
+        <form [formGroup]="feedbackForm" (ngSubmit)="submit()" class="feedback-form" novalidate>
+            <div class="mb-3">
+                <label for="feedbackName" class="form-label">
+                    <i-bs name="person" class="me-2"></i-bs>
+                    Ваше имя <span class="required-mark">*</span>
+                </label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="feedbackName"
+                    formControlName="name"
+                    placeholder="Как к вам обращаться"
+                    autocomplete="name"
+                />
+                @if (feedbackForm.get('name')?.invalid && feedbackForm.get('name')?.touched) {
+                    <div class="error-message">
+                        <i-bs name="exclamation-circle" class="me-2"></i-bs>
+                        <span>Укажите ваше имя.</span>
+                    </div>
+                }
+            </div>
+
+            <div class="mb-3">
+                <label for="feedbackEmail" class="form-label">
+                    <i-bs name="envelope-fill" class="me-2"></i-bs>
+                    Email для ответа <span class="required-mark">*</span>
+                </label>
+                <input
+                    type="email"
+                    class="form-control"
+                    id="feedbackEmail"
+                    formControlName="email"
+                    placeholder="example@mail.com"
+                    autocomplete="email"
+                />
+                @if (feedbackForm.get('email')?.invalid && feedbackForm.get('email')?.touched) {
+                    <div class="error-message">
+                        <i-bs name="exclamation-circle" class="me-2"></i-bs>
+                        @if (feedbackForm.get('email')?.errors?.['required']) {
+                            <span>Укажите email для ответа.</span>
+                        } @else {
+                            <span>Введите корректный email.</span>
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="mb-3">
+                <label for="feedbackPhone" class="form-label">
+                    <i-bs name="telephone-fill" class="me-2"></i-bs>
+                    Телефон
+                </label>
+                <input
+                    type="tel"
+                    class="form-control"
+                    id="feedbackPhone"
+                    formControlName="phone"
+                    placeholder="+375 (29) 999-99-99"
+                    autocomplete="tel"
+                />
+            </div>
+
+            <div class="mb-3">
+                <label for="feedbackSubject" class="form-label">
+                    <i-bs name="tag-fill" class="me-2"></i-bs>
+                    Тема
+                </label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="feedbackSubject"
+                    formControlName="subject"
+                    placeholder="Кратко о чём обращение"
+                />
+            </div>
+
+            <div class="mb-3">
+                <label for="feedbackMessage" class="form-label">
+                    <i-bs name="card-text" class="me-2"></i-bs>
+                    Сообщение <span class="required-mark">*</span>
+                </label>
+                <textarea
+                    class="form-control"
+                    id="feedbackMessage"
+                    formControlName="message"
+                    rows="4"
+                    placeholder="Опишите ваше обращение подробнее"
+                ></textarea>
+                @if (feedbackForm.get('message')?.invalid && feedbackForm.get('message')?.touched) {
+                    <div class="error-message">
+                        <i-bs name="exclamation-circle" class="me-2"></i-bs>
+                        @if (feedbackForm.get('message')?.errors?.['required']) {
+                            <span>Введите текст обращения.</span>
+                        } @else {
+                            <span>Сообщение должно содержать не менее 10 символов.</span>
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="mb-4 form-check consent-check">
+                <input type="checkbox" class="form-check-input" id="feedbackConsent" formControlName="personalDataConsent" />
+                <label class="form-check-label" for="feedbackConsent">
+                    Я согласен(а) на обработку персональных данных в соответствии с
+                    <a routerLink="/policy" target="_blank">политикой конфиденциальности</a>.
+                </label>
+                @if (feedbackForm.get('personalDataConsent')?.invalid && feedbackForm.get('personalDataConsent')?.touched) {
+                    <div class="error-message">
+                        <i-bs name="exclamation-circle" class="me-2"></i-bs>
+                        <span>Необходимо согласие на обработку персональных данных.</span>
+                    </div>
+                }
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-submit" [disabled]="isSubmitting">
+                    @if (isSubmitting) {
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <span>Отправляем...</span>
+                    } @else {
+                        <i-bs name="envelope" class="me-2"></i-bs>
+                        <span>Отправить обращение</span>
+                    }
+                </button>
+            </div>
+        </form>
+    } @else {
+        <div class="feedback-success text-center">
+            <div class="success-icon-wrapper">
+                <i-bs name="check-circle-fill" class="success-icon"></i-bs>
+            </div>
+            <h6 class="success-title">Спасибо за обращение!</h6>
+            <p class="success-description">
+                Мы открыли ваш почтовый клиент с заполненным письмом — осталось нажать «Отправить». Если окно не открылось,
+                напишите нам напрямую:
+            </p>
+            <a [href]="mailtoLink" class="feedback-email-link">
+                <i-bs name="envelope-fill" class="me-2"></i-bs>
+                {{ feedbackEmail }}
+            </a>
+            <div class="mt-4">
+                <button type="button" class="btn btn-primary btn-submit" (click)="close()">
+                    <i-bs name="check-lg" class="me-2"></i-bs>
+                    Готово
+                </button>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,250 @@
+// Global modal styling shared with other cosmetician modals
+::ng-deep .cosmetician-modal {
+    .modal-content {
+        border-radius: 20px;
+        border: 2px solid var(--powder-pink);
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(212, 80, 109, 0.2);
+        background: transparent;
+
+        .modal-header,
+        .modal-body {
+            border: none;
+        }
+    }
+
+    .modal-dialog {
+        max-width: 540px;
+
+        @media (max-width: 576px) {
+            max-width: 95%;
+            margin: 1rem auto;
+        }
+    }
+}
+
+// Header
+.modal-header {
+    background: linear-gradient(135deg, var(--soft-pink) 0%, var(--warm-white) 100%);
+    border-bottom: 2px solid var(--powder-pink);
+    padding: 1.5rem;
+    border-radius: 20px 20px 0 0;
+    position: relative;
+
+    .modal-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        .modal-icon {
+            color: var(--primary);
+            font-size: 1.4rem;
+        }
+    }
+
+    .modal-title {
+        color: var(--gray-dark);
+        font-weight: 600;
+        margin: 0;
+        font-size: 1.35rem;
+    }
+
+    .btn-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid rgba(255, 214, 224, 0.3);
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        color: #666;
+        transition: all 0.3s ease;
+        padding: 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+        &:hover {
+            background: var(--soft-pink);
+            color: var(--primary);
+            transform: scale(1.1) rotate(90deg);
+            border-color: var(--secondary);
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 0.2rem rgba(212, 80, 109, 0.15);
+        }
+    }
+}
+
+// Body
+.modal-body {
+    background: linear-gradient(135deg, var(--light-beige) 0%, var(--warm-white) 100%);
+    padding: 1.75rem 2rem 2rem;
+    border-radius: 0 0 20px 20px;
+}
+
+.feedback-intro {
+    color: var(--gray-medium);
+    font-size: 0.92rem;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+}
+
+.required-mark {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.feedback-form {
+    .form-label {
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+        color: var(--gray-dark);
+        font-size: 0.9rem;
+        margin-bottom: 0.4rem;
+
+        i-bs {
+            color: var(--secondary);
+        }
+    }
+
+    .form-control {
+        border-radius: 12px;
+        border: 2px solid var(--powder-pink);
+        padding: 0.65rem 0.9rem;
+        background: rgba(255, 255, 255, 0.85);
+        transition: all 0.25s ease;
+        font-size: 0.95rem;
+
+        &::placeholder {
+            color: var(--gray-medium);
+            opacity: 0.7;
+        }
+
+        &:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 0.2rem rgba(212, 80, 109, 0.12);
+            background: #fff;
+        }
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 96px;
+    }
+
+    .consent-check {
+        .form-check-input {
+            border: 2px solid var(--powder-pink);
+            cursor: pointer;
+
+            &:checked {
+                background-color: var(--primary);
+                border-color: var(--primary);
+            }
+
+            &:focus {
+                box-shadow: 0 0 0 0.2rem rgba(212, 80, 109, 0.12);
+            }
+        }
+
+        .form-check-label {
+            font-size: 0.85rem;
+            color: var(--gray-medium);
+            line-height: 1.4;
+
+            a {
+                color: var(--primary);
+                font-weight: 600;
+                text-decoration: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+}
+
+.error-message {
+    display: flex;
+    align-items: center;
+    color: var(--danger);
+    font-size: 0.82rem;
+    margin-top: 0.4rem;
+
+    i-bs {
+        flex-shrink: 0;
+    }
+}
+
+.btn-submit {
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    border: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(212, 80, 109, 0.3);
+    }
+
+    &:disabled {
+        opacity: 0.65;
+    }
+}
+
+// Success state
+.feedback-success {
+    padding: 1rem 0;
+
+    .success-icon-wrapper {
+        margin-bottom: 1.25rem;
+
+        .success-icon {
+            color: var(--success, #4caf50);
+            font-size: 3.25rem;
+        }
+    }
+
+    .success-title {
+        font-weight: 600;
+        color: var(--gray-dark);
+        font-size: 1.3rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .success-description {
+        color: var(--gray-medium);
+        line-height: 1.55;
+        font-size: 0.95rem;
+        max-width: 400px;
+        margin: 0 auto 1.25rem;
+    }
+
+    .feedback-email-link {
+        display: inline-flex;
+        align-items: center;
+        font-weight: 600;
+        color: var(--primary);
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 12px;
+        background: rgba(232, 164, 184, 0.12);
+        border: 1px solid rgba(232, 164, 184, 0.25);
+
+        &:hover {
+            background: var(--soft-pink);
+        }
+    }
+}
