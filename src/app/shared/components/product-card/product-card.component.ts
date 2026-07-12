@@ -99,8 +99,6 @@ export class ProductCardComponent implements OnInit, OnDestroy {
         if (!this.product) return;
         this.allCharacteristics = [
             { label: 'Бренд', value: this.product.brand?.title || '—' },
-            { label: 'Производитель', value: this.product.brand?.manufacturer || '—' },
-            { label: 'Импортёр', value: this.product.brand?.importer || '—' },
             { label: 'Категория', value: this.product.categories?.map(category => category.title).join(', ') || '—' },
             { label: 'Объем', value: this.getSelectedVariantVolume() + ' мл' },
             { label: 'Страна', value: this.product.countries.map(country => country.name).join(', ') || '—' },

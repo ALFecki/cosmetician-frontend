@@ -910,3 +910,22 @@
         animation: priceHide 0.4s ease-in forwards;
     }
 }
+
+// Юридическая информация (производитель / импортёр) — намеренно неброский блок
+.product-legal-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 1.25rem;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(212, 80, 109, 0.1);
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: var(--gray-medium);
+    opacity: 0.8;
+
+    .legal-item .legal-label {
+        font-weight: 600;
+        margin-right: 0.3rem;
+    }
+}

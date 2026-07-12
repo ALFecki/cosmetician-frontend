@@ -314,6 +314,23 @@
             </div>
         </div>
     }
+
+    @if (!loading && !error && product && (product.brand.manufacturer || product.brand.importer)) {
+        <div class="product-legal-info">
+            @if (product.brand.manufacturer) {
+                <span class="legal-item">
+                    <span class="legal-label">Производитель:</span>
+                    {{ product.brand.manufacturer }}
+                </span>
+            }
+            @if (product.brand.importer) {
+                <span class="legal-item">
+                    <span class="legal-label">Импортёр:</span>
+                    {{ product.brand.importer }}
+                </span>
+            }
+        </div>
+    }
 </div>
 
 <app-product-carousel></app-product-carousel>
