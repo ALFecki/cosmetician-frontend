@@ -1,54 +1,24 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { IconsModule } from '../../../../shared/base/icons/icons.module';
 import { ImageUrlPipe } from '../../../../shared/utils/image-url.pipe';
-import { PromoBannerComponent } from '../promo-banner/promo-banner.component';
-
-interface Slide {
-    image?: string;
-    title?: string;
-    subtitle?: string;
-    buttonText?: string;
-    buttonLink?: string;
-    isPromo?: boolean;
-}
+import { Subscription } from 'rxjs';
+import { BannerModel } from '../../../../shared/models/banner.model';
+import { BannerService } from '../../../../shared/services/banner.service';
 
 @Component({
     selector: 'app-carousel',
     templateUrl: './carousel.component.html',
     styleUrls: ['./carousel.component.scss'],
-    imports: [ImageUrlPipe, CommonModule, IconsModule, RouterModule, PromoBannerComponent],
+    imports: [ImageUrlPipe, CommonModule, IconsModule, RouterModule],
 })
 export class CarouselComponent implements OnInit, OnDestroy {
-    slides: Slide[] = [
-        // {
-        //     image: 'assets/images/carousel5.jpg',
-        //     isPromo: true,
-        // },
-        // {
-        //     image: 'assets/images/carousel1.jpg',
-        //     title: 'Мы открылись!',
-        //     subtitle: 'Первым 10 клиентам – подарок!',
-        //     buttonText: 'Смотреть каталог',
-        //     buttonLink: '/products',
-        // },
-        {
-            image: 'assets/images/carousel2.jpg',
-            title: 'Профессиональные консультации',
-            subtitle: 'Консультации проводит Скворцова Виктория, врач, к.м.н., практикующий косметолог',
-            buttonText: 'Записаться на консультацию',
-            buttonLink:
-                'https://apnt.app/skvorcova_viktoriya3?fbclid=PAQ0xDSwKli-VleHRuA2FlbQIxMAABp6AV960erBxS8DMQpTuLAE_1JXXrza9KJW4KG3BwtMLX3rG2oVmGlWWGIyTH_aem_txkMk0eQ6Zj09wPmjRtNxg',
-        },
-        {
-            image: 'assets/images/carousel3.jpg',
-            title: 'Индивидуальные наборы для домашнего ухода',
-            subtitle: 'Новые индивидуальные наборы для домашнего ухода уже в продаже!',
-            buttonText: 'Смотреть каталог',
-            buttonLink: '/products',
-        },
-    ];
+    slides: BannerModel[] = [];
+    private subscription?: Subscription;
+    private platformId = inject(PLATFORM_ID);
+
+    constructor(private bannerService: BannerService) {}
 
     puzzlePieces = Array(16)
         .fill(0)
@@ -59,10 +29,21 @@ export class CarouselComponent implements OnInit, OnDestroy {
     isPaused = false;
 
     ngOnInit() {
-        this.startAutoSlide();
+        if (!isPlatformBrowser(this.platformId)) return;
+        this.subscription = this.bannerService.getPublished().subscribe({
+            next: response => {
+                this.slides = response.data;
+                this.currentIndex = 0;
+                this.startAutoSlide();
+            },
+            error: () => {
+                this.slides = [];
+            },
+        });
     }
 
     ngOnDestroy() {
+        this.subscription?.unsubscribe();
         this.stopAutoSlide();
     }
 
