@@ -20,10 +20,6 @@ export class CarouselComponent implements OnInit, OnDestroy {
 
     constructor(private bannerService: BannerService) {}
 
-    puzzlePieces = Array(16)
-        .fill(0)
-        .map((_, i) => i);
-
     currentIndex = 0;
     private intervalId: number | null = null;
     isPaused = false;

@@ -1,4 +1,4 @@
-<div>
+<div [class.storefront]="showNavbarAndFooter$ | async">
     @if (showNavbarAndFooter$ | async) {
         <app-navbar></app-navbar>
     }

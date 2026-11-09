@@ -43,6 +43,23 @@ describe('Published homepage banners', () => {
         expect(element.querySelector('.carousel-indicators')).toBeNull();
     });
 
+    it('keeps only the selected banner accessible while navigating and wrapping', () => {
+        http.expectOne(`${environment.server_url}/banner`).flush({
+            status: 'success',
+            length: 2,
+            data: [slide, { ...slide, id: 'banner-2', title: 'Второй' }],
+        });
+        fixture.detectChanges();
+        const element: HTMLElement = fixture.nativeElement;
+        expect(element.querySelectorAll('.carousel-item[aria-hidden="false"]').length).toBe(1);
+        element.querySelector<HTMLButtonElement>('.carousel-control-prev')!.click();
+        fixture.detectChanges();
+        expect(element.querySelector('.carousel-item[aria-hidden="false"] h2')?.textContent).toBe('Второй');
+        element.querySelector<HTMLButtonElement>('.carousel-control-next')!.click();
+        fixture.detectChanges();
+        expect(element.querySelector('.carousel-item[aria-hidden="false"] h2')?.textContent).toBe(slide.title);
+    });
+
     for (const failed of [false, true]) {
         it(`hides the carousel when the API is ${failed ? 'unavailable' : 'empty'}`, () => {
             const request = http.expectOne(`${environment.server_url}/banner`);

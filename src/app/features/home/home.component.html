@@ -1,30 +1,54 @@
-<!-- Кнопка поиска -->
-<div class="search-trigger-wrapper" [class.hidden]="!isSearchVisible">
-    <button class="search-trigger-button" (click)="openSearch()" type="button" aria-label="Открыть поиск">
-        <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-                d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4.35-4.35"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            />
-        </svg>
-        <span class="search-trigger-text">Поиск продуктов...</span>
-        <div class="search-trigger-shortcuts">
-            <kbd>/</kbd>
-            <span>или</span>
-            <kbd>Ctrl</kbd><kbd>K</kbd>
+<section class="hero sf-container">
+    <div class="hero-copy">
+        <p class="sf-eyebrow">SkViDerm · осознанный уход</p>
+        <h1>Внимание к коже.<br /><em>Забота о себе.</em></h1>
+        <p class="hero-description">Профессиональная косметика и помощь косметолога — чтобы найти уход, который подходит именно вам.</p>
+        <div class="hero-actions">
+            <a class="sf-button" routerLink="/products">Найти свой уход <span aria-hidden="true">→</span></a
+            ><button type="button" class="sf-text-link" (click)="openConsultation()">Нужна консультация</button>
         </div>
-    </button>
+    </div>
+    <div class="hero-image">
+        <img
+            src="assets/images/hero-still-life.jpg"
+            alt="Косметические флаконы и крем на тёплой каменной поверхности"
+            width="1200"
+            height="800"
+            loading="eager"
+            fetchpriority="high"
+        /><span>Больше внимания к себе</span>
+    </div>
+</section>
+<div class="sf-container assurance-strip">
+    <span><i-bs name="check-circle"></i-bs>Профессиональные бренды</span><span><i-bs name="person"></i-bs>Подбор с косметологом</span
+    ><span><i-bs name="truck"></i-bs>Доставка по всей Беларуси</span>
 </div>
-
-<app-carousel></app-carousel>
-
+<section class="sf-container care-section">
+    <div class="sf-section-heading">
+        <div>
+            <p class="sf-eyebrow">С чего начнём?</p>
+            <h2>У каждой кожи — свои потребности</h2>
+        </div>
+        <a class="sf-text-link" routerLink="/products">Весь каталог →</a>
+    </div>
+    <div class="care-grid">
+        @for (category of categories$ | async; track category.id) {
+            <a class="care-tile" [routerLink]="['/category', category.id]"
+                ><h3>{{ category.title }}</h3>
+                <span class="care-caption">Ваш ежедневный ритуал</span>
+                @if (category.image) {
+                    <img [src]="category.image | imageUrl" alt="" loading="lazy" />
+                }
+                <span class="care-arrow" aria-hidden="true">→</span></a
+            >
+        }
+    </div>
+</section>
 <app-brands></app-brands>
-<app-benefits></app-benefits>
+<app-carousel></app-carousel>
 <app-product-carousel></app-product-carousel>
 <app-about-me></app-about-me>
-
-<!-- Модальное окно поиска -->
-<app-product-search *ngIf="isSearchOpen" (closeSearch)="closeSearch()"></app-product-search>
+<app-benefits></app-benefits>
+<section class="sf-container closing-note">
+    <span>Уход — это время для себя.</span><a class="sf-text-link" routerLink="/products">Найдите свой ритуал →</a>
+</section>

@@ -214,7 +214,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
                 scrollable: true,
             });
             activeModal.componentInstance.selectedProduct = product;
-            activeModal.componentInstance.selectedVariantId = this.getSelectedVariant(product);
+            activeModal.componentInstance.selectedVariantId = this.getSelectedVariantId(product);
         }
     }
 

@@ -1,3 +1,4 @@
+import { OverflowDescriptionComponent } from '../../shared/components/overflow-description/overflow-description.component';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -11,7 +12,7 @@ import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
     selector: 'app-category',
     templateUrl: './category.component.html',
     styleUrl: './category.component.scss',
-    imports: [ProductsComponent, CommonModule, ImageUrlPipe],
+    imports: [OverflowDescriptionComponent, ProductsComponent, CommonModule, ImageUrlPipe],
 })
 export class CategoryComponent {
     categoryId!: string;

@@ -1,3 +1,4 @@
+import { OverflowDescriptionComponent } from '../../shared/components/overflow-description/overflow-description.component';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -10,7 +11,7 @@ import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
 
 @Component({
     selector: 'app-brand',
-    imports: [CommonModule, ProductsComponent, IconsModule, ImageUrlPipe],
+    imports: [OverflowDescriptionComponent, CommonModule, ProductsComponent, IconsModule, ImageUrlPipe],
     templateUrl: './brand.component.html',
     styleUrl: './brand.component.scss',
 })

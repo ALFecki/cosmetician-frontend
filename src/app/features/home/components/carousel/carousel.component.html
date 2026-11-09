@@ -1,82 +1,65 @@
 @if (slides.length) {
-    <div id="carouselExample" class="carousel slide" (mouseenter)="pauseCarousel()" (mouseleave)="resumeCarousel()">
-        <div class="carousel-background">
+    <section
+        class="carousel sf-container"
+        aria-label="Предложения магазина"
+        aria-roledescription="карусель"
+        (mouseenter)="pauseCarousel()"
+        (mouseleave)="resumeCarousel()"
+    >
+        <div class="carousel-background" aria-hidden="true">
             @for (slide of slides; track slide.id; let i = $index) {
                 <div
                     class="background-slide"
-                    [class.active]="i === getPreviousIndex()"
+                    [class.active]="i === currentIndex"
                     [style.background-image]="'url(' + (slide.image | imageUrl) + ')'"
                 ></div>
             }
         </div>
-
-        <div class="carousel-inner">
+        <div class="carousel-inner" aria-live="polite">
             @for (slide of slides; track slide.id; let i = $index) {
-                <div class="carousel-item" [class.active]="i === currentIndex">
-                    @for (piece of puzzlePieces; track piece) {
-                        <div class="puzzle-piece">
-                            <div class="puzzle-inner">
-                                <img [src]="slide.image | imageUrl" alt="{{ slide.title }}" />
-                            </div>
-                        </div>
-                    }
-                    <div class="overlay">
-                        <div class="slide-content">
-                            <h2 class="slide-title">{{ slide.title }}</h2>
-                            <p class="slide-description">{{ slide.subtitle }}</p>
-                            @if (slide.buttonText && slide.buttonLink) {
-                                <a class="btn btn-shop" [href]="slide.buttonLink">{{ slide.buttonText }}</a>
-                            }
-                        </div>
+                <div
+                    class="carousel-item"
+                    [class.active]="i === currentIndex"
+                    [attr.aria-hidden]="i !== currentIndex"
+                    [attr.inert]="i !== currentIndex ? '' : null"
+                    role="group"
+                    [attr.aria-label]="i + 1 + ' из ' + slides.length"
+                >
+                    <img [src]="slide.image | imageUrl" [alt]="slide.title" />
+                    <div class="slide-content">
+                        <p class="sf-eyebrow">Внимание к вашему уходу</p>
+                        <h2>{{ slide.title }}</h2>
+                        <p>{{ slide.subtitle }}</p>
+                        @if (slide.buttonText && slide.buttonLink) {
+                            <a class="sf-button" [href]="slide.buttonLink">{{ slide.buttonText }} <span aria-hidden="true">→</span></a>
+                        }
                     </div>
                 </div>
             }
         </div>
-
         @if (slides.length > 1) {
-            <button class="carousel-control carousel-control-prev" (click)="prevSlide()" tabindex="0" aria-label="Предыдущий слайд">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-            </button>
-
-            <button class="carousel-control carousel-control-next" (click)="nextSlide()" tabindex="0" aria-label="Следующий слайд">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-            </button>
-
-            <div class="carousel-indicators">
-                @for (slide of slides; track slide.id; let i = $index) {
-                    <button
-                        class="indicator"
-                        [class.active]="i === currentIndex"
-                        (click)="goToSlide(i)"
-                        tabindex="0"
-                        [attr.aria-label]="'Перейти к слайду ' + (i + 1)"
-                    ></button>
-                }
+            <div class="carousel-navigation">
+                <button type="button" class="carousel-control carousel-control-prev" (click)="prevSlide()" aria-label="Предыдущий слайд">
+                    ←
+                </button>
+                <div class="carousel-indicators">
+                    @for (slide of slides; track slide.id; let i = $index) {
+                        <button
+                            type="button"
+                            class="indicator"
+                            [class.active]="i === currentIndex"
+                            [attr.aria-current]="i === currentIndex ? 'true' : null"
+                            (click)="goToSlide(i)"
+                            [attr.aria-label]="'Перейти к слайду ' + (i + 1)"
+                        >
+                            <span></span>
+                        </button>
+                    }
+                </div>
+                <button type="button" class="carousel-control carousel-control-next" (click)="nextSlide()" aria-label="Следующий слайд">
+                    →
+                </button>
             </div>
         }
-    </div>
+    </section>
 }

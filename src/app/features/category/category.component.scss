@@ -1,88 +1,57 @@
-.category-hero {
-    background: linear-gradient(135deg, var(--light-beige) 0%, #ffffff 100%);
-    padding: 3rem 0;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 2rem;
-
-    &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="categoryGrain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23ffd6e0" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="%23f2b2b2" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23categoryGrain)"/></svg>');
-        opacity: 0.3;
+.collection-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 230px;
+    gap: 55px;
+    align-items: center;
+    padding-bottom: 45px;
+}
+.collection-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--sf-muted);
+    margin-bottom: 30px;
+    a {
+        color: inherit;
+        text-decoration: none;
     }
-
-    .category-info {
-        position: relative;
-        z-index: 2;
+}
+.collection-image {
+    height: 200px;
+    padding: 25px;
+    display: grid;
+    place-items: center;
+    background: #eee8df;
+    img {
+        max-width: 100%;
+        max-height: 150px;
+        object-fit: contain;
+        mix-blend-mode: multiply;
     }
-
-    .breadcrumb {
-        background: none;
-        padding: 0;
-        margin: 0;
-
-        .breadcrumb-item {
-            a {
-                color: #666;
-                text-decoration: none;
-                transition: color 0.3s ease;
-
-                &:hover {
-                    color: var(--secondary);
-                }
-            }
-
-            &.active {
-                color: var(--secondary);
-                font-weight: 500;
-            }
-        }
+}
+.brand-legal {
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--sf-muted);
+    summary {
+        cursor: pointer;
+        min-height: 44px;
+        color: var(--sf-rose);
     }
-
-    .category-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #333;
-        margin-bottom: 1rem;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-        @media (max-width: 768px) {
-            font-size: 2rem;
-        }
+    p {
+        margin-bottom: 10px;
     }
-
-    .category-description {
-        font-size: 1.1rem;
-        color: #666;
-        line-height: 1.6;
-        margin: 0;
+}
+@media (max-width: 700px) {
+    .collection-header {
+        grid-template-columns: 1fr;
+        gap: 20px;
     }
-
-    .category-image {
-        text-align: center;
-        position: relative;
-        z-index: 2;
-
+    .collection-image {
+        height: 150px;
         img {
-            max-height: 200px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-height: 100px;
         }
-    }
-
-    .hero-decoration {
-        position: absolute;
-        bottom: -30px;
-        right: 10%;
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(45deg, var(--primary), var(--secondary));
-        border-radius: 50%;
-        opacity: 0.2;
     }
 }
