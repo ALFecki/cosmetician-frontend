@@ -135,6 +135,9 @@
     </div>
     <div class="modal-body">
         <form [formGroup]="itemForm" (ngSubmit)="saveItem()">
+            @if (currentModel === 'banners' && error) {
+                <div class="alert alert-danger" role="alert">{{ error }}</div>
+            }
             @for (field of currentModelFields; track field) {
                 <div class="mb-3">
                     <label [for]="field.key" class="form-label">{{ field.label }}</label>
@@ -431,7 +434,7 @@
                             />
                             @if (field.type === 'image') {
                                 <div class="d-flex align-items-center mt-2">
-                                    @if (itemForm.get(field.key)?.value && !filePreviewUrls[field.key]) {
+                                    @if (itemForm.get(field.key)?.value && !selectedFiles[field.key]) {
                                         <div class="me-3">
                                             <p class="mb-1 text-muted small">Текущее изображение:</p>
                                             <img

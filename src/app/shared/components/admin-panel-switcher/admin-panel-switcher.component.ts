@@ -10,6 +10,7 @@ import { FilterCategorySchema } from '../../schemas/category.schema';
 import { FilterCountrySchema } from '../../schemas/country.schema';
 import { FilterProductScopeSchema, FilterProductTypeSchema } from '../../schemas/product.schema';
 import { CreateProductVariantSchema } from '../../schemas/product_variant.schema';
+import { BannerService } from '../../services/banner.service';
 import { BrandService } from '../../services/brand.service';
 import { CategoryService } from '../../services/category.service';
 import { CountryService } from '../../services/country.service';
@@ -138,6 +139,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
         private productVariantService: ProductVariantService,
         private promotionService: PromotionService,
         private promocodeService: PromocodeService,
+        private bannerService: BannerService,
     ) {}
 
     ngOnInit(): void {
@@ -190,6 +192,27 @@ export class AdminPanelSwitcherComponent implements OnInit {
     }
 
     setupModelConfigs() {
+        this.modelConfigs['banners'] = {
+            key: 'banners',
+            title: 'Баннеры',
+            service: this.bannerService,
+            fields: [
+                { key: 'image', label: 'Изображение', type: 'image', required: true },
+                { key: 'title', label: 'Заголовок', type: 'text' },
+                { key: 'subtitle', label: 'Подпись', type: 'textarea' },
+                { key: 'buttonText', label: 'Текст кнопки', type: 'text' },
+                { key: 'buttonLink', label: 'Ссылка кнопки (путь /products или https://...)', type: 'text' },
+                { key: 'sortOrder', label: 'Порядок (0–10000, меньшие числа раньше)', type: 'number', required: true },
+                { key: 'isActive', label: 'Показывать на главной', type: 'boolean' },
+            ],
+            columns: [
+                { key: 'image', title: 'Изображение', type: 'image' },
+                { key: 'title', title: 'Заголовок' },
+                { key: 'sortOrder', title: 'Порядок', type: 'number' },
+                { key: 'isActive', title: 'На главной', type: 'boolean' },
+            ],
+        };
+
         this.modelConfigs['products'] = {
             key: 'products',
             title: 'Продукты',
@@ -667,7 +690,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
                     value = productIds.join(',');
                     this.initializeProductSearch(field.key, value);
                 } else {
-                    value = field.key.includes('.') ? this.getNestedProperty(item, field.key) : item[field.key] || '';
+                    value = field.key.includes('.') ? this.getNestedProperty(item, field.key) : (item[field.key] ?? '');
                 }
             } else {
                 if (field.key === 'variants') {
@@ -679,6 +702,11 @@ export class AdminPanelSwitcherComponent implements OnInit {
                     this.productSearchText[field.key] = '';
                     this.showProductDropdown[field.key] = false;
                 }
+            }
+
+            if (!item && this.currentModel === 'banners') {
+                if (field.key === 'sortOrder') value = 0;
+                if (field.key === 'isActive') value = false;
             }
 
             if (field.key === 'variants') {
@@ -709,6 +737,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
     }
 
     openAddModal() {
+        this.error = null;
         this.isEditMode = false;
         this.selectedItemId = null;
         this.editingItem = null;
@@ -718,6 +747,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
     }
 
     editItem(item: any) {
+        this.error = null;
         this.isEditMode = true;
         this.selectedItemId = item.id;
         this.editingItem = item;
@@ -751,16 +781,24 @@ export class AdminPanelSwitcherComponent implements OnInit {
         if (fileInput.files && fileInput.files.length) {
             const file = fileInput.files[0];
             this.selectedFiles[fieldKey] = file;
+            if (this.currentModel === 'banners') this.itemForm.get(fieldKey)?.setValue(file);
 
             const reader = new FileReader();
             reader.onload = () => {
-                this.filePreviewUrls[fieldKey] = reader.result as string;
+                if (this.selectedFiles[fieldKey] === file) {
+                    this.filePreviewUrls[fieldKey] = reader.result as string;
+                }
             };
             reader.readAsDataURL(file);
         }
     }
 
     cancelFileSelection(fieldKey: string) {
+        delete this.selectedFiles[fieldKey];
+        delete this.filePreviewUrls[fieldKey];
+        if (this.currentModel === 'banners') {
+            this.itemForm.get(fieldKey)?.setValue(this.editingItem?.[fieldKey] ?? '');
+        }
         const fileInput = document.getElementById(fieldKey) as HTMLInputElement;
         if (fileInput) {
             fileInput.value = '';
@@ -916,6 +954,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
             return;
         }
 
+        this.error = null;
         this.saving = true;
         const service = this.currentModelConfig.service;
         const formData: Record<string, any> = {};
@@ -927,6 +966,11 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
             const value = this.itemForm.value[key];
             const field = this.currentModelFields.find(f => f.key === key);
+
+            if (this.currentModel === 'banners') {
+                formData[key] = field?.type === 'boolean' ? value === true : field?.type === 'number' ? Number(value) : (value ?? '');
+                return;
+            }
 
             if (value !== null && value !== undefined && value !== '') {
                 if (key === 'variants' || key === 'categoryIds' || key === 'countryIds' || key === 'productScopeIds') {
@@ -968,7 +1012,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
             .catch((error: any) => {
                 console.error('Error saving item:', error);
                 this.saving = false;
-                this.error = 'Ошибка при сохранении данных';
+                this.error =
+                    this.currentModel === 'banners' && typeof error.error === 'string' ? error.error : 'Ошибка при сохранении данных';
             });
     }
 
