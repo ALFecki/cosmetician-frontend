@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { AdminPanelSwitcherComponent } from '../../shared/components/admin-panel-switcher/admin-panel-switcher.component';
 
 @Component({
@@ -8,6 +8,8 @@ import { AdminPanelSwitcherComponent } from '../../shared/components/admin-panel
     imports: [AdminPanelSwitcherComponent],
 })
 export class AdminComponent {
-    // This component serves as a placeholder for the admin panel.
-    // It can be extended in the future to include additional functionality or features.
+    @ViewChild(AdminPanelSwitcherComponent) panel?: AdminPanelSwitcherComponent;
+    canLeave(): boolean {
+        return this.panel?.canLeave() ?? true;
+    }
 }

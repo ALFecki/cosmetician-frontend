@@ -184,3 +184,48 @@
         }
     }
 }
+
+:host {
+    display: block;
+    --primary: #ae3d5b;
+    --border-color: #e7e7e5;
+    --text-muted: #74767c;
+    --light: #fafaf8;
+}
+.admin-orders-container {
+    .orders-header {
+        display: none;
+    }
+    .orders-tabs .nav-pills .nav-link {
+        font-size: 12px;
+        border-radius: 6px;
+        padding: 8px 14px;
+    }
+    .table {
+        font-size: 12px;
+        background: white;
+        border: 1px solid #e7e7e5;
+        th {
+            font-size: 11px;
+            font-weight: 500;
+            background: #fafaf8;
+            padding: 12px 16px;
+        }
+        td {
+            padding: 14px 16px;
+        }
+        .badge {
+            font-size: 10px;
+            font-weight: 500;
+        }
+    }
+    .customer-info .fw-medium {
+        font-size: 12px;
+    }
+    .btn {
+        font-size: 12px;
+    }
+    .table-responsive {
+        border-radius: 8px;
+    }
+}

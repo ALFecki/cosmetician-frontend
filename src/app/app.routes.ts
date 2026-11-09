@@ -50,6 +50,7 @@ export const routes: Routes = [
     },
     {
         path: 'admin',
+        canDeactivate: [(component: { canLeave: () => boolean }) => component.canLeave()],
         loadComponent: () => import('./features/admin/admin.component').then(m => m.AdminComponent),
         canActivate: [AuthGuard, AdminGuard, MaintenanceGuard],
         title: 'Админ - SkViDerm',
