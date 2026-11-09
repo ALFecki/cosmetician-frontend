@@ -98,6 +98,18 @@ test('unknown writes and dangerous GET routes fail closed without outgoing produ
     assert.equal(forwarded, 0);
 });
 
+test('derived public routes accept only explicit API paths and reject inherited property names', async t => {
+    const server = await serverFor(t);
+    for (const path of ['/foo/country', '/foo/product_scope', '/foo/product_type', '/api/toString', '/api/constructor', '/api/__proto__']) {
+        assert.equal((await request(server, path)).status, 404, path);
+    }
+    for (const path of ['/api/country', '/api/product_scope', '/api/product_type']) {
+        const response = await request(server, path);
+        assert.equal(response.status, 200, path);
+        assert.ok(response.data.data.length > 0, path);
+    }
+});
+
 test('requires local origin, authentication and CSRF before changing account or order', async t => {
     const server = await serverFor(t);
     assert.equal((await request(server, '/api/product', 'GET', undefined, { Origin: 'https://evil.example' })).status, 403);

@@ -184,7 +184,11 @@ export function createPreviewServer() {
             if (!product) throw fail(404, 'Product fixture not found');
             return list(product[promotions[2] === 'promotions' ? 'promotions' : 'promoCodes'] || []);
         }
-        const derived = { country: 'countries', product_scope: 'productScopes', product_type: 'productType' }[path.slice(5)];
+        const derived = new Map([
+            ['/api/country', 'countries'],
+            ['/api/product_scope', 'productScopes'],
+            ['/api/product_type', 'productType'],
+        ]).get(path);
         if (method === 'GET' && derived) {
             const items = catalog.product.data.flatMap(p => p[derived] || []);
             return list([...new Map(items.map(item => [item.id, item])).values()]);
