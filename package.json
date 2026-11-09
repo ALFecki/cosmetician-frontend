@@ -11,7 +11,9 @@
         "lint": "eslint . --ext .ts,.tsx",
         "lint:fix": "eslint . --ext .ts,.tsx --fix",
         "fmt": "prettier --write .",
-        "fmt:check": "prettier --check ."
+        "fmt:check": "prettier --check .",
+        "preview:storefront": "node tools/storefront-preview/start.mjs",
+        "test:storefront-preview": "node --test tools/storefront-preview/server.test.mjs"
     },
     "private": true,
     "dependencies": {

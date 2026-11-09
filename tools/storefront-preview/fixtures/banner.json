@@ -1,0 +1,32 @@
+{
+    "status": "success",
+    "length": 2,
+    "data": [
+        {
+            "id": "00000000-0000-4000-8000-000000000001",
+            "title": "Профессиональные консультации",
+            "subtitle": "Консультации проводит Скворцова Виктория, врач, к.м.н., практикующий косметолог",
+            "image": "assets/images/carousel2.jpg",
+            "buttonText": "Записаться на консультацию",
+            "buttonLink": "https://apnt.app/skvorcova_viktoriya3?fbclid=PAQ0xDSwKli-VleHRuA2FlbQIxMAABp6AV960erBxS8DMQpTuLAE_1JXXrza9KJW4KG3BwtMLX3rG2oVmGlWWGIyTH_aem_txkMk0eQ6Zj09wPmjRtNxg",
+            "sortOrder": 10,
+            "isActive": true,
+            "createdAt": "2026-11-09T12:31:37.563326Z",
+            "updatedAt": "2026-11-09T12:31:37.563326Z"
+        },
+        {
+            "id": "00000000-0000-4000-8000-000000000002",
+            "title": "Индивидуальные наборы для домашнего ухода",
+            "subtitle": "Новые индивидуальные наборы для домашнего ухода уже в продаже!",
+            "image": "assets/images/carousel3.jpg",
+            "buttonText": "Смотреть каталог",
+            "buttonLink": "/products",
+            "sortOrder": 20,
+            "isActive": true,
+            "createdAt": "2026-11-09T12:31:37.563326Z",
+            "updatedAt": "2026-11-09T12:31:37.563326Z"
+        }
+    ],
+    "page": null,
+    "limit": null
+}
