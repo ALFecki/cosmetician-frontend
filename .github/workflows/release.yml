@@ -1,0 +1,51 @@
+name: Release frontend
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - codex/reliable-deployment
+    pull_request:
+
+permissions:
+    contents: read
+
+jobs:
+    build:
+        runs-on: ubuntu-24.04
+        timeout-minutes: 15
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '22'
+                  cache: yarn
+            - name: Install locked dependencies
+              run: yarn install --frozen-lockfile --non-interactive
+            - name: Lint
+              run: yarn lint
+            - name: Production build
+              run: yarn build --configuration production
+            - name: Package release
+              run: |
+                  test -s dist/proskin-frontend/browser/index.html
+                  mkdir -p release
+                  tar -czf release/frontend.tar.gz -C dist/proskin-frontend/browser .
+                  python3 - <<'PY'
+                  import hashlib, json, os, pathlib
+                  archive = pathlib.Path('release/frontend.tar.gz')
+                  manifest = {
+                      'schema': 1,
+                      'component': 'frontend',
+                      'repository': os.environ['GITHUB_REPOSITORY'],
+                      'commit': os.environ['GITHUB_SHA'],
+                      'run_id': os.environ['GITHUB_RUN_ID'],
+                      'files': {'frontend.tar.gz': hashlib.sha256(archive.read_bytes()).hexdigest()},
+                  }
+                  pathlib.Path('release/manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+                  PY
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: frontend-${{ github.sha }}
+                  path: release/
+                  retention-days: 30
