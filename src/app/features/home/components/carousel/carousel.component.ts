@@ -1,5 +1,5 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { IconsModule } from '../../../../shared/base/icons/icons.module';
 import { ImageUrlPipe } from '../../../../shared/utils/image-url.pipe';
@@ -14,6 +14,7 @@ import { BannerService } from '../../../../shared/services/banner.service';
     imports: [ImageUrlPipe, CommonModule, IconsModule, RouterModule],
 })
 export class CarouselComponent implements OnInit, OnDestroy {
+    @Input() showIntro = false;
     slides: BannerModel[] = [];
     private subscription?: Subscription;
     private platformId = inject(PLATFORM_ID);
@@ -21,6 +22,35 @@ export class CarouselComponent implements OnInit, OnDestroy {
     constructor(private bannerService: BannerService) {}
 
     currentIndex = 0;
+    private touchStartX = 0;
+    private touchStartY = 0;
+    get introOffset(): number {
+        return this.showIntro ? 1 : 0;
+    }
+    get slideCount(): number {
+        return this.slides.length + this.introOffset;
+    }
+    get slidePositions(): number[] {
+        return Array.from({ length: this.slideCount }, (_, index) => index);
+    }
+
+    onTouchStart(event: TouchEvent): void {
+        const touch = event.changedTouches[0];
+        if (!touch) return;
+        this.touchStartX = touch.screenX;
+        this.touchStartY = touch.screenY;
+    }
+
+    onTouchEnd(event: TouchEvent): void {
+        const touch = event.changedTouches[0];
+        if (!touch) return;
+        const horizontal = touch.screenX - this.touchStartX;
+        const vertical = touch.screenY - this.touchStartY;
+        if (Math.abs(horizontal) > 60 && Math.abs(horizontal) > Math.abs(vertical) * 1.3) {
+            if (horizontal < 0) this.nextSlide();
+            else this.prevSlide();
+        }
+    }
     private intervalId: number | null = null;
     isPaused = false;
 
@@ -61,19 +91,19 @@ export class CarouselComponent implements OnInit, OnDestroy {
     }
 
     prevSlide() {
-        this.currentIndex = this.currentIndex === 0 ? this.slides.length - 1 : this.currentIndex - 1;
+        this.currentIndex = this.currentIndex === 0 ? this.slideCount - 1 : this.currentIndex - 1;
     }
 
     nextSlide() {
-        this.currentIndex = this.currentIndex === this.slides.length - 1 ? 0 : this.currentIndex + 1;
+        this.currentIndex = this.currentIndex === this.slideCount - 1 ? 0 : this.currentIndex + 1;
     }
 
     getPreviousIndex(): number {
-        return this.currentIndex === 0 ? this.slides.length - 1 : this.currentIndex - 1;
+        return this.currentIndex === 0 ? this.slideCount - 1 : this.currentIndex - 1;
     }
 
     goToSlide(index: number) {
-        this.currentIndex = index;
+        if (index >= 0 && index < this.slideCount) this.currentIndex = index;
     }
 
     pauseCarousel() {

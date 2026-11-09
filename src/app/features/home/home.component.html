@@ -1,24 +1,26 @@
-<section class="hero sf-container">
-    <div class="hero-copy">
-        <p class="sf-eyebrow">SkViDerm · осознанный уход</p>
-        <h1>Внимание к коже.<br /><em>Забота о себе.</em></h1>
-        <p class="hero-description">Профессиональная косметика и помощь косметолога — чтобы найти уход, который подходит именно вам.</p>
-        <div class="hero-actions">
-            <a class="sf-button" routerLink="/products">Найти свой уход <span aria-hidden="true">→</span></a
-            ><button type="button" class="sf-text-link" (click)="openConsultation()">Нужна консультация</button>
+<app-carousel [showIntro]="true"
+    ><section class="hero" carouselIntro>
+        <div class="hero-copy">
+            <p class="sf-eyebrow">SkViDerm · осознанный уход</p>
+            <h1>Внимание к коже.<br /><em>Забота о себе.</em></h1>
+            <p class="hero-description">Профессиональная косметика и помощь косметолога — чтобы найти уход, который подходит именно вам.</p>
+            <div class="hero-actions">
+                <a class="sf-button" routerLink="/products">Найти свой уход <span aria-hidden="true">→</span></a
+                ><button type="button" class="sf-text-link" (click)="openConsultation()">Нужна консультация</button>
+            </div>
         </div>
-    </div>
-    <div class="hero-image">
-        <img
-            src="assets/images/hero-still-life.jpg"
-            alt="Косметические флаконы и крем на тёплой каменной поверхности"
-            width="1200"
-            height="800"
-            loading="eager"
-            fetchpriority="high"
-        /><span>Больше внимания к себе</span>
-    </div>
-</section>
+        <div class="hero-image">
+            <img
+                src="assets/images/hero-still-life.jpg"
+                alt="Косметические флаконы и крем на тёплой каменной поверхности"
+                width="1200"
+                height="800"
+                loading="eager"
+                fetchpriority="high"
+            /><span>Больше внимания к себе</span>
+        </div>
+    </section></app-carousel
+>
 <div class="sf-container assurance-strip">
     <span><i-bs name="check-circle"></i-bs>Профессиональные бренды</span><span><i-bs name="person"></i-bs>Подбор с косметологом</span
     ><span><i-bs name="truck"></i-bs>Доставка по всей Беларуси</span>
@@ -45,7 +47,6 @@
     </div>
 </section>
 <app-brands></app-brands>
-<app-carousel></app-carousel>
 <app-product-carousel></app-product-carousel>
 <app-about-me></app-about-me>
 <app-benefits></app-benefits>

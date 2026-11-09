@@ -1,6 +1,9 @@
-@if (slides.length) {
+@if (slideCount) {
     <section
         class="carousel sf-container"
+        [class.hero-carousel]="showIntro"
+        (touchstart)="onTouchStart($event)"
+        (touchend)="onTouchEnd($event)"
         aria-label="Предложения магазина"
         aria-roledescription="карусель"
         (mouseenter)="pauseCarousel()"
@@ -10,20 +13,32 @@
             @for (slide of slides; track slide.id; let i = $index) {
                 <div
                     class="background-slide"
-                    [class.active]="i === currentIndex"
+                    [class.active]="i + introOffset === currentIndex"
                     [style.background-image]="'url(' + (slide.image | imageUrl) + ')'"
                 ></div>
             }
         </div>
         <div class="carousel-inner" aria-live="polite">
+            @if (showIntro) {
+                <div
+                    class="carousel-item intro-slide"
+                    [class.active]="currentIndex === 0"
+                    [attr.aria-hidden]="currentIndex !== 0"
+                    [attr.inert]="currentIndex !== 0 ? '' : null"
+                    role="group"
+                    [attr.aria-label]="'1 из ' + slideCount"
+                >
+                    <ng-content select="[carouselIntro]"></ng-content>
+                </div>
+            }
             @for (slide of slides; track slide.id; let i = $index) {
                 <div
                     class="carousel-item"
-                    [class.active]="i === currentIndex"
-                    [attr.aria-hidden]="i !== currentIndex"
-                    [attr.inert]="i !== currentIndex ? '' : null"
+                    [class.active]="i + introOffset === currentIndex"
+                    [attr.aria-hidden]="i + introOffset !== currentIndex"
+                    [attr.inert]="i + introOffset !== currentIndex ? '' : null"
                     role="group"
-                    [attr.aria-label]="i + 1 + ' из ' + slides.length"
+                    [attr.aria-label]="i + introOffset + 1 + ' из ' + slideCount"
                 >
                     <img [src]="slide.image | imageUrl" [alt]="slide.title" />
                     <div class="slide-content">
@@ -37,13 +52,13 @@
                 </div>
             }
         </div>
-        @if (slides.length > 1) {
+        @if (slideCount > 1) {
             <div class="carousel-navigation">
                 <button type="button" class="carousel-control carousel-control-prev" (click)="prevSlide()" aria-label="Предыдущий слайд">
                     ←
                 </button>
                 <div class="carousel-indicators">
-                    @for (slide of slides; track slide.id; let i = $index) {
+                    @for (i of slidePositions; track i) {
                         <button
                             type="button"
                             class="indicator"
@@ -56,6 +71,9 @@
                         </button>
                     }
                 </div>
+                @if (showIntro) {
+                    <span class="carousel-count" aria-hidden="true">{{ currentIndex + 1 }} / {{ slideCount }}</span>
+                }
                 <button type="button" class="carousel-control carousel-control-next" (click)="nextSlide()" aria-label="Следующий слайд">
                     →
                 </button>
