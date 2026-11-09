@@ -1,6 +1,7 @@
+import { CommonModule } from '@angular/common';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, catchError, forkJoin, of, tap } from 'rxjs';
@@ -64,6 +65,7 @@ interface ModelConfig {
     templateUrl: './admin-panel-switcher.component.html',
     styleUrl: './admin-panel-switcher.component.scss',
     imports: [
+        CommonModule,
         FormsModule,
         ReactiveFormsModule,
         StatisticsComponent,
@@ -83,9 +85,49 @@ export class AdminPanelSwitcherComponent implements OnInit {
         { key: 'product', title: 'Товары' },
         { key: 'category', title: 'Категории' },
         { key: 'brand', title: 'Бренды' },
-        { key: 'person', title: 'Пользователи' },
+        { key: 'person', title: 'Клиенты' },
         { key: 'statistics', title: 'Статистика' },
     ];
+    readonly navigation = [
+        {
+            title: 'Магазин',
+            items: [
+                { key: 'orders', title: 'Заказы', icon: 'bag-check' },
+                { key: 'products', title: 'Товары', icon: 'box-seam' },
+                { key: 'users', title: 'Клиенты', icon: 'person' },
+            ],
+        },
+        {
+            title: 'Продвижение',
+            items: [
+                { key: 'promotions', title: 'Акции и промокоды', icon: 'tag' },
+                { key: 'banners', title: 'Баннеры', icon: 'grid' },
+            ],
+        },
+        {
+            title: 'Управление',
+            items: [
+                { key: 'statistics', title: 'Статистика', icon: 'list-check' },
+                { key: 'categories', title: 'Справочники', icon: 'book' },
+                { key: 'settings', title: 'Настройки', icon: 'gear' },
+            ],
+        },
+    ];
+    readonly referenceModels = ['categories', 'brands', 'productTypes', 'productScopes', 'countries'];
+    readonly editorTabs = [
+        { key: 'main', title: 'Основное' },
+        { key: 'prices', title: 'Цены и объёмы' },
+        { key: 'description', title: 'Описание и состав' },
+    ];
+    editorOpen = false;
+    editorTab = 'main';
+    productStatus = 'all';
+    brandFilter = '';
+    categoryFilter = '';
+    sortOrder = 'title';
+    page = 1;
+    readonly pageSize = 20;
+    compact = false;
     currentModel = 'products';
     currentModelData: any[] = [];
     filteredData: any[] = [];
@@ -98,6 +140,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
     saving = false;
     savingVariant = false;
     deleting = false;
+    deletingVariant = false;
     cascadeDeleting = false;
     restoring = false;
     currentProductId: string | null = null;
@@ -215,7 +258,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
         this.modelConfigs['products'] = {
             key: 'products',
-            title: 'Продукты',
+            title: 'Товары',
             service: this.productService,
             fields: [
                 { key: 'title', label: 'Название', type: 'text', required: true },
@@ -229,7 +272,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 { key: 'countryIds', label: 'Страны производители', type: 'multiselect', required: false },
                 { key: 'composition', label: 'Состав', type: 'textarea', required: false },
                 { key: 'productScopeIds', label: 'Область применения', type: 'multiselect', required: false },
-                { key: 'productTypeId', label: 'Тип продукта', type: 'select', required: false },
+                { key: 'productTypeId', label: 'Тип продукта', type: 'select', required: true },
                 { key: 'methodOfUse', label: 'Способ применения', type: 'textarea', required: false },
             ],
             columns: [
@@ -334,7 +377,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
         this.modelConfigs['users'] = {
             key: 'users',
-            title: 'Пользователи',
+            title: 'Клиенты',
             service: this.personService,
             fields: [
                 { key: 'email', label: 'Email', type: 'email', required: true },
@@ -547,30 +590,125 @@ export class AdminPanelSwitcherComponent implements OnInit {
     }
 
     get currentModelFields() {
-        return this.currentModelConfig.fields;
+        return this.currentModelConfig?.fields || [];
     }
 
     get currentModelColumns() {
-        return this.currentModelConfig.columns;
+        const visible: Record<string, string[]> = {
+            productTypes: ['title', 'description', 'isDeleted'],
+            productScopes: ['title', 'description', 'isDeleted'],
+            categories: ['image', 'title', 'description', 'isDeleted'],
+            brands: ['image', 'title', 'manufacturer', 'isDeleted'],
+            users: ['email', 'firstName', 'secondName', 'isAdmin', 'isModerator'],
+            countries: ['name', 'code', 'isDeleted'],
+            promotions: ['title', 'discountType', 'discountValue', 'validUntil', 'isActive'],
+            promocodes: ['code', 'discountValue', 'usageCount', 'validUntil', 'isActive'],
+        };
+        return (this.currentModelConfig?.columns || []).filter(
+            column => !visible[this.currentModel] || visible[this.currentModel].includes(column.key),
+        );
+    }
+
+    modelTitle(key: string): string {
+        return this.modelConfigs[key]?.title || key;
     }
 
     getCurrentModelTitle(): string {
-        return this.currentModelConfig?.title || '';
+        return this.currentModel === 'settings' ? 'Настройки' : this.currentModelConfig?.title || '';
     }
 
-    switchModel(modelKey: string) {
-        if (this.currentModel !== modelKey) {
-            this.currentModel = modelKey;
-            this.searchText = '';
-            if (modelKey === 'statistics') {
-                this.loading = false;
-            } else {
-                this.loadData();
-            }
+    isNavigationActive(key: string): boolean {
+        return (
+            key === this.currentModel ||
+            (key === 'categories' && this.referenceModels.includes(this.currentModel)) ||
+            (key === 'promotions' && this.currentModel === 'promocodes')
+        );
+    }
+
+    get hasList(): boolean {
+        return !['statistics', 'orders', 'settings'].includes(this.currentModel);
+    }
+
+    get pageCount(): number {
+        return Math.max(1, Math.ceil(this.filteredData.length / this.pageSize));
+    }
+    get pagedProducts(): any[] {
+        return this.filteredData.slice((this.page - 1) * this.pageSize, this.page * this.pageSize);
+    }
+    get editorFields() {
+        if (this.currentModel !== 'products') return this.currentModelFields;
+        const descriptions = ['description', 'composition', 'methodOfUse'];
+        const prices = ['variants', 'isPriceHidden'];
+        return this.currentModelFields.filter(field =>
+            this.editorTab === 'description'
+                ? descriptions.includes(field.key)
+                : this.editorTab === 'prices'
+                  ? prices.includes(field.key)
+                  : !descriptions.includes(field.key) && !prices.includes(field.key),
+        );
+    }
+
+    getOptions(key: string): any[] {
+        return this.modelConfigs['products'].fields.find(field => field.key === key)?.options || [];
+    }
+    activeVariants(product: any): any[] {
+        return (product.variants || []).filter((variant: any) => !variant.isDeleted);
+    }
+    productPrice(product: any, hidden = product.isPriceHidden): string {
+        if (hidden) return 'Скрыта';
+        const prices = this.activeVariants(product).map(variant => Number(variant.price));
+        if (!prices.length) return 'Нет вариантов';
+        return (
+            (new Set(prices).size > 1 ? 'от ' : '') +
+            Math.min(...prices).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        );
+    }
+    productVolumes(product: any): string {
+        const volumes = this.activeVariants(product).map(variant => variant.volume);
+        return volumes.length ? volumes.join(' · ') + ' мл' : '—';
+    }
+
+    get hasUnsavedChanges(): boolean {
+        return !!this.itemForm?.dirty || Object.keys(this.selectedFiles).length > 0;
+    }
+
+    canLeave(): boolean {
+        if (this.saving || this.savingVariant || this.deleting || this.restoring || this.deletingVariant) return false;
+        return !this.editorOpen || !this.hasUnsavedChanges || window.confirm('Есть несохранённые изменения. Выйти без сохранения?');
+    }
+
+    @HostListener('window:beforeunload', ['$event'])
+    beforeUnload(event: BeforeUnloadEvent): void {
+        if (this.saving || this.savingVariant || this.deletingVariant || (this.editorOpen && this.hasUnsavedChanges)) {
+            event.preventDefault();
+            event.returnValue = '';
         }
     }
 
+    closeEditor(): boolean {
+        if (!this.canLeave()) return false;
+        this.editorOpen = false;
+        this.error = null;
+        this.resetFileUploads();
+        return true;
+    }
+
+    switchModel(modelKey: string) {
+        if (this.currentModel === modelKey || !this.closeEditor()) return;
+        this.currentModel = modelKey;
+        this.searchText = '';
+        this.brandFilter = '';
+        this.categoryFilter = '';
+        this.productStatus = 'all';
+        this.page = 1;
+        this.currentModelData = [];
+        this.filteredData = [];
+        if (this.hasList) this.loadData();
+        else this.loading = false;
+    }
+
     loadData() {
+        const model = this.currentModel;
         this.loading = true;
         this.error = null;
 
@@ -593,6 +731,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
             forkJoin(observables)
                 .pipe(
                     tap(results => {
+                        if (this.currentModel !== model) return;
                         this.currentModelConfig.fields.forEach(field => {
                             if (field.type === 'select' || field.type === 'multiselect') {
                                 if (field.key === 'categoryIds' && results['categories']) {
@@ -620,7 +759,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
                     }),
                 )
                 .subscribe(() => {
-                    this.loadMainData();
+                    if (this.currentModel === model) this.loadMainData();
                 });
         } else {
             this.loadMainData();
@@ -628,15 +767,18 @@ export class AdminPanelSwitcherComponent implements OnInit {
     }
 
     loadMainData() {
+        const model = this.currentModel;
         const service = this.currentModelConfig.service;
 
         service.getAll({ includeDeleted: true }).subscribe(
             (response: any) => {
+                if (this.currentModel !== model) return;
                 this.currentModelData = response.data;
-                this.filteredData = [...this.currentModelData];
+                this.applyFilters();
                 this.loading = false;
             },
             (error: any) => {
+                if (this.currentModel !== model) return;
                 console.error(`Error loading ${this.currentModel}:`, error);
                 this.error = `Ошибка загрузки данных: ${error.message || 'Неизвестная ошибка'}`;
                 this.loading = false;
@@ -645,23 +787,41 @@ export class AdminPanelSwitcherComponent implements OnInit {
     }
 
     onSearchChange() {
-        console.log('On search change');
-        if (!this.searchText.trim()) {
-            console.log('return1');
-            this.filteredData = [...this.currentModelData];
-            return;
-        }
+        this.page = 1;
+        this.applyFilters();
+    }
 
-        const searchLower = this.searchText.toLowerCase().trim();
-
+    applyFilters() {
+        const query = this.searchText.trim().toLocaleLowerCase();
         this.filteredData = this.currentModelData.filter(item => {
-            return String(item['title']).toLowerCase().includes(searchLower);
+            const text = [item.title, item.fullTitle, item.brand?.title, item.name, item.code, item.email, item.firstName, item.secondName]
+                .filter(Boolean)
+                .join(' ')
+                .toLocaleLowerCase();
+            if (query && !text.includes(query)) return false;
+            if (this.currentModel !== 'products') return true;
+            return (
+                (this.productStatus === 'all' || (this.productStatus === 'archived' ? item.isDeleted : !item.isDeleted)) &&
+                (!this.brandFilter || item.brandId === this.brandFilter) &&
+                (!this.categoryFilter || item.categories?.some((category: any) => category.id === this.categoryFilter))
+            );
         });
+        if (this.currentModel === 'products') {
+            this.filteredData.sort((left, right) => {
+                if (this.sortOrder === 'price') {
+                    const a = Math.min(...this.activeVariants(left).map(variant => Number(variant.price)));
+                    const b = Math.min(...this.activeVariants(right).map(variant => Number(variant.price)));
+                    if (a !== b) return a - b;
+                }
+                return left.title.localeCompare(right.title, 'ru');
+            });
+        }
+        this.page = Math.min(this.page, this.pageCount);
     }
 
     clearSearch() {
         this.searchText = '';
-        this.filteredData = [...this.currentModelData];
+        this.onSearchChange();
     }
 
     buildForm(item?: any) {
@@ -704,6 +864,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 }
             }
 
+            if (!item && field.type === 'boolean') value = false;
+
             if (!item && this.currentModel === 'banners') {
                 if (field.key === 'sortOrder') value = 0;
                 if (field.key === 'isActive') value = false;
@@ -714,9 +876,9 @@ export class AdminPanelSwitcherComponent implements OnInit {
                     value.map((variant: any) =>
                         this.fb.group({
                             id: [variant.id || null],
-                            volume: [variant.volume || '', Validators.required],
-                            costPrice: [variant.costPrice || '', Validators.required],
-                            price: [variant.price || '', Validators.required],
+                            volume: [variant.volume ?? '', Validators.required],
+                            costPrice: [variant.costPrice ?? '', Validators.required],
+                            price: [variant.price ?? '', Validators.required],
                             isDeleted: [variant.isDeleted || false],
                         }),
                     ),
@@ -743,7 +905,21 @@ export class AdminPanelSwitcherComponent implements OnInit {
         this.editingItem = null;
         this.itemForm = this.buildForm();
         this.resetFileUploads();
-        this.modalService.open(this.itemModal, { size: 'lg' });
+        this.editorTab = 'main';
+        if (this.currentModel === 'products') {
+            this.editorOpen = true;
+            setTimeout(function () {
+                document.querySelector('.admin-workspace')?.scrollIntoView({ block: 'start' });
+            });
+            this.currentProductId = this.editingItem?.id || null;
+        } else {
+            this.modalService.open(this.itemModal, {
+                size: 'lg',
+                windowClass: 'skviderm-admin-modal',
+                backdrop: 'static',
+                beforeDismiss: () => !this.saving,
+            });
+        }
     }
 
     editItem(item: any) {
@@ -754,18 +930,41 @@ export class AdminPanelSwitcherComponent implements OnInit {
         this.showDeletedVariants = false; // Reset checkbox when opening new item
         this.itemForm = this.buildForm(item);
         this.resetFileUploads();
-        this.modalService.open(this.itemModal, { size: 'lg' });
+        this.editorTab = 'main';
+        if (this.currentModel === 'products') {
+            this.editorOpen = true;
+            setTimeout(function () {
+                document.querySelector('.admin-workspace')?.scrollIntoView({ block: 'start' });
+            });
+            this.currentProductId = this.editingItem?.id || null;
+        } else {
+            this.modalService.open(this.itemModal, {
+                size: 'lg',
+                windowClass: 'skviderm-admin-modal',
+                backdrop: 'static',
+                beforeDismiss: () => !this.saving,
+            });
+        }
     }
 
     openDeleteModal(item: any) {
+        this.cascadeDeleting = false;
         this.selectedItemId = item.id;
-        this.modalService.open(this.deleteModal);
+        this.modalService.open(this.deleteModal, {
+            windowClass: 'skviderm-admin-modal',
+            backdrop: 'static',
+            beforeDismiss: () => !this.deleting,
+        });
     }
 
     openCascadeDeleteModal(item: any) {
         this.selectedItemId = item.id;
         this.cascadeDeleting = true;
-        this.modalService.open(this.deleteModal);
+        this.modalService.open(this.deleteModal, {
+            windowClass: 'skviderm-admin-modal',
+            backdrop: 'static',
+            beforeDismiss: () => !this.deleting,
+        });
     }
 
     resetFileUploads() {
@@ -810,7 +1009,9 @@ export class AdminPanelSwitcherComponent implements OnInit {
         if (!this.currentProductId || this.currentModel !== 'products') return;
 
         try {
-            const response = await this.productService.getById(this.currentProductId).toPromise();
+            const productId = this.currentProductId;
+            const response = await this.productService.getById(productId).toPromise();
+            if (this.currentModel !== 'products' || this.currentProductId !== productId || !this.editorOpen) return;
             if (response?.data) {
                 this.editingItem = response.data;
 
@@ -819,7 +1020,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 const index = this.currentModelData.findIndex(item => item.id === this.currentProductId);
                 if (index !== -1) {
                     this.currentModelData[index] = response.data;
-                    this.filteredData = [...this.currentModelData];
+                    this.applyFilters();
                 }
             }
         } catch (error) {
@@ -845,9 +1046,9 @@ export class AdminPanelSwitcherComponent implements OnInit {
             variantsArray.push(
                 this.fb.group({
                     id: [variant.id || null],
-                    volume: [variant.volume || '', Validators.required],
-                    costPrice: [variant.costPrice || '', Validators.required],
-                    price: [variant.price || '', Validators.required],
+                    volume: [variant.volume ?? '', Validators.required],
+                    costPrice: [variant.costPrice ?? '', Validators.required],
+                    price: [variant.price ?? '', Validators.required],
                     isDeleted: [variant.isDeleted || false],
                 }),
             );
@@ -869,7 +1070,11 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
         this.currentProductId = this.editingItem.id;
         this.variantForm.reset();
-        this.modalService.open(this.variantModal, { backdrop: 'static' });
+        this.modalService.open(this.variantModal, {
+            backdrop: 'static',
+            windowClass: 'skviderm-admin-modal',
+            beforeDismiss: () => !this.savingVariant,
+        });
     }
 
     async saveVariant() {
@@ -903,7 +1108,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
     }
 
     async removeVariant(index: number): Promise<void> {
-        if (this.currentModel !== 'products') return;
+        if (this.currentModel !== 'products' || this.deletingVariant || this.saving || this.savingVariant) return;
 
         const variantsArray = this.getVariantsFormArray();
         if (!variantsArray) return;
@@ -922,6 +1127,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
             return;
         }
 
+        this.deletingVariant = true;
         try {
             const response = await this.productVariantService.delete(variantId).toPromise();
             if (response?.status) {
@@ -931,6 +1137,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
         } catch (error) {
             console.error('Error deleting variant:', error);
             this.toastService.show('Ошибка при удалении варианта', 'error');
+        } finally {
+            this.deletingVariant = false;
         }
     }
 
@@ -947,7 +1155,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
     }
 
     async saveItem() {
-        if (this.itemForm.invalid || this.saving) {
+        if (this.itemForm.invalid || this.saving || this.savingVariant || this.deletingVariant || this.restoring) {
             Object.keys(this.itemForm.controls).forEach(key => {
                 this.itemForm.get(key)?.markAsTouched();
             });
@@ -972,6 +1180,10 @@ export class AdminPanelSwitcherComponent implements OnInit {
                 return;
             }
 
+            if (this.currentModel === 'products' && ['fullTitle', 'composition', 'methodOfUse'].includes(key)) {
+                formData[key] = value ?? '';
+                return;
+            }
             if (value !== null && value !== undefined && value !== '') {
                 if (key === 'variants' || key === 'categoryIds' || key === 'countryIds' || key === 'productScopeIds') {
                     formData[key] = JSON.stringify(value);
@@ -990,7 +1202,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
             }
         });
 
-        if (this.currentModel === 'product') {
+        if (this.currentModel === 'products') {
             delete formData['variants'];
         }
 
@@ -1004,9 +1216,19 @@ export class AdminPanelSwitcherComponent implements OnInit {
         const operation = this.isEditMode ? service.update(this.selectedItemId, formData, true) : service.create(formData, true);
 
         await operation
-            .then(() => {
+            .then((response: any) => {
                 this.saving = false;
-                this.modalService.dismissAll();
+                this.itemForm.markAsPristine();
+                this.resetFileUploads();
+                if (this.currentModel === 'products' && !this.isEditMode) {
+                    this.editItem(response.data);
+                    this.editorTab = 'prices';
+                    this.toastService.show('Товар создан. Добавьте объёмы и цены.', 'success');
+                } else {
+                    this.editorOpen = false;
+                    this.modalService.dismissAll();
+                    this.toastService.show('Изменения сохранены', 'success');
+                }
                 this.loadData();
             })
             .catch((error: any) => {
@@ -1018,38 +1240,44 @@ export class AdminPanelSwitcherComponent implements OnInit {
     }
 
     deleteItem() {
-        if (!this.selectedItemId) return;
-
-        const service = this.currentModelConfig.service;
-
-        if (this.cascadeDeleting) {
-            service.deleteCascade(this.selectedItemId).subscribe(
-                () => {
-                    this.cascadeDeleting = false;
-                    this.modalService.dismissAll();
-                    this.loadData();
-                },
-                (error: any) => {
-                    console.error('Error deleting item:', error);
-                    this.cascadeDeleting = false;
-                },
-            );
-            return;
-        }
-
+        if (!this.selectedItemId || this.deleting) return;
         this.deleting = true;
-
-        service.delete(this.selectedItemId).subscribe(
-            () => {
+        const service = this.currentModelConfig.service;
+        const operation = this.cascadeDeleting ? service.deleteCascade(this.selectedItemId) : service.delete(this.selectedItemId);
+        operation.subscribe({
+            next: () => {
                 this.deleting = false;
+                this.cascadeDeleting = false;
+                this.editorOpen = false;
                 this.modalService.dismissAll();
                 this.loadData();
             },
-            (error: any) => {
-                console.error('Error deleting item:', error);
+            error: () => {
                 this.deleting = false;
+                this.toastService.show('Не удалось удалить. Данные сохранены, попробуйте ещё раз.', 'error');
             },
-        );
+        });
+    }
+
+    async restoreProduct() {
+        if (!this.editingItem || this.restoring) return;
+        this.restoring = true;
+        try {
+            const product = this.editingItem;
+            await this.productService.update(product.id, {
+                isDeleted: false,
+                categoryIds: JSON.stringify(product.categories.map((item: any) => item.id)),
+                countryIds: JSON.stringify(product.countries.map((item: any) => item.id)),
+                productScopeIds: JSON.stringify(product.productScopes.map((item: any) => item.id)),
+            } as any);
+            this.editingItem = { ...product, isDeleted: false };
+            this.loadData();
+            this.toastService.show('Товар возвращён в каталог', 'success');
+        } catch {
+            this.error = 'Не удалось восстановить товар. Попробуйте ещё раз.';
+        } finally {
+            this.restoring = false;
+        }
     }
 
     onMultiselectChange(fieldKey: string, optionId: string, event: any) {
@@ -1063,12 +1291,13 @@ export class AdminPanelSwitcherComponent implements OnInit {
         }
 
         this.itemForm.get(fieldKey)?.setValue(newValue);
+        this.itemForm.markAsDirty();
     }
 
     getSelectedOptionsText(fieldKey: string, options: any[]): string {
         const selectedIds = this.itemForm.get(fieldKey)?.value || [];
         if (selectedIds.length === 0) {
-            return `Выберите ${fieldKey.toLowerCase()}...`;
+            return 'Выберите…';
         }
 
         if (selectedIds.length === 1) {

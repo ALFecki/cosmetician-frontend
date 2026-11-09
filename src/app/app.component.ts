@@ -62,7 +62,7 @@ export class AppComponent {
             ),
         ]).pipe(
             map(([isMaintenanceMode, currentUrl]) => {
-                if (currentUrl.includes('/maintenance')) {
+                if (currentUrl.includes('/maintenance') || /^\/admin(?:[/?#]|$)/.test(currentUrl)) {
                     return false;
                 }
 

@@ -301,3 +301,38 @@
         }
     }
 }
+
+:host {
+    display: block;
+    --primary: #ae3d5b;
+}
+.statistics-container {
+    padding: 0;
+    background: transparent;
+    min-height: auto;
+    .statistics-header {
+        display: none;
+    }
+    .filters-section .card {
+        border: 1px solid #e7e7e5;
+        border-radius: 8px;
+        background: white;
+        .card-header {
+            background: #fafaf8;
+            border-color: #e7e7e5;
+        }
+        .card-body {
+            background: white;
+        }
+    }
+    .filters-section .form-control,
+    .filters-section .form-select {
+        font-size: 13px;
+        padding: 8px 12px;
+        border: 1px solid #dedfdf;
+        border-radius: 6px;
+    }
+    .filters-section .form-label {
+        font-size: 12px;
+    }
+}

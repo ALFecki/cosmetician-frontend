@@ -1,146 +1,390 @@
-<div class="admin-panel-switcher">
-    <h1 class="mb-4">Панель администратора</h1>
-
-    <!-- Maintenance Mode Control -->
-    <div class="maintenance-control mb-4">
-        <div class="card">
-            <div class="card-header bg-warning text-dark">
-                <h6 class="mb-0">
-                    <i-bs name="tools" class="me-2"></i-bs>
-                    Режим технических работ
-                </h6>
-            </div>
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <p class="mb-1">
-                            <strong>Статус:</strong>
-                            <span [class]="'badge ' + (isMaintenanceMode ? 'bg-danger' : 'bg-success')">
-                                {{ isMaintenanceMode ? 'Включен' : 'Отключен' }}
-                            </span>
-                        </p>
-                        <small class="text-muted"> Когда включен, доступ к сайту имеют только администраторы </small>
-                    </div>
-
-                    <button
-                        class="btn"
-                        [class]="isMaintenanceMode ? 'btn-success' : 'btn-danger'"
-                        (click)="toggleMaintenanceMode()"
-                        [disabled]="maintenanceLoading"
-                    >
-                        @if (maintenanceLoading) {
-                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        }
-                        <i-bs [name]="isMaintenanceMode ? 'check-circle' : 'tools'" class="me-2"></i-bs>
-                        {{ isMaintenanceMode ? 'Отключить' : 'Включить' }}
-                    </button>
-                </div>
-
-                @if (!isMaintenanceMode) {
-                    <div class="mb-3">
-                        <label for="maintenanceDuration" class="form-label">
-                            <i-bs name="clock" class="me-2"></i-bs>
-                            Длительность технических работ (в секундах)
-                        </label>
-                        <div class="input-group">
-                            <input
-                                type="number"
-                                class="form-control"
-                                id="maintenanceDuration"
-                                [(ngModel)]="maintenanceDuration"
-                                placeholder="Введите время в секундах"
-                                min="1"
-                                step="1"
-                            />
-                            <span class="input-group-text">сек.</span>
-                        </div>
-                        <small class="text-muted"> Например: 300 сек = 5 мин, 3600 сек = 1 час </small>
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
-
-    <ul class="nav nav-tabs" role="tablist">
-        @for (model of availableModels; track model) {
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" [class.active]="currentModel === model.key" (click)="switchModel(model.key)" type="button">
-                    {{ model.title }}
-                </button>
-            </li>
-        }
-    </ul>
-
-    @if (currentModel !== 'statistics' && currentModel !== 'orders') {
-        <div class="admin-actions">
-            <div class="search-box">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Поиск..." [(ngModel)]="searchText" (input)="onSearchChange()" />
-                    @if (searchText) {
-                        <button class="btn btn-outline-secondary" type="button" (click)="clearSearch()">✖</button>
+<div class="admin-workspace">
+    <aside class="sidebar">
+        <div class="brand">SkVi<span>Derm</span></div>
+        <div class="brand-caption">Управление магазином</div>
+        <nav aria-label="Разделы администрирования">
+            @for (group of navigation; track group.title) {
+                <div class="nav-group">
+                    <div class="nav-caption">{{ group.title }}</div>
+                    @for (item of group.items; track item.key) {
+                        <button
+                            type="button"
+                            [class.active]="isNavigationActive(item.key)"
+                            [attr.aria-current]="isNavigationActive(item.key) ? 'page' : null"
+                            (click)="switchModel(item.key)"
+                        >
+                            <i-bs [name]="$any(item.icon)"></i-bs>{{ item.title }}
+                        </button>
                     }
                 </div>
-            </div>
-            <button class="btn btn-primary" (click)="openAddModal()">
-                <i-bs name="plus-lg"></i-bs> Добавить {{ getCurrentModelTitle() }}
-            </button>
+            }
+        </nav>
+        <a class="shop-link" href="/" target="_blank" rel="noopener"><i-bs name="box-arrow-up-right"></i-bs> Открыть магазин</a>
+        <div class="sidebar-footer">
+            <span class="avatar">S</span><span>Администратор<small>SkViDerm</small></span>
         </div>
-    }
-
-    <div class="table-container">
-        @if (loading) {
-            <div class="text-center p-5">
-                <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Загрузка...</span>
+    </aside>
+    <div class="workspace-content">
+        <header class="topbar">
+            <span
+                >Магазин <span class="separator">/</span> {{ getCurrentModelTitle() }}
+                @if (editorOpen) {
+                    <span class="separator">/</span> {{ isEditMode ? 'Редактирование' : 'Новый товар' }}
+                }</span
+            ><span class="mode-label">Панель управления</span>
+        </header>
+        <main class="content">
+            @if (editorOpen) {
+                <button type="button" class="back-link" (click)="closeEditor()"><i-bs name="arrow-left"></i-bs> К списку товаров</button>
+                <div class="page-heading">
+                    <div>
+                        <h1>{{ isEditMode ? editingItem.title : 'Новый товар' }}</h1>
+                        <p>Карточка товара · изменения сохранятся после нажатия кнопки</p>
+                    </div>
+                    <div class="heading-actions">
+                        <button
+                            type="button"
+                            class="btn btn-light"
+                            (click)="closeEditor()"
+                            [disabled]="saving || savingVariant || deletingVariant || restoring"
+                        >
+                            Отмена</button
+                        ><button
+                            type="button"
+                            class="btn btn-primary"
+                            (click)="saveItem()"
+                            [disabled]="saving || savingVariant || deletingVariant || restoring"
+                        >
+                            {{ saving ? 'Сохранение…' : 'Сохранить товар' }}
+                        </button>
+                    </div>
                 </div>
-            </div>
-        }
-
-        @if (error) {
-            <div class="alert alert-danger m-3" role="alert">
-                {{ error }}
-            </div>
-        }
-
-        @if (!loading && currentModel === 'statistics') {
-            <app-statistics> </app-statistics>
-        }
-
-        @if (!loading && currentModel === 'orders') {
-            <app-admin-orders> </app-admin-orders>
-        }
-
-        @if (!loading && filteredData.length > 0 && currentModel !== 'statistics' && currentModel !== 'orders') {
-            <app-generic-table
-                [data]="filteredData"
-                [columns]="currentModelColumns"
-                [key]="currentModel"
-                (editItem)="editItem($event)"
-                (deleteItem)="openDeleteModal($event)"
-                (cascadeDeleteItem)="openCascadeDeleteModal($event)"
-            >
-            </app-generic-table>
-        }
-
-        @if (!loading && filteredData.length === 0) {
-            <div class="p-5 text-center text-muted">Нет данных для отображения</div>
-        }
+                @if (error) {
+                    <div class="alert alert-danger" role="alert">{{ error }}</div>
+                }
+                @if (itemForm.invalid && itemForm.touched) {
+                    <div class="alert alert-warning" role="alert">
+                        Заполните обязательные поля, в том числе во вкладках «Основное» и «Описание и состав».
+                    </div>
+                }
+                <div class="editor-layout">
+                    <section class="editor-card">
+                        <nav class="section-tabs" aria-label="Разделы карточки товара">
+                            @for (tab of editorTabs; track tab.key) {
+                                <button
+                                    type="button"
+                                    [class.active]="editorTab === tab.key"
+                                    [attr.aria-current]="editorTab === tab.key ? 'page' : null"
+                                    (click)="editorTab = tab.key"
+                                >
+                                    {{ tab.title }}
+                                </button>
+                            }
+                        </nav>
+                        <div class="editor-form"><ng-container *ngTemplateOutlet="itemFields"></ng-container></div>
+                    </section>
+                    <aside class="product-preview">
+                        <section class="preview-card">
+                            <h2>Карточка товара</h2>
+                            <div class="preview-image">
+                                @if (filePreviewUrls['image']) {
+                                    <img [src]="filePreviewUrls['image']" alt="Новое изображение товара" />
+                                } @else if (itemForm.value.image) {
+                                    <img [src]="itemForm.value.image | imageUrl" alt="Изображение товара" />
+                                } @else {
+                                    <i-bs name="box-seam"></i-bs>
+                                }
+                            </div>
+                            <h3>{{ itemForm.value.title || 'Название товара' }}</h3>
+                            <p>
+                                {{ isEditMode ? productPrice(editingItem, itemForm.value.isPriceHidden) : 'Добавьте цены после создания' }}
+                                @if (isEditMode && !itemForm.value.isPriceHidden && activeVariants(editingItem).length) {
+                                    BYN
+                                }
+                            </p>
+                            <span class="status-badge" [class.archived]="editingItem?.isDeleted">{{
+                                !isEditMode ? 'Новый товар' : editingItem.isDeleted ? 'В архиве' : 'В каталоге'
+                            }}</span>
+                        </section>
+                        @if (isEditMode) {
+                            <section class="preview-card product-actions">
+                                <h2>Управление товаром</h2>
+                                @if (editingItem.isDeleted) {
+                                    <button type="button" class="btn btn-light" (click)="restoreProduct()" [disabled]="restoring || saving">
+                                        {{ restoring ? 'Восстановление…' : 'Вернуть в каталог' }}
+                                    </button>
+                                } @else {
+                                    <button
+                                        type="button"
+                                        class="btn btn-light"
+                                        (click)="openDeleteModal(editingItem)"
+                                        [disabled]="saving || savingVariant || deletingVariant || restoring"
+                                    >
+                                        Убрать в архив
+                                    </button>
+                                }
+                                <details>
+                                    <summary>Дополнительные действия</summary>
+                                    <button
+                                        type="button"
+                                        class="danger-link"
+                                        (click)="openCascadeDeleteModal(editingItem)"
+                                        [disabled]="saving || savingVariant || deletingVariant || restoring"
+                                    >
+                                        Удалить навсегда</button
+                                    ><small>Удаление потребует подтверждения.</small>
+                                </details>
+                            </section>
+                        }
+                    </aside>
+                </div>
+            } @else {
+                <div class="page-heading">
+                    <div>
+                        <h1>
+                            {{ getCurrentModelTitle() }}
+                            @if (hasList && !loading) {
+                                <span class="total">{{ currentModelData.length }}</span>
+                            }
+                        </h1>
+                        <p>{{ currentModel === 'products' ? 'Каталог, цены и информация о товарах' : 'Управление магазином SkViDerm' }}</p>
+                    </div>
+                    @if (hasList) {
+                        <button type="button" class="btn btn-primary" (click)="openAddModal()" [disabled]="loading || !!error">
+                            <i-bs name="plus-lg"></i-bs> {{ currentModel === 'products' ? 'Добавить товар' : 'Добавить' }}
+                        </button>
+                    }
+                </div>
+                @if (referenceModels.includes(currentModel) || currentModel === 'promotions' || currentModel === 'promocodes') {
+                    <nav class="section-tabs subnavigation" aria-label="Подразделы">
+                        @for (key of referenceModels.includes(currentModel) ? referenceModels : ['promotions', 'promocodes']; track key) {
+                            <button type="button" [class.active]="currentModel === key" (click)="switchModel(key)">
+                                {{ modelTitle(key) }}
+                            </button>
+                        }
+                    </nav>
+                }
+                @if (currentModel === 'settings') {
+                    <section class="settings-card">
+                        <h2>Технические работы</h2>
+                        <p>Во время обслуживания покупатели увидят страницу технических работ. Администраторам доступ сохранится.</p>
+                        <p>
+                            Сейчас: <strong>{{ isMaintenanceMode ? 'технические работы включены' : 'магазин доступен' }}</strong>
+                        </p>
+                        @if (!isMaintenanceMode) {
+                            <label for="maintenance-duration">Автоматически открыть через (секунды)</label
+                            ><input
+                                id="maintenance-duration"
+                                class="form-control"
+                                type="number"
+                                min="1"
+                                [(ngModel)]="maintenanceDuration"
+                                placeholder="Без ограничения"
+                            /><small>300 секунд — 5 минут. Пустое поле — до ручного отключения.</small>
+                        }
+                        <button type="button" class="btn btn-light mt-3" (click)="toggleMaintenanceMode()" [disabled]="maintenanceLoading">
+                            {{ isMaintenanceMode ? 'Открыть магазин' : 'Включить технические работы' }}
+                        </button>
+                    </section>
+                }
+                @if (currentModel === 'statistics') {
+                    <app-statistics></app-statistics>
+                }
+                @if (currentModel === 'orders') {
+                    <app-admin-orders></app-admin-orders>
+                }
+                @if (hasList) {
+                    <section class="list-card" [class.compact]="compact">
+                        @if (currentModel === 'products') {
+                            <div class="list-top">
+                                <nav class="section-tabs" aria-label="Статус товара">
+                                    <button
+                                        type="button"
+                                        [class.active]="productStatus === 'all'"
+                                        (click)="productStatus = 'all'; onSearchChange()"
+                                    >
+                                        Все товары
+                                    </button>
+                                    <button
+                                        type="button"
+                                        [class.active]="productStatus === 'active'"
+                                        (click)="productStatus = 'active'; onSearchChange()"
+                                    >
+                                        В каталоге
+                                    </button>
+                                    <button
+                                        type="button"
+                                        [class.active]="productStatus === 'archived'"
+                                        (click)="productStatus = 'archived'; onSearchChange()"
+                                    >
+                                        Архив
+                                    </button>
+                                </nav>
+                                <button type="button" class="density-toggle" [attr.aria-pressed]="compact" (click)="compact = !compact">
+                                    <i-bs name="list-ul"></i-bs> Компактно
+                                </button>
+                            </div>
+                        }
+                        <div class="toolbar">
+                            <label class="search-field"
+                                ><span class="visually-hidden">Поиск</span
+                                ><input
+                                    type="search"
+                                    class="form-control"
+                                    [placeholder]="currentModel === 'products' ? 'Поиск по названию или бренду…' : 'Поиск…'"
+                                    [(ngModel)]="searchText"
+                                    (input)="onSearchChange()"
+                            /></label>
+                            @if (currentModel === 'products') {
+                                <select class="form-select" aria-label="Бренд" [(ngModel)]="brandFilter" (change)="onSearchChange()">
+                                    <option value="">Все бренды</option>
+                                    @for (brand of getOptions('brandId'); track brand.id) {
+                                        <option [value]="brand.id">{{ brand.title }}</option>
+                                    }
+                                </select>
+                                <select class="form-select" aria-label="Категория" [(ngModel)]="categoryFilter" (change)="onSearchChange()">
+                                    <option value="">Все категории</option>
+                                    @for (category of getOptions('categoryIds'); track category.id) {
+                                        <option [value]="category.id">{{ category.title }}</option>
+                                    }
+                                </select>
+                                <select
+                                    class="form-select sort-select"
+                                    aria-label="Сортировка"
+                                    [(ngModel)]="sortOrder"
+                                    (change)="onSearchChange()"
+                                >
+                                    <option value="title">По названию</option>
+                                    <option value="price">По цене ↑</option>
+                                </select>
+                            }
+                        </div>
+                        @if (loading) {
+                            <div class="empty-state" role="status"><span class="spinner-border spinner-border-sm"></span> Загрузка…</div>
+                        } @else if (error) {
+                            <div class="empty-state" role="alert">
+                                <p>{{ error }}</p>
+                                <button class="btn btn-light" (click)="loadData()">Повторить</button>
+                            </div>
+                        } @else if (!filteredData.length) {
+                            <div class="empty-state">
+                                <i-bs name="box-seam"></i-bs>
+                                <h2>{{ searchText || brandFilter || categoryFilter ? 'Ничего не найдено' : 'Здесь пока нет записей' }}</h2>
+                                <p>Попробуйте изменить условия поиска или добавить запись.</p>
+                            </div>
+                        } @else if (currentModel === 'products') {
+                            <div class="table-scroll">
+                                <table class="product-table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Товар</th>
+                                            <th scope="col">Категория</th>
+                                            <th scope="col">Цена, BYN</th>
+                                            <th scope="col">Объёмы</th>
+                                            <th scope="col">Статус</th>
+                                            <th scope="col"><span class="visually-hidden">Редактировать</span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (product of pagedProducts; track product.id) {
+                                            <tr>
+                                                <td>
+                                                    <button class="product-link" (click)="editItem(product)">
+                                                        <span class="product-thumbnail">
+                                                            @if (product.image) {
+                                                                <img [src]="product.image | imageUrl" alt="" loading="lazy" />
+                                                            } @else {
+                                                                <i-bs name="box-seam"></i-bs>
+                                                            }</span
+                                                        ><span
+                                                            ><strong>{{ product.title }}</strong
+                                                            ><small>{{ product.brand?.title || 'Без бренда' }}</small></span
+                                                        >
+                                                    </button>
+                                                </td>
+                                                <td class="category-cell">
+                                                    @for (category of product.categories; track category.id; let last = $last) {
+                                                        {{ category.title }}{{ last ? '' : ', ' }}
+                                                    }
+                                                </td>
+                                                <td class="price-cell">{{ productPrice(product) }}</td>
+                                                <td class="volume-cell">{{ productVolumes(product) }}</td>
+                                                <td>
+                                                    <span class="status-badge" [class.archived]="product.isDeleted">{{
+                                                        product.isDeleted ? 'В архиве' : 'В каталоге'
+                                                    }}</span>
+                                                </td>
+                                                <td>
+                                                    <button
+                                                        class="edit-button"
+                                                        [attr.aria-label]="'Редактировать ' + product.title"
+                                                        (click)="editItem(product)"
+                                                    >
+                                                        <i-bs name="pencil"></i-bs>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <footer class="pagination-bar">
+                                <span>Найдено: {{ filteredData.length }}</span>
+                                <div>
+                                    <button
+                                        class="btn btn-light btn-sm"
+                                        aria-label="Предыдущая страница"
+                                        (click)="page = page - 1"
+                                        [disabled]="page <= 1"
+                                    >
+                                        <i-bs name="chevron-left"></i-bs></button
+                                    ><span>{{ page }} из {{ pageCount }}</span
+                                    ><button
+                                        class="btn btn-light btn-sm"
+                                        aria-label="Следующая страница"
+                                        (click)="page = page + 1"
+                                        [disabled]="page >= pageCount"
+                                    >
+                                        <i-bs name="chevron-right"></i-bs>
+                                    </button>
+                                </div>
+                            </footer>
+                        } @else {
+                            <app-generic-table
+                                [data]="filteredData"
+                                [columns]="currentModelColumns"
+                                [key]="currentModel"
+                                (editItem)="editItem($event)"
+                                (deleteItem)="openDeleteModal($event)"
+                                (cascadeDeleteItem)="openCascadeDeleteModal($event)"
+                            ></app-generic-table>
+                        }
+                    </section>
+                }
+            }
+        </main>
     </div>
 </div>
 
-<ng-template #itemModal let-modal>
-    <div class="modal-header">
-        <h5 class="modal-title">{{ isEditMode ? 'Редактировать' : 'Добавить' }} {{ getCurrentModelTitle() }}</h5>
-        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
-    </div>
-    <div class="modal-body">
-        <form [formGroup]="itemForm" (ngSubmit)="saveItem()">
-            @if (currentModel === 'banners' && error) {
+<ng-template #itemFields>
+    <form [formGroup]="itemForm" (ngSubmit)="saveItem()">
+        <fieldset [disabled]="saving || restoring || deletingVariant || savingVariant">
+            @if (currentModel !== 'products' && error) {
                 <div class="alert alert-danger" role="alert">{{ error }}</div>
             }
-            @for (field of currentModelFields; track field) {
-                <div class="mb-3">
-                    <label [for]="field.key" class="form-label">{{ field.label }}</label>
+            @for (field of editorFields; track field.key) {
+                <div
+                    class="mb-3 field"
+                    [class.field-wide]="field.type === 'textarea' || field.type === 'image' || field.type === 'variants'"
+                >
+                    @if (field.type !== 'boolean') {
+                        <label [for]="field.key" class="form-label"
+                            >{{ field.label }}
+                            @if (field.required) {
+                                <span class="required">*</span>
+                            }
+                        </label>
+                    }
                     @if (field.type === 'text' || field.type === 'number' || field.type === 'email') {
                         <input [type]="field.type" class="form-control" [id]="field.key" [formControlName]="field.key" />
                     }
@@ -250,22 +494,11 @@
                     }
                     @if (field.type === 'multiselect') {
                         <div class="multiselect-dropdown">
-                            <div class="dropdown">
-                                <button
-                                    class="btn btn-outline-secondary dropdown-toggle w-100 text-start"
-                                    type="button"
-                                    [id]="'dropdown-' + field.key"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false"
-                                >
-                                    @if (itemForm.get(field.key)?.value?.length === 0) {
-                                        <span class="text-muted"> Выберите {{ field.label.toLowerCase() }}... </span>
-                                    }
-                                    @if (itemForm.get(field.key)?.value?.length > 0) {
-                                        <span> Выбрано: {{ itemForm.get(field.key)?.value?.length }} </span>
-                                    }
-                                </button>
-                                <ul class="dropdown-menu multiselect-dropdown-menu" [attr.aria-labelledby]="'dropdown-' + field.key">
+                            <details class="multiselect">
+                                <summary [attr.aria-label]="field.label + ': ' + getSelectedOptionsText(field.key, field.options || [])">
+                                    {{ getSelectedOptionsText(field.key, field.options || []) }}
+                                </summary>
+                                <ul class="multiselect-options" [attr.aria-labelledby]="'dropdown-' + field.key">
                                     @for (option of field.options; track option) {
                                         <li class="dropdown-item-wrapper">
                                             <div
@@ -292,7 +525,7 @@
                                         </li>
                                     }
                                 </ul>
-                            </div>
+                            </details>
                         </div>
                     }
                     @if (field.type === 'variants') {
@@ -394,7 +627,7 @@
                                                             type="button"
                                                             class="btn btn-outline-danger btn-sm"
                                                             (click)="removeVariant(i)"
-                                                            [disabled]="variant.get('isDeleted')?.value"
+                                                            [disabled]="variant.get('isDeleted')?.value || deletingVariant"
                                                             title="Удалить вариант"
                                                         >
                                                             <i-bs name="trash"></i-bs>
@@ -484,26 +717,55 @@
                     }
                 </div>
             }
-        </form>
+        </fieldset>
+    </form>
+</ng-template>
+<ng-template #itemModal let-modal>
+    <div class="modal-header">
+        <h2 class="modal-title">{{ isEditMode ? 'Редактирование' : 'Новая запись' }} · {{ getCurrentModelTitle() }}</h2>
+        <button
+            type="button"
+            class="btn-close"
+            aria-label="Закрыть"
+            (click)="modal.dismiss()"
+            [disabled]="saving || savingVariant || deletingVariant || restoring"
+        ></button>
     </div>
+    <div class="modal-body"><ng-container *ngTemplateOutlet="itemFields"></ng-container></div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Отмена</button>
-        <button type="button" class="btn btn-primary" (click)="saveItem()" [disabled]="itemForm.invalid || saving">
-            @if (saving) {
-                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-            }
-            {{ isEditMode ? 'Сохранить' : 'Добавить' }}
+        <button
+            type="button"
+            class="btn btn-light"
+            (click)="modal.dismiss()"
+            [disabled]="saving || savingVariant || deletingVariant || restoring"
+        >
+            Отмена</button
+        ><button
+            type="button"
+            class="btn btn-primary"
+            (click)="saveItem()"
+            [disabled]="saving || savingVariant || deletingVariant || restoring"
+        >
+            {{ saving ? 'Сохранение…' : 'Сохранить' }}
         </button>
     </div>
 </ng-template>
-
 <ng-template #deleteModal let-modal>
     <div class="modal-header">
         <h5 class="modal-title">Подтверждение удаления</h5>
         <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
     </div>
     <div class="modal-body">
-        <p>Вы уверены, что хотите удалить этот элемент?</p>
+        <p>
+            {{
+                currentModel === 'products' && !cascadeDeleting
+                    ? 'Убрать товар из каталога? Позже его можно вернуть из архива.'
+                    : 'Удалить эту запись?'
+            }}
+        </p>
+        @if (editorOpen && hasUnsavedChanges) {
+            <p class="text-warning">Несохранённые изменения карточки будут потеряны.</p>
+        }
         @if (cascadeDeleting) {
             <p class="text-danger">Это действие нельзя отменить.</p>
         }
@@ -529,88 +791,90 @@
     </div>
     <div class="modal-body">
         <form [formGroup]="variantForm" (ngSubmit)="saveVariant()">
-            <div class="mb-3">
-                <label for="variantVolume" class="form-label">
-                    <i-bs name="droplet" class="me-1"></i-bs>
-                    Объем (мл) <span class="text-danger">*</span>
-                </label>
-                <input
-                    type="number"
-                    class="form-control"
-                    id="variantVolume"
-                    formControlName="volume"
-                    placeholder="Введите объем в миллилитрах"
-                    min="1"
-                    step="1"
-                />
-                @if (variantForm.get('volume')?.invalid && variantForm.get('volume')?.touched) {
-                    <div class="invalid-feedback">
-                        @if (variantForm.get('volume')?.errors?.['required']) {
-                            <div>Объем обязателен для заполнения</div>
-                        }
-                        @if (variantForm.get('volume')?.errors?.['min']) {
-                            <div>Объем должен быть больше 0</div>
-                        }
-                    </div>
-                }
-            </div>
+            <fieldset [disabled]="savingVariant">
+                <div class="mb-3">
+                    <label for="variantVolume" class="form-label">
+                        <i-bs name="droplet" class="me-1"></i-bs>
+                        Объем (мл) <span class="text-danger">*</span>
+                    </label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="variantVolume"
+                        formControlName="volume"
+                        placeholder="Введите объем в миллилитрах"
+                        min="1"
+                        step="1"
+                    />
+                    @if (variantForm.get('volume')?.invalid && variantForm.get('volume')?.touched) {
+                        <div class="invalid-feedback">
+                            @if (variantForm.get('volume')?.errors?.['required']) {
+                                <div>Объем обязателен для заполнения</div>
+                            }
+                            @if (variantForm.get('volume')?.errors?.['min']) {
+                                <div>Объем должен быть больше 0</div>
+                            }
+                        </div>
+                    }
+                </div>
 
-            <div class="mb-3">
-                <label for="variantCostPrice" class="form-label">
-                    <i-bs name="currency-dollar" class="me-1"></i-bs>
-                    Себестоимость (руб.) <span class="text-danger">*</span>
-                </label>
-                <input
-                    type="number"
-                    class="form-control"
-                    id="variantCostPrice"
-                    formControlName="costPrice"
-                    placeholder="Введите себестоимость"
-                    min="0.01"
-                    step="0.01"
-                />
-                @if (variantForm.get('costPrice')?.invalid && variantForm.get('costPrice')?.touched) {
-                    <div class="invalid-feedback">
-                        @if (variantForm.get('costPrice')?.errors?.['required']) {
-                            <div>Себестоимость обязательна для заполнения</div>
-                        }
-                        @if (variantForm.get('costPrice')?.errors?.['min']) {
-                            <div>Себестоимость должна быть больше 0</div>
-                        }
-                    </div>
-                }
-            </div>
+                <div class="mb-3">
+                    <label for="variantCostPrice" class="form-label">
+                        <i-bs name="currency-dollar" class="me-1"></i-bs>
+                        Себестоимость (руб.) <span class="text-danger">*</span>
+                    </label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="variantCostPrice"
+                        formControlName="costPrice"
+                        placeholder="Введите себестоимость"
+                        min="0.01"
+                        step="0.01"
+                    />
+                    @if (variantForm.get('costPrice')?.invalid && variantForm.get('costPrice')?.touched) {
+                        <div class="invalid-feedback">
+                            @if (variantForm.get('costPrice')?.errors?.['required']) {
+                                <div>Себестоимость обязательна для заполнения</div>
+                            }
+                            @if (variantForm.get('costPrice')?.errors?.['min']) {
+                                <div>Себестоимость должна быть больше 0</div>
+                            }
+                        </div>
+                    }
+                </div>
 
-            <div class="mb-3">
-                <label for="variantPrice" class="form-label">
-                    <i-bs name="tag" class="me-1"></i-bs>
-                    Цена продажи (руб.) <span class="text-danger">*</span>
-                </label>
-                <input
-                    type="number"
-                    class="form-control"
-                    id="variantPrice"
-                    formControlName="price"
-                    placeholder="Введите цену продажи"
-                    min="0.01"
-                    step="0.01"
-                />
-                @if (variantForm.get('price')?.invalid && variantForm.get('price')?.touched) {
-                    <div class="invalid-feedback">
-                        @if (variantForm.get('price')?.errors?.['required']) {
-                            <div>Цена обязательна для заполнения</div>
-                        }
-                        @if (variantForm.get('price')?.errors?.['min']) {
-                            <div>Цена должна быть больше 0</div>
-                        }
-                    </div>
-                }
-            </div>
+                <div class="mb-3">
+                    <label for="variantPrice" class="form-label">
+                        <i-bs name="tag" class="me-1"></i-bs>
+                        Цена продажи (руб.) <span class="text-danger">*</span>
+                    </label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="variantPrice"
+                        formControlName="price"
+                        placeholder="Введите цену продажи"
+                        min="0.01"
+                        step="0.01"
+                    />
+                    @if (variantForm.get('price')?.invalid && variantForm.get('price')?.touched) {
+                        <div class="invalid-feedback">
+                            @if (variantForm.get('price')?.errors?.['required']) {
+                                <div>Цена обязательна для заполнения</div>
+                            }
+                            @if (variantForm.get('price')?.errors?.['min']) {
+                                <div>Цена должна быть больше 0</div>
+                            }
+                        </div>
+                    }
+                </div>
 
-            <div class="alert alert-info">
-                <i-bs name="info-circle" class="me-2"></i-bs>
-                <strong>Примечание:</strong> Вариант будет добавлен и форма останется открытой для добавления следующих вариантов.
-            </div>
+                <div class="alert alert-info">
+                    <i-bs name="info-circle" class="me-2"></i-bs>
+                    <strong>Примечание:</strong> Вариант будет добавлен и форма останется открытой для добавления следующих вариантов.
+                </div>
+            </fieldset>
         </form>
     </div>
     <div class="modal-footer">

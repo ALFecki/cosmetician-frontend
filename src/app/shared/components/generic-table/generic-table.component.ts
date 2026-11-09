@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { IconsModule } from '../../base/icons/icons.module';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
 import { IconName } from 'ngx-bootstrap-icons';
@@ -12,8 +12,6 @@ import { IconName } from 'ngx-bootstrap-icons';
     styleUrls: ['./generic-table.component.scss'],
 })
 export class GenericTableComponent implements OnChanges {
-    @ViewChild('tableContainer') tableContainer!: ElementRef;
-
     @Input() data: any[] = [];
     @Input() columns: { key: string; title: string; type?: string }[] = [];
     @Input() key = '';
@@ -23,9 +21,6 @@ export class GenericTableComponent implements OnChanges {
     @Output() cascadeDeleteItem = new EventEmitter<any>();
     @Output() restoreItem = new EventEmitter<any>();
 
-    isDragging = false;
-    startX = 0;
-    scrollLeft = 0;
     expandedCells = new Set<string>();
 
     sortedData: any[] = [];
@@ -41,27 +36,6 @@ export class GenericTableComponent implements OnChanges {
                 this.applySorting();
             }
         }
-    }
-
-    startDrag(e: MouseEvent): void {
-        this.isDragging = true;
-        this.startX = e.pageX - this.tableContainer.nativeElement.offsetLeft;
-        this.scrollLeft = this.tableContainer.nativeElement.scrollLeft;
-        this.tableContainer.nativeElement.style.cursor = 'grabbing';
-        e.preventDefault();
-    }
-
-    onDrag(e: MouseEvent): void {
-        if (!this.isDragging) return;
-        e.preventDefault();
-        const x = e.pageX - this.tableContainer.nativeElement.offsetLeft;
-        const walk = (x - this.startX) * 2;
-        this.tableContainer.nativeElement.scrollLeft = this.scrollLeft - walk;
-    }
-
-    stopDrag(): void {
-        this.isDragging = false;
-        this.tableContainer.nativeElement.style.cursor = 'grab';
     }
 
     onEdit(item: any): void {
@@ -140,8 +114,8 @@ export class GenericTableComponent implements OnChanges {
     getSortIcon(columnKey: string, columnType?: string): IconName {
         if (this.isUnsortable(columnType)) return 'circle';
         if (this.sortColumn !== columnKey) return 'arrow-down-up';
-        if (this.sortDirection === 'asc') return 'sort-alpha-down';
-        return 'sort-alpha-up';
+        if (this.sortDirection === 'asc') return 'arrow-down';
+        return 'arrow-up';
     }
 
     isUnsortable(columnType?: string): boolean {

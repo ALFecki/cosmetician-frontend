@@ -1,17 +1,12 @@
-<div
-    class="table-responsive table-drag-scroll"
-    #tableContainer
-    (mousedown)="startDrag($event)"
-    (mousemove)="onDrag($event)"
-    (mouseup)="stopDrag()"
-    (mouseleave)="stopDrag()"
-    [class.dragging]="isDragging"
->
+<div class="table-responsive">
     <table class="table table-striped">
         <thead>
             <tr>
                 @for (column of columns; track column) {
                     <th
+                        tabindex="0"
+                        (keydown.enter)="sortBy(column.key, column.type)"
+                        [attr.aria-sort]="sortColumn === column.key ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'"
                         [class.sortable]="!isUnsortable(column.type)"
                         [class.sorted-asc]="sortColumn === column.key && sortDirection === 'asc'"
                         [class.sorted-desc]="sortColumn === column.key && sortDirection === 'desc'"
@@ -142,7 +137,13 @@
                                     }
                                 }
                                 @default {
-                                    {{ getNestedProperty(item, column.key) || '—' }}
+                                    {{
+                                        getNestedProperty(item, column.key) === true
+                                            ? 'Да'
+                                            : getNestedProperty(item, column.key) === false
+                                              ? 'Нет'
+                                              : (getNestedProperty(item, column.key) ?? '—')
+                                    }}
                                 }
                             }
                         </td>
@@ -160,17 +161,14 @@
                             >
                                 <i-bs name="trash2"></i-bs>
                             </button>
-                            <button
-                                type="button"
-                                title="Удалить полностью"
-                                class="btn btn-sm btn-outline-danger"
-                                (click)="onCascadeDelete(item)"
-                            >
-                                <i-bs name="trash"></i-bs>
-                            </button>
-                            @if (item.isDeleted) {
-                                <button type="button" title="Восстановить" class="btn btn-sm btn-outline-success" (click)="onRestore(item)">
-                                    <i-bs name="arrow-counterclockwise"></i-bs>
+                            @if (!['banners', 'promotions', 'promocodes'].includes(key)) {
+                                <button
+                                    type="button"
+                                    title="Удалить полностью"
+                                    class="btn btn-sm btn-outline-danger"
+                                    (click)="onCascadeDelete(item)"
+                                >
+                                    <i-bs name="trash"></i-bs>
                                 </button>
                             }
                         </div>
