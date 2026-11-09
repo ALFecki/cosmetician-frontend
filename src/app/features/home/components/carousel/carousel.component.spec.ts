@@ -1,5 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { PLATFORM_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { environment } from '../../../../../environments/environment';
 import { CarouselComponent } from './carousel.component';
@@ -63,5 +64,18 @@ describe('Published homepage banners', () => {
         fixture.detectChanges();
         expect(fixture.nativeElement.querySelector('.carousel-item.active h2').textContent).toBe('Второй');
         expect(fixture.nativeElement.querySelector('.carousel-item.active a')).toBeNull();
+    });
+});
+
+describe('Banner prerender', () => {
+    it('never embeds changeable banners into static HTML', async () => {
+        await TestBed.configureTestingModule({
+            imports: [CarouselComponent],
+            providers: [provideHttpClient(), provideHttpClientTesting(), { provide: PLATFORM_ID, useValue: 'server' }],
+        }).compileComponents();
+        const fixture = TestBed.createComponent(CarouselComponent);
+        fixture.detectChanges();
+        TestBed.inject(HttpTestingController).expectNone(`${environment.server_url}/banner`);
+        expect(fixture.nativeElement.querySelector('.carousel')).toBeNull();
     });
 });

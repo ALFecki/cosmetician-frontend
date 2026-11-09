@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { IconsModule } from '../../../../shared/base/icons/icons.module';
 import { ImageUrlPipe } from '../../../../shared/utils/image-url.pipe';
@@ -16,6 +16,7 @@ import { BannerService } from '../../../../shared/services/banner.service';
 export class CarouselComponent implements OnInit, OnDestroy {
     slides: BannerModel[] = [];
     private subscription?: Subscription;
+    private platformId = inject(PLATFORM_ID);
 
     constructor(private bannerService: BannerService) {}
 
@@ -28,6 +29,7 @@ export class CarouselComponent implements OnInit, OnDestroy {
     isPaused = false;
 
     ngOnInit() {
+        if (!isPlatformBrowser(this.platformId)) return;
         this.subscription = this.bannerService.getPublished().subscribe({
             next: response => {
                 this.slides = response.data;
