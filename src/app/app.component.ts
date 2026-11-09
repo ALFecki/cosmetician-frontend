@@ -45,6 +45,15 @@ export class AppComponent {
         this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe(() => {
             if (isPlatformBrowser(this.platformId)) {
                 setTimeout(() => {
+                    const fragment = this.router.parseUrl(this.router.url).fragment;
+                    if (fragment) {
+                        this.viewportScroller.setOffset(() => [
+                            0,
+                            (document.querySelector('app-navbar')?.getBoundingClientRect().height ?? 0) + 16,
+                        ]);
+                        this.viewportScroller.scrollToAnchor(fragment);
+                        return;
+                    }
                     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
                     document.body.scrollTop = 0;
                     document.documentElement.scrollTop = 0;
@@ -77,6 +86,7 @@ export class AppComponent {
 
     onActivate() {
         if (isPlatformBrowser(this.platformId)) {
+            if (this.router.parseUrl(this.router.url).fragment) return;
             const scrollToTop = () => {
                 window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
                 document.body.scrollTop = 0;

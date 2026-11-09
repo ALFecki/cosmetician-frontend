@@ -36,7 +36,12 @@
             </button>
         </div>
     </div>
-    <div id="storefront-navigation" class="navigation-panel" [class.is-open]="isMenuOpen">
+    <div
+        id="storefront-navigation"
+        class="navigation-panel"
+        [class.is-open]="isMenuOpen"
+        [attr.inert]="isMobileNavigation && !isMenuOpen ? '' : null"
+    >
         <nav class="sf-container category-nav" aria-label="Основная навигация">
             <a routerLink="/products" (click)="closeMenu()" routerLinkActive="active"><i-bs name="grid"></i-bs> Каталог</a>
             <button
@@ -55,7 +60,7 @@
             >
                 Бренды <span aria-hidden="true">⌄</span>
             </button>
-            <a routerLink="/about" (click)="closeMenu()">О SkViDerm</a>
+            <a routerLink="/" fragment="about" (click)="closeMenu()">О SkViDerm</a>
             <a routerLink="/delivery" (click)="closeMenu()">Доставка и оплата</a>
             <a routerLink="/contacts" (click)="closeMenu()">Контакты</a>
             <button class="consult-link" type="button" (click)="openFeedbackModal(); closeMenu()">Помочь с выбором? →</button>
@@ -66,7 +71,7 @@
         <div
             class="mega-menu"
             [class.is-open]="activeMenu === 'care'"
-            [attr.inert]="activeMenu !== 'care' ? '' : null"
+            [attr.inert]="activeMenu !== 'care' || (isMobileNavigation && !isMenuOpen) ? '' : null"
             id="care-navigation"
         >
             <div class="sf-container mega-inner">
@@ -85,7 +90,7 @@
         <div
             class="mega-menu"
             [class.is-open]="activeMenu === 'brands'"
-            [attr.inert]="activeMenu !== 'brands' ? '' : null"
+            [attr.inert]="activeMenu !== 'brands' || (isMobileNavigation && !isMenuOpen) ? '' : null"
             id="brand-navigation"
         >
             <div class="sf-container mega-inner">
@@ -103,7 +108,3 @@
         </div>
     </div>
 </header>
-
-@if (isSearchOpen) {
-    <app-product-search (closeSearch)="isSearchOpen = false"></app-product-search>
-}

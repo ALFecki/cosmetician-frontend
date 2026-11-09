@@ -315,3 +315,30 @@ body:has(.storefront) .modal:not(.skviderm-admin-modal) {
         scroll-behavior: auto !important;
     }
 }
+
+body:has(.storefront).modal-open {
+    position: static;
+    height: auto;
+    overflow: hidden !important;
+}
+.storefront-search-window .modal-dialog {
+    max-width: 700px;
+    margin: 45px auto;
+}
+.storefront-filter-panel {
+    --bs-offcanvas-width: min(350px, 90vw);
+    color: var(--sf-ink);
+    background: var(--sf-paper);
+    font-family: 'Golos Text', sans-serif;
+}
+@media (max-width: 700px) {
+    .storefront-search-window .modal-dialog {
+        margin: 24px 12px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .storefront-filter-panel,
+    .storefront-search-window {
+        transition: none !important;
+    }
+}

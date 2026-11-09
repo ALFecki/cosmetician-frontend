@@ -1,6 +1,7 @@
 :host {
     display: block;
-    position: relative;
+    position: sticky;
+    top: 0;
     z-index: 100;
 }
 .utility {
@@ -18,6 +19,7 @@
     }
 }
 .site-header {
+    position: relative;
     background: var(--sf-paper);
     border-bottom: 1px solid var(--sf-line);
 }
@@ -127,6 +129,10 @@ i-bs {
     }
 }
 .mega-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
     display: grid;
     grid-template-rows: 0fr;
     visibility: hidden;
@@ -263,6 +269,9 @@ i-bs {
             display: flex;
             margin-left: 0;
         }
+    }
+    .mega-menu {
+        position: static;
     }
     .mega-menu .mega-inner {
         display: block;

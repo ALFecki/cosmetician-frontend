@@ -7,18 +7,18 @@
     </header>
 }
 <div class="sf-container catalog-layout">
-    <aside class="catalog-sidebar" [class.is-open]="showFilters" id="catalog-filters" aria-label="Фильтры каталога">
+    <aside class="catalog-sidebar" id="catalog-filters" aria-label="Фильтры каталога">
         <div class="filters-heading">
             <h2>Фильтры</h2>
-            <button type="button" class="close-filters" (click)="toggleFilters()" aria-label="Закрыть фильтры">×</button>
         </div>
-        <app-product-filter [initialFilters]="filterOptions" (filterChange)="onFilterChange($event)"></app-product-filter>
+        @if (!showFilters) {
+            <app-product-filter [initialFilters]="filterOptions" (filterChange)="onFilterChange($event)"></app-product-filter>
+        }
         <div class="filter-help">
             <h3>Сложно выбрать?</h3>
             <p>Поможем разобраться и найти подходящий уход.</p>
             <a href="https://t.me/vikskvor" target="_blank" rel="noopener">Спросить косметолога →</a>
         </div>
-        <button type="button" class="btn btn-primary apply-filters" (click)="toggleFilters()">Показать товары</button>
     </aside>
     <section class="catalog-results" aria-label="Товары">
         <div class="results-toolbar">
@@ -26,7 +26,7 @@
                 class="btn btn-outline-primary open-filters"
                 type="button"
                 [attr.aria-expanded]="showFilters"
-                aria-controls="catalog-filters"
+                aria-haspopup="dialog"
                 (click)="toggleFilters()"
             >
                 Фильтры
@@ -145,3 +145,14 @@
     </div>
     <a class="sf-button" href="https://t.me/vikskvor" target="_blank" rel="noopener">Помочь с выбором →</a>
 </section>
+
+<ng-template #mobileFilters let-panel>
+    <div class="offcanvas-header">
+        <h2 id="mobile-filter-title">Фильтры</h2>
+        <button type="button" class="filter-close" ngbAutofocus (click)="panel.close()" aria-label="Закрыть фильтры">×</button>
+    </div>
+    <div class="offcanvas-body">
+        <app-product-filter [initialFilters]="filterOptions" (filterChange)="onFilterChange($event)"></app-product-filter
+        ><button type="button" class="btn btn-primary apply-filters" (click)="panel.close()">Показать товары</button>
+    </div>
+</ng-template>

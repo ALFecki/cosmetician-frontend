@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrandModel } from '../../models/brand.model';
 import { CategoryModel } from '../../models/category.model';
@@ -14,7 +14,7 @@ import { ProductScopeService } from '../../services/product_scope.service';
     templateUrl: './product-filter.component.html',
     styleUrls: ['./product-filter.component.scss'],
 })
-export class ProductFilterComponent implements OnInit {
+export class ProductFilterComponent implements OnInit, OnChanges {
     @Output() filterChange = new EventEmitter<FilterProductSchema>();
     @Input() initialFilters: FilterProductSchema = {};
 
@@ -42,9 +42,21 @@ export class ProductFilterComponent implements OnInit {
 
     ngOnInit(): void {
         this.loadFilterOptions();
-        if (this.initialFilters) {
-            this.filterData = { ...this.filterData, ...this.initialFilters };
-        }
+    }
+
+    ngOnChanges(): void {
+        this.filterData = {
+            title: '',
+            brandId: [],
+            categoryId: [],
+            productScopeId: [],
+            countryId: [],
+            minPrice: undefined,
+            maxPrice: undefined,
+            minVolume: undefined,
+            maxVolume: undefined,
+            ...this.initialFilters,
+        };
     }
 
     loadFilterOptions(): void {

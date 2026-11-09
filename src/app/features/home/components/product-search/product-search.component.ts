@@ -87,12 +87,13 @@ export class ProductSearchComponent implements OnInit, OnDestroy {
         this.closeSearch.emit();
     }
 
-    @HostListener('document:keydown', ['$event'])
+    @HostListener('document:keydown.escape')
+    onEscape(): void {
+        this.close();
+    }
+
     handleKeyboardEvent(event: KeyboardEvent): void {
         switch (event.key) {
-            case 'Escape':
-                this.close();
-                break;
             case 'ArrowDown':
                 event.preventDefault();
                 this.selectedIndex = Math.min(this.selectedIndex + 1, this.searchResults.length - 1);
@@ -115,7 +116,10 @@ export class ProductSearchComponent implements OnInit, OnDestroy {
     private scrollToSelected(): void {
         setTimeout(() => {
             const selected = document.querySelector('.search-result-item.selected');
-            selected?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            selected?.scrollIntoView({
+                behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+                block: 'nearest',
+            });
         });
     }
 

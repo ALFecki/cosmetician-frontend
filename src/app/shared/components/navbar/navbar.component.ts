@@ -1,6 +1,6 @@
 import { ProductSearchComponent } from '../../../features/home/components/product-search/product-search.component';
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, inject, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, Subscription } from 'rxjs';
@@ -19,11 +19,14 @@ import { LoginComponent } from '../login/login.component';
 
 @Component({
     selector: 'app-navbar',
-    imports: [CommonModule, RouterModule, IconsModule, ProductSearchComponent],
+    imports: [CommonModule, RouterModule, IconsModule],
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.scss',
 })
-export class NavbarComponent implements OnDestroy, OnInit {
+export class NavbarComponent implements OnDestroy, OnInit, AfterViewInit {
+    @ViewChild('menuToggle') private menuToggle?: ElementRef<HTMLButtonElement>;
+    isMobileNavigation = false;
+    private headerObserver?: ResizeObserver;
     isMenuOpen = false;
     isSearchOpen = false;
     isScrolled = false;
@@ -43,12 +46,14 @@ export class NavbarComponent implements OnDestroy, OnInit {
         private router: Router,
         private loginModalService: LoginModalService,
         private feedbackModalService: FeedbackModalService,
+        private host: ElementRef<HTMLElement>,
     ) {
         this.categories$ = this.categoryService.getCategoriesList();
         this.brands$ = this.brandService.getBrandsList();
     }
 
     ngOnInit() {
+        this.onBreakpointChange();
         this.navigationSubscription = this.router.events.subscribe(event => {
             if (event instanceof NavigationEnd) this.closeMenu();
         });
@@ -58,6 +63,7 @@ export class NavbarComponent implements OnDestroy, OnInit {
     }
 
     ngOnDestroy() {
+        this.headerObserver?.disconnect();
         this.navigationSubscription?.unsubscribe();
         if (this.authSubscribtion) {
             this.authSubscribtion.unsubscribe();
@@ -70,8 +76,43 @@ export class NavbarComponent implements OnDestroy, OnInit {
     }
 
     openSearch(): void {
+        if (this.isSearchOpen) return;
         this.closeMenu();
         this.isSearchOpen = true;
+        const modal = this.modalService.open(ProductSearchComponent, {
+            size: 'lg',
+            windowClass: 'storefront-search-window',
+            ariaLabelledBy: 'storefront-search-title',
+        });
+        modal.componentInstance.closeSearch.subscribe(() => modal.close());
+        modal.hidden.subscribe(() => {
+            this.isSearchOpen = false;
+        });
+    }
+
+    ngAfterViewInit(): void {
+        if (typeof ResizeObserver === 'undefined') return;
+        this.headerObserver = new ResizeObserver(() => {
+            const shell = this.host.nativeElement.closest<HTMLElement>('.storefront');
+            shell?.style.setProperty('--sf-header-height', `${this.host.nativeElement.getBoundingClientRect().height}px`);
+        });
+        this.headerObserver.observe(this.host.nativeElement);
+    }
+
+    @HostListener('window:resize')
+    onBreakpointChange(): void {
+        const mobile = typeof window !== 'undefined' && window.innerWidth <= 700;
+        if (mobile !== this.isMobileNavigation) {
+            const focusWasInside =
+                typeof document !== 'undefined' &&
+                !!this.host.nativeElement.querySelector('#storefront-navigation')?.contains(document.activeElement);
+            this.closeMenu();
+            this.isMobileNavigation = mobile;
+            if (focusWasInside) {
+                if (mobile) this.menuToggle?.nativeElement.focus();
+                else this.host.nativeElement.querySelector<HTMLAnchorElement>('.category-nav a')?.focus();
+            }
+        }
     }
 
     @HostListener('document:keydown', ['$event'])
@@ -86,7 +127,10 @@ export class NavbarComponent implements OnDestroy, OnInit {
     }
 
     toggleMenu() {
-        this.isMenuOpen = !this.isMenuOpen;
+        if (this.isMenuOpen) {
+            this.closeMenu();
+            this.menuToggle?.nativeElement.focus();
+        } else this.isMenuOpen = true;
     }
 
     openLoginModal() {
@@ -122,8 +166,18 @@ export class NavbarComponent implements OnDestroy, OnInit {
     }
 
     closeMenu(): void {
+        const panel = this.host.nativeElement.querySelector('#storefront-navigation');
+        const focusWasInside = typeof document !== 'undefined' && !!panel?.contains(document.activeElement);
+        const trigger = this.isMobileNavigation
+            ? this.menuToggle?.nativeElement
+            : this.activeMenu
+              ? this.host.nativeElement.querySelector<HTMLButtonElement>(
+                    `button[aria-controls="${this.activeMenu === 'care' ? 'care-navigation' : 'brand-navigation'}"]`,
+                )
+              : null;
         this.isMenuOpen = false;
         this.activeMenu = null;
+        if (focusWasInside) trigger?.focus();
     }
 
     toggleSection(section: 'care' | 'brands'): void {
@@ -132,7 +186,15 @@ export class NavbarComponent implements OnDestroy, OnInit {
 
     @HostListener('document:keydown.escape')
     onEscape(): void {
+        const trigger =
+            this.isMobileNavigation && this.isMenuOpen
+                ? this.menuToggle?.nativeElement
+                : this.host.nativeElement.querySelector<HTMLButtonElement>(
+                      `.category-nav button[aria-controls="${this.activeMenu === 'care' ? 'care-navigation' : 'brand-navigation'}"]`,
+                  );
+        const wasOpen = this.isMenuOpen || !!this.activeMenu;
         this.closeMenu();
+        if (wasOpen) trigger?.focus();
     }
 
     navigateToCart(): void {

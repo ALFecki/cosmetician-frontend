@@ -1,16 +1,6 @@
-.search-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 90px 24px 30px;
-    background: #30292277;
-}
 .search-modal {
-    width: min(700px, 100%);
-    max-height: calc(100dvh - 120px);
+    width: 100%;
+    max-height: min(80dvh, 760px);
     display: flex;
     flex-direction: column;
     background: var(--sf-paper);
@@ -145,11 +135,8 @@ kbd {
     padding: 3px 5px;
 }
 @media (max-width: 700px) {
-    .search-overlay {
-        padding: 20px 12px;
-    }
     .search-modal {
-        max-height: calc(100dvh - 40px);
+        max-height: calc(100dvh - 48px);
     }
     .search-header {
         padding: 12px 16px;
