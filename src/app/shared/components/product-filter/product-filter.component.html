@@ -95,9 +95,23 @@
                         Цена
                     </label>
                     <div class="input-group-range">
-                        <input type="number" class="form-control" id="minPrice" placeholder="От" [(ngModel)]="filterData.minPrice" (input)="applyFilter()"/>
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="minPrice"
+                            placeholder="От"
+                            [(ngModel)]="filterData.minPrice"
+                            (input)="applyFilter()"
+                        />
                         <span class="range-separator">—</span>
-                        <input type="number" class="form-control" id="maxPrice" placeholder="До" [(ngModel)]="filterData.maxPrice" (input)="applyFilter()"/>
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="maxPrice"
+                            placeholder="До"
+                            [(ngModel)]="filterData.maxPrice"
+                            (input)="applyFilter()"
+                        />
                     </div>
                 </div>
 
@@ -107,9 +121,23 @@
                         Объем (мл)
                     </label>
                     <div class="input-group-range">
-                        <input type="number" class="form-control" id="minVolume" placeholder="От" [(ngModel)]="filterData.minVolume" (input)="applyFilter()" />
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="minVolume"
+                            placeholder="От"
+                            [(ngModel)]="filterData.minVolume"
+                            (input)="applyFilter()"
+                        />
                         <span class="range-separator">—</span>
-                        <input type="number" class="form-control" id="maxVolume" placeholder="До" [(ngModel)]="filterData.maxVolume" (input)="applyFilter()"/>
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="maxVolume"
+                            placeholder="До"
+                            [(ngModel)]="filterData.maxVolume"
+                            (input)="applyFilter()"
+                        />
                     </div>
                 </div>
             </div>

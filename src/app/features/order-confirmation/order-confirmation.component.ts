@@ -295,9 +295,7 @@ export class OrderConfirmationComponent implements OnInit {
     }
 
     private scrollToFirstError(): void {
-        const firstInvalid = document.querySelector<HTMLElement>(
-            '.form-control.is-invalid, .form-check-input.is-invalid, .is-invalid',
-        );
+        const firstInvalid = document.querySelector<HTMLElement>('.form-control.is-invalid, .form-check-input.is-invalid, .is-invalid');
         if (firstInvalid) {
             firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
             firstInvalid.focus({ preventScroll: true });

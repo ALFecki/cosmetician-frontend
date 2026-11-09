@@ -4,6 +4,7 @@ on:
     workflow_dispatch:
     push:
         branches:
+            - main
             - codex/reliable-deployment
     pull_request:
 
@@ -24,6 +25,8 @@ jobs:
               run: yarn install --frozen-lockfile --non-interactive
             - name: Lint
               run: yarn lint
+            - name: Formatting
+              run: yarn fmt:check
             - name: Production build
               run: yarn build --configuration production
             - name: Package release
