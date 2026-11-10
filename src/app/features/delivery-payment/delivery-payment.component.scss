@@ -191,6 +191,12 @@
     color: var(--sf-ink);
     text-align: right;
 }
+.price-info {
+    margin: 12px 0 0;
+    strong {
+        color: var(--sf-ink);
+    }
+}
 .delivery-time,
 .warning-notice,
 .additional-service {
