@@ -1,20 +1,13 @@
-<div class="container mt-5">
-    <div class="d-flex justify-content-center align-items-center mb-4">
-        <h2 class="text-center mb-4 section-title">Преимущества SkViDerm</h2>
-    </div>
-    <div class="row d-flex">
-        @for (benefit of benefits; track benefit) {
-            <div class="col-md-4 mb-4 d-flex">
-                <div class="card text-center w-100">
-                    <div class="card-body">
-                        <div class="circle-icon mb-3">
-                            <img [src]="benefit.icon | imageUrl" alt="{{ benefit.title }}" class="img-fluid" />
-                        </div>
-                        <h5 class="card-title">{{ benefit.title }}</h5>
-                        <p class="card-text">{{ benefit.description }}</p>
-                    </div>
-                </div>
-            </div>
+<section class="sf-container benefits-section">
+    <p class="sf-eyebrow">С заботой о вас</p>
+    <h2>Преимущества SkViDerm</h2>
+    <div class="benefits-grid">
+        @for (benefit of benefits; track benefit.title; let i = $index) {
+            <article>
+                <span class="benefit-number">0{{ i + 1 }}</span>
+                <h3>{{ benefit.title }}</h3>
+                <p>{{ benefit.description }}</p>
+            </article>
         }
     </div>
-</div>
+</section>

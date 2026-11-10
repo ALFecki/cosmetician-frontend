@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -7,7 +8,11 @@ import { environment } from '../../../environments/environment';
     standalone: true,
 })
 export class PersonalDataRedirectComponent implements OnInit {
+    private readonly platformId = inject(PLATFORM_ID);
+
     ngOnInit() {
-        window.location.href = environment.personal_data_url;
+        if (isPlatformBrowser(this.platformId)) {
+            window.location.href = environment.personal_data_url;
+        }
     }
 }

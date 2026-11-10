@@ -1,110 +1,64 @@
-<section class="about-me-section">
-    <div class="container">
-        <div class="about-header text-center mb-5">
-            <h2 class="text-center mb-4 section-title">Обо мне</h2>
-            <p class="section-subtitle">История создания SkViDerm</p>
-        </div>
-
-        <div class="row align-items-center mb-5">
-            <div class="col-lg-6 mb-4 mb-lg-0">
-                <div class="about-content">
-                    <div class="intro-block">
-                        <h3 class="intro-title">Добро пожаловать в мир красоты</h3>
-                        <p class="intro-text">
-                            <strong>SkViDerm</strong> – это не просто интернет-магазин косметики, это реализация мечты – сделать мир ярче,
-                            красивее и увереннее. Меня зовут <strong>{{ ownerInfo.name }}</strong> ({{ ownerInfo.title }}), и это
-                            пространство создано мной с большой любовью.
-                        </p>
-                    </div>
-
-                    <div class="story-block">
-                        <p>
-                            Мой путь начался много лет назад, когда я впервые открыла для себя магию домашнего ухода и почувствовала, как
-                            важна забота о себе для сохранения молодости и внутренней гармонии.
-                        </p>
-                        <p>
-                            Любовь к косметике росла с каждым годом: изучала новейшие технологии, пробовала сотни средств и искала лучшие
-                            ингредиенты. Вдохновленная этим опытом, решила объединить свои знания и страсть в одном месте –
-                            интернет-магазине, где каждый может найти качественную косметику, подходящую именно ему.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-6">
-                <div class="photo-section">
-                    <div class="main-photo-container">
-                        <img [src]="ownerInfo.mainPhoto" [alt]="ownerInfo.name" class="main-photo" />
-                        <div class="photo-decoration"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="values-section mb-5">
-            <div class="row align-items-center">
-                <div class="col-lg-5 mb-4 mb-lg-0">
-                    <div class="secondary-photo-container">
-                        <img [src]="ownerInfo.secondaryPhoto" [alt]="ownerInfo.name + ' в работе'" class="secondary-photo" />
-                        <div class="photo-frame"></div>
-                    </div>
-                </div>
-
-                <div class="col-lg-7">
-                    <div class="values-content">
-                        <h3 class="values-title">Мои ценности</h3>
-                        <p class="values-intro">Создавая магазин, руководствовалась следующими принципами:</p>
-
-                        <div class="values-grid">
-                            @for (value of values; track value) {
-                                <div class="value-item">
-                                    <div class="value-content">
-                                        <h4 class="value-title">{{ value.title }}</h4>
-                                        <p class="value-description">{{ value.description }}</p>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="mission-section">
-            <div class="mission-card">
-                <div class="row align-items-center">
-                    <div class="col-lg-8">
-                        <div class="mission-content">
-                            <h3 class="mission-title">Наша миссия</h3>
-                            <p>
-                                Здесь каждый клиент может найти средства для ежедневного ухода, профессиональные маски, уникальные сыворотки
-                                и косметику от проверенных брендов. Здесь ценят каждого и стремятся сделать процесс покупки приятным и
-                                полезным.
-                            </p>
-                            <p class="mission-highlight">
-                                <strong>SkViDerm</strong> - это история любви к красоте, многолетнего опыта и искренней заботы о каждом
-                                клиенте. Ведь настоящая красота начинается внутри и проявляется в заботе о себе каждый день.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="mission-stats">
-                            <div class="stat-item">
-                                <span class="stat-number">10+</span>
-                                <span class="stat-label">лет опыта</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-number">100+</span>
-                                <span class="stat-label">довольных клиентов</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-number">10+</span>
-                                <span class="stat-label">проверенных брендов</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<section class="sf-container owner-section" id="about">
+    <div class="owner-portrait">
+        <img [src]="ownerInfo.mainPhoto" [alt]="ownerInfo.name" loading="lazy" /><span>{{ ownerInfo.name }}</span>
     </div>
+    <div class="owner-copy">
+        <p class="sf-eyebrow">За SkViDerm стоит человек</p>
+        <h2>Хороший уход начинается<br />с понимания вашей кожи</h2>
+        <p>
+            <strong>SkViDerm</strong> – это не просто интернет-магазин косметики, это реализация мечты – сделать мир ярче, красивее и
+            увереннее. Меня зовут <strong>{{ ownerInfo.name }}</strong> ({{ ownerInfo.title }}), и это пространство создано мной с большой
+            любовью.
+        </p>
+        @if (!fullStory) {
+            <a class="sf-text-link story-link" routerLink="/about">О SkViDerm: история и ценности →</a>
+        }
+        <a class="sf-button" href="https://t.me/vikskvor" target="_blank" rel="noopener">Обсудить мой уход →</a
+        ><span class="consultation-note">Можно начать с простого вопроса</span>
+    </div>
+    @if (fullStory) {
+        <div class="owner-story">
+            <div class="story-layout">
+                <div>
+                    <p class="sf-eyebrow">История создания SkViDerm</p>
+                    <h3>Добро пожаловать в мир красоты</h3>
+                    <p>
+                        Мой путь начался много лет назад, когда я впервые открыла для себя магию домашнего ухода и почувствовала, как важна
+                        забота о себе для сохранения молодости и внутренней гармонии.
+                    </p>
+                    <p>
+                        Любовь к косметике росла с каждым годом: изучала новейшие технологии, пробовала сотни средств и искала лучшие
+                        ингредиенты. Вдохновленная этим опытом, решила объединить свои знания и страсть в одном месте – интернет-магазине,
+                        где каждый может найти качественную косметику, подходящую именно ему.
+                    </p>
+                </div>
+                <img [src]="ownerInfo.secondaryPhoto" [alt]="ownerInfo.name + ' в работе'" loading="lazy" />
+            </div>
+            <h3>Мои ценности</h3>
+            <p>Создавая магазин, руководствовалась следующими принципами:</p>
+            <div class="values-grid">
+                @for (value of values; track value.title) {
+                    <article>
+                        <h4>{{ value.title }}</h4>
+                        <p>{{ value.description }}</p>
+                    </article>
+                }
+            </div>
+            <div class="mission-content">
+                <h3 class="mission-title">Наша миссия</h3>
+                <p>
+                    Здесь каждый клиент может найти средства для ежедневного ухода, профессиональные маски, уникальные сыворотки и косметику
+                    от проверенных брендов. Здесь ценят каждого и стремятся сделать процесс покупки приятным и полезным.
+                </p>
+                <p class="mission-highlight">
+                    <strong>SkViDerm</strong> - это история любви к красоте, многолетнего опыта и искренней заботы о каждом клиенте. Ведь
+                    настоящая красота начинается внутри и проявляется в заботе о себе каждый день.
+                </p>
+            </div>
+            <div class="mission-stats">
+                <span><strong>10+</strong> лет опыта</span><span><strong>100+</strong> довольных клиентов</span
+                ><span><strong>10+</strong> проверенных брендов</span>
+            </div>
+        </div>
+    }
 </section>

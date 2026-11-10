@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { IconsModule } from '../../../../shared/base/icons/icons.module';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -10,6 +10,7 @@ import { RouterModule } from '@angular/router';
     imports: [CommonModule, RouterModule, IconsModule],
 })
 export class AboutMeComponent {
+    @Input() fullStory = false;
     ownerInfo = {
         name: 'Виктория Скворцова',
         title: 'врач, кандидат медицинских наук, практикующий косметолог',

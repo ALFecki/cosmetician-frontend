@@ -5,6 +5,10 @@
     overflow-x: hidden;
 }
 
+:host:has(> .storefront) {
+    overflow-x: clip;
+}
+
 :host:has(app-admin-panel-switcher) {
     // A scroll container here would trap the admin sidebar's sticky positioning.
     overflow-x: clip;

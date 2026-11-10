@@ -1,201 +1,158 @@
 @if (!categoryId && !brandId) {
-    <div class="catalog-hero">
-        <div class="container">
-            <div class="hero-content text-center">
-                <h1 class="hero-title">Каталог косметики</h1>
-                <p class="hero-subtitle">Откройте для себя мир красоты с нашей премиальной косметикой</p>
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <span class="stat-number">100+</span>
-                        <span class="stat-label">товаров</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">10+</span>
-                        <span class="stat-label">брендов</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">100%</span>
-                        <span class="stat-label">качество</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="hero-decoration"></div>
-    </div>
+    <header class="sf-container sf-page-header">
+        <nav aria-label="Навигационная цепочка" class="catalog-breadcrumb"><a href="/">Главная</a><span>/</span>Каталог</nav>
+        <p class="sf-eyebrow">Забота о коже каждый день</p>
+        <h1>Каталог ухода</h1>
+        <p>Найдите своё средство — по потребности, бренду или привычному этапу ухода.</p>
+    </header>
 }
-
-<div class="catalog-container">
-    <div class="container-fluid">
-        <div class="row g-4">
-            <div class="col-12">
-                <div class="results-header">
-                    <div class="results-info">
-                        <h2 class="results-title">
-                            <i class="bi bi-grid-3x3-gap-fill me-2"></i>
-                            Наши товары
-                        </h2>
-                        @if (totalItems$ | async; as total) {
-                            <p class="results-count">
-                                Найдено <strong>{{ total }}</strong> {{ total === 1 ? 'товар' : total < 5 ? 'товара' : 'товаров' }}
-                            </p>
-                        }
-                    </div>
-                    <div class="header-controls">
-                        <button class="btn btn-filter" [class.active]="showFilters" (click)="toggleFilters()" type="button">
-                            <i class="bi bi-funnel-fill me-2"></i>
-                            Фильтры
-                            @if (activeFiltersCount > 0) {
-                                <span class="filter-count">{{ activeFiltersCount }}</span>
-                            }
+<div class="sf-container catalog-layout">
+    <aside class="catalog-sidebar" id="catalog-filters" aria-label="Фильтры каталога">
+        <div class="filters-heading">
+            <h2>Фильтры</h2>
+        </div>
+        @if (!showFilters) {
+            <app-product-filter [initialFilters]="filterOptions" (filterChange)="onFilterChange($event)"></app-product-filter>
+        }
+        <div class="filter-help">
+            <h3>Сложно выбрать?</h3>
+            <p>Поможем разобраться и найти подходящий уход.</p>
+            <a href="https://t.me/vikskvor" target="_blank" rel="noopener">Спросить косметолога →</a>
+        </div>
+    </aside>
+    <section class="catalog-results" aria-label="Товары">
+        <div class="results-toolbar">
+            <button
+                class="btn btn-outline-primary open-filters"
+                type="button"
+                [attr.aria-expanded]="showFilters"
+                aria-haspopup="dialog"
+                (click)="toggleFilters()"
+            >
+                Фильтры
+                @if (activeFiltersCount) {
+                    <span>{{ activeFiltersCount }}</span>
+                }</button
+            ><span class="results-count" aria-live="polite">Найдено {{ (totalItems$ | async) ?? 0 }} товаров</span
+            ><label class="sort-controls"
+                >Сначала
+                <select class="form-select" aria-label="Сортировка товаров" [(ngModel)]="sortBy" (change)="onSortChange(sortBy)">
+                    <option value="title">по названию</option>
+                    <option value="price-asc">дешевле</option>
+                    <option value="price-desc">дороже</option>
+                    <option value="createdAt">новинки</option>
+                </select></label
+            >
+        </div>
+        @if (products$ | async; as products) {
+            <div class="products-grid">
+                @for (product of products; track product.id) {
+                    <article class="product-card" [attr.data-product-id]="product.id">
+                        <button
+                            class="product-image"
+                            type="button"
+                            (click)="openProductDetails(product)"
+                            [attr.aria-label]="'Посмотреть ' + product.title"
+                        >
+                            <img
+                                [src]="product.image | imageUrl"
+                                [alt]="product.title"
+                                loading="lazy"
+                                (load)="onImageLoad($event)"
+                                (error)="onImageError($event)"
+                            />
                         </button>
-                        <div class="sort-controls">
-                            <label for="sortSelect" class="sort-label">
-                                <i class="bi bi-sort-down me-1"></i>
-                                Сортировка:
-                            </label>
-                            <select id="sortSelect" class="form-select sort-select" [(ngModel)]="sortBy" (change)="onSortChange(sortBy)">
-                                <option value="title">По названию (А-Я)</option>
-                                <option value="price-asc">Сначала дешевые</option>
-                                <option value="price-desc">Сначала дорогие</option>
-                                <option value="createdAt">Новинки</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                @if (showFilters) {
-                    <div class="filters-panel">
-                        <app-product-filter [initialFilters]="filterOptions" (filterChange)="onFilterChange($event)"> </app-product-filter>
-                    </div>
-                }
-
-                @if (products$ | async; as products) {
-                    <div class="products-grid">
-                        @for (product of products; track trackByProductId($index, product)) {
-                            <div class="product-card-wrapper">
-                                <div
-                                    class="card product-card"
-                                    [attr.data-product-id]="product.id"
-                                    tabindex="0"
-                                    role="button"
-                                    (click)="this.openProductDetails(product)"
-                                    (keydown.enter)="this.openProductDetails(product)"
-                                    (keydown.space)="this.openProductDetails(product); $event.preventDefault()"
+                        @if (product.brand) {
+                            <p class="product-brand">{{ product.brand.title }}</p>
+                        }
+                        <button type="button" class="product-name" (click)="openProductDetails(product)">{{ product.title }}</button>
+                        @if (product.productType) {
+                            <p class="product-type">{{ product.productType.title }}</p>
+                        }
+                        <div class="product-variants">
+                            @for (variant of product.variants; track variant.id) {
+                                <button
+                                    type="button"
+                                    class="variant"
+                                    [class.active]="getSelectedVariantId(product) === variant.id"
+                                    [attr.aria-pressed]="getSelectedVariantId(product) === variant.id"
+                                    (click)="selectVariant(product, variant.id)"
                                 >
-                                    <div class="card-image-container">
-                                        <img
-                                            [src]="product.image | imageUrl"
-                                            class="card-img-top"
-                                            alt="{{ product.title }}"
-                                            loading="lazy"
-                                            (load)="onImageLoad($event)"
-                                            (error)="onImageError($event)"
-                                        />
-                                        @if (product.brand) {
-                                            <div class="card-badge">
-                                                {{ product.brand.title }}
-                                            </div>
-                                        }
-                                    </div>
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ product.title }}</h5>
-                                        <div class="card-details">
-                                            @if (product.productType) {
-                                                <span class="product-type">{{ product.productType.title }}</span>
-                                            }
-                                        </div>
-                                        @if (product.variants && product.variants.length > 1) {
-                                            <div class="volume-selection mb-3">
-                                                <div class="volume-buttons">
-                                                    @for (variant of product.variants; track variant) {
-                                                        <button
-                                                            class="btn btn-sm volume-btn"
-                                                            [class.active]="getSelectedVariant(product).id === variant.id"
-                                                            (click)="selectVariant(product, variant.id); $event.stopPropagation()"
-                                                        >
-                                                            {{ variant.volume }}мл
-                                                        </button>
-                                                    }
-                                                </div>
-                                            </div>
-                                        }
-                                        <div class="price-section">
-                                            @if (product.isPriceHidden && !isPriceRevealed(product.id)) {
-                                                <div class="price-hidden">
-                                                    <!-- <button class="btn btn-outline-primary add-to-cart-btn" -->
-                                                    <button
-                                                        class="btn btn-outline-primary btn-sm reveal-price-btn"
-                                                        (click)="revealPrice(product.id); $event.stopPropagation()"
-                                                    >
-                                                        <i class="bi bi-eye me-2"></i>
-                                                        Узнать цену
-                                                    </button>
-                                                </div>
-                                            } @else {
-                                                <div
-                                                    class="price-revealed"
-                                                    [class.animate-reveal]="product.isPriceHidden && isPriceRevealed(product.id)"
-                                                >
-                                                    @let priceInfo = getProductPriceInfo(product);
-                                                    @if (priceInfo.hasDiscount) {
-                                                        <div class="price-with-discount">
-                                                            <div class="price-original">
-                                                                {{ priceInfo.originalPrice | number: '1.2-2' }} р.
-                                                            </div>
-                                                            <div class="price-discounted">
-                                                                {{ priceInfo.discountedPrice | number: '1.2-2' }} р.
-                                                                <span class="discount-badge">{{ priceInfo.discountLabel }}</span>
-                                                            </div>
-                                                        </div>
-                                                    } @else {
-                                                        <div class="price">{{ getSelectedVariantPrice(product) | number: '1.2-2' }} р.</div>
-                                                    }
-                                                    @if (!product.variants || product.variants.length === 1) {
-                                                        <div class="volume-info">{{ getSelectedVariantVolume(product) }}мл</div>
-                                                    }
-                                                </div>
-                                            }
-                                        </div>
-                                        <button
-                                            class="btn btn-primary add-to-cart-btn"
-                                            (click)="$event.stopPropagation(); addToCart(product)"
-                                        >
-                                            <i class="bi bi-bag-plus me-2"></i>
-                                            Купить
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
-
-                @if ((products$ | async)?.length === 0) {
-                    <div class="empty-state text-center">
-                        <div class="empty-icon">
-                            <i class="bi bi-search"></i>
+                                    {{ variant.volume }} мл
+                                </button>
+                            }
                         </div>
-                        <h3 class="empty-title">Товары не найдены</h3>
-                        <p class="empty-text">Попробуйте изменить параметры поиска или сбросить фильтры</p>
-                        <button class="btn btn-outline-primary" (click)="resetFilters()">
-                            <i class="bi bi-arrow-clockwise me-2"></i>
-                            Сбросить фильтры
-                        </button>
-                    </div>
-                }
-
-                @if (((products$ | async)?.length ?? 0) > 0) {
-                    <div class="pagination-wrapper">
-                        <app-pagination
-                            [totalItems]="(totalItems$ | async) ?? 0"
-                            [itemsPerPage]="itemsPerPage"
-                            [currentPage]="currentPage"
-                            (pageChange)="onPageChange($event)"
-                            (itemsPerPageChange)="onItemsPerPageChange($event)"
-                        ></app-pagination>
-                    </div>
+                        <div class="product-bottom">
+                            <div class="price-section" aria-live="polite">
+                                @if (product.isPriceHidden && !isPriceRevealed(product.id)) {
+                                    <button type="button" class="reveal-price" (click)="revealPrice(product.id)">Узнать цену</button>
+                                } @else {
+                                    <div
+                                        class="price-revealed"
+                                        [class.animate-reveal]="product.isPriceHidden && isPriceRevealed(product.id)"
+                                    >
+                                        @let priceInfo = getProductPriceInfo(product);
+                                        @if (priceInfo.hasDiscount) {
+                                            <span class="price-original">{{ priceInfo.originalPrice | number: '1.2-2' }}</span
+                                            ><span class="price">{{ priceInfo.discountedPrice | number: '1.2-2' }} <small>BYN</small></span
+                                            ><span class="discount-badge">{{ priceInfo.discountLabel }}</span>
+                                        } @else {
+                                            <span class="price"
+                                                >{{ getSelectedVariantPrice(product) | number: '1.2-2' }} <small>BYN</small></span
+                                            >
+                                        }
+                                    </div>
+                                }
+                            </div>
+                            <button
+                                type="button"
+                                class="add-button"
+                                (click)="addToCart(product)"
+                                [attr.aria-label]="'Добавить в корзину: ' + product.title"
+                            >
+                                +
+                            </button>
+                        </div>
+                    </article>
                 }
             </div>
-        </div>
-    </div>
+            @if (products.length === 0) {
+                <div class="empty-state">
+                    <h2>Товары не найдены</h2>
+                    <p>Попробуйте изменить параметры поиска или сбросить фильтры.</p>
+                    <button class="btn btn-outline-primary" (click)="resetFilters()">Сбросить фильтры</button>
+                </div>
+            }
+            @if (products.length > 0) {
+                <div class="pagination-wrapper">
+                    <app-pagination
+                        [totalItems]="(totalItems$ | async) ?? 0"
+                        [itemsPerPage]="itemsPerPage"
+                        [currentPage]="currentPage"
+                        (pageChange)="onPageChange($event)"
+                        (itemsPerPageChange)="onItemsPerPageChange($event)"
+                    ></app-pagination>
+                </div>
+            }
+        }
+    </section>
 </div>
+<section class="sf-container catalog-consult">
+    <div>
+        <p class="sf-eyebrow">Индивидуальный подход</p>
+        <h2>Не нужно выбирать в одиночку</h2>
+        <p>Косметолог поможет составить ваш домашний уход.</p>
+    </div>
+    <a class="sf-button" href="https://t.me/vikskvor" target="_blank" rel="noopener">Помочь с выбором →</a>
+</section>
+
+<ng-template #mobileFilters let-panel>
+    <div class="offcanvas-header">
+        <h2 id="mobile-filter-title">Фильтры</h2>
+        <button type="button" class="filter-close" ngbAutofocus (click)="panel.close()" aria-label="Закрыть фильтры">×</button>
+    </div>
+    <div class="offcanvas-body">
+        <app-product-filter [initialFilters]="filterOptions" (filterChange)="onFilterChange($event)"></app-product-filter
+        ><button type="button" class="btn btn-primary apply-filters" (click)="panel.close()">Показать товары</button>
+    </div>
+</ng-template>

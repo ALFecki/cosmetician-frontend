@@ -1,4 +1,4 @@
-<div class="loader-overlay" *ngIf="loaderService.isLoading$ | async">
+<div role="status" aria-live="polite" class="loader-overlay" *ngIf="loaderService.isLoading$ | async">
     <div class="loader-container">
         <div class="spinner">
             <div class="double-bounce1"></div>

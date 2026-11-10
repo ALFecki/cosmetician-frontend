@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbOffcanvas, NgbOffcanvasRef } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, of } from 'rxjs';
 import { IconsModule } from '../../base/icons/icons.module';
 import { ProductModel } from '../../models/product.model';
@@ -24,7 +24,7 @@ import { ProductModalComponent } from '../product-modal/product-modal.component'
     templateUrl: './products.component.html',
     styleUrl: './products.component.scss',
 })
-export class ProductsComponent implements OnInit, OnDestroy {
+export class ProductsComponent implements OnInit, OnChanges, OnDestroy {
     products$!: Observable<ProductModel[]>;
     @Input() categoryId: string | undefined;
     @Input() brandId: string | undefined;
@@ -35,6 +35,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
     filterOptions: FilterProductSchema = {};
     sortBy: 'title' | 'price-asc' | 'price-desc' | 'createdAt' = 'title';
     showFilters = false;
+    @ViewChild('mobileFilters') private mobileFilters!: TemplateRef<unknown>;
+    private filterPanel?: NgbOffcanvasRef;
+    private initialized = false;
     private selectedVariants: Record<string, string> = {};
     private revealedPrices = new Set<string>();
     private priceTimeouts = new Map<string, NodeJS.Timeout>();
@@ -47,9 +50,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
         private modalService: NgbModal,
         private authService: AuthService,
         private loginModalService: LoginModalService,
+        private offcanvasService: NgbOffcanvas,
     ) {}
 
     ngOnInit(): void {
+        this.initialized = true;
         if (this.categoryId) {
             this.filterOptions.categoryId = [this.categoryId];
         }
@@ -65,6 +70,15 @@ export class ProductsComponent implements OnInit, OnDestroy {
         });
 
         this.loadProducts();
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (!changes['brandId'] && !changes['categoryId']) return;
+        this.filterOptions = {};
+        if (this.categoryId) this.filterOptions.categoryId = [this.categoryId];
+        if (this.brandId) this.filterOptions.brandId = [this.brandId];
+        this.currentPage = 1;
+        if (this.initialized) this.loadProducts();
     }
 
     isPriceRevealed(productId: string): boolean {
@@ -98,6 +112,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.filterPanel?.dismiss();
         this.priceTimeouts.forEach(timeout => {
             clearTimeout(timeout);
         });
@@ -159,7 +174,29 @@ export class ProductsComponent implements OnInit, OnDestroy {
     }
 
     toggleFilters(): void {
-        this.showFilters = !this.showFilters;
+        if (this.filterPanel) {
+            this.filterPanel.close();
+            return;
+        }
+        this.showFilters = true;
+        this.filterPanel = this.offcanvasService.open(this.mobileFilters, {
+            position: 'start',
+            panelClass: 'storefront-filter-panel',
+            ariaLabelledBy: 'mobile-filter-title',
+            backdrop: true,
+            keyboard: true,
+            scroll: false,
+            animation: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? false : undefined,
+        });
+        this.filterPanel.hidden.subscribe(() => {
+            this.showFilters = false;
+            this.filterPanel = undefined;
+        });
+    }
+
+    @HostListener('window:resize')
+    closeFiltersOnDesktop(): void {
+        if (window.innerWidth > 700) this.filterPanel?.close();
     }
 
     get activeFiltersCount(): number {
@@ -214,7 +251,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
                 scrollable: true,
             });
             activeModal.componentInstance.selectedProduct = product;
-            activeModal.componentInstance.selectedVariantId = this.getSelectedVariant(product);
+            activeModal.componentInstance.selectedVariantId = this.getSelectedVariantId(product);
         }
     }
 

@@ -1,63 +1,35 @@
-<div class="container mt-4">
-    @if (loading) {
-        <div class="text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Загрузка...</span>
-            </div>
-        </div>
-    }
-
-    @if (error) {
-        <div class="alert alert-danger mx-3" role="alert">
-            {{ error }}
-        </div>
-    }
-
-    @if (!loading && !error && (brand$ | async); as brandData) {
+@if (loading) {
+    <div class="sf-container py-5" role="status">Загружаем информацию о бренде…</div>
+}
+@if (error) {
+    <p class="sf-container alert alert-danger" role="alert">{{ error }}</p>
+}
+@if (!loading && !error && (brand$ | async); as brandData) {
+    <header class="sf-container sf-page-header collection-header">
         <div>
-            <!-- Full-width Brand Hero Banner -->
-            <div class="brand-hero">
-                <div class="container">
-                    <nav aria-label="breadcrumb" class="mb-4">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="/">Главная</a></li>
-                            <li class="breadcrumb-item"><a href="/products">Каталог</a></li>
-                            <li class="breadcrumb-item active">{{ brandData.title }}</li>
-                        </ol>
-                    </nav>
-                    <div class="row align-items-center">
-                        <div class="col-lg-8">
-                            <div class="brand-content">
-                                <h1 class="brand-title text-center">{{ brandData.title }}</h1>
-                                @if (brandData.description) {
-                                    <div class="brand-description text-center">
-                                        <p>{{ brandData.description }}</p>
-                                    </div>
-                                }
-                                <div class="brand-stats mt-4 justify-content-center">
-                                    <div class="stat-item">
-                                        <i-bs name="award" class="stat-icon"></i-bs>
-                                        <span class="stat-text">Премиальное качество</span>
-                                    </div>
-                                    <div class="stat-item">
-                                        <i-bs name="shield-check" class="stat-icon"></i-bs>
-                                        <span class="stat-text">Сертифицированные товары</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        @if (brandData.image) {
-                            <div class="col-lg-4">
-                                <div class="brand-image-container">
-                                    <img [src]="brandData.image | imageUrl" [alt]="brandData.title" class="brand-image-large" />
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
-                <div class="hero-decoration"></div>
-            </div>
+            <nav class="collection-breadcrumb" aria-label="Навигационная цепочка">
+                <a href="/">Главная</a><span>/</span><a href="/products">Каталог</a><span>/</span><span>{{ brandData.title }}</span>
+            </nav>
+            <p class="sf-eyebrow">Профессиональная косметика</p>
+            <h1>{{ brandData.title }}</h1>
+            @if (brandData.description) {
+                <app-overflow-description [text]="brandData.description"></app-overflow-description>
+            }
+            @if (brandData.manufacturer || brandData.importer) {
+                <details class="brand-legal">
+                    <summary>Производитель и импортёр</summary>
+                    @if (brandData.manufacturer) {
+                        <p>Производитель: {{ brandData.manufacturer }}</p>
+                    }
+                    @if (brandData.importer) {
+                        <p>Импортёр: {{ brandData.importer }}</p>
+                    }
+                </details>
+            }
         </div>
-    }
-</div>
+        @if (brandData.image) {
+            <div class="collection-image"><img [src]="brandData.image | imageUrl" [alt]="brandData.title" /></div>
+        }
+    </header>
+}
 <app-products [brandId]="brandId"></app-products>

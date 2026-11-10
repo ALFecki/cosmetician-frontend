@@ -1,4 +1,4 @@
-<div>
+<div [class.storefront]="showNavbarAndFooter$ | async">
     @if (showNavbarAndFooter$ | async) {
         <app-navbar></app-navbar>
     }
@@ -8,6 +8,6 @@
     @if (showNavbarAndFooter$ | async) {
         <app-footer></app-footer>
     }
-    <app-toast></app-toast>
-    <app-loader></app-loader>
+    <app-toast [class.storefront-presentation]="showNavbarAndFooter$ | async"></app-toast>
+    <app-loader [class.storefront-presentation]="showNavbarAndFooter$ | async"></app-loader>
 </div>

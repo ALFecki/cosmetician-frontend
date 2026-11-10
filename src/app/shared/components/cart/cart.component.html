@@ -30,14 +30,7 @@
                                     Товары в корзине ({{ getCartItemsCount() | async }})
                                 </h3>
                                 @for (item of cartItems; track item) {
-                                    <div
-                                        class="cart-item"
-                                        (click)="openProductDetails(item.product)"
-                                        (keyup.enter)="openProductDetails(item.product)"
-                                        (keyup.space)="openProductDetails(item.product)"
-                                        tabindex="0"
-                                        role="button"
-                                    >
+                                    <div class="cart-item">
                                         <img [src]="item.product.image | imageUrl" [alt]="item.product.title" class="item-image" />
                                         <div class="item-details">
                                             <a
@@ -66,33 +59,37 @@
                                                 <div class="item-price">{{ item.variant.price | number: '1.2-2' }} р. за шт.</div>
                                             }
                                         </div>
-                                        <div class="quantity-controls">
+                                        <div class="item-controls">
+                                            <div class="quantity-controls">
+                                                <button
+                                                    class="quantity-btn"
+                                                    type="button"
+                                                    (click)="decreaseQuantity(item); $event.stopPropagation()"
+                                                    aria-label="Уменьшить количество"
+                                                    [disabled]="item.quantity <= 1"
+                                                >
+                                                    -
+                                                </button>
+                                                <span class="quantity-display">{{ item.quantity }}</span>
+                                                <button
+                                                    class="quantity-btn"
+                                                    type="button"
+                                                    (click)="increaseQuantity(item); $event.stopPropagation()"
+                                                    aria-label="Увеличить количество"
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                            <div class="item-total">{{ getItemTotal(item) | number: '1.2-2' }} р.</div>
                                             <button
-                                                class="quantity-btn"
+                                                class="remove-btn"
                                                 type="button"
-                                                (click)="decreaseQuantity(item); $event.stopPropagation()"
-                                                [disabled]="item.quantity <= 1"
+                                                (click)="removeProduct(item); $event.stopPropagation()"
+                                                title="Удалить товар"
                                             >
-                                                -
-                                            </button>
-                                            <span class="quantity-display">{{ item.quantity }}</span>
-                                            <button
-                                                class="quantity-btn"
-                                                type="button"
-                                                (click)="increaseQuantity(item); $event.stopPropagation()"
-                                            >
-                                                +
+                                                <i-bs name="trash"></i-bs>
                                             </button>
                                         </div>
-                                        <div class="item-total">{{ getItemTotal(item) | number: '1.2-2' }} р.</div>
-                                        <button
-                                            class="remove-btn"
-                                            type="button"
-                                            (click)="removeProduct(item); $event.stopPropagation()"
-                                            title="Удалить товар"
-                                        >
-                                            <i-bs name="trash"></i-bs>
-                                        </button>
                                     </div>
                                 }
                             </div>
@@ -168,7 +165,7 @@
                                         }
                                     </span>
                                 </div>
-                                <button class="btn checkout-btn" (click)="goToOrderConfirmation()">
+                                <button class="btn btn-primary checkout-btn" (click)="goToOrderConfirmation()">
                                     <i class="bi bi-credit-card"></i>
                                     Оформить заказ
                                 </button>

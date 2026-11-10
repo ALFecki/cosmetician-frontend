@@ -65,6 +65,34 @@
                             "optimization": false,
                             "extractLicenses": false,
                             "sourceMap": true
+                        },
+                        "testing": {
+                            "optimization": false,
+                            "extractLicenses": false,
+                            "sourceMap": true,
+                            "index": "tools/storefront-preview/index.html",
+                            "prerender": false,
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.testing.ts"
+                                }
+                            ],
+                            "assets": [
+                                "src/assets",
+                                {
+                                    "glob": "**/*",
+                                    "input": "public"
+                                },
+                                {
+                                    "glob": "**/*",
+                                    "input": "tools/storefront-preview/public",
+                                    "output": "/__preview"
+                                }
+                            ],
+                            "server": false,
+                            "ssr": false,
+                            "outputPath": "dist/storefront-preview"
                         }
                     },
                     "defaultConfiguration": "production"
@@ -77,6 +105,9 @@
                         },
                         "development": {
                             "buildTarget": "proskin-frontend:build:development"
+                        },
+                        "testing": {
+                            "buildTarget": "proskin-frontend:build:testing"
                         }
                     },
                     "defaultConfiguration": "development"

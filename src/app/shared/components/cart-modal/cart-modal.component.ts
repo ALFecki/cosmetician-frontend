@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { IconsModule } from '../../base/icons/icons.module';
@@ -21,7 +20,7 @@ import { calculateDiscountedPrice, PriceInfo } from '../../utils/promotion.utils
     selector: 'app-cart-modal',
     templateUrl: './cart-modal.component.html',
     styleUrls: ['./cart-modal.component.scss'],
-    imports: [CommonModule, RouterModule, NgbModalModule, FormsModule, IconsModule, ImageUrlPipe],
+    imports: [CommonModule, RouterModule, NgbModalModule, IconsModule, ImageUrlPipe],
 })
 export class CartModalComponent implements OnInit {
     cartItems$: Observable<CartModel[]> = new Observable<CartModel[]>();
@@ -60,14 +59,6 @@ export class CartModalComponent implements OnInit {
     decreaseQuantity(item: CartModel): void {
         if (item.quantity > 1) {
             this.cartService.decreaseQuantity(item);
-        }
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    updateQuantity(item: CartModel, event: any): void {
-        const quantity = parseInt(event.target.value);
-        if (quantity > 0) {
-            this.cartService.updateQuantity(item.product.id, quantity);
         }
     }
 
