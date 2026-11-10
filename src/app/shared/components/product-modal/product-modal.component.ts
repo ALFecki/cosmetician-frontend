@@ -17,6 +17,7 @@ import { calculateDiscountedPrice, PriceInfo } from '../../utils/promotion.utils
     imports: [CommonModule, IconsModule, ImageUrlPipe],
     templateUrl: './product-modal.component.html',
     styleUrl: './product-modal.component.scss',
+    host: { '[class.storefront-presentation]': 'isStorefront' },
 })
 export class ProductModalComponent implements OnDestroy {
     selectedProduct: ProductModel | null = null;
@@ -33,6 +34,10 @@ export class ProductModalComponent implements OnDestroy {
         private toastService: ToastService,
         private loginModalService: LoginModalService,
     ) {}
+
+    get isStorefront(): boolean {
+        return !/^\/admin(?:[/?#]|$)/.test(this.router.url);
+    }
 
     moreInfo() {
         this.modalService.dismissAll();
