@@ -3,7 +3,7 @@
         <i class="fas fa-envelope-check modal-icon"></i>
         <h5 class="modal-title" id="verifyEmailModalLabel">Подтверждение Email</h5>
     </div>
-    <button type="button" class="btn-close" aria-label="Close" (click)="close()">
+    <button type="button" class="btn-close" aria-label="Закрыть" (click)="close()">
         <i-bs name="x-lg"></i-bs>
     </button>
 </div>
@@ -79,6 +79,8 @@
                             placeholder="000000"
                             required
                             maxlength="6"
+                            inputmode="numeric"
+                            autocomplete="one-time-code"
                         />
                         <i class="fas fa-keyboard input-icon"></i>
                     </div>

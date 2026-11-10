@@ -39,6 +39,9 @@ export class OrderConfirmationComponent implements OnInit {
     loading = true;
     postPlacements$: BehaviorSubject<PostPlacement[]> = new BehaviorSubject<PostPlacement[]>([]);
     filteredPostPlacements$: BehaviorSubject<PostPlacement[]> = new BehaviorSubject<PostPlacement[]>([]);
+    postPlacementsLoading = true;
+    postPlacementsError = false;
+    activePlacementIndex = -1;
     showDropdown = false;
     selectedPlacementText = '';
     currentOrder: OrderModel | null = null;
@@ -62,12 +65,7 @@ export class OrderConfirmationComponent implements OnInit {
         private promotionService: PromotionService,
     ) {
         this.currentUser$ = this.authService.getCurrentUser();
-        this.getPostPlacements().subscribe(data => {
-            if (data.status == 'success') {
-                this.postPlacements$.next(data.data);
-                this.filteredPostPlacements$.next(data.data);
-            }
-        });
+        this.loadPostPlacements();
 
         this.confirmationForm = this.formBuilder.group({
             firstName: ['', [Validators.required, Validators.minLength(2)]],
@@ -166,7 +164,13 @@ export class OrderConfirmationComponent implements OnInit {
         });
 
         this.confirmationForm.get('postPlacementFilter')?.valueChanges.subscribe(filterText => {
+            if (filterText !== this.selectedPlacementText) {
+                this.confirmationForm.get('postPlacement')?.setValue('');
+                this.selectedPlacementText = '';
+            }
             this.filterPostPlacements(filterText || '');
+            this.activePlacementIndex = -1;
+            this.showDropdown = true;
         });
 
         this.loadCartItems();
@@ -510,43 +514,59 @@ export class OrderConfirmationComponent implements OnInit {
     selectPostPlacement(placement: PostPlacement): void {
         this.confirmationForm.get('postPlacement')?.setValue(placement.id);
         this.selectedPlacementText = `Отделение №${placement.number} - ${placement.address}`;
-        this.confirmationForm.get('postPlacementFilter')?.setValue(this.selectedPlacementText);
+        this.confirmationForm.get('postPlacementFilter')?.setValue(this.selectedPlacementText, { emitEvent: false });
         this.showDropdown = false;
 
-        this.confirmationForm.get('postPlacementFilter')?.updateValueAndValidity();
+        this.confirmationForm.get('postPlacementFilter')?.updateValueAndValidity({ emitEvent: false });
     }
 
     onFilterFocus(): void {
         this.showDropdown = true;
-        if (this.confirmationForm.get('postPlacementFilter')?.value === this.selectedPlacementText) {
-            this.confirmationForm.get('postPlacementFilter')?.setValue('');
-        }
+        this.filterPostPlacements('');
     }
 
     onFilterBlur(): void {
         setTimeout(() => {
             this.showDropdown = false;
+            this.confirmationForm.get('postPlacementFilter')?.markAsTouched();
+        }, 150);
+    }
 
-            const filterValue = this.confirmationForm.get('postPlacementFilter')?.value;
-            const allPlacements = this.postPlacements$.getValue();
+    onPlacementKeydown(event: KeyboardEvent): void {
+        const placements = this.filteredPostPlacements$.value;
+        if (event.key === 'Escape') {
+            this.showDropdown = false;
+            event.preventDefault();
+        } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+            event.preventDefault();
+            this.showDropdown = true;
+            this.activePlacementIndex = placements.length
+                ? Math.max(0, Math.min(placements.length - 1, this.activePlacementIndex + (event.key === 'ArrowDown' ? 1 : -1)))
+                : -1;
+            document.getElementById(`placement-${this.activePlacementIndex}`)?.scrollIntoView({ block: 'nearest' });
+        } else if (event.key === 'Enter' && this.showDropdown && placements[this.activePlacementIndex]) {
+            event.preventDefault();
+            this.selectPostPlacement(placements[this.activePlacementIndex]);
+        }
+    }
 
-            const matchedPlacement = allPlacements.find(placement => {
-                const placementText = `Отделение №${placement.number} - ${placement.address}`;
-                return placementText === filterValue;
-            });
-
-            if (matchedPlacement) {
-                this.confirmationForm.get('postPlacement')?.setValue(matchedPlacement.id);
-                this.selectedPlacementText = filterValue;
-            } else {
-                this.confirmationForm.get('postPlacement')?.setValue('');
-                if (!filterValue && this.selectedPlacementText) {
-                    this.confirmationForm.get('postPlacementFilter')?.setValue(this.selectedPlacementText);
+    loadPostPlacements(): void {
+        this.postPlacementsLoading = true;
+        this.postPlacementsError = false;
+        this.getPostPlacements().subscribe({
+            next: data => {
+                this.postPlacementsLoading = false;
+                this.postPlacementsError = data.status !== 'success';
+                if (data.status === 'success') {
+                    this.postPlacements$.next(data.data);
+                    this.filteredPostPlacements$.next(data.data);
                 }
-            }
-
-            this.confirmationForm.get('postPlacementFilter')?.updateValueAndValidity();
-        }, 200);
+            },
+            error: () => {
+                this.postPlacementsLoading = false;
+                this.postPlacementsError = true;
+            },
+        });
     }
 
     private validPostPlacementValidator(): ValidatorFn {
@@ -558,7 +578,7 @@ export class OrderConfirmationComponent implements OnInit {
             const allPlacements = this.postPlacements$.getValue();
             const isValid = allPlacements.some(placement => {
                 const placementText = `Отделение №${placement.number} - ${placement.address}`;
-                return placementText === control.value;
+                return placementText === control.value && placement.id === this.confirmationForm.get('postPlacement')?.value;
             });
 
             return isValid ? null : { invalidPostPlacement: { value: control.value } };

@@ -1,6 +1,6 @@
 <div class="modal-header">
     <h5 class="modal-title" id="loginModalLabel">Вход в аккаунт</h5>
-    <button type="button" class="btn-close" aria-label="Close" (click)="closeLoginModal()"><i-bs name="x-lg"></i-bs></button>
+    <button type="button" class="btn-close" aria-label="Закрыть" (click)="closeLoginModal()"><i-bs name="x-lg"></i-bs></button>
 </div>
 <div class="modal-body">
     <form [formGroup]="loginForm" class="login-form" (ngSubmit)="onSubmit($event)">
@@ -13,7 +13,16 @@
 
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" [formControl]="email" placeholder="name@example.com" required email />
+            <input
+                type="email"
+                class="form-control"
+                id="email"
+                [formControl]="email"
+                autocomplete="email"
+                placeholder="name@example.com"
+                required
+                email
+            />
             @if (email.invalid && (email.dirty || email.touched)) {
                 <div class="error-message">
                     @if (email.errors?.['required']) {
@@ -33,6 +42,7 @@
                 class="form-control"
                 id="password"
                 [formControl]="password"
+                autocomplete="current-password"
                 placeholder="Введите пароль"
                 required
                 minlength="6"
@@ -54,7 +64,7 @@
       <label class="form-check-label" for="rememberMe">Запомнить меня</label>
     </div> -->
 
-        <button type="sumbit" class="btn btn-primary" [disabled]="isLoggingIn">
+        <button type="submit" class="btn btn-primary" [disabled]="isLoggingIn">
             @if (isLoggingIn) {
                 <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                 <span>Вход...</span>
@@ -76,7 +86,7 @@
 <ng-template #registerModal>
     <div class="modal-header">
         <h5 class="modal-title" id="registerModalLabel">Регистрация</h5>
-        <button type="button" class="btn-close" aria-label="Close" (click)="closeRegisterModal()"><i-bs name="x-lg"></i-bs></button>
+        <button type="button" class="btn-close" aria-label="Закрыть" (click)="closeRegisterModal()"><i-bs name="x-lg"></i-bs></button>
     </div>
     <div class="modal-body">
         @if (registrationError) {
@@ -179,6 +189,7 @@
                     class="form-control"
                     id="regPassword"
                     formControlName="password"
+                    autocomplete="new-password"
                     placeholder="Введите пароль"
                     required
                     minlength="6"
@@ -205,6 +216,7 @@
                     class="form-control"
                     id="confirmPassword"
                     formControlName="confirmPassword"
+                    autocomplete="new-password"
                     placeholder="Подтвердите пароль"
                     required
                 />
@@ -265,7 +277,7 @@
 <ng-template #forgotPasswordModal>
     <div class="modal-header">
         <h5 class="modal-title" id="forgotPasswordModalLabel">Восстановление пароля</h5>
-        <button type="button" class="btn-close" aria-label="Close" (click)="closeForgotPasswordModal()"><i-bs name="x-lg"></i-bs></button>
+        <button type="button" class="btn-close" aria-label="Закрыть" (click)="closeForgotPasswordModal()"><i-bs name="x-lg"></i-bs></button>
     </div>
     <div class="modal-body">
         @if (forgotPasswordError) {
