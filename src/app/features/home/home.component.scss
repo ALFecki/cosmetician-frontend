@@ -4,6 +4,7 @@
     grid-template-columns: 1fr 1fr;
     background: #eee7df;
     min-height: 520px;
+    height: 100%;
 }
 .hero-copy {
     padding: 65px 45px 95px;
@@ -165,6 +166,7 @@
         width: 100%;
         margin-top: 0;
         grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 1fr) 290px;
         min-height: 0;
     }
     .hero-copy {

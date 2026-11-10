@@ -16,6 +16,12 @@ export const routes: Routes = [
         title: 'SkViDerm - Косметика и уход за кожей',
     },
     {
+        path: 'about',
+        loadComponent: () => import('./features/about/about.component').then(m => m.AboutComponent),
+        canActivate: [MaintenanceGuard],
+        title: 'О SkViDerm — история и ценности',
+    },
+    {
         path: 'category/:id',
         loadComponent: () => import('./features/category/category.component').then(m => m.CategoryComponent),
         canActivate: [MaintenanceGuard],

@@ -1,6 +1,9 @@
 import { fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { firstValueFrom, of } from 'rxjs';
 import { CartService } from './cart.service';
+import { AuthService } from './auth.service';
+import { OrderService } from './order.service';
+import { CartModel } from '../models/cart.model';
 import { OrderModel } from '../models/order.model';
 
 describe('Cart row and order totals', () => {
@@ -16,8 +19,11 @@ describe('Cart row and order totals', () => {
             ],
         } as unknown as OrderModel;
         service = new CartService(
-            { getLoginStatus: () => of(false), checkAuth: () => of(null) } as any,
-            { addProductToOrder: () => Promise.resolve(order), changeBatchQuantities: () => Promise.resolve(order) } as any,
+            { getLoginStatus: () => of(false), checkAuth: () => of(null) } as unknown as AuthService,
+            {
+                addProductToOrder: () => Promise.resolve(order),
+                changeBatchQuantities: () => Promise.resolve(order),
+            } as unknown as OrderService,
         );
     });
     afterEach(() => service.ngOnDestroy());
@@ -29,7 +35,7 @@ describe('Cart row and order totals', () => {
     it('keeps unchanged rows independent when quantity changes and reconciles server total', fakeAsync(() => {
         service.addProductToCart('v2');
         flushMicrotasks();
-        let items: any[] = [];
+        let items: CartModel[] = [];
         service.getCartItems().subscribe(value => (items = value));
         service.increaseQuantity(items[0]);
         let total = 0;

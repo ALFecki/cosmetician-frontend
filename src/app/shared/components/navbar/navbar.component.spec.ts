@@ -13,7 +13,7 @@ import { LoginModalService } from '../../services/login-modal.service';
 import { FeedbackModalService } from '../../services/feedback-modal.service';
 
 @Component({ template: '', standalone: true })
-class EmptyPage {}
+class EmptyPageComponent {}
 
 describe('Rendered storefront navigation', () => {
     let fixture: ComponentFixture<NavbarComponent>;
@@ -25,8 +25,8 @@ describe('Rendered storefront navigation', () => {
             imports: [NavbarComponent],
             providers: [
                 provideRouter([
-                    { path: '', component: EmptyPage },
-                    { path: 'products', component: EmptyPage },
+                    { path: '', component: EmptyPageComponent },
+                    { path: 'products', component: EmptyPageComponent },
                 ]),
                 { provide: AuthService, useValue: { getCurrentUser: () => of(null), isLoggedIn: () => false, isAdmin: () => false } },
                 { provide: BrandService, useValue: { getBrandsList: () => of([{ id: 'brand', title: 'Brand' }]) } },
@@ -117,10 +117,10 @@ describe('Rendered storefront navigation', () => {
         expect(document.querySelector('ngb-modal-window')).toBeNull();
         expect(document.activeElement).toBe(opener);
     }));
-    it('links About to the real homepage owner section', () => {
+    it('links About to the full story page', () => {
         const link: HTMLAnchorElement = Array.from(fixture.nativeElement.querySelectorAll('a') as NodeListOf<HTMLAnchorElement>).find(a =>
             a.textContent?.includes('О SkViDerm'),
         )!;
-        expect(link.getAttribute('href')).toBe('/#about');
+        expect(link.getAttribute('href')).toBe('/about');
     });
 });

@@ -181,9 +181,11 @@
                                                 aria-label="Отделения Европочты"
                                             >
                                                 @for (placement of filteredPostPlacements$ | async; track placement.id; let i = $index) {
-                                                    <div
+                                                    <button
+                                                        type="button"
                                                         class="dropdown-item"
                                                         role="option"
+                                                        tabindex="-1"
                                                         [id]="'placement-' + i"
                                                         [class.active]="activePlacementIndex === i"
                                                         [attr.aria-selected]="confirmationForm.get('postPlacement')?.value === placement.id"
@@ -191,8 +193,8 @@
                                                         (click)="selectPostPlacement(placement)"
                                                     >
                                                         <strong>Отделение №{{ placement.number }}</strong>
-                                                        <div class="placement-address">{{ placement.address }}</div>
-                                                    </div>
+                                                        <span class="placement-address">{{ placement.address }}</span>
+                                                    </button>
                                                 }
                                             </div>
                                         }

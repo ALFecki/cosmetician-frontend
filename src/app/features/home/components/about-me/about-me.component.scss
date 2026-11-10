@@ -40,6 +40,10 @@
         text-decoration: none;
     }
 }
+.story-link {
+    display: table;
+    margin-bottom: 24px;
+}
 .consultation-note {
     display: block;
     font-size: 10px;
@@ -50,18 +54,7 @@
     grid-column: 1/-1;
     background: var(--sf-paper);
     border-bottom: 1px solid var(--sf-line);
-    summary {
-        list-style: none;
-        display: flex;
-        justify-content: space-between;
-        padding: 20px 0;
-        cursor: pointer;
-        font-size: 13px;
-        color: var(--sf-rose);
-    }
-    summary::-webkit-details-marker {
-        display: none;
-    }
+    padding-block: 35px;
     h3 {
         font-size: 27px;
     }

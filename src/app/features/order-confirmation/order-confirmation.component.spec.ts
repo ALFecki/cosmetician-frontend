@@ -1,5 +1,5 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { CartService } from '../../shared/services/cart.service';
 import { OrderService } from '../../shared/services/order.service';
@@ -11,7 +11,7 @@ import { ToastService } from '../../shared/services/toast.service';
 import { FormBuilder } from '@angular/forms';
 import { of, Subject } from 'rxjs';
 import { OrderConfirmationComponent } from './order-confirmation.component';
-import { OrderModel } from '../../shared/models/order.model';
+import { OrderModel, OrderProductModel } from '../../shared/models/order.model';
 import { ListResponse } from '../../shared/base/schemas/base_schema';
 import { PostPlacement } from '../../shared/models/utils.interface';
 
@@ -35,18 +35,18 @@ describe('Checkout delivery contract', () => {
             {
                 getLastNotCheckedOrder: () => of({ id: 'cart', totalPrice: 102, products: [] }),
                 update,
-            } as any,
-            { checkout } as any,
+            } as unknown as OrderService,
+            { checkout } as unknown as CartService,
             {
                 getCurrentUser: () => of(null),
                 isLoggedIn: () => true,
-            } as any,
-            { show: () => {} } as any,
-            { navigate: () => {} } as any,
-            { getPostPlacements: post } as any,
-            {} as any,
-            {} as any,
-            { getProductPromotions: () => of({ data: [] }) } as any,
+            } as unknown as AuthService,
+            { show: jasmine.createSpy() } as unknown as ToastService,
+            { navigate: jasmine.createSpy() } as unknown as Router,
+            { getPostPlacements: post } as unknown as PostService,
+            {} as unknown as PaymentService,
+            {} as unknown as PromocodeService,
+            { getProductPromotions: () => of({ data: [] }) } as unknown as PromotionService,
         );
         response.next({ status: 'success', data: placements } as ListResponse<PostPlacement>);
         response.complete();
@@ -80,7 +80,7 @@ describe('Checkout delivery contract', () => {
         validForm();
         component.confirmationForm.get('deliveryMethod')!.setValue('standart');
         component.confirmationForm.patchValue({ city: 'Минск', street: 'Ленина', house: '4', building: '2', apartment: '15' });
-        component.cartItems$.next([{ product: { id: 'product' }, variant: { price: 102 }, quantity: 1 }] as any);
+        component.cartItems$.next([{ product: { id: 'product' }, variant: { price: 102 }, quantity: 1 }] as unknown as OrderProductModel[]);
         expect(component.getTotalWithDeliveryAndPromotions()).toBe(112);
         await component.confirmOrder();
         expect(update.calls.mostRecent().args[1].deliveryAddress).toBe('Минск, Ленина, 4, корпус 2, кв. 15');
@@ -127,15 +127,15 @@ describe('Checkout placement keyboard and request states', () => {
         response = new Subject();
         component = new OrderConfirmationComponent(
             new FormBuilder(),
-            { getLastNotCheckedOrder: () => of(null) } as any,
-            {} as any,
-            { getCurrentUser: () => of(null) } as any,
-            {} as any,
-            {} as any,
-            { getPostPlacements: () => response } as any,
-            {} as any,
-            {} as any,
-            {} as any,
+            { getLastNotCheckedOrder: () => of(null) } as unknown as OrderService,
+            {} as unknown as CartService,
+            { getCurrentUser: () => of(null) } as unknown as AuthService,
+            {} as unknown as ToastService,
+            {} as unknown as Router,
+            { getPostPlacements: () => response } as unknown as PostService,
+            {} as unknown as PaymentService,
+            {} as unknown as PromocodeService,
+            {} as unknown as PromotionService,
         );
     });
     it('shows loading then an error without inventing selectable locations', () => {

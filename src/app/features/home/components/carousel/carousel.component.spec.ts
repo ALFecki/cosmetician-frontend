@@ -107,10 +107,10 @@ describe('Banner prerender', () => {
         </div></app-carousel
     >`,
 })
-class HeroHost {}
+class HeroHostComponent {}
 
 describe('Approved main hero composition', () => {
-    let fixture: ComponentFixture<HeroHost>;
+    let fixture: ComponentFixture<HeroHostComponent>;
     let http: HttpTestingController;
     const slides = [
         {
@@ -131,9 +131,9 @@ describe('Approved main hero composition', () => {
         },
     ];
     beforeEach(() => {
-        TestBed.configureTestingModule({ imports: [HeroHost], providers: [provideHttpClient(), provideHttpClientTesting()] });
+        TestBed.configureTestingModule({ imports: [HeroHostComponent], providers: [provideHttpClient(), provideHttpClientTesting()] });
         http = TestBed.inject(HttpTestingController);
-        fixture = TestBed.createComponent(HeroHost);
+        fixture = TestBed.createComponent(HeroHostComponent);
         fixture.detectChanges();
     });
     afterEach(() => http.verify());
@@ -194,10 +194,10 @@ describe('Approved main hero composition', () => {
 describe('Main hero prerender', () => {
     it('keeps the introduction in static HTML without embedding changeable API banners', () => {
         TestBed.configureTestingModule({
-            imports: [HeroHost],
+            imports: [HeroHostComponent],
             providers: [provideHttpClient(), provideHttpClientTesting(), { provide: PLATFORM_ID, useValue: 'server' }],
         });
-        const fixture = TestBed.createComponent(HeroHost);
+        const fixture = TestBed.createComponent(HeroHostComponent);
         fixture.detectChanges();
         TestBed.inject(HttpTestingController).expectNone(`${environment.server_url}/banner`);
         expect(fixture.nativeElement.querySelector('h1')?.textContent).toContain('Внимание к коже');

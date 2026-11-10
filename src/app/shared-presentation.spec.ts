@@ -15,7 +15,7 @@ import { MaintenanceService } from './shared/services/maintenance.service';
 import { ToastService } from './shared/services/toast.service';
 
 @Component({ template: 'Страница', standalone: true })
-class PresentationPage {}
+class PresentationPageComponent {}
 
 describe('Shared customer/admin presentation boundary', () => {
     it('switches root notifications and detached product dialogs with the active route', fakeAsync(() => {
@@ -23,7 +23,7 @@ describe('Shared customer/admin presentation boundary', () => {
         TestBed.configureTestingModule({
             imports: [AppComponent],
             providers: [
-                provideRouter([{ path: '**', component: PresentationPage }]),
+                provideRouter([{ path: '**', component: PresentationPageComponent }]),
                 { provide: AuthService, useValue: { getCurrentUser: () => of(null), isLoggedIn: () => false, isAdmin: () => false } },
                 { provide: MaintenanceService, useValue: { isMaintenanceModeEnabled: () => of(false) } },
                 { provide: BrandService, useValue: { getBrandsList: () => of([]) } },
