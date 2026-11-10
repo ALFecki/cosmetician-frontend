@@ -935,6 +935,7 @@
 :host(.storefront-presentation) {
     & {
         display: block;
+        overflow-y: auto;
         color: var(--sf-ink);
         font-family: 'Golos Text', sans-serif;
         background: var(--sf-paper);
