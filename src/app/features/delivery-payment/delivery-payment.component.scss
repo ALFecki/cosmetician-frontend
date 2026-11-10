@@ -114,12 +114,10 @@
     border-block: 1px solid var(--sf-line);
     margin-top: 35px;
 }
-.delivery-details > summary {
-    cursor: pointer;
+.delivery-details > h2 {
     padding: 24px 0;
-    font-size: 15px;
-    color: var(--sf-rose);
-    min-height: 60px;
+    font-size: clamp(27px, 3vw, 32px);
+    color: var(--sf-ink);
 }
 .original-conditions {
     padding-block: 5px 25px;
