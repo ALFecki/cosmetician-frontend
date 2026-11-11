@@ -1,15 +1,7 @@
-<div class="pagination-container d-flex justify-content-between align-items-center mt-3">
+<div class="pagination-container">
     <div class="items-per-page">
-        <label for="itemsPerPage" class="me-2">
-            <i-bs name="list-ul" class="me-1"></i-bs>
-            Показывать:
-        </label>
-        <select
-            id="itemsPerPage"
-            class="form-select form-select-sm d-inline-block w-auto"
-            (change)="onItemsPerPageChange($event)"
-            [value]="itemsPerPage"
-        >
+        <label for="itemsPerPage">На странице</label>
+        <select id="itemsPerPage" class="form-select" (change)="onItemsPerPageChange($event)" [value]="itemsPerPage">
             @for (size of pageSizeOptions; track size) {
                 <option [value]="size">{{ size }}</option>
             }
@@ -17,82 +9,84 @@
     </div>
 
     <nav aria-label="Навигация по страницам">
-        <ul class="pagination mb-0">
+        <ul class="pagination">
             <li class="page-item first-page" [class.disabled]="currentPage === 1">
-                <a
+                <button
+                    type="button"
                     class="page-link"
-                    href="javascript:void(0)"
                     (click)="onPageChange(1)"
-                    aria-label="Первая"
-                    [attr.tabindex]="currentPage === 1 ? -1 : 0"
+                    aria-label="Первая страница"
+                    [disabled]="currentPage <= 1"
                 >
                     <span class="double-chevron">
                         <i-bs name="chevron-left"></i-bs>
                         <i-bs name="chevron-left"></i-bs>
                     </span>
-                </a>
+                </button>
             </li>
             <li class="page-item prev-page" [class.disabled]="currentPage === 1">
-                <a
+                <button
+                    type="button"
                     class="page-link"
-                    href="javascript:void(0)"
                     (click)="onPageChange(currentPage - 1)"
-                    aria-label="Предыдущая"
-                    [attr.tabindex]="currentPage === 1 ? -1 : 0"
+                    aria-label="Предыдущая страница"
+                    [disabled]="currentPage <= 1"
                 >
                     <i-bs name="chevron-left"></i-bs>
-                </a>
+                </button>
             </li>
 
             @for (page of getPageRange(); track page) {
-                <li class="page-item page-number" [class.active]="page === currentPage">
-                    <a
+                <li
+                    class="page-item page-number"
+                    [class.active]="page === currentPage"
+                    [class.distant-page]="Math.abs(page - currentPage) > 1"
+                >
+                    <button
+                        type="button"
                         class="page-link"
-                        href="javascript:void(0)"
                         (click)="onPageChange(page)"
+                        [attr.aria-label]="'Страница ' + page"
                         [attr.aria-current]="page === currentPage ? 'page' : null"
                     >
                         {{ page }}
-                    </a>
+                    </button>
                 </li>
             }
 
             <li class="page-item next-page" [class.disabled]="currentPage === totalPages">
-                <a
+                <button
+                    type="button"
                     class="page-link"
-                    href="javascript:void(0)"
                     (click)="onPageChange(currentPage + 1)"
-                    aria-label="Следующая"
-                    [attr.tabindex]="currentPage === totalPages ? -1 : 0"
+                    aria-label="Следующая страница"
+                    [disabled]="currentPage >= totalPages"
                 >
                     <i-bs name="chevron-right"></i-bs>
-                </a>
+                </button>
             </li>
             <li class="page-item last-page" [class.disabled]="currentPage === totalPages">
-                <a
+                <button
+                    type="button"
                     class="page-link"
-                    href="javascript:void(0)"
                     (click)="onPageChange(totalPages)"
-                    aria-label="Последняя"
-                    [attr.tabindex]="currentPage === totalPages ? -1 : 0"
+                    aria-label="Последняя страница"
+                    [disabled]="currentPage >= totalPages"
                 >
                     <span class="double-chevron">
                         <i-bs name="chevron-right"></i-bs>
                         <i-bs name="chevron-right"></i-bs>
                     </span>
-                </a>
+                </button>
             </li>
         </ul>
     </nav>
 
-    <div class="pagination-info">
-        <i-bs name="card-text" class="me-2"></i-bs>
+    <div class="pagination-info" aria-live="polite" aria-atomic="true">
         <span>
-            <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong>
-            {{ ' - ' }}
-            <strong>{{ Math.min(currentPage * itemsPerPage, totalItems) }}</strong>
+            {{ totalItems ? (currentPage - 1) * itemsPerPage + 1 : 0 }}–{{ Math.min(currentPage * itemsPerPage, totalItems) }}
             {{ ' из ' }}
-            <strong>{{ totalItems }}</strong>
+            {{ totalItems }}
         </span>
     </div>
 </div>
