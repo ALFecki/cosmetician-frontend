@@ -15,10 +15,34 @@
     font-size: 25px;
     margin: 10px 0;
 }
-.order-status-badge,
-.payment-badge {
-    background: #e9eee6;
-    color: #45604c;
+.order-status-line {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+}
+.badge.order-status-badge,
+.badge.payment-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 9px;
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 1.4;
+}
+.order-status-badge::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: currentColor;
+}
+@media (min-width: 992px) {
+    .order-status-line {
+        justify-content: flex-end;
+    }
 }
 .payment-actions {
     display: flex;
