@@ -46,6 +46,14 @@
                             />
                         </div>
                     } @else {
+                        @if (isGuest) {
+                            <p class="text-muted">
+                                Оформление без регистрации. Заказы будут доступны в этом браузере до 30 дней. Уже есть аккаунт?
+                                <button type="button" class="btn btn-link p-0" (click)="loginModalService.openLoginModal(true)">
+                                    Войти
+                                </button>
+                            </p>
+                        }
                         <form [formGroup]="confirmationForm" (ngSubmit)="confirmOrder()">
                             <div class="form-section mb-3">
                                 <h5 class="section-title">
@@ -111,7 +119,7 @@
                                             id="phone"
                                             autocomplete="tel"
                                             formControlName="phone"
-                                            [readonly]="phoneCheckout"
+                                            [readonly]="hasVerifiedPhone"
                                             placeholder="+375 (29) 999-99-99"
                                             inputmode="tel"
                                             maxlength="19"

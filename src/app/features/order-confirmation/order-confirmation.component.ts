@@ -1,5 +1,6 @@
+import { GuestCheckoutService } from '../../shared/services/guest-checkout.service';
 import { PhoneAuthComponent } from '../../shared/components/phone-auth/phone-auth.component';
-import { CartQuote, CheckoutDetails, CheckoutRequest } from '../../shared/models/checkout.model';
+import { CartItemInput, CartQuote, CheckoutDetails, CheckoutRequest } from '../../shared/models/checkout.model';
 import { LoginModalService } from '../../shared/services/login-modal.service';
 import { apiMessage } from '../../shared/utils/api-message';
 import { CommonModule } from '@angular/common';
@@ -45,7 +46,13 @@ export class OrderConfirmationComponent implements OnInit, OnDestroy {
     private restoredCustomer: string | null = null;
     private orderSaved = false;
     get needsPhone(): boolean {
-        return this.phoneCheckout && !this.authService.getCurrentUserSync()?.verifiedPhone;
+        return this.phoneCheckout && !this.authService.guestCheckoutAvailable && !this.hasVerifiedPhone;
+    }
+    get hasVerifiedPhone(): boolean {
+        return !!this.authService.getCurrentUserSync()?.verifiedPhone;
+    }
+    get isGuest(): boolean {
+        return this.phoneCheckout && !this.authService.isLoggedIn();
     }
     get phonePurpose(): 'login' | 'link' {
         return this.authService.isLoggedIn() ? 'link' : 'login';
@@ -84,6 +91,7 @@ export class OrderConfirmationComponent implements OnInit, OnDestroy {
         private promocodeService: PromocodeService,
         private promotionService: PromotionService,
         public loginModalService: LoginModalService,
+        private guestCheckout: GuestCheckoutService,
     ) {
         this.currentUser$ = this.authService.getCurrentUser();
         this.loadPostPlacements();
@@ -260,7 +268,20 @@ export class OrderConfirmationComponent implements OnInit, OnDestroy {
             }),
         );
         this.loading = false;
-        if (this.phoneCheckout && this.authService.isLoggedIn()) await this.recoverOrder().catch(() => false);
+        if (this.isGuest) {
+            await this.guestCheckout.ready;
+            const user = this.guestCheckout.session?.customer;
+            if (user) {
+                this.confirmationForm.patchValue({
+                    firstName: user.firstName,
+                    lastName: user.secondName,
+                    email: user.contactEmail || '',
+                    phone: this.formatBelarusPhone(user.phone || ''),
+                });
+                this.restoreDelivery(user.checkoutDetails);
+            }
+        }
+        if (this.phoneCheckout && (!this.isGuest || this.guestCheckout.session)) await this.recoverOrder().catch(() => false);
     }
 
     ngOnDestroy(): void {
@@ -326,10 +347,10 @@ export class OrderConfirmationComponent implements OnInit, OnDestroy {
     }
 
     private pendingKey(): string {
-        return `skviderm.checkout.${this.authService.getCurrentUserSync()?.id || ''}`;
+        return `skviderm.checkout.${this.authService.getCurrentUserSync()?.id || 'guest'}`;
     }
 
-    private pendingAttempt(): { key: string; cartId: string } | null {
+    private pendingAttempt(): { key: string; cartId: string; items?: CartItemInput[] } | null {
         try {
             const pending = JSON.parse(sessionStorage.getItem(this.pendingKey()) || 'null');
             return pending && /^[0-9a-f-]{36}$/i.test(pending.key) && /^[0-9a-f-]{36}$/i.test(pending.cartId) ? pending : null;
@@ -363,13 +384,27 @@ export class OrderConfirmationComponent implements OnInit, OnDestroy {
         const pending = this.pendingAttempt();
         if (!pending) return false;
         try {
-            const order = await this.orderService.findCheckoutAttempt(pending.key);
+            if (this.isGuest && !this.guestCheckout.session) {
+                throw new Error(
+                    'Доступ к предыдущему заказу в этом браузере недоступен. Свяжитесь с магазином перед повторным оформлением.',
+                );
+            }
+            const order = this.isGuest
+                ? await this.guestCheckout.findAttempt(pending.key)
+                : await this.orderService.findCheckoutAttempt(pending.key);
             if (!order) return false;
             this.orderSaved = true;
+            await this.cartService.clearAfterCheckout(
+                this.isGuest
+                    ? {
+                          cartId: pending.cartId,
+                          items: order.products.map(item => ({ variantId: item.variant.id, quantity: item.quantity })),
+                      }
+                    : undefined,
+            );
             sessionStorage.removeItem(this.pendingKey());
-            this.cartService.clearAfterCheckout();
             this.toastService.show('Ваш заказ уже сохранён', 'success');
-            await this.router.navigate(['/order', order.id]);
+            await this.router.navigate([this.isGuest ? '/guest-order' : '/order', order.id]);
             return true;
         } catch (error) {
             this.checkoutError = apiMessage(error, 'Пока не удалось проверить предыдущий заказ. Повторите проверку');
@@ -384,6 +419,7 @@ export class OrderConfirmationComponent implements OnInit, OnDestroy {
             firstName: value.firstName.trim(),
             secondName: value.lastName.trim(),
             email: value.email?.trim() || null,
+            phone: value.phone,
             deliveryMethod: value.deliveryMethod,
             paymentMethod: value.paymentMethod,
             isCourierDelivery: value.courierDelivery,
@@ -434,33 +470,42 @@ export class OrderConfirmationComponent implements OnInit, OnDestroy {
                 return;
             }
             const cart = this.cartService.currentQuote!;
+            if (this.isGuest) await this.guestCheckout.ensureSession(this.checkoutDetails());
+            const cartId = this.isGuest ? this.cartService.guestCartId : cart.order.id;
+            if (!cartId) throw new Error('Корзина изменилась. Обновите страницу перед оформлением.');
             const pending = this.pendingAttempt();
-            const key = pending?.cartId === cart.order.id ? pending.key : crypto.randomUUID();
-            sessionStorage.setItem(this.pendingKey(), JSON.stringify({ key, cartId: cart.order.id }));
+            const key = this.isGuest ? cartId : pending?.cartId === cartId ? pending.key : crypto.randomUUID();
+            sessionStorage.setItem(this.pendingKey(), JSON.stringify({ key, cartId, items: cart.items }));
             const request: CheckoutRequest = {
                 checkoutKey: key,
-                cartId: cart.order.id,
-                expectedRevision: cart.order.cartRevision!,
+                cartId,
+                expectedRevision: this.isGuest ? 0 : cart.order.cartRevision!,
                 items: cart.items,
                 promoCode: cart.promoCode,
                 expectedTotalCents: this.checkoutQuote!.totalCents,
                 details: this.checkoutDetails(),
             };
-            const order = await this.orderService.confirmCheckout(request);
+            const guestOrder = this.isGuest;
+            const pendingStorageKey = this.pendingKey();
+            const order = guestOrder
+                ? await this.cartService.confirmGuestCheckout(request)
+                : await this.orderService.confirmCheckout(request);
             this.orderSaved = true;
-            sessionStorage.removeItem(this.pendingKey());
-            this.cartService.clearAfterCheckout();
+            if (!guestOrder) await this.cartService.clearAfterCheckout();
+            sessionStorage.removeItem(pendingStorageKey);
             this.toastService.show('Заказ оформлен', 'success');
             if (order.paymentMethod === 'online') {
                 try {
-                    const payment = await firstValueFrom(this.paymentService.processPayment(order));
+                    const payment = await firstValueFrom(
+                        guestOrder ? this.guestCheckout.pay(order.id) : this.paymentService.processPayment(order),
+                    );
                     window.location.assign(payment.formUrl);
                     return;
                 } catch (error) {
                     this.toastService.show(apiMessage(error, 'Заказ сохранён. Перейти к оплате можно со страницы заказа'), 'warning');
                 }
             }
-            await this.router.navigate(['/order', order.id]);
+            await this.router.navigate([guestOrder ? '/guest-order' : '/order', order.id]);
         } catch (error) {
             this.checkoutError = apiMessage(error, 'Не удалось получить подтверждение. Повторите проверку — второй заказ создан не будет');
             if ((error as { status: number }).status === 409) {

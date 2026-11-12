@@ -1,17 +1,26 @@
 <div class="container my-5">
     <div class="row">
-        <div class="col-md-3">
-            <app-profile-sidebar></app-profile-sidebar>
-        </div>
-
-        <div class="col-md-9">
+        @if (!guestMode) {
+            <div class="col-md-3">
+                <app-profile-sidebar></app-profile-sidebar>
+            </div>
+        }
+        <div [class]="guestMode ? 'col-12' : 'col-md-9'">
             <div class="main-card">
                 <div class="main-card-header d-flex justify-content-between align-items-center flex-wrap">
                     <h4 class="mb-0"><i class="bi bi-receipt me-2"></i>Детали заказа</h4>
-                    <a routerLink="/orders" class="btn btn-back"> <i class="bi bi-arrow-left me-2"></i>Назад к списку </a>
+                    <a [routerLink]="guestMode ? '/guest-orders' : '/orders'" class="btn btn-back">
+                        <i class="bi bi-arrow-left me-2"></i>Назад к списку
+                    </a>
                 </div>
 
                 <div class="main-card-body">
+                    @if (guestMode && !error) {
+                        <p>
+                            Заказ сохранён. <a routerLink="/guest-orders">Мои заказы</a> доступны в этом браузере до 30 дней, пока сохранены
+                            cookies.
+                        </p>
+                    }
                     @if (loading) {
                         <div class="text-center my-5">
                             <div class="spinner-border spinner-custom" role="status">

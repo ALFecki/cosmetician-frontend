@@ -1,8 +1,12 @@
+import { CartService } from '../../shared/services/cart.service';
+import { GuestCheckoutService } from '../../shared/services/guest-checkout.service';
+import { PhoneAuthComponent } from '../../shared/components/phone-auth/phone-auth.component';
+import { LoginModalService } from '../../shared/services/login-modal.service';
+import { apiMessage } from '../../shared/utils/api-message';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { BehaviorSubject, firstValueFrom, Observable, of } from 'rxjs';
 import { ProfileSidebarComponent } from '../../shared/components/profile-sidebar/profile-sidebar.component';
 import { OrderMinimalModel } from '../../shared/models/order.model';
 import { PersonModel } from '../../shared/models/person.model';
@@ -13,9 +17,14 @@ import { OrderService } from '../../shared/services/order.service';
     selector: 'app-order-history',
     templateUrl: './order-history.component.html',
     styleUrl: './order-history.component.scss',
-    imports: [CommonModule, RouterModule, ProfileSidebarComponent],
+    imports: [CommonModule, RouterModule, ProfileSidebarComponent, PhoneAuthComponent],
 })
 export class OrderHistoryComponent implements OnInit {
+    guestMode = false;
+    page = 1;
+    hasNextPage = false;
+    claiming = false;
+    claimMessage: string | null = null;
     orders$!: Observable<OrderMinimalModel[]>;
     loading = true;
     error: string | null = null;
@@ -25,6 +34,10 @@ export class OrderHistoryComponent implements OnInit {
         public authService: AuthService,
         private orderService: OrderService,
         public router: Router,
+        private route: ActivatedRoute,
+        public guestCheckout: GuestCheckoutService,
+        public loginModalService: LoginModalService,
+        private cartService: CartService,
     ) {
         this.authService.getCurrentUser().subscribe(user => {
             if (user) {
@@ -33,25 +46,61 @@ export class OrderHistoryComponent implements OnInit {
         });
     }
 
-    ngOnInit(): void {
-        if (!this.authService.isLoggedIn()) {
-            this.router.navigate(['/']);
+    async ngOnInit(): Promise<void> {
+        this.guestMode = this.route.snapshot.data['guest'] === true;
+        await this.authService.ready;
+        if (this.guestMode) {
+            await this.guestCheckout.ready;
+        } else if (!this.authService.isLoggedIn()) {
+            await this.router.navigate(['/']);
             return;
         }
-
-        this.loadOrders();
+        await this.loadOrders();
     }
 
-    loadOrders(): void {
+    async loadOrders(page = 1): Promise<void> {
         this.loading = true;
-        this.orders$ = this.orderService.getUserMinimalOrders(this.currentUser.value!.id).pipe(
-            map(orders => {
-                const filteredOrders = orders.filter(order => order.status !== 'NotChecked');
-                filteredOrders.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-                return filteredOrders;
-            }),
-        );
-        this.loading = false;
+        this.error = null;
+        try {
+            if (this.guestMode) {
+                if (!this.guestCheckout.session)
+                    throw new Error(
+                        'В этом браузере нет сохранённого доступа к заказам. После очистки cookies или через 30 дней свяжитесь с магазином.',
+                    );
+                const response = await this.guestCheckout.getOrders(page);
+                this.orders$ = of(response.data);
+                this.page = page;
+                this.hasNextPage = page * 20 < response.length;
+            } else {
+                const orders = await firstValueFrom(this.orderService.getUserMinimalOrders(this.currentUser.value!.id));
+                this.orders$ = of(
+                    orders
+                        .filter(order => order.status !== 'NotChecked')
+                        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()),
+                );
+            }
+        } catch (error) {
+            this.error = apiMessage(error, 'Не удалось загрузить историю заказов. Попробуйте ещё раз.');
+        } finally {
+            this.loading = false;
+        }
+    }
+
+    async claimOrders(): Promise<void> {
+        if (this.claiming) return;
+        this.claiming = true;
+        this.error = null;
+        try {
+            const result = await this.cartService.claimGuestOrders();
+            this.claimMessage = result.claimed
+                ? 'Заказы добавлены в историю вашего аккаунта.'
+                : 'Заказов с подтверждённым номером для переноса нет.';
+            await this.loadOrders();
+        } catch (error) {
+            this.error = apiMessage(error, 'Не удалось добавить заказы. Можно повторить без нового SMS.');
+        } finally {
+            this.claiming = false;
+        }
     }
 
     getOrderStatusClass(status: string): string {

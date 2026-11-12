@@ -1,3 +1,4 @@
+import { GuestCheckoutService } from './guest-checkout.service';
 import { ToastService } from './toast.service';
 import { fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { firstValueFrom, of } from 'rxjs';
@@ -26,6 +27,7 @@ describe('Cart row and order totals', () => {
                 changeBatchQuantities: () => Promise.resolve(order),
             } as unknown as OrderService,
             { show: jasmine.createSpy('show') } as unknown as ToastService,
+            {} as GuestCheckoutService,
         );
         await service.ready;
     });

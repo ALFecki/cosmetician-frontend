@@ -1,3 +1,4 @@
+import { GuestCheckoutService } from '../../services/guest-checkout.service';
 import { ProductSearchComponent } from '../../../features/home/components/product-search/product-search.component';
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, HostListener, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
@@ -35,6 +36,7 @@ export class NavbarComponent implements OnDestroy, OnInit, AfterViewInit {
     categories$!: Observable<CategoryModel[]>;
     brands$!: Observable<BrandModel[]>;
     authService: AuthService = inject(AuthService);
+    guestCheckout = inject(GuestCheckoutService);
     authSubscribtion: Subscription | null = null;
     currentUser: PersonModel | null = null;
 

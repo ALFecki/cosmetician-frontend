@@ -1,4 +1,5 @@
-import { CartItemInput, CartQuote } from '../models/checkout.model';
+import { GuestCheckoutService } from './guest-checkout.service';
+import { CartItemInput, CartQuote, CheckoutRequest } from '../models/checkout.model';
 import { apiMessage } from '../utils/api-message';
 import { ToastService } from './toast.service';
 import { Injectable, OnDestroy } from '@angular/core';
@@ -48,6 +49,7 @@ export class CartService implements OnDestroy {
         private authService: AuthService,
         private orderService: OrderService,
         private toastService: ToastService,
+        private guestCheckout: GuestCheckoutService,
     ) {
         this.ready = this.initialize();
         this.subscriptions.add(
@@ -149,7 +151,20 @@ export class CartService implements OnDestroy {
 
     private async loadPhoneCart(): Promise<void> {
         const generation = this.generation;
-        const guest = this.readGuest();
+        await this.guestCheckout.ready;
+        let guest = this.readGuest();
+        if (guest?.items.length) await this.guestCheckout.restore();
+        if (guest?.items.length && this.guestCheckout.session) {
+            const completed = await this.guestCheckout.findAttempt(guest.mergeId);
+            if (generation !== this.generation) return;
+            if (completed) {
+                this.removePurchasedGuest(
+                    guest.mergeId,
+                    completed.products.map(item => ({ variantId: item.variant.id, quantity: item.quantity })),
+                );
+                guest = this.readGuest();
+            }
+        }
         let quote: CartQuote;
         if (this.authService.isLoggedIn()) {
             if (guest?.items.length) {
@@ -269,8 +284,64 @@ export class CartService implements OnDestroy {
         if (!this.enabled && this.pendingUpdates.length) await this.processBatchQuantityChanges([...this.pendingUpdates]);
     }
 
-    clearAfterCheckout(): void {
-        this.clearPrivateCart();
+    get guestCartId(): string | null {
+        return this.readGuest()?.mergeId || null;
+    }
+
+    private removePurchasedGuest(cartId: string, ordered: CartItemInput[]): void {
+        const guest = this.readGuest();
+        if (!guest || guest.mergeId !== cartId) return;
+        const items = guest.items
+            .map(item => ({
+                ...item,
+                quantity: item.quantity - (ordered.find(row => row.variantId === item.variantId)?.quantity || 0),
+            }))
+            .filter(item => item.quantity > 0);
+        if (items.length) localStorage.setItem(this.guestKey, JSON.stringify({ mergeId: crypto.randomUUID(), items }));
+        else localStorage.removeItem(this.guestKey);
+    }
+
+    async clearAfterCheckout(purchased?: { cartId: string; items: CartItemInput[] }): Promise<void> {
+        if (purchased || !this.authService.isLoggedIn()) {
+            await this.enqueue(() =>
+                this.withGuestLock(async () => {
+                    const guest = this.readGuest();
+                    if (guest) this.removePurchasedGuest(purchased?.cartId || guest.mergeId, purchased?.items || guest.items);
+                    this.clearPrivateCart();
+                    await this.loadPhoneCart();
+                }),
+            );
+        } else this.clearPrivateCart();
+    }
+
+    confirmGuestCheckout(request: CheckoutRequest): Promise<OrderModel> {
+        return this.enqueue(() =>
+            this.withGuestLock(async () => {
+                let order = await this.guestCheckout.findAttempt(request.checkoutKey);
+                if (!order) {
+                    if (this.readGuest()?.mergeId !== request.cartId)
+                        throw new Error('Корзина изменилась. Обновите страницу перед оформлением.');
+                    order = await this.guestCheckout.checkout(request);
+                }
+                this.removePurchasedGuest(
+                    request.cartId,
+                    order.products.map(item => ({ variantId: item.variant.id, quantity: item.quantity })),
+                );
+                this.clearPrivateCart();
+                // The order is already committed; refreshing the remaining cart may be retried independently.
+                void this.refresh().catch(() => undefined);
+                return order;
+            }),
+        );
+    }
+
+    claimGuestOrders(): Promise<{ claimed: number }> {
+        return this.enqueue(() =>
+            this.withGuestLock(async () => {
+                await this.loadPhoneCart();
+                return this.guestCheckout.claim();
+            }),
+        );
     }
 
     private clearPrivateCart(): void {

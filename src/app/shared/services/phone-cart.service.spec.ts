@@ -1,9 +1,10 @@
+import { GuestCheckoutService } from './guest-checkout.service';
 import { BehaviorSubject, firstValueFrom, of } from 'rxjs';
 import { CartService } from './cart.service';
 import { AuthService } from './auth.service';
 import { OrderService } from './order.service';
 import { ToastService } from './toast.service';
-import { CartItemInput, CartQuote } from '../models/checkout.model';
+import { CartItemInput, CartQuote, CheckoutRequest } from '../models/checkout.model';
 import { OrderModel } from '../models/order.model';
 
 const variant = '11111111-1111-4111-8111-111111111111';
@@ -38,6 +39,7 @@ describe('Phone checkout guest cart', () => {
     let signedIn: boolean;
     let remote: CartQuote;
     let orders: jasmine.SpyObj<OrderService>;
+    let guest: GuestCheckoutService;
     function create(): CartService {
         return new CartService(
             {
@@ -51,6 +53,7 @@ describe('Phone checkout guest cart', () => {
             } as unknown as AuthService,
             orders,
             { show: jasmine.createSpy('show') } as unknown as ToastService,
+            guest,
         );
     }
     beforeEach(() => {
@@ -66,11 +69,100 @@ describe('Phone checkout guest cart', () => {
             remote = quote(items);
             return remote;
         });
+        guest = {
+            ready: Promise.resolve(null),
+            session: null,
+            findAttempt: jasmine.createSpy().and.resolveTo(null),
+            restore: jasmine.createSpy().and.callFake(async () => guest.session),
+        } as unknown as GuestCheckoutService;
         service = create();
     });
     afterEach(() => {
         service.ngOnDestroy();
         localStorage.removeItem('skviderm.guest-cart.v1');
+    });
+    it('removes purchased guest items from persistent storage so reload cannot restore a completed cart', async () => {
+        await service.ready;
+        await service.addProductToCart(variant);
+        await service.clearAfterCheckout();
+        service.ngOnDestroy();
+        service = create();
+        await service.ready;
+        expect(await firstValueFrom(service.getProductCount())).toBe(0);
+    });
+    it('preserves additions from another tab and does not subtract a recovered checkout twice', async () => {
+        await service.ready;
+        await service.addProductToCart(variant);
+        const purchased = { cartId: service.guestCartId!, items: [{ variantId: variant, quantity: 1 }] };
+        await service.addProductToCart(variant);
+        await service.clearAfterCheckout(purchased);
+        expect(await firstValueFrom(service.getProductCount())).toBe(1);
+        expect(service.guestCartId).not.toBe(purchased.cartId);
+        await service.clearAfterCheckout(purchased);
+        expect(await firstValueFrom(service.getProductCount())).toBe(1);
+    });
+    it('does not merge a completed guest order into an account after a lost checkout response', async () => {
+        await service.ready;
+        await service.addProductToCart(variant);
+        const cartId = service.guestCartId!;
+        guest.session = { csrfToken: 'test', expiresAt: Date.now() / 1000 + 1000, customer: { id: 'guest' } } as typeof guest.session;
+        (guest.findAttempt as jasmine.Spy).and.callFake(async (key: string) =>
+            key === cartId ? quote([{ variantId: variant, quantity: 1 }]).order : null,
+        );
+        signedIn = true;
+        await service.refresh();
+        expect(orders.mergeCheckoutCart).not.toHaveBeenCalled();
+        expect(localStorage.getItem('skviderm.guest-cart.v1')).toBeNull();
+        expect(await firstValueFrom(service.getProductCount())).toBe(0);
+    });
+    it('serializes guest checkout with account merge and recovers committed items before merging', async () => {
+        await service.ready;
+        await service.addProductToCart(variant);
+        const cartId = service.guestCartId!;
+        guest.session = { csrfToken: 'test', expiresAt: Date.now() / 1000 + 1000, customer: { id: 'guest' } } as typeof guest.session;
+        let committed: OrderModel | null = null;
+        let complete!: () => void;
+        let started!: () => void;
+        const waiting = new Promise<void>(resolve => {
+            complete = resolve;
+        });
+        const sending = new Promise<void>(resolve => {
+            started = resolve;
+        });
+        (guest.findAttempt as jasmine.Spy).and.callFake(async () => committed);
+        guest.checkout = jasmine.createSpy().and.callFake(async () => {
+            started();
+            await waiting;
+            committed = quote([{ variantId: variant, quantity: 1 }]).order;
+            throw { status: 0 };
+        });
+        const checkout = service.confirmGuestCheckout({ cartId, checkoutKey: cartId } as CheckoutRequest).catch(error => error.status);
+        await sending;
+        signedIn = true;
+        const merging = service.refresh();
+        expect(orders.mergeCheckoutCart).not.toHaveBeenCalled();
+        complete();
+        expect(await checkout).toBe(0);
+        await merging;
+        expect(orders.mergeCheckoutCart).not.toHaveBeenCalled();
+        expect(localStorage.getItem('skviderm.guest-cart.v1')).toBeNull();
+    });
+    it('restores a guest cookie created in another tab before merging a paid basket', async () => {
+        await service.ready;
+        await service.addProductToCart(variant);
+        const cartId = service.guestCartId!;
+        expect(guest.session).toBeNull();
+        (guest.restore as jasmine.Spy).and.callFake(async () => {
+            guest.session = { customer: { id: 'from-other-tab' } } as typeof guest.session;
+            return guest.session;
+        });
+        (guest.findAttempt as jasmine.Spy).and.callFake(async (key: string) =>
+            key === cartId ? quote([{ variantId: variant, quantity: 1 }]).order : null,
+        );
+        signedIn = true;
+        await service.refresh();
+        expect(orders.mergeCheckoutCart).not.toHaveBeenCalled();
+        expect(localStorage.getItem('skviderm.guest-cart.v1')).toBeNull();
     });
     it('keeps anonymous quantities on reload and stores no product prices or contact data', async () => {
         await service.ready;

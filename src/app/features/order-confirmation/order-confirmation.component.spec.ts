@@ -1,3 +1,4 @@
+import { GuestCheckoutService } from '../../shared/services/guest-checkout.service';
 import { LoginModalService } from '../../shared/services/login-modal.service';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
@@ -40,6 +41,7 @@ describe('Checkout delivery contract', () => {
             { checkout, flushPendingUpdates: () => Promise.resolve() } as unknown as CartService,
             {
                 getCurrentUser: () => of(null),
+                getCurrentUserSync: () => null,
                 isLoggedIn: () => true,
             } as unknown as AuthService,
             { show: jasmine.createSpy() } as unknown as ToastService,
@@ -49,6 +51,7 @@ describe('Checkout delivery contract', () => {
             {} as unknown as PromocodeService,
             { getProductPromotions: () => of({ data: [] }) } as unknown as PromotionService,
             {} as unknown as LoginModalService,
+            {} as GuestCheckoutService,
         );
         component.loadCartItems();
         response.next({ status: 'success', data: placements } as ListResponse<PostPlacement>);
@@ -63,6 +66,12 @@ describe('Checkout delivery contract', () => {
             offerConsent: true,
         });
     }
+    it('shows the contact form without SMS when temporary guest checkout is enabled', () => {
+        const auth = (component as unknown as { authService: AuthService }).authService;
+        Object.assign(auth, { guestCheckoutAvailable: true, getCurrentUserSync: () => null });
+        component.phoneCheckout = true;
+        expect(component.needsPhone).toBeFalse();
+    });
     it('loads actual locations through PostService and searches address and number', () => {
         expect(post).toHaveBeenCalledTimes(1);
         component.filterPostPlacements('брест');
@@ -140,6 +149,7 @@ describe('Checkout placement keyboard and request states', () => {
             {} as unknown as PromocodeService,
             {} as unknown as PromotionService,
             {} as unknown as LoginModalService,
+            {} as GuestCheckoutService,
         );
     });
     it('shows loading then an error without inventing selectable locations', () => {
@@ -174,8 +184,12 @@ describe('Rendered checkout EuroPost selection', () => {
         TestBed.configureTestingModule({
             imports: [OrderConfirmationComponent],
             providers: [
+                { provide: GuestCheckoutService, useValue: { ready: Promise.resolve(), session: null } },
                 provideRouter([]),
-                { provide: AuthService, useValue: { getCurrentUser: () => of(null), isLoggedIn: () => true } },
+                {
+                    provide: AuthService,
+                    useValue: { getCurrentUser: () => of(null), getCurrentUserSync: () => null, isLoggedIn: () => true },
+                },
                 { provide: OrderService, useValue: { getLastNotCheckedOrder: () => of({ id: 'cart', totalPrice: 102, products: [] }) } },
                 { provide: PostService, useValue: { getPostPlacements: () => response } },
                 { provide: CartService, useValue: {} },
@@ -249,6 +263,7 @@ describe('Phone checkout recovery', () => {
             {} as PromocodeService,
             {} as PromotionService,
             {} as LoginModalService,
+            {} as GuestCheckoutService,
         );
         component.phoneCheckout = true;
     });

@@ -1,10 +1,11 @@
+import { GuestCheckoutService } from '../../shared/services/guest-checkout.service';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { PaymentService } from '../../shared/services/payment.service';
 import { apiMessage } from '../../shared/utils/api-message';
-import { switchMap } from 'rxjs/operators';
+import { catchError, switchMap } from 'rxjs/operators';
 import { SingleResponse } from '../../shared/base/schemas/base_schema';
 import { ProfileSidebarComponent } from '../../shared/components/profile-sidebar/profile-sidebar.component';
 import { OrderModel } from '../../shared/models/order.model';
@@ -24,6 +25,7 @@ import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
 export class OrderDetailsComponent implements OnInit {
     order: BehaviorSubject<OrderModel | null> = new BehaviorSubject<OrderModel | null>(null);
     orderRecipient: BehaviorSubject<PersonModel | null> = new BehaviorSubject<PersonModel | null>(null);
+    guestMode = false;
     loading = true;
     error: string | null = null;
     cancellingOrder = false;
@@ -39,6 +41,7 @@ export class OrderDetailsComponent implements OnInit {
         private personService: PersonService,
         private toastService: ToastService,
         private paymentService: PaymentService,
+        private guestCheckout: GuestCheckoutService,
     ) {
         this.authService.getCurrentUser().subscribe(user => {
             if (user) {
@@ -56,8 +59,11 @@ export class OrderDetailsComponent implements OnInit {
             this.loading = false;
             return;
         }
-        if (!this.authService.isLoggedIn()) {
-            this.router.navigate(['/']);
+        await this.guestCheckout.ready;
+        this.guestMode = (!!this.guestCheckout.session && this.route.snapshot.data['guest'] === true) || !this.authService.isLoggedIn();
+        if (this.guestMode && !this.guestCheckout.session) {
+            this.error = 'Доступ к заказу в этом браузере не найден. Войдите в аккаунт или свяжитесь с магазином.';
+            this.loading = false;
             return;
         }
 
@@ -73,7 +79,21 @@ export class OrderDetailsComponent implements OnInit {
                     if (!orderId) {
                         throw new Error('Order ID is required');
                     }
-                    return this.orderService.getById(orderId);
+                    if (this.guestMode)
+                        return this.guestCheckout.getOrder(orderId).pipe(
+                            catchError(error => {
+                                if (error.status !== 404 || !this.authService.isLoggedIn()) throw error;
+                                this.guestMode = false;
+                                return this.orderService.getById(orderId);
+                            }),
+                        );
+                    return this.orderService.getById(orderId).pipe(
+                        catchError(error => {
+                            if (![403, 404].includes(error.status) || !this.guestCheckout.session) throw error;
+                            this.guestMode = true;
+                            return this.guestCheckout.getOrder(orderId);
+                        }),
+                    );
                 }),
             )
             .subscribe(
@@ -81,7 +101,16 @@ export class OrderDetailsComponent implements OnInit {
                     this.order.next(order.data);
 
                     // Load recipient information if available
-                    if (order.data.personId) {
+                    if (order.data.contactSnapshot) {
+                        const contact = order.data.contactSnapshot;
+                        this.orderRecipient.next({
+                            firstName: contact.firstName,
+                            secondName: contact.secondName,
+                            phone: contact.phone,
+                            email: contact.email,
+                            surname: null,
+                        } as PersonModel);
+                    } else if (!this.guestMode && order.data.personId) {
                         this.personService.getById(order.data.personId).subscribe(
                             person => {
                                 const snapshot = order.data.contactSnapshot;
@@ -264,7 +293,7 @@ export class OrderDetailsComponent implements OnInit {
 
     canChangePaymentMethod(): boolean {
         const order = this.order.value;
-        if (!order) return false;
+        if (!order || this.guestMode || order.contactSnapshot) return false;
 
         return (
             order.paymentMethod?.toLowerCase() === 'online' &&
@@ -316,7 +345,9 @@ export class OrderDetailsComponent implements OnInit {
         if (!order || this.retryingPayment || !this.canRetryPayment()) return;
         this.retryingPayment = true;
         try {
-            const payment = await firstValueFrom(this.paymentService.processPayment(order));
+            const payment = await firstValueFrom(
+                this.guestMode ? this.guestCheckout.pay(order.id) : this.paymentService.processPayment(order),
+            );
             window.location.assign(payment.formUrl);
         } catch (error) {
             this.toastService.show(apiMessage(error, 'Не удалось перейти к оплате. Попробуйте позже.'), 'error');

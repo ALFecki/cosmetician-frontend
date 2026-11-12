@@ -13,6 +13,7 @@ export interface DeliveryAddress {
     postalCode: string;
 }
 export interface CheckoutDetails {
+    phone?: string | null;
     firstName: string;
     secondName: string;
     email: string | null;
@@ -58,4 +59,5 @@ export interface PhoneChallenge {
 export interface PhoneConfig {
     enabled: boolean;
     phoneLoginAvailable: boolean;
+    guestCheckoutAvailable?: boolean;
 }

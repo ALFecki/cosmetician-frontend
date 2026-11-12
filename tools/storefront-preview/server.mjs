@@ -396,7 +396,7 @@ export function createPreviewServer({ backend = false } = {}) {
             }
             if (req.method === 'OPTIONS') {
                 res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE');
-                res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-CSRF-Token, X-Phone-CSRF');
+                res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-CSRF-Token, X-Phone-CSRF, X-Guest-CSRF');
                 res.writeHead(204);
                 res.end();
                 return;

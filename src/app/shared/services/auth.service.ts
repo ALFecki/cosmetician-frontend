@@ -21,6 +21,7 @@ export class AuthService {
 
     phoneCheckoutEnabled = false;
     phoneLoginAvailable = false;
+    guestCheckoutAvailable = false;
     readonly ready: Promise<void>;
 
     constructor(private http: HttpClient) {
@@ -30,6 +31,7 @@ export class AuthService {
                 const config = await firstValueFrom(this.http.get<PhoneConfig>(`${environment.server_url}/auth/phone/config`));
                 this.phoneCheckoutEnabled = config.enabled;
                 this.phoneLoginAvailable = config.phoneLoginAvailable;
+                this.guestCheckoutAvailable = config.guestCheckoutAvailable === true;
             } catch {
                 /* Older backend keeps the existing checkout. */
             }
