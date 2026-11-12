@@ -1,0 +1,106 @@
+<div class="phone-auth">
+    @if (error) {
+        <p class="alert alert-danger" role="alert">{{ error }}</p>
+    }
+    @if (!authService.phoneLoginAvailable) {
+        <p class="alert alert-info" role="status">Вход по SMS временно недоступен. Попробуйте позже или войдите по email.</p>
+    }
+    @if (step === 'phone') {
+        <h3>{{ purpose === 'link' ? 'Подтвердите свой телефон' : 'Начнём с телефона' }}</h3>
+        <p class="phone-hint">
+            {{
+                purpose === 'link'
+                    ? 'Номер будет привязан к вашему аккаунту. История заказов сохранится.'
+                    : 'Пришлём короткий код. Пароль для оформления заказа не понадобится.'
+            }}
+        </p>
+        <form [formGroup]="form" (ngSubmit)="sendCode()">
+            <label for="checkout-phone">Номер телефона</label>
+            <input
+                id="checkout-phone"
+                class="form-control"
+                type="tel"
+                inputmode="tel"
+                autocomplete="tel"
+                formControlName="phone"
+                placeholder="+375 29 123-45-67"
+                [readonly]="busy"
+            />
+            <button class="btn btn-primary" type="submit" [disabled]="busy || remaining > 0 || !authService.phoneLoginAvailable">
+                {{ busy ? 'Отправляем…' : remaining > 0 ? 'Повторить через ' + remaining + ' с' : 'Получить код' }}
+            </button>
+        </form>
+        @if (purpose === 'login') {
+            <button type="button" class="phone-link" (click)="emailLogin.emit()">Уже покупали с аккаунтом? Войти по email</button>
+        }
+    }
+    @if (step === 'code') {
+        <h3>Код из SMS</h3>
+        <p class="phone-hint">Отправили на {{ form.controls.phone.value }}. Код действует 5 минут.</p>
+        <form [formGroup]="form" (ngSubmit)="verifyCode()">
+            <label for="checkout-sms">Введите 5 цифр</label>
+            <input
+                #codeInput
+                id="checkout-sms"
+                class="form-control code-input"
+                type="text"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength="5"
+                formControlName="code"
+                (input)="codeChanged($event)"
+                [readonly]="busy"
+            />
+            <button type="submit" class="btn btn-primary" [disabled]="busy">{{ busy ? 'Проверяем…' : 'Подтвердить номер' }}</button>
+        </form>
+        <div class="phone-actions">
+            <button type="button" class="phone-link" (click)="sendCode()" [disabled]="busy || remaining > 0">
+                {{ remaining > 0 ? 'Новый код через ' + remaining + ' с' : 'Отправить код ещё раз' }}</button
+            ><button type="button" class="phone-link" (click)="editPhone()" [disabled]="busy">Изменить номер</button>
+        </div>
+    }
+    @if (step === 'details') {
+        <h3>Как к вам обращаться?</h3>
+        <p class="phone-hint">Сохраним данные для следующих заказов. Их можно будет изменить.</p>
+        <form [formGroup]="form" (ngSubmit)="complete()">
+            <div class="phone-names">
+                <div>
+                    <label for="phone-first-name">Имя</label
+                    ><input
+                        id="phone-first-name"
+                        class="form-control"
+                        autocomplete="given-name"
+                        formControlName="firstName"
+                        maxlength="100"
+                    />
+                </div>
+                <div>
+                    <label for="phone-last-name">Фамилия</label
+                    ><input
+                        id="phone-last-name"
+                        class="form-control"
+                        autocomplete="family-name"
+                        formControlName="secondName"
+                        maxlength="100"
+                    />
+                </div>
+            </div>
+            <label for="phone-email">Email <span class="phone-hint">— необязательно</span></label>
+            <input
+                id="phone-email"
+                class="form-control"
+                type="email"
+                autocomplete="email"
+                formControlName="email"
+                placeholder="Для уведомлений о заказе"
+            />
+            <label class="phone-consent"
+                ><input type="checkbox" formControlName="consent" /><span
+                    >Согласен(на) на <a routerLink="/personal-data" target="_blank" rel="noopener">обработку персональных данных</a></span
+                ></label
+            >
+            <button type="submit" class="btn btn-primary" [disabled]="busy">{{ busy ? 'Сохраняем…' : 'Продолжить' }}</button>
+        </form>
+        <button type="button" class="phone-link" (click)="editPhone()" [disabled]="busy">Подтвердить номер заново</button>
+    }
+</div>

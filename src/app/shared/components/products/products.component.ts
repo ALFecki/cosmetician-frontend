@@ -257,7 +257,7 @@ export class ProductsComponent implements OnInit, OnChanges, OnDestroy {
 
     async addToCart(product: ProductModel | null) {
         if (product) {
-            if (this.authService.isLoggedIn()) {
+            if (this.authService.phoneCheckoutEnabled || this.authService.isLoggedIn()) {
                 await this.cartService.addProductToCart(this.selectedVariants[product.id]);
             } else {
                 this.loginModalService.openLoginModal();

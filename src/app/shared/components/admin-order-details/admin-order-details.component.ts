@@ -90,7 +90,19 @@ export class AdminOrderDetailsComponent implements OnInit {
 
         this.personService.getById(personId).subscribe({
             next: response => {
-                this.orderUser.next(response.data);
+                const snapshot = this.order.value?.contactSnapshot;
+                this.orderUser.next(
+                    snapshot
+                        ? {
+                              ...response.data,
+                              firstName: snapshot.firstName,
+                              secondName: snapshot.secondName,
+                              phone: snapshot.phone,
+                              email: snapshot.email,
+                              surname: null,
+                          }
+                        : response.data,
+                );
                 this.loading = false;
             },
             error: error => {

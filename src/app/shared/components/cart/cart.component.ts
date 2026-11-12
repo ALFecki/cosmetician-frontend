@@ -38,7 +38,7 @@ export class CartComponent {
     private productPromotions: Record<string, PromotionModel[]> = {};
 
     constructor(
-        private cartService: CartService,
+        public cartService: CartService,
         private orderService: OrderService,
         private authService: AuthService,
         private toastService: ToastService,
@@ -60,6 +60,13 @@ export class CartComponent {
         });
     }
 
+    retryCart(): void {
+        void this.cartService.refresh().catch(() => undefined);
+    }
+    removeUnavailable(variantId: string): void {
+        void this.cartService.removeUnavailable(variantId).catch(() => undefined);
+    }
+
     increaseQuantity(cartItem: CartModel): void {
         this.cartService.increaseQuantity(cartItem);
     }
@@ -69,7 +76,7 @@ export class CartComponent {
     }
 
     removeProduct(cartItem: CartModel): void {
-        this.cartService.removeProduct(cartItem);
+        void this.cartService.removeProduct(cartItem).catch(() => undefined);
     }
 
     getCartItemsCount(): Observable<number> {
@@ -77,13 +84,13 @@ export class CartComponent {
     }
 
     goToOrderConfirmation(): void {
-        if (!this.authService.isLoggedIn()) {
+        if (!this.authService.phoneCheckoutEnabled && !this.authService.isLoggedIn()) {
             this.loginModalService.openLoginModal();
             return;
         }
 
         const user = this.authService.getCurrentUserSync();
-        if (user && !user.isEmailVerified) {
+        if (!this.authService.phoneCheckoutEnabled && user && !user.isEmailVerified) {
             this.toastService.show('Для оформления заказа необходимо подтвердить email', 'warning');
             this.verifyEmailModalService.openVerifyEmailModal().subscribe(verified => {
                 if (verified) {
@@ -117,6 +124,10 @@ export class CartComponent {
     }
 
     async applyPromocode(): Promise<void> {
+        if (this.cartService.enabled) {
+            await this.cartService.applyPhonePromocode(this.promocode).catch(() => undefined);
+            return;
+        }
         if (!this.promocode.trim()) {
             this.toastService.show('Введите промокод', 'warning');
             return;
@@ -142,6 +153,11 @@ export class CartComponent {
     }
 
     removePromocode(): void {
+        if (this.cartService.enabled) {
+            this.promocode = '';
+            void this.cartService.applyPhonePromocode(null).catch(() => undefined);
+            return;
+        }
         this.promocode = '';
         this.appliedPromocode = null;
         this.promocodeDiscount = 0;
@@ -195,6 +211,7 @@ export class CartComponent {
     }
 
     getCartTotalWithDiscount(): number {
+        if (this.cartService.enabled) return (this.cartService.currentQuote?.totalCents || 0) / 100;
         const total = this.getCartTotal();
         return Math.max(0, total - this.promocodeDiscount);
     }

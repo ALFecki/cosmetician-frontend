@@ -29,7 +29,7 @@ export class CartModalComponent implements OnInit {
     private productPromotions: Record<string, PromotionModel[]> = {};
 
     constructor(
-        private cartService: CartService,
+        public cartService: CartService,
         private router: Router,
         public activeModal: NgbActiveModal,
         private authService: AuthService,
@@ -52,6 +52,13 @@ export class CartModalComponent implements OnInit {
         });
     }
 
+    retryCart(): void {
+        void this.cartService.refresh().catch(() => undefined);
+    }
+    removeUnavailable(variantId: string): void {
+        void this.cartService.removeUnavailable(variantId).catch(() => undefined);
+    }
+
     increaseQuantity(item: CartModel): void {
         this.cartService.increaseQuantity(item);
     }
@@ -63,7 +70,7 @@ export class CartModalComponent implements OnInit {
     }
 
     removeProduct(item: CartModel): void {
-        this.cartService.removeProduct(item);
+        void this.cartService.removeProduct(item).catch(() => undefined);
     }
 
     getTotalItemsCount(): Observable<number> {
@@ -76,7 +83,7 @@ export class CartModalComponent implements OnInit {
     }
 
     goToOrderConfirmation(): void {
-        if (!this.authService.isLoggedIn()) {
+        if (!this.authService.phoneCheckoutEnabled && !this.authService.isLoggedIn()) {
             this.activeModal.close();
             this.loginModalService.openLoginModal();
             return;
@@ -84,7 +91,7 @@ export class CartModalComponent implements OnInit {
 
         const user = this.authService.getCurrentUserSync();
 
-        if (user && !user.isEmailVerified) {
+        if (!this.authService.phoneCheckoutEnabled && user && !user.isEmailVerified) {
             this.toastService.show('Для оформления заказа необходимо подтвердить email', 'warning');
             this.activeModal.close();
             this.verifyEmailModalService.openVerifyEmailModal().subscribe(verified => {

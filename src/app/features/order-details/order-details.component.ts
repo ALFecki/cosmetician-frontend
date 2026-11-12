@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { PaymentService } from '../../shared/services/payment.service';
+import { apiMessage } from '../../shared/utils/api-message';
 import { switchMap } from 'rxjs/operators';
 import { SingleResponse } from '../../shared/base/schemas/base_schema';
 import { ProfileSidebarComponent } from '../../shared/components/profile-sidebar/profile-sidebar.component';
@@ -36,6 +38,7 @@ export class OrderDetailsComponent implements OnInit {
         private orderService: OrderService,
         private personService: PersonService,
         private toastService: ToastService,
+        private paymentService: PaymentService,
     ) {
         this.authService.getCurrentUser().subscribe(user => {
             if (user) {
@@ -44,7 +47,15 @@ export class OrderDetailsComponent implements OnInit {
         });
     }
 
-    ngOnInit(): void {
+    async ngOnInit(): Promise<void> {
+        try {
+            await this.authService.ready;
+            await firstValueFrom(this.authService.checkAuth());
+        } catch {
+            this.error = 'Не удалось проверить вход. Обновите страницу.';
+            this.loading = false;
+            return;
+        }
         if (!this.authService.isLoggedIn()) {
             this.router.navigate(['/']);
             return;
@@ -73,7 +84,19 @@ export class OrderDetailsComponent implements OnInit {
                     if (order.data.personId) {
                         this.personService.getById(order.data.personId).subscribe(
                             person => {
-                                this.orderRecipient.next(person.data);
+                                const snapshot = order.data.contactSnapshot;
+                                this.orderRecipient.next(
+                                    snapshot
+                                        ? {
+                                              ...person.data,
+                                              firstName: snapshot.firstName,
+                                              secondName: snapshot.secondName,
+                                              phone: snapshot.phone,
+                                              email: snapshot.email,
+                                              surname: null,
+                                          }
+                                        : person.data,
+                                );
                             },
                             error => {
                                 console.warn('Failed to load recipient information:', error);
@@ -253,7 +276,11 @@ export class OrderDetailsComponent implements OnInit {
         const order = this.order.value;
         if (!order) return false;
 
-        return order.paymentStatus?.toLowerCase() === 'failed' || order.paymentStatus?.toLowerCase() === 'pending';
+        return (
+            order.paymentMethod === 'online' &&
+            !['Cancelled', 'Completed'].includes(order.status) &&
+            ['Pending', 'Processing', 'NotPaid'].includes(order.paymentStatus)
+        );
     }
 
     changePaymentMethod(paymentMethod: string): void {
@@ -284,22 +311,16 @@ export class OrderDetailsComponent implements OnInit {
         );
     }
 
-    retryPayment(): void {
+    async retryPayment(): Promise<void> {
         const order = this.order.value;
-        if (!order || this.retryingPayment) {
-            return;
-        }
-
-        if (!confirm('Вы уверены, что хотите повторить попытку оплаты?')) {
-            return;
-        }
-
+        if (!order || this.retryingPayment || !this.canRetryPayment()) return;
         this.retryingPayment = true;
-
-        if (order.paymentId) {
-            window.location.href = order.paymentFormUrl!;
-        } else {
-            this.toastService.show('Не удалось найти данные для повторной оплаты', 'error');
+        try {
+            const payment = await firstValueFrom(this.paymentService.processPayment(order));
+            window.location.assign(payment.formUrl);
+        } catch (error) {
+            this.toastService.show(apiMessage(error, 'Не удалось перейти к оплате. Попробуйте позже.'), 'error');
+        } finally {
             this.retryingPayment = false;
         }
     }

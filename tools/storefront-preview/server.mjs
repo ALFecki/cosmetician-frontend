@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-import { createServer } from 'node:http';
+import { createServer, request as httpRequest } from 'node:http';
 
 export const PREVIEW_ORIGIN = 'http://localhost:4300';
 export const PREVIEW_ACCOUNT = { email: 'preview@example.test', password: 'Preview123!' };
@@ -86,7 +86,33 @@ async function bodyOf(req) {
     }
 }
 
-export function createPreviewServer() {
+function forwardToBackend(req, res) {
+    return new Promise((resolve, reject) => {
+        const upstream = httpRequest(
+            {
+                hostname: '127.0.0.1',
+                port: 18000,
+                method: req.method,
+                path: req.url,
+                headers: { ...req.headers, host: '127.0.0.1:18000' },
+            },
+            response => {
+                res.statusCode = response.statusCode;
+                for (const name of ['content-type', 'set-cookie', 'retry-after']) {
+                    if (response.headers[name]) res.setHeader(name, response.headers[name]);
+                }
+                response.on('error', reject);
+                response.on('end', resolve);
+                response.pipe(res);
+            },
+        );
+        upstream.setTimeout(15000, () => upstream.destroy(new Error('Preview backend timeout')));
+        upstream.on('error', reject);
+        req.pipe(upstream);
+    });
+}
+
+export function createPreviewServer({ backend = false } = {}) {
     let person = {
         id: 'preview-person',
         firstName: 'Тестовая',
@@ -370,13 +396,22 @@ export function createPreviewServer() {
             }
             if (req.method === 'OPTIONS') {
                 res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE');
-                res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-CSRF-Token');
+                res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-CSRF-Token, X-Phone-CSRF');
                 res.writeHead(204);
                 res.end();
                 return;
             }
             if (!req.url.startsWith('/') || req.url.startsWith('//')) throw fail(404, 'Proxy requests are unsupported');
             const url = new URL(req.url, 'http://localhost:4301');
+            if (
+                backend &&
+                /^\/api\/(auth\/phone|checkout|login|check_auth|logout|person|order|order_minimal|payments)(\/|$)/.test(url.pathname)
+            ) {
+                await forwardToBackend(req, res);
+                return;
+            }
+            if (backend && /^\/api\/(email|register|forgot_password|verify_reset_token|reset_password)(\/|$)/.test(url.pathname))
+                throw fail(503, 'Email operations are disabled in the isolated backend preview');
             const result = await route(req, res, url.pathname, url.searchParams);
             req.resume();
             res.end(typeof result === 'string' ? result : JSON.stringify(result));

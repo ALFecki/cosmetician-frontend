@@ -1,3 +1,4 @@
+import { ToastService } from './toast.service';
 import { fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 import { firstValueFrom, of } from 'rxjs';
 import { CartService } from './cart.service';
@@ -9,7 +10,7 @@ import { OrderModel } from '../models/order.model';
 describe('Cart row and order totals', () => {
     let service: CartService;
     let order: OrderModel;
-    beforeEach(() => {
+    beforeEach(async () => {
         order = {
             totalPrice: 402,
             discountAmount: 0,
@@ -19,12 +20,14 @@ describe('Cart row and order totals', () => {
             ],
         } as unknown as OrderModel;
         service = new CartService(
-            { getLoginStatus: () => of(false), checkAuth: () => of(null) } as unknown as AuthService,
+            { getLoginStatus: () => of(false), getLogoutStatus: () => of(false), checkAuth: () => of(null) } as unknown as AuthService,
             {
                 addProductToOrder: () => Promise.resolve(order),
                 changeBatchQuantities: () => Promise.resolve(order),
             } as unknown as OrderService,
+            { show: jasmine.createSpy('show') } as unknown as ToastService,
         );
+        await service.ready;
     });
     afterEach(() => service.ngOnDestroy());
     it('uses backend order total once for two distinct variants (102 + 300 = 402)', async () => {

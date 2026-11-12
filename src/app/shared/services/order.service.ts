@@ -1,3 +1,5 @@
+import { CartItemInput, CartQuote, CheckoutRequest, QuoteRequest } from '../models/checkout.model';
+import { PersonModel } from '../models/person.model';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, firstValueFrom, from, map, Observable, of } from 'rxjs';
@@ -18,6 +20,37 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
 
     constructor(private httpClient: HttpClient) {
         super(httpClient);
+    }
+
+    quoteCart(request: QuoteRequest): Promise<CartQuote> {
+        return firstValueFrom(this.http.post<CartQuote>(`${environment.server_url}/checkout/cart/quote`, request));
+    }
+    getCheckoutCart(): Promise<CartQuote> {
+        return firstValueFrom(this.http.get<CartQuote>(`${environment.server_url}/checkout/cart`));
+    }
+    mergeCheckoutCart(mergeId: string, items: CartItemInput[]): Promise<CartQuote> {
+        return firstValueFrom(this.http.post<CartQuote>(`${environment.server_url}/checkout/cart/merge`, { mergeId, items }));
+    }
+    replaceCheckoutCart(cartId: string, expectedRevision: number, items: CartItemInput[], promoCode: string | null): Promise<CartQuote> {
+        return firstValueFrom(
+            this.http.put<CartQuote>(`${environment.server_url}/checkout/cart`, { cartId, expectedRevision, items, promoCode }),
+        );
+    }
+    confirmCheckout(request: CheckoutRequest): Promise<OrderModel> {
+        return firstValueFrom(this.http.post<OrderModel>(`${environment.server_url}/checkout`, request));
+    }
+    findCheckoutAttempt(key: string): Promise<OrderModel | null> {
+        return firstValueFrom(
+            this.http.get<OrderModel>(`${environment.server_url}/checkout/attempt/${key}`).pipe(
+                catchError(error => {
+                    if (error.status === 404) return of(null);
+                    throw error;
+                }),
+            ),
+        );
+    }
+    updateContactProfile(firstName: string, secondName: string, email: string | null): Promise<PersonModel> {
+        return firstValueFrom(this.http.patch<PersonModel>(`${environment.server_url}/checkout/profile`, { firstName, secondName, email }));
     }
 
     getProductCount(): Observable<number> {

@@ -198,7 +198,7 @@ export class NavbarComponent implements OnDestroy, OnInit, AfterViewInit {
     }
 
     navigateToCart(): void {
-        if (this.authService.isLoggedIn()) {
+        if (this.authService.phoneCheckoutEnabled || this.authService.isLoggedIn()) {
             if (this.isMobile()) {
                 this.router.navigate(['/cart']);
             } else {
@@ -218,7 +218,7 @@ export class NavbarComponent implements OnDestroy, OnInit, AfterViewInit {
     }
 
     async logout() {
-        await this.cartService.syncOrder();
+        await this.cartService.flushPendingUpdates().catch(() => undefined);
         this.authService.logout().subscribe(() => {
             this.router.navigate(['/']);
         });

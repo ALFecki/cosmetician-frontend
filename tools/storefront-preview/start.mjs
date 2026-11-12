@@ -18,11 +18,12 @@ try {
     process.exit(1);
 }
 
-const api = createPreviewServer();
+const backend = process.env.SKVIDERM_PREVIEW_BACKEND === 'true';
+const api = createPreviewServer({ backend });
 api.listen(4301, '127.0.0.1');
 await once(api, 'listening');
 console.log(
-    `\nISOLATED STOREFRONT TEST — ${PREVIEW_ORIGIN}\nPhone view: ${PREVIEW_ORIGIN}/__preview/phone.html\nLocal fake account: ${PREVIEW_ACCOUNT.email} / ${PREVIEW_ACCOUNT.password}\nUse invented data only. Orders reset on stop. No email or payment gateway is contacted. Ctrl+C stops both servers.\n`,
+    `\nISOLATED STOREFRONT TEST — ${PREVIEW_ORIGIN}\nPhone view: ${PREVIEW_ORIGIN}/__preview/phone.html\nLocal fake account: ${PREVIEW_ACCOUNT.email} / ${PREVIEW_ACCOUNT.password}\nUse invented data only. ${backend ? 'Orders persist in the isolated preview database. SMS mode is configured by the local backend launcher.' : 'Orders reset on stop.'} No email or payment gateway is contacted. Ctrl+C stops both servers.\n`,
 );
 const angular = spawn(
     process.execPath,

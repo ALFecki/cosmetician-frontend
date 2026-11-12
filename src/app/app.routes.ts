@@ -81,6 +81,7 @@ export const routes: Routes = [
     },
     {
         path: 'order-confirmation',
+        data: { allowGuestCheckout: true },
         loadComponent: () => import('./features/order-confirmation/order-confirmation.component').then(m => m.OrderConfirmationComponent),
         canActivate: [AuthGuard, MaintenanceGuard],
         title: 'Подтверждение заказа - SkViDerm',

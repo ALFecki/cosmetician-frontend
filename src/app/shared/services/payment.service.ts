@@ -10,6 +10,6 @@ export class PaymentService {
     constructor(private http: HttpClient) {}
 
     processPayment(order: OrderMinimalModel) {
-        return this.http.post<{ formUrl: string; orderId: string }>(`${environment.server_url}/payments/process`, order);
+        return this.http.post<{ formUrl: string; orderId: string }>(`${environment.server_url}/payments/process`, { id: order.id });
     }
 }

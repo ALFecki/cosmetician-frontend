@@ -8,12 +8,13 @@ import { LoginComponent } from '../components/login/login.component';
 export class LoginModalService {
     constructor(private modalService: NgbModal) {}
 
-    openLoginModal(): void {
-        this.modalService.open(LoginComponent, {
+    openLoginModal(emailMode = false): void {
+        const modal = this.modalService.open(LoginComponent, {
             size: 'lg',
             centered: true,
             scrollable: true,
             windowClass: 'cosmetician-modal',
         });
+        modal.componentInstance.emailMode = emailMode;
     }
 }
