@@ -30,6 +30,5 @@ export interface ErrorResponse {
 }
 
 export interface ForgotPasswordResponse {
-    status: string;
-    link: string;
+    result: string;
 }

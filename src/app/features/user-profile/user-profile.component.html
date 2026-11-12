@@ -29,7 +29,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        @if (currentUser.value && !currentUser.value.isEmailVerified) {
+                        @if (currentUser.value?.email && !currentUser.value?.verifiedPhone && !currentUser.value?.isEmailVerified) {
                             <div class="alert alert-warning d-flex justify-content-between align-items-center mb-4 animated-alert">
                                 <div class="d-flex align-items-center">
                                     <div class="alert-icon">
@@ -110,21 +110,6 @@
                                         }
                                     </div>
                                 </div>
-
-                                <div class="mb-4 row align-items-center">
-                                    <label for="surname" class="col-md-3 col-form-label">
-                                        <i class="fas fa-user me-2 text-muted"></i>Отчество
-                                    </label>
-                                    <div class="col-md-9">
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            id="surname"
-                                            formControlName="surname"
-                                            placeholder="Введите отчество (необязательно)"
-                                        />
-                                    </div>
-                                </div>
                             </div>
 
                             <div class="form-section">
@@ -133,11 +118,12 @@
                                 <div class="mb-4 row align-items-center">
                                     <label for="email" class="col-md-3 col-form-label">
                                         <i class="fas fa-envelope me-2 text-muted"></i>Email
+                                        {{ currentUser.value?.verifiedPhone ? '(необязательно)' : '' }}
                                     </label>
                                     <div class="col-md-9">
                                         <div class="input-group">
                                             <input type="email" class="form-control" id="email" formControlName="email" />
-                                            @if (currentUser.value?.isEmailVerified) {
+                                            @if (!currentUser.value?.verifiedPhone && currentUser.value?.isEmailVerified) {
                                                 <span class="input-group-text verified-badge">
                                                     <i class="fas fa-check-circle text-success"></i>
                                                 </span>
@@ -156,6 +142,7 @@
                                             class="form-control"
                                             id="phone"
                                             formControlName="phone"
+                                            [readonly]="!!currentUser.value?.verifiedPhone"
                                             placeholder="+375 (29) 123-45-67"
                                             autocomplete="tel"
                                         />
@@ -175,6 +162,9 @@
                                 </button>
                             </div>
                         </form>
+                        @if (authService.phoneCheckoutEnabled && !currentUser.value?.verifiedPhone) {
+                            <div class="mt-4"><app-phone-auth purpose="link" /></div>
+                        }
                     </div>
                 </div>
             }

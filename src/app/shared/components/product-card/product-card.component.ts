@@ -110,7 +110,7 @@ export class ProductCardComponent implements OnInit, OnDestroy {
     }
 
     async addToCart() {
-        if (this.authService.isLoggedIn()) {
+        if (this.authService.phoneCheckoutEnabled || this.authService.isLoggedIn()) {
             const variant = this.getSelectedVariant();
             if (variant) {
                 await this.cartService.addProductToCart(variant.id);

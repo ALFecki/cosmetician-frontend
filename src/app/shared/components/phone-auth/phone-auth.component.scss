@@ -1,0 +1,83 @@
+:host {
+    display: block;
+}
+.phone-auth {
+    max-width: 32rem;
+    margin-inline: auto;
+}
+h3 {
+    font:
+        400 clamp(1.6rem, 5vw, 2rem) Georgia,
+        serif;
+    margin-bottom: 0.75rem;
+}
+.phone-hint {
+    color: #786d63;
+    line-height: 1.6;
+}
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+.form-control {
+    min-height: 3rem;
+    font-size: 1rem;
+    margin-bottom: 1.25rem;
+}
+.btn-primary {
+    min-height: 3rem;
+    width: 100%;
+}
+.code-input {
+    letter-spacing: 0.45em;
+    font-size: 1.75rem;
+    max-width: 16rem;
+}
+.phone-link {
+    background: none;
+    border: 0;
+    color: #91445a;
+    padding: 0.75rem 0;
+    text-align: left;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+}
+.phone-link:disabled {
+    color: #81786e;
+    text-decoration: none;
+}
+.phone-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0 1rem;
+}
+.phone-names {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+.phone-names > div {
+    min-width: 0;
+}
+.phone-consent {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin: 0.5rem 0 1.5rem;
+}
+.phone-consent input {
+    flex: none;
+    margin-top: 0.25rem;
+    accent-color: #91445a;
+    width: 1.1rem;
+    height: 1.1rem;
+}
+@media (max-width: 350px) {
+    .phone-names {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}

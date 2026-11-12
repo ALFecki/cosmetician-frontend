@@ -76,11 +76,26 @@ export const routes: Routes = [
     {
         path: 'order/:id',
         loadComponent: () => import('./features/order-details/order-details.component').then(m => m.OrderDetailsComponent),
-        canActivate: [AuthGuard, MaintenanceGuard],
+        canActivate: [MaintenanceGuard],
+        title: 'Детали заказа - SkViDerm',
+    },
+    {
+        path: 'guest-orders',
+        data: { guest: true },
+        loadComponent: () => import('./features/order-history/order-history.component').then(m => m.OrderHistoryComponent),
+        canActivate: [MaintenanceGuard],
+        title: 'Мои заказы - SkViDerm',
+    },
+    {
+        path: 'guest-order/:id',
+        data: { guest: true },
+        loadComponent: () => import('./features/order-details/order-details.component').then(m => m.OrderDetailsComponent),
+        canActivate: [MaintenanceGuard],
         title: 'Детали заказа - SkViDerm',
     },
     {
         path: 'order-confirmation',
+        data: { allowGuestCheckout: true },
         loadComponent: () => import('./features/order-confirmation/order-confirmation.component').then(m => m.OrderConfirmationComponent),
         canActivate: [AuthGuard, MaintenanceGuard],
         title: 'Подтверждение заказа - SkViDerm',

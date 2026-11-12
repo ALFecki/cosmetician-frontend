@@ -1,7 +1,10 @@
+import { PhoneAuthComponent } from '../../shared/components/phone-auth/phone-auth.component';
+import { OrderService } from '../../shared/services/order.service';
+import { apiMessage } from '../../shared/utils/api-message';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { ProfileSidebarComponent } from '../../shared/components/profile-sidebar/profile-sidebar.component';
 import { PersonModel } from '../../shared/models/person.model';
 import { UpdatePersonSchema } from '../../shared/schemas/person.schema';
@@ -14,7 +17,7 @@ import { VerifyEmailModalService } from '../../shared/services/verify-email-moda
     selector: 'app-user-profile',
     templateUrl: './user-profile.component.html',
     styleUrl: './user-profile.component.scss',
-    imports: [ReactiveFormsModule, ProfileSidebarComponent],
+    imports: [ReactiveFormsModule, ProfileSidebarComponent, PhoneAuthComponent],
 })
 export class UserProfileComponent implements OnInit {
     profileForm!: FormGroup;
@@ -26,15 +29,24 @@ export class UserProfileComponent implements OnInit {
     success: string | null = null;
 
     constructor(
-        private authService: AuthService,
+        public authService: AuthService,
         private personService: PersonService,
         private fb: FormBuilder,
         private router: Router,
         private toastService: ToastService,
         private verifyEmailModalService: VerifyEmailModalService,
+        private orderService: OrderService,
     ) {}
 
-    ngOnInit(): void {
+    async ngOnInit(): Promise<void> {
+        try {
+            await this.authService.ready;
+            await firstValueFrom(this.authService.checkAuth());
+        } catch (error) {
+            this.error = apiMessage(error, 'Не удалось загрузить профиль. Обновите страницу.');
+            this.initialLoading = false;
+            return;
+        }
         this.authService.getCurrentUser().subscribe(
             user => {
                 this.currentUser.next(user);
@@ -54,10 +66,12 @@ export class UserProfileComponent implements OnInit {
 
     private initForm(): void {
         this.profileForm = this.fb.group({
-            firstName: [this.currentUser.value?.firstName, Validators.required],
-            secondName: [this.currentUser.value?.secondName, Validators.required],
-            surname: [this.currentUser.value?.surname],
-            email: [this.currentUser.value?.email, [Validators.required, Validators.email]],
+            firstName: [this.currentUser.value?.firstName, [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)]],
+            secondName: [this.currentUser.value?.secondName, [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)]],
+            email: [
+                this.currentUser.value?.verifiedPhone ? this.currentUser.value?.contactEmail || '' : this.currentUser.value?.email || '',
+                this.currentUser.value?.verifiedPhone ? [Validators.email] : [Validators.required, Validators.email],
+            ],
             phone: [this.currentUser.value?.phone],
         });
     }
@@ -71,11 +85,28 @@ export class UserProfileComponent implements OnInit {
         this.error = null;
         this.success = null;
 
+        if (this.currentUser.value?.verifiedPhone) {
+            try {
+                const value = this.profileForm.getRawValue();
+                const user = await this.orderService.updateContactProfile(
+                    value.firstName.trim(),
+                    value.secondName.trim(),
+                    value.email?.trim() || null,
+                );
+                this.authService.updateCurrentUser(user);
+                this.success = 'Профиль обновлён';
+            } catch (error) {
+                this.error = apiMessage(error);
+            } finally {
+                this.loading = false;
+            }
+            return;
+        }
         const updatedUser: UpdatePersonSchema = {
-            ...this.currentUser.value,
-            ...this.profileForm.value,
-            isEmailVerified:
-                this.currentUser.value!.email === this.profileForm.value.email ? Boolean(this.currentUser.value?.isEmailVerified) : false,
+            firstName: this.profileForm.value.firstName,
+            secondName: this.profileForm.value.secondName,
+            email: this.profileForm.value.email,
+            phone: this.profileForm.value.phone,
         };
 
         const result = await this.personService.update(this.currentUser.value!.id, updatedUser);

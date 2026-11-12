@@ -1,3 +1,4 @@
+import { GuestCheckoutService } from '../../services/guest-checkout.service';
 import { Component } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
@@ -24,6 +25,7 @@ describe('Rendered storefront navigation', () => {
         TestBed.configureTestingModule({
             imports: [NavbarComponent],
             providers: [
+                { provide: GuestCheckoutService, useValue: { session: null } },
                 provideRouter([
                     { path: '', component: EmptyPageComponent },
                     { path: 'products', component: EmptyPageComponent },

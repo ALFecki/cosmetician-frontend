@@ -1,8 +1,13 @@
+import { GuestCheckoutService } from '../../shared/services/guest-checkout.service';
+import { PhoneAuthComponent } from '../../shared/components/phone-auth/phone-auth.component';
+import { CartItemInput, CartQuote, CheckoutDetails, CheckoutRequest } from '../../shared/models/checkout.model';
+import { LoginModalService } from '../../shared/services/login-modal.service';
+import { apiMessage } from '../../shared/utils/api-message';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable, Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { IconsModule } from '../../shared/base/icons/icons.module';
 import { ListResponse } from '../../shared/base/schemas/base_schema';
@@ -27,10 +32,32 @@ import { calculateDiscountedPrice, PriceInfo } from '../../shared/utils/promotio
     selector: 'app-order-confirmation',
     templateUrl: './order-confirmation.component.html',
     styleUrl: './order-confirmation.component.scss',
-    imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, IconsModule, ImageUrlPipe],
+    imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, IconsModule, ImageUrlPipe, PhoneAuthComponent],
 })
-export class OrderConfirmationComponent implements OnInit {
+export class OrderConfirmationComponent implements OnInit, OnDestroy {
     confirmationForm: FormGroup;
+    phoneCheckout = false;
+    checkoutQuote: CartQuote | null = null;
+    checkoutError: string | null = null;
+    quoteLoading = false;
+    private quoteVersion = 0;
+    private subscriptions = new Subscription();
+    private savedPlacementId: number | null = null;
+    private restoredCustomer: string | null = null;
+    private orderSaved = false;
+    get needsPhone(): boolean {
+        return this.phoneCheckout && !this.authService.guestCheckoutAvailable && !this.hasVerifiedPhone;
+    }
+    get hasVerifiedPhone(): boolean {
+        return !!this.authService.getCurrentUserSync()?.verifiedPhone;
+    }
+    get isGuest(): boolean {
+        return this.phoneCheckout && !this.authService.isLoggedIn();
+    }
+    get phonePurpose(): 'login' | 'link' {
+        return this.authService.isLoggedIn() ? 'link' : 'login';
+    }
+
     isSubmitting = false;
     publicOfferUrl = environment.public_offer_url;
     currentUser$: Observable<PersonModel | null> = new Observable<PersonModel | null>();
@@ -63,13 +90,15 @@ export class OrderConfirmationComponent implements OnInit {
         private paymentService: PaymentService,
         private promocodeService: PromocodeService,
         private promotionService: PromotionService,
+        public loginModalService: LoginModalService,
+        private guestCheckout: GuestCheckoutService,
     ) {
         this.currentUser$ = this.authService.getCurrentUser();
         this.loadPostPlacements();
 
         this.confirmationForm = this.formBuilder.group({
-            firstName: ['', [Validators.required, Validators.minLength(2)]],
-            lastName: ['', [Validators.required, Validators.minLength(2)]],
+            firstName: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)]],
+            lastName: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(100)]],
             email: ['', [Validators.required, Validators.email]],
             phone: ['', [Validators.required, Validators.pattern(/^\+375 \(\d{2}\) \d{3}-\d{2}-\d{2}$/)]],
             city: [''],
@@ -77,6 +106,7 @@ export class OrderConfirmationComponent implements OnInit {
             house: [''],
             building: [''],
             apartment: [''],
+            postalCode: [''],
             deliveryMethod: ['pickup', Validators.required],
             courierDelivery: [false],
             paymentMethod: ['card', Validators.required],
@@ -173,7 +203,12 @@ export class OrderConfirmationComponent implements OnInit {
             this.showDropdown = true;
         });
 
-        this.loadCartItems();
+        this.confirmationForm.get('deliveryMethod')?.valueChanges.subscribe(() => {
+            if (this.phoneCheckout) void this.refreshQuote().catch(() => undefined);
+        });
+        this.confirmationForm.get('courierDelivery')?.valueChanges.subscribe(() => {
+            if (this.phoneCheckout) void this.refreshQuote().catch(() => undefined);
+        });
     }
 
     loadCartItems(): void {
@@ -192,26 +227,299 @@ export class OrderConfirmationComponent implements OnInit {
         });
     }
 
-    ngOnInit(): void {
-        if (!this.authService.isLoggedIn()) {
-            this.router.navigate(['/']);
-            return;
+    async ngOnInit(): Promise<void> {
+        await this.authService.ready;
+        this.phoneCheckout = this.authService.phoneCheckoutEnabled;
+        if (this.phoneCheckout) {
+            this.confirmationForm.get('email')?.setValidators([Validators.email]);
+            this.confirmationForm.get('email')?.updateValueAndValidity({ emitEvent: false });
+            await this.cartService.ready;
+            this.subscriptions.add(
+                this.cartService.quote$.subscribe(quote => {
+                    if (!quote || this.orderSaved) return;
+                    this.currentOrder = quote.order;
+                    this.cartItems$.next(quote.order.products);
+                    this.totalPrice$.next(quote.totalCents / 100);
+                    void this.refreshQuote().catch(() => undefined);
+                }),
+            );
+        } else {
+            if (!this.authService.isLoggedIn()) {
+                void this.router.navigate(['/']);
+                return;
+            }
+            this.loadCartItems();
         }
-
-        this.currentUser$.subscribe(user => {
+        this.subscriptions.add(
+            this.currentUser$.subscribe(user => {
+                if (user) {
+                    this.confirmationForm.patchValue({
+                        firstName: user.firstName || '',
+                        lastName: user.secondName || '',
+                        email: this.phoneCheckout && user.verifiedPhone ? user.contactEmail || '' : user.email || '',
+                        phone: this.formatBelarusPhone(user.verifiedPhone || user.phone || ''),
+                    });
+                    if (this.phoneCheckout && this.restoredCustomer !== user.id) {
+                        this.restoredCustomer = user.id;
+                        this.restoreDelivery(user.checkoutDetails);
+                    }
+                }
+                this.loading = false;
+            }),
+        );
+        this.loading = false;
+        if (this.isGuest) {
+            await this.guestCheckout.ready;
+            const user = this.guestCheckout.session?.customer;
             if (user) {
                 this.confirmationForm.patchValue({
-                    firstName: user.firstName || '',
-                    lastName: user.secondName || '',
-                    email: user.email || '',
+                    firstName: user.firstName,
+                    lastName: user.secondName,
+                    email: user.contactEmail || '',
                     phone: this.formatBelarusPhone(user.phone || ''),
                 });
+                this.restoreDelivery(user.checkoutDetails);
             }
-            this.loading = false;
+        }
+        if (this.phoneCheckout && (!this.isGuest || this.guestCheckout.session)) await this.recoverOrder().catch(() => false);
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
+        this.quoteVersion++;
+    }
+
+    private restoreDelivery(details: CheckoutDetails | null | undefined): void {
+        if (!details) return;
+        this.confirmationForm.patchValue({
+            deliveryMethod: details.deliveryMethod,
+            courierDelivery: details.isCourierDelivery,
+            paymentMethod: details.paymentMethod,
+            city: details.address?.city || '',
+            street: details.address?.street || '',
+            house: details.address?.house || '',
+            building: details.address?.building || '',
+            apartment: details.address?.apartment || '',
+            postalCode: details.address?.postalCode || '',
         });
+        this.savedPlacementId = details.postPlacementId;
+        this.restorePlacement();
+    }
+
+    private restorePlacement(): void {
+        const placement = this.postPlacements$.value.find(item => item.id === this.savedPlacementId);
+        if (placement && this.confirmationForm.get('deliveryMethod')?.value === 'post') this.selectPostPlacement(placement);
+    }
+
+    async phoneAuthenticated(): Promise<void> {
+        this.checkoutError = null;
+        try {
+            await this.cartService.refresh();
+            await this.refreshQuote();
+            await this.recoverOrder();
+        } catch (error) {
+            this.checkoutError = apiMessage(error);
+        }
+    }
+
+    async refreshQuote(): Promise<void> {
+        const cart = this.cartService.currentQuote;
+        if (!this.phoneCheckout || !cart || this.orderSaved) return;
+        const version = ++this.quoteVersion;
+        this.quoteLoading = true;
+        try {
+            const quote = await this.orderService.quoteCart({
+                items: cart.items,
+                promoCode: cart.promoCode,
+                deliveryMethod: this.confirmationForm.get('deliveryMethod')?.value,
+                isCourierDelivery: this.confirmationForm.get('courierDelivery')?.value,
+            });
+            if (version === this.quoteVersion) {
+                this.checkoutQuote = quote;
+                this.promocodeDiscount = quote.promoCodeDiscountCents / 100;
+            }
+        } catch (error) {
+            if (version === this.quoteVersion) this.checkoutError = apiMessage(error, 'Не удалось проверить итог заказа');
+            throw error;
+        } finally {
+            if (version === this.quoteVersion) this.quoteLoading = false;
+        }
+    }
+
+    private pendingKey(): string {
+        return `skviderm.checkout.${this.authService.getCurrentUserSync()?.id || 'guest'}`;
+    }
+
+    private pendingAttempt(): { key: string; cartId: string; items?: CartItemInput[] } | null {
+        try {
+            const pending = JSON.parse(sessionStorage.getItem(this.pendingKey()) || 'null');
+            return pending && /^[0-9a-f-]{36}$/i.test(pending.key) && /^[0-9a-f-]{36}$/i.test(pending.cartId) ? pending : null;
+        } catch {
+            return null;
+        }
+    }
+
+    get hasPendingOrder(): boolean {
+        return this.phoneCheckout && !!this.pendingAttempt();
+    }
+
+    async retryPreviousOrder(): Promise<void> {
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
+        this.checkoutError = null;
+        try {
+            if (!(await this.recoverOrder())) {
+                this.checkoutError = 'Предыдущий заказ пока не найден. Проверьте корзину перед оформлением.';
+                await this.cartService.refresh();
+                await this.refreshQuote();
+            }
+        } catch (error) {
+            this.checkoutError = apiMessage(error, 'Не удалось проверить заказ. Попробуйте ещё раз.');
+        } finally {
+            this.isSubmitting = false;
+        }
+    }
+
+    private async recoverOrder(): Promise<boolean> {
+        const pending = this.pendingAttempt();
+        if (!pending) return false;
+        try {
+            if (this.isGuest && !this.guestCheckout.session) {
+                throw new Error('Не удалось проверить предыдущий заказ. Свяжитесь с магазином перед повторным оформлением.');
+            }
+            const order = this.isGuest
+                ? await this.guestCheckout.findAttempt(pending.key)
+                : await this.orderService.findCheckoutAttempt(pending.key);
+            if (!order) return false;
+            this.orderSaved = true;
+            await this.cartService.clearAfterCheckout(
+                this.isGuest
+                    ? {
+                          cartId: pending.cartId,
+                          items: order.products.map(item => ({ variantId: item.variant.id, quantity: item.quantity })),
+                      }
+                    : undefined,
+            );
+            sessionStorage.removeItem(this.pendingKey());
+            this.toastService.show('Ваш заказ уже сохранён', 'success');
+            await this.router.navigate([this.isGuest ? '/guest-order' : '/order', order.id]);
+            return true;
+        } catch (error) {
+            this.checkoutError = apiMessage(error, 'Пока не удалось проверить предыдущий заказ. Повторите проверку');
+            throw error;
+        }
+    }
+
+    private checkoutDetails(): CheckoutDetails {
+        const value = this.confirmationForm.getRawValue();
+        const placement = this.postPlacements$.value.find(item => item.id === value.postPlacement);
+        return {
+            firstName: value.firstName.trim(),
+            secondName: value.lastName.trim(),
+            email: value.email?.trim() || null,
+            phone: value.phone,
+            deliveryMethod: value.deliveryMethod,
+            paymentMethod: value.paymentMethod,
+            isCourierDelivery: value.courierDelivery,
+            address: {
+                city: value.city,
+                street: value.street,
+                house: value.house,
+                building: value.building,
+                apartment: value.apartment,
+                postalCode: value.postalCode,
+            },
+            postPlacementId: value.deliveryMethod === 'post' ? placement?.id || null : null,
+            deliveryPostAddress:
+                value.deliveryMethod === 'post' && placement ? `Отделение №${placement.number} - ${placement.address}` : null,
+            comment: value.comments?.trim() || null,
+            offerConsent: value.offerConsent,
+        };
+    }
+
+    private async confirmPhoneOrder(): Promise<void> {
+        if (this.isSubmitting || this.orderSaved) return;
+        if (this.needsPhone) {
+            this.checkoutError = 'Сначала подтвердите номер телефона';
+            return;
+        }
+        if (this.confirmationForm.invalid) {
+            this.markFormGroupTouched();
+            this.scrollToFirstError();
+            return;
+        }
+        this.isSubmitting = true;
+        this.checkoutError = null;
+        try {
+            if (await this.recoverOrder()) return;
+            await this.cartService.flushPendingUpdates();
+            if (this.cartService.hasUnavailableItems || !this.cartService.currentQuote?.items.length) {
+                this.checkoutError = 'Проверьте товары в корзине перед оформлением';
+                return;
+            }
+            const shownTotal = this.checkoutQuote?.totalCents;
+            await this.refreshQuote();
+            if (this.checkoutQuote?.promoCodeError) {
+                this.checkoutError = this.checkoutQuote.promoCodeError;
+                return;
+            }
+            if (shownTotal !== this.checkoutQuote?.totalCents) {
+                this.checkoutError = 'Итог изменился. Проверьте сумму и подтвердите заказ ещё раз';
+                return;
+            }
+            const cart = this.cartService.currentQuote!;
+            if (this.isGuest) await this.guestCheckout.ensureSession(this.checkoutDetails());
+            const cartId = this.isGuest ? this.cartService.guestCartId : cart.order.id;
+            if (!cartId) throw new Error('Корзина изменилась. Обновите страницу перед оформлением.');
+            const pending = this.pendingAttempt();
+            const key = this.isGuest ? cartId : pending?.cartId === cartId ? pending.key : crypto.randomUUID();
+            sessionStorage.setItem(this.pendingKey(), JSON.stringify({ key, cartId, items: cart.items }));
+            const request: CheckoutRequest = {
+                checkoutKey: key,
+                cartId,
+                expectedRevision: this.isGuest ? 0 : cart.order.cartRevision!,
+                items: cart.items,
+                promoCode: cart.promoCode,
+                expectedTotalCents: this.checkoutQuote!.totalCents,
+                details: this.checkoutDetails(),
+            };
+            const guestOrder = this.isGuest;
+            const pendingStorageKey = this.pendingKey();
+            const order = guestOrder
+                ? await this.cartService.confirmGuestCheckout(request)
+                : await this.orderService.confirmCheckout(request);
+            this.orderSaved = true;
+            if (!guestOrder) await this.cartService.clearAfterCheckout();
+            sessionStorage.removeItem(pendingStorageKey);
+            this.toastService.show('Заказ оформлен', 'success');
+            if (order.paymentMethod === 'online') {
+                try {
+                    const payment = await firstValueFrom(
+                        guestOrder ? this.guestCheckout.pay(order.id) : this.paymentService.processPayment(order),
+                    );
+                    window.location.assign(payment.formUrl);
+                    return;
+                } catch (error) {
+                    this.toastService.show(apiMessage(error, 'Заказ сохранён. Перейти к оплате можно со страницы заказа'), 'warning');
+                }
+            }
+            await this.router.navigate([guestOrder ? '/guest-order' : '/order', order.id]);
+        } catch (error) {
+            this.checkoutError = apiMessage(error, 'Не удалось получить подтверждение. Повторите проверку — второй заказ создан не будет');
+            if ((error as { status: number }).status === 409) {
+                await this.cartService.refresh();
+                await this.refreshQuote();
+            }
+        } finally {
+            this.isSubmitting = false;
+        }
     }
 
     async confirmOrder(): Promise<void> {
+        if (this.phoneCheckout) {
+            await this.confirmPhoneOrder();
+            return;
+        }
         if (this.isSubmitting) {
             return;
         }
@@ -244,21 +552,21 @@ export class OrderConfirmationComponent implements OnInit {
             postAddress = `Отделение №${placement?.number} - ${placement?.address}`;
         }
 
-        await this.orderService.update(this.currentOrder!.id, {
-            firstName: this.confirmationForm.get('firstName')?.value,
-            secondName: this.confirmationForm.get('lastName')?.value,
-            email: this.confirmationForm.get('email')?.value,
-            phone: this.normalizePhone(this.confirmationForm.get('phone')?.value),
-            deliveryMethod: this.confirmationForm.get('deliveryMethod')?.value,
-            isCourierDelivery: this.confirmationForm.get('courierDelivery')?.value,
-            paymentMethod: this.confirmationForm.get('paymentMethod')?.value,
-            deliveryAddress: deliveryAddress,
-            deliveryPostAddress: postAddress,
-            deliveryCost: this.getDeliveryPrice(),
-            comment: this.confirmationForm.get('comments')?.value,
-        } as UpdateOrderSchema);
-
         try {
+            await this.cartService.flushPendingUpdates();
+            await this.orderService.update(this.currentOrder!.id, {
+                firstName: this.confirmationForm.get('firstName')?.value,
+                secondName: this.confirmationForm.get('lastName')?.value,
+                email: this.confirmationForm.get('email')?.value,
+                phone: this.normalizePhone(this.confirmationForm.get('phone')?.value),
+                deliveryMethod: this.confirmationForm.get('deliveryMethod')?.value,
+                isCourierDelivery: this.confirmationForm.get('courierDelivery')?.value,
+                paymentMethod: this.confirmationForm.get('paymentMethod')?.value,
+                deliveryAddress: deliveryAddress,
+                deliveryPostAddress: postAddress,
+                deliveryCost: this.getDeliveryPrice(),
+                comment: this.confirmationForm.get('comments')?.value,
+            } as UpdateOrderSchema);
             const result = await this.cartService.checkout(this.confirmationForm.get('paymentMethod')?.value === 'online');
 
             if (result) {
@@ -268,7 +576,6 @@ export class OrderConfirmationComponent implements OnInit {
                     const paymentResponse = await this.paymentService.processPayment(orderMinimal!).toPromise();
                     if (paymentResponse && paymentResponse.formUrl) {
                         window.location.href = paymentResponse.formUrl;
-                        this.orderService.update(this.currentOrder!.id, { paymentStatus: 'Processing' } as UpdateOrderSchema);
                         return;
                     } else {
                         this.toastService.show('Ошибка при переходе к оплате', 'error');
@@ -389,6 +696,7 @@ export class OrderConfirmationComponent implements OnInit {
     }
 
     getDeliveryPrice(): number {
+        if (this.phoneCheckout) return this.checkoutQuote?.order.deliveryCost || 0;
         if (this.currentOrder?.totalPrice && this.currentOrder.totalPrice >= 250) {
             return 0;
         }
@@ -437,7 +745,7 @@ export class OrderConfirmationComponent implements OnInit {
                 discountLabel: '',
             };
         }
-        const promotions = this.productPromotions[item.product.id] || [];
+        const promotions = this.phoneCheckout ? item.product.promotions || [] : this.productPromotions[item.product.id] || [];
         return calculateDiscountedPrice(item.variant.price, promotions);
     }
 
@@ -448,6 +756,8 @@ export class OrderConfirmationComponent implements OnInit {
     }
 
     getCartTotal(): number {
+        if (this.phoneCheckout)
+            return this.checkoutQuote ? (this.checkoutQuote.subtotalCents - this.checkoutQuote.promotionDiscountCents) / 100 : 0;
         let total = 0;
         const items = this.cartItems$.value;
         total = items.reduce((sum, item) => sum + this.getItemTotal(item), 0);
@@ -460,12 +770,25 @@ export class OrderConfirmationComponent implements OnInit {
     }
 
     getTotalWithDeliveryAndPromotions(): number {
+        if (this.phoneCheckout) return (this.checkoutQuote?.totalCents || 0) / 100;
         const cartTotal = this.getCartTotal();
         const totalWithDiscount = Math.max(0, cartTotal - this.promocodeDiscount);
         return totalWithDiscount + this.getDeliveryPrice();
     }
 
     async applyPromocode(): Promise<void> {
+        if (this.phoneCheckout) {
+            this.applyingPromocode = true;
+            try {
+                await this.cartService.applyPhonePromocode(this.promocode);
+                await this.refreshQuote();
+            } catch (error) {
+                this.checkoutError = apiMessage(error);
+            } finally {
+                this.applyingPromocode = false;
+            }
+            return;
+        }
         if (!this.promocode.trim()) {
             this.toastService.show('Введите промокод', 'warning');
             return;
@@ -491,6 +814,16 @@ export class OrderConfirmationComponent implements OnInit {
     }
 
     removePromocode(): void {
+        if (this.phoneCheckout) {
+            this.promocode = '';
+            void this.cartService
+                .applyPhonePromocode(null)
+                .then(() => this.refreshQuote())
+                .catch(error => {
+                    this.checkoutError = apiMessage(error);
+                });
+            return;
+        }
         this.promocode = '';
         this.appliedPromocode = null;
         this.promocodeDiscount = 0;
@@ -560,6 +893,7 @@ export class OrderConfirmationComponent implements OnInit {
                 if (data.status === 'success') {
                     this.postPlacements$.next(data.data);
                     this.filteredPostPlacements$.next(data.data);
+                    this.restorePlacement();
                 }
             },
             error: () => {

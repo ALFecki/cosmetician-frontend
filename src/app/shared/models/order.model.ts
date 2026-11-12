@@ -1,3 +1,4 @@
+import { CheckoutDetails } from './checkout.model';
 import { ProductModel, ProductVariantModel } from './product.model';
 
 export interface OrderMinimalModel {
@@ -14,6 +15,8 @@ export interface OrderMinimalModel {
 }
 
 export interface OrderModel extends OrderMinimalModel {
+    cartRevision?: number;
+    contactSnapshot?: (CheckoutDetails & { phone: string; phoneVerified?: boolean }) | null;
     products: OrderProductModel[];
     deliveryMethod: string;
     deliveryDate: Date;

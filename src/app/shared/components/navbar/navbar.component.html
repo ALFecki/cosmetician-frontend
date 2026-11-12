@@ -22,7 +22,11 @@
             <i-bs name="search"></i-bs><span>Средство, бренд или задача ухода</span><span aria-hidden="true">→</span>
         </button>
         <div class="nav-actions">
-            @if (!authService.isLoggedIn()) {
+            @if (!authService.isLoggedIn() && guestCheckout.session) {
+                <button type="button" routerLink="/guest-orders" (click)="closeMenu()" aria-label="Мои заказы">
+                    <i-bs name="person"></i-bs><span>Мои заказы</span>
+                </button>
+            } @else if (!authService.isLoggedIn()) {
                 <button type="button" (click)="openLoginModal(); closeMenu()" aria-label="Войти в личный кабинет">
                     <i-bs name="person"></i-bs><span>Войти</span>
                 </button>
@@ -64,6 +68,9 @@
             <a routerLink="/delivery" (click)="closeMenu()">Доставка и оплата</a>
             <a routerLink="/contacts" (click)="closeMenu()">Контакты</a>
             <button class="consult-link" type="button" (click)="openFeedbackModal(); closeMenu()">Помочь с выбором? →</button>
+            @if (guestCheckout.session && authService.isLoggedIn()) {
+                <a routerLink="/guest-orders" (click)="closeMenu()">Заказы без регистрации</a>
+            }
             @if (authService.isAdmin()) {
                 <a routerLink="/admin" (click)="closeMenu()">Админ панель</a>
             }

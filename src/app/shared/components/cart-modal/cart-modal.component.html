@@ -12,8 +12,21 @@
     </div>
 
     <div class="modal-body">
+        @if (cartService.error$ | async; as error) {
+            <div class="alert alert-warning" role="alert">
+                {{ error }} <button type="button" class="btn btn-link" (click)="retryCart()">Повторить</button>
+            </div>
+        }
+        @if (cartService.quote$ | async; as quote) {
+            @for (item of quote.unavailableItems; track item.variantId) {
+                <div class="alert alert-warning d-flex align-items-center justify-content-between gap-3">
+                    <span>Товар больше недоступен ({{ item.quantity }} шт.)</span
+                    ><button type="button" class="btn btn-outline-secondary" (click)="removeUnavailable(item.variantId)">Убрать</button>
+                </div>
+            }
+        }
         @if (cartItems$ | async; as cartItems) {
-            @if (cartItems.length === 0) {
+            @if (cartItems.length === 0 && !cartService.hasUnavailableItems) {
                 <div class="empty-cart-modal">
                     <span class="empty-icon"><i-bs name="cart-x"></i-bs></span>
                     <h4>Корзина пуста</h4>

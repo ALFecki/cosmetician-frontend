@@ -3,84 +3,91 @@
     <button type="button" class="btn-close" aria-label="Закрыть" (click)="closeLoginModal()"><i-bs name="x-lg"></i-bs></button>
 </div>
 <div class="modal-body">
-    <form [formGroup]="loginForm" class="login-form" (ngSubmit)="onSubmit($event)">
-        <!-- Alert for login errors -->
-        @if (loginError) {
-            <div class="alert alert-danger mb-3" role="alert">
-                {{ loginError }}
-            </div>
+    @if (authService.phoneCheckoutEnabled && authService.phoneLoginAvailable && !emailMode) {
+        <app-phone-auth (authenticated)="loginSucceeded()" (emailLogin)="emailMode = true" />
+    } @else {
+        @if (authService.phoneCheckoutEnabled && authService.phoneLoginAvailable) {
+            <button type="button" class="btn btn-link mb-3" (click)="emailMode = false">← Войти по телефону</button>
         }
-
-        <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input
-                type="email"
-                class="form-control"
-                id="email"
-                [formControl]="email"
-                autocomplete="email"
-                placeholder="name@example.com"
-                required
-                email
-            />
-            @if (email.invalid && (email.dirty || email.touched)) {
-                <div class="error-message">
-                    @if (email.errors?.['required']) {
-                        <div>Email обязателен.</div>
-                    }
-                    @if (email.errors?.['email']) {
-                        <div>Некорректный email.</div>
-                    }
+        <form [formGroup]="loginForm" class="login-form" (ngSubmit)="onSubmit($event)">
+            <!-- Alert for login errors -->
+            @if (loginError) {
+                <div class="alert alert-danger mb-3" role="alert">
+                    {{ loginError }}
                 </div>
             }
-        </div>
 
-        <div class="mb-3">
-            <label for="password" class="form-label">Пароль</label>
-            <input
-                type="password"
-                class="form-control"
-                id="password"
-                [formControl]="password"
-                autocomplete="current-password"
-                placeholder="Введите пароль"
-                required
-                minlength="6"
-            />
-            @if (password.invalid && (password.dirty || password.touched)) {
-                <div class="error-message">
-                    @if (password.errors?.['required']) {
-                        <div>Пароль обязателен.</div>
-                    }
-                    @if (password.errors?.['minlength']) {
-                        <div>Пароль должен содержать минимум 6 символов.</div>
-                    }
-                </div>
-            }
-        </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    [formControl]="email"
+                    autocomplete="email"
+                    placeholder="name@example.com"
+                    required
+                    email
+                />
+                @if (email.invalid && (email.dirty || email.touched)) {
+                    <div class="error-message">
+                        @if (email.errors?.['required']) {
+                            <div>Email обязателен.</div>
+                        }
+                        @if (email.errors?.['email']) {
+                            <div>Некорректный email.</div>
+                        }
+                    </div>
+                }
+            </div>
 
-        <!-- <div class="mb-3 form-check">
+            <div class="mb-3">
+                <label for="password" class="form-label">Пароль</label>
+                <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    [formControl]="password"
+                    autocomplete="current-password"
+                    placeholder="Введите пароль"
+                    required
+                    minlength="6"
+                />
+                @if (password.invalid && (password.dirty || password.touched)) {
+                    <div class="error-message">
+                        @if (password.errors?.['required']) {
+                            <div>Пароль обязателен.</div>
+                        }
+                        @if (password.errors?.['minlength']) {
+                            <div>Пароль должен содержать минимум 6 символов.</div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- <div class="mb-3 form-check">
       <input type="checkbox" class="form-check-input" id="rememberMe" [formControl]="rememberMe" />
       <label class="form-check-label" for="rememberMe">Запомнить меня</label>
     </div> -->
 
-        <button type="submit" class="btn btn-primary" [disabled]="isLoggingIn">
-            @if (isLoggingIn) {
-                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                <span>Вход...</span>
-            } @else {
-                <i class="fas fa-sign-in-alt me-2"></i>
-                <span>Войти</span>
-            }
-        </button>
+            <button type="submit" class="btn btn-primary" [disabled]="isLoggingIn">
+                @if (isLoggingIn) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <span>Вход...</span>
+                } @else {
+                    <i class="fas fa-sign-in-alt me-2"></i>
+                    <span>Войти</span>
+                }
+            </button>
 
-        <div class="register-links">
-            <a href="#" class="btn btn-link" (click)="openForgotPasswordModal(forgotPasswordModal); $event.preventDefault()"
-                >Забыли пароль?</a
-            >
-            <a href="#" class="btn btn-link" (click)="openRegisterModal(registerModal); $event.preventDefault()">Зарегистрироваться</a>
-        </div>
-    </form>
+            <div class="register-links">
+                <a href="#" class="btn btn-link" (click)="openForgotPasswordModal(forgotPasswordModal); $event.preventDefault()"
+                    >Забыли пароль?</a
+                >
+                <a href="#" class="btn btn-link" (click)="openRegisterModal(registerModal); $event.preventDefault()">Зарегистрироваться</a>
+            </div>
+        </form>
+    }
 </div>
 
 <ng-template #registerModal>
@@ -131,11 +138,6 @@
                         }
                     </div>
                 }
-            </div>
-
-            <div class="mb-3">
-                <label for="surname" class="form-label">Отчество</label>
-                <input type="text" class="form-control" id="surname" formControlName="surname" placeholder="Введите отчество" />
             </div>
 
             <div class="mb-3">

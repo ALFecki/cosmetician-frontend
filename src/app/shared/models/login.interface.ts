@@ -19,6 +19,7 @@ export interface LoginResponse {
 }
 
 export interface Claims {
+    phone_auth?: boolean;
     email: string;
     expires: number;
     is_moderator: boolean;

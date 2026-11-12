@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
-import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { Observable, of, from } from 'rxjs';
+import { map, catchError, switchMap } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 
 @Injectable({
@@ -14,7 +14,10 @@ export class AuthGuard implements CanActivate {
     ) {}
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-        return this.authService.checkAuth().pipe(
+        return from(this.authService.ready).pipe(
+            switchMap(() =>
+                route.data['allowGuestCheckout'] && this.authService.phoneCheckoutEnabled ? of(true) : this.authService.checkAuth(),
+            ),
             map(response => {
                 if (response) {
                     return true;

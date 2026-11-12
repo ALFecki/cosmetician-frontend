@@ -58,8 +58,11 @@
                                     </div>
                                     <div class="card-body">
                                         <p class="mb-1"><strong>Имя:</strong> {{ user.firstName }} {{ user.secondName }}</p>
-                                        <p class="mb-1"><strong>Email:</strong> {{ user.email }}</p>
+                                        <p class="mb-1"><strong>Email:</strong> {{ user.email || 'Не указан' }}</p>
                                         <p class="mb-0"><strong>Телефон:</strong> {{ user.phone || 'Не указан' }}</p>
+                                        @if ((order | async)?.contactSnapshot?.phoneVerified === false) {
+                                            <span class="badge bg-warning text-dark">Номер не подтверждён</span>
+                                        }
                                     </div>
                                 </div>
                             </div>

@@ -1,3 +1,5 @@
+import { GuestCheckoutService } from '../../shared/services/guest-checkout.service';
+import { LoginModalService } from '../../shared/services/login-modal.service';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
@@ -36,9 +38,10 @@ describe('Checkout delivery contract', () => {
                 getLastNotCheckedOrder: () => of({ id: 'cart', totalPrice: 102, products: [] }),
                 update,
             } as unknown as OrderService,
-            { checkout } as unknown as CartService,
+            { checkout, flushPendingUpdates: () => Promise.resolve() } as unknown as CartService,
             {
                 getCurrentUser: () => of(null),
+                getCurrentUserSync: () => null,
                 isLoggedIn: () => true,
             } as unknown as AuthService,
             { show: jasmine.createSpy() } as unknown as ToastService,
@@ -47,7 +50,10 @@ describe('Checkout delivery contract', () => {
             {} as unknown as PaymentService,
             {} as unknown as PromocodeService,
             { getProductPromotions: () => of({ data: [] }) } as unknown as PromotionService,
+            {} as unknown as LoginModalService,
+            {} as GuestCheckoutService,
         );
+        component.loadCartItems();
         response.next({ status: 'success', data: placements } as ListResponse<PostPlacement>);
         response.complete();
     });
@@ -60,6 +66,12 @@ describe('Checkout delivery contract', () => {
             offerConsent: true,
         });
     }
+    it('shows the contact form without SMS when temporary guest checkout is enabled', () => {
+        const auth = (component as unknown as { authService: AuthService }).authService;
+        Object.assign(auth, { guestCheckoutAvailable: true, getCurrentUserSync: () => null });
+        component.phoneCheckout = true;
+        expect(component.needsPhone).toBeFalse();
+    });
     it('loads actual locations through PostService and searches address and number', () => {
         expect(post).toHaveBeenCalledTimes(1);
         component.filterPostPlacements('брест');
@@ -136,6 +148,8 @@ describe('Checkout placement keyboard and request states', () => {
             {} as unknown as PaymentService,
             {} as unknown as PromocodeService,
             {} as unknown as PromotionService,
+            {} as unknown as LoginModalService,
+            {} as GuestCheckoutService,
         );
     });
     it('shows loading then an error without inventing selectable locations', () => {
@@ -165,13 +179,17 @@ describe('Checkout placement keyboard and request states', () => {
 describe('Rendered checkout EuroPost selection', () => {
     let fixture: ComponentFixture<OrderConfirmationComponent>;
     let response: Subject<ListResponse<PostPlacement>>;
-    beforeEach(() => {
+    beforeEach(async () => {
         response = new Subject();
         TestBed.configureTestingModule({
             imports: [OrderConfirmationComponent],
             providers: [
+                { provide: GuestCheckoutService, useValue: { ready: Promise.resolve(), session: null } },
                 provideRouter([]),
-                { provide: AuthService, useValue: { getCurrentUser: () => of(null), isLoggedIn: () => true } },
+                {
+                    provide: AuthService,
+                    useValue: { getCurrentUser: () => of(null), getCurrentUserSync: () => null, isLoggedIn: () => true },
+                },
                 { provide: OrderService, useValue: { getLastNotCheckedOrder: () => of({ id: 'cart', totalPrice: 102, products: [] }) } },
                 { provide: PostService, useValue: { getPostPlacements: () => response } },
                 { provide: CartService, useValue: {} },
@@ -182,6 +200,8 @@ describe('Rendered checkout EuroPost selection', () => {
             ],
         });
         fixture = TestBed.createComponent(OrderConfirmationComponent);
+        fixture.detectChanges();
+        await fixture.whenStable();
         fixture.detectChanges();
     });
     it('keeps the selected ID and closes the list after asynchronous loading and keyboard selection', fakeAsync(() => {
@@ -211,4 +231,63 @@ describe('Rendered checkout EuroPost selection', () => {
         expect(fixture.componentInstance.confirmationForm.get('postPlacement')!.value).toBe(907);
         expect(fixture.componentInstance.confirmationForm.get('postPlacementFilter')!.valid).toBeTrue();
     }));
+});
+
+describe('Phone checkout recovery', () => {
+    let component: OrderConfirmationComponent;
+    let orders: jasmine.SpyObj<OrderService>;
+    let cart: jasmine.SpyObj<CartService>;
+    let router: jasmine.SpyObj<Router>;
+    const customer = { id: 'customer', firstName: 'Анна', secondName: 'Иванова', verifiedPhone: '+375290000001', contactEmail: null };
+    beforeEach(() => {
+        sessionStorage.removeItem('skviderm.checkout.customer');
+        orders = jasmine.createSpyObj<OrderService>('orders', ['findCheckoutAttempt', 'quoteCart', 'confirmCheckout']);
+        cart = jasmine.createSpyObj<CartService>('cart', ['clearAfterCheckout', 'refresh', 'flushPendingUpdates']);
+        router = jasmine.createSpyObj<Router>('router', ['navigate']);
+        router.navigate.and.resolveTo(true);
+        component = new OrderConfirmationComponent(
+            new FormBuilder(),
+            orders,
+            cart,
+            {
+                ready: Promise.resolve(),
+                phoneCheckoutEnabled: true,
+                getCurrentUser: () => of(customer),
+                getCurrentUserSync: () => customer,
+                isLoggedIn: () => true,
+            } as unknown as AuthService,
+            { show: jasmine.createSpy() } as unknown as ToastService,
+            router,
+            { getPostPlacements: () => of({ data: [] }) } as unknown as PostService,
+            {} as PaymentService,
+            {} as PromocodeService,
+            {} as PromotionService,
+            {} as LoginModalService,
+            {} as GuestCheckoutService,
+        );
+        component.phoneCheckout = true;
+    });
+    afterEach(() => {
+        component.ngOnDestroy();
+        sessionStorage.removeItem('skviderm.checkout.customer');
+    });
+    it('can recover after a transient error despite an empty cart and invalid new-order form', async () => {
+        sessionStorage.setItem(
+            'skviderm.checkout.customer',
+            JSON.stringify({ key: '11111111-1111-4111-8111-111111111111', cartId: '22222222-2222-4222-8222-222222222222' }),
+        );
+        orders.findCheckoutAttempt.and.callFake(async () => {
+            throw { status: 503 };
+        });
+        await component.retryPreviousOrder();
+        expect(component.hasPendingOrder).toBeTrue();
+        expect(component.isSubmitting).toBeFalse();
+        expect(component.confirmationForm.invalid).toBeTrue();
+        orders.findCheckoutAttempt.and.resolveTo({ id: 'saved-order' } as OrderModel);
+        await component.retryPreviousOrder();
+        expect(router.navigate).toHaveBeenCalledWith(['/order', 'saved-order']);
+        expect(cart.clearAfterCheckout).toHaveBeenCalledTimes(1);
+        expect(orders.confirmCheckout).not.toHaveBeenCalled();
+        expect(component.hasPendingOrder).toBeFalse();
+    });
 });

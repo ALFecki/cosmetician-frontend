@@ -1,3 +1,4 @@
+import { PhoneAuthComponent } from '../phone-auth/phone-auth.component';
 import { Component, Input, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,12 +15,13 @@ import { IconsModule } from '../../base/icons/icons.module';
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss',
-    imports: [ReactiveFormsModule, IconsModule],
+    imports: [ReactiveFormsModule, IconsModule, PhoneAuthComponent],
 })
 export class LoginComponent {
     @Input() loginForm: FormGroup = new FormGroup({});
 
     returnUrl: string | null = null;
+    emailMode = false;
 
     email = new FormControl('');
     password = new FormControl('');
@@ -53,7 +55,7 @@ export class LoginComponent {
     isSendingReset = false;
 
     constructor(
-        private authService: AuthService,
+        public authService: AuthService,
         private modalService: NgbModal,
         private route: ActivatedRoute,
         private toastService: ToastService,
@@ -76,6 +78,10 @@ export class LoginComponent {
 
         this.authService.login(loginData).subscribe({
             next: response => {
+                if (this.authService.phoneCheckoutEnabled) {
+                    this.loginSucceeded();
+                    return;
+                }
                 if (!response.user.isEmailVerified) {
                     this.closeLoginModal();
                     this.verifyEmailModalService.openVerifyEmailModal().subscribe(verified => {
@@ -131,11 +137,24 @@ export class LoginComponent {
         });
     }
 
+    loginSucceeded(): void {
+        this.closeLoginModal();
+        if (this.router.url.split('?')[0] === '/login') {
+            const requested = this.returnUrl || '/';
+            const destination = requested.startsWith('/') && !requested.startsWith('//') ? requested : '/';
+            void this.router.navigateByUrl(destination);
+        }
+    }
+
     closeLoginModal() {
         this.modalService.dismissAll();
     }
 
     openRegisterModal(content: unknown) {
+        if (this.authService.phoneCheckoutEnabled && this.authService.phoneLoginAvailable) {
+            this.emailMode = false;
+            return;
+        }
         this.registrationForm.reset();
         this.registrationError = null;
         this.modalService.open(content, {

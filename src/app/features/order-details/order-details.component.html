@@ -1,17 +1,23 @@
 <div class="container my-5">
     <div class="row">
-        <div class="col-md-3">
-            <app-profile-sidebar></app-profile-sidebar>
-        </div>
-
-        <div class="col-md-9">
+        @if (!guestMode) {
+            <div class="col-md-3">
+                <app-profile-sidebar></app-profile-sidebar>
+            </div>
+        }
+        <div [class]="guestMode ? 'col-12' : 'col-md-9'">
             <div class="main-card">
                 <div class="main-card-header d-flex justify-content-between align-items-center flex-wrap">
                     <h4 class="mb-0"><i class="bi bi-receipt me-2"></i>Детали заказа</h4>
-                    <a routerLink="/orders" class="btn btn-back"> <i class="bi bi-arrow-left me-2"></i>Назад к списку </a>
+                    <a [routerLink]="guestMode ? '/guest-orders' : '/orders'" class="btn btn-back">
+                        <i class="bi bi-arrow-left me-2"></i>Назад к списку
+                    </a>
                 </div>
 
                 <div class="main-card-body">
+                    @if (guestMode && !error) {
+                        <p>Заказ сохранён. Посмотреть его статус можно в разделе&nbsp;<a routerLink="/guest-orders">«Мои заказы»</a>.</p>
+                    }
                     @if (loading) {
                         <div class="text-center my-5">
                             <div class="spinner-border spinner-custom" role="status">
@@ -45,11 +51,16 @@
                                     </div>
                                     <div class="col-lg-6 text-lg-end">
                                         <div class="status-wrapper">
-                                            <span class="status-label">Статус заказа:</span>
-                                            <span class="badge order-status-badge {{ getOrderStatusClass((order | async)?.status || '') }}">
-                                                <i class="bi {{ getStatusIcon((order | async)?.status || '') }} me-2"></i>
-                                                {{ getOrderStatusText((order | async)?.status || '') }}
-                                            </span>
+                                            <div class="order-status-line">
+                                                <span class="status-label">Статус заказа</span>
+                                                <span
+                                                    class="badge order-status-badge {{
+                                                        getOrderStatusClass((order | async)?.status || '')
+                                                    }}"
+                                                >
+                                                    {{ getOrderStatusText((order | async)?.status || '') }}
+                                                </span>
+                                            </div>
                                             @if ((order | async)?.paymentMethod === 'online') {
                                                 <div class="payment-status mt-2">
                                                     <span
@@ -64,7 +75,7 @@
                                             }
                                             @if (canRetryPayment() || canChangePaymentMethod()) {
                                                 <div class="payment-actions mt-3">
-                                                    <!-- @if (canRetryPayment() && (order | async)?.paymentMethod?.toLowerCase() === 'online') {
+                                                    @if (canRetryPayment() && (order | async)?.paymentMethod?.toLowerCase() === 'online') {
                                                         <button
                                                             class="btn btn-retry-payment me-2"
                                                             (click)="retryPayment()"
@@ -74,9 +85,9 @@
                                                             @if (retryingPayment) {
                                                                 <span class="spinner-border spinner-border-sm me-2"></span>
                                                             }
-                                                            Повторить оплату
+                                                            Продолжить оплату
                                                         </button>
-                                                    } -->
+                                                    }
 
                                                     @if (canChangePaymentMethod()) {
                                                         <button
@@ -208,7 +219,7 @@
                                                 </div>
                                                 <div class="info-card-content">
                                                     <div class="info-card-label">Email</div>
-                                                    <div class="info-card-value">{{ (orderRecipient | async)?.email }}</div>
+                                                    <div class="info-card-value">{{ (orderRecipient | async)?.email || 'Не указан' }}</div>
                                                 </div>
                                             </div>
                                         </div>

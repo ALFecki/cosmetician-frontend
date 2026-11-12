@@ -1,10 +1,11 @@
 <div class="container my-5">
     <div class="row">
-        <div class="col-md-3">
-            <app-profile-sidebar></app-profile-sidebar>
-        </div>
-
-        <div class="col-md-9">
+        @if (!guestMode) {
+            <div class="col-md-3">
+                <app-profile-sidebar></app-profile-sidebar>
+            </div>
+        }
+        <div [class]="guestMode ? 'col-12' : 'col-md-9'">
             @if (loading) {
                 <div class="card loading-card">
                     <div class="loading-container">
@@ -29,6 +30,33 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        @if (guestMode && guestCheckout.session) {
+                            <p>Ваши заказы без регистрации.</p>
+                            @if (authService.getCurrentUserSync()?.verifiedPhone) {
+                                <p>Сохраните эти заказы в своём аккаунте.</p>
+                                <button class="btn btn-outline-primary mb-3" type="button" (click)="claimOrders()" [disabled]="claiming">
+                                    {{ claiming ? 'Добавляем…' : 'Добавить заказы в аккаунт' }}
+                                </button>
+                            } @else if (authService.phoneLoginAvailable) {
+                                <p>Подтвердите номер из заказа, чтобы сохранить историю в аккаунте.</p>
+                                <app-phone-auth
+                                    [purpose]="authService.isLoggedIn() ? 'link' : 'login'"
+                                    (authenticated)="claimOrders()"
+                                    (emailLogin)="loginModalService.openLoginModal(true)"
+                                />
+                            } @else if (!authService.isLoggedIn()) {
+                                <button type="button" class="btn btn-link p-0 mb-3" (click)="loginModalService.openLoginModal(true)">
+                                    Войти в существующий аккаунт
+                                </button>
+                            }
+                            @if (authService.isLoggedIn() && !claimMessage) {
+                                <p><a routerLink="/orders">Перейти к заказам аккаунта →</a></p>
+                            }
+                            @if (claimMessage) {
+                                <p role="status">{{ claimMessage }} <a routerLink="/orders">Заказы аккаунта →</a></p>
+                            }
+                        }
+
                         @if (error) {
                             <div class="alert alert-danger animated-alert">
                                 <i class="fas fa-exclamation-circle me-2"></i>
@@ -36,6 +64,17 @@
                             </div>
                         }
 
+                        @if (guestMode && (page > 1 || hasNextPage)) {
+                            <nav class="d-flex gap-3 align-items-center mb-3" aria-label="Страницы заказов">
+                                <button class="btn btn-outline-primary" [disabled]="page === 1" (click)="loadOrders(page - 1)">
+                                    Назад
+                                </button>
+                                <span>Страница {{ page }}</span>
+                                <button class="btn btn-outline-primary" [disabled]="!hasNextPage" (click)="loadOrders(page + 1)">
+                                    Далее
+                                </button>
+                            </nav>
+                        }
                         <div class="table-responsive">
                             @if (orders$ | async; as orders) {
                                 <table class="table table-hover orders-table">
@@ -62,7 +101,7 @@
                                                 <td>
                                                     <button
                                                         class="btn btn-sm btn-outline-primary details-btn"
-                                                        [routerLink]="['/order', order.id]"
+                                                        [routerLink]="[guestMode ? '/guest-order' : '/order', order.id]"
                                                     >
                                                         <i class="fas fa-eye me-1"></i>
                                                         Подробнее

@@ -41,10 +41,9 @@ export class ProfileSidebarComponent implements OnInit {
     }
 
     async logout() {
-        await this.cartService.syncOrder();
+        await this.cartService.flushPendingUpdates().catch(() => undefined);
         this.authService.logout().subscribe(() => {
             this.router.navigate(['/']);
-            window.location.reload();
         });
     }
 }
