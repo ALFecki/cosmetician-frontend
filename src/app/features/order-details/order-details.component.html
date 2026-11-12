@@ -16,10 +16,7 @@
 
                 <div class="main-card-body">
                     @if (guestMode && !error) {
-                        <p>
-                            Заказ сохранён. <a routerLink="/guest-orders">Мои заказы</a> доступны в этом браузере до 30 дней, пока сохранены
-                            cookies.
-                        </p>
+                        <p>Заказ сохранён. Посмотреть его статус можно в разделе <a routerLink="/guest-orders">«Мои заказы»</a>.</p>
                     }
                     @if (loading) {
                         <div class="text-center my-5">
