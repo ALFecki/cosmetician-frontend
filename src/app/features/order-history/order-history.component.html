@@ -31,12 +31,9 @@
                     </div>
                     <div class="card-body">
                         @if (guestMode && guestCheckout.session) {
-                            <p>
-                                Здесь заказы, оформленные без регистрации в этом браузере. Доступ сохранён до
-                                {{ guestCheckout.session.expiresAt * 1000 | date: 'dd.MM.yyyy' }}. После очистки cookies он пропадёт.
-                            </p>
+                            <p>Ваши заказы без регистрации.</p>
                             @if (authService.getCurrentUserSync()?.verifiedPhone) {
-                                <p>Добавьте заказы с вашим подтверждённым номером в аккаунт, чтобы видеть их на любом устройстве.</p>
+                                <p>Сохраните эти заказы в своём аккаунте.</p>
                                 <button class="btn btn-outline-primary mb-3" type="button" (click)="claimOrders()" [disabled]="claiming">
                                     {{ claiming ? 'Добавляем…' : 'Добавить заказы в аккаунт' }}
                                 </button>
@@ -47,11 +44,13 @@
                                     (authenticated)="claimOrders()"
                                     (emailLogin)="loginModalService.openLoginModal(true)"
                                 />
-                            } @else {
-                                <p>Позже историю можно будет сохранить в аккаунте после подтверждения номера телефона.</p>
+                            } @else if (!authService.isLoggedIn()) {
                                 <button type="button" class="btn btn-link p-0 mb-3" (click)="loginModalService.openLoginModal(true)">
                                     Войти в существующий аккаунт
                                 </button>
+                            }
+                            @if (authService.isLoggedIn() && !claimMessage) {
+                                <p><a routerLink="/orders">Перейти к заказам аккаунта →</a></p>
                             }
                             @if (claimMessage) {
                                 <p role="status">{{ claimMessage }} <a routerLink="/orders">Заказы аккаунта →</a></p>

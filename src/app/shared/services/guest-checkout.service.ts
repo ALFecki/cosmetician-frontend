@@ -39,7 +39,7 @@ export class GuestCheckoutService {
         await this.ready;
         if (typeof navigator === 'undefined' || !navigator.locks) {
             if (await this.restore()) return this.session!;
-            throw new Error('Для оформления без регистрации обновите браузер или войдите в свой аккаунт.');
+            throw new Error('Оформление без регистрации недоступно. Войдите в аккаунт или свяжитесь с магазином.');
         }
         return navigator.locks.request('skviderm-guest-session', async () => {
             const restored = await this.restore();
@@ -50,7 +50,8 @@ export class GuestCheckoutService {
     }
 
     private options() {
-        if (!this.session || this.session.expiresAt * 1000 <= Date.now()) throw new Error('Срок доступа к гостевым заказам истёк.');
+        if (!this.session || this.session.expiresAt * 1000 <= Date.now())
+            throw new Error('Не удалось открыть заказ. Свяжитесь с магазином — мы поможем.');
         return { withCredentials: true, headers: { 'X-Guest-CSRF': this.session.csrfToken } };
     }
 

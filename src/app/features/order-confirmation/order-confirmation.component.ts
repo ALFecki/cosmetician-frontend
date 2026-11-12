@@ -385,9 +385,7 @@ export class OrderConfirmationComponent implements OnInit, OnDestroy {
         if (!pending) return false;
         try {
             if (this.isGuest && !this.guestCheckout.session) {
-                throw new Error(
-                    'Доступ к предыдущему заказу в этом браузере недоступен. Свяжитесь с магазином перед повторным оформлением.',
-                );
+                throw new Error('Не удалось проверить предыдущий заказ. Свяжитесь с магазином перед повторным оформлением.');
             }
             const order = this.isGuest
                 ? await this.guestCheckout.findAttempt(pending.key)

@@ -64,9 +64,7 @@ export class OrderHistoryComponent implements OnInit {
         try {
             if (this.guestMode) {
                 if (!this.guestCheckout.session)
-                    throw new Error(
-                        'В этом браузере нет сохранённого доступа к заказам. После очистки cookies или через 30 дней свяжитесь с магазином.',
-                    );
+                    throw new Error('Не удалось открыть историю заказов. Войдите в аккаунт или свяжитесь с магазином — мы поможем.');
                 const response = await this.guestCheckout.getOrders(page);
                 this.orders$ = of(response.data);
                 this.page = page;
@@ -97,7 +95,7 @@ export class OrderHistoryComponent implements OnInit {
                 : 'Заказов с подтверждённым номером для переноса нет.';
             await this.loadOrders();
         } catch (error) {
-            this.error = apiMessage(error, 'Не удалось добавить заказы. Можно повторить без нового SMS.');
+            this.error = apiMessage(error, 'Не удалось добавить заказы. Попробуйте ещё раз.');
         } finally {
             this.claiming = false;
         }

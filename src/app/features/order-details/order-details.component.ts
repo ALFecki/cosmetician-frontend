@@ -62,7 +62,7 @@ export class OrderDetailsComponent implements OnInit {
         await this.guestCheckout.ready;
         this.guestMode = (!!this.guestCheckout.session && this.route.snapshot.data['guest'] === true) || !this.authService.isLoggedIn();
         if (this.guestMode && !this.guestCheckout.session) {
-            this.error = 'Доступ к заказу в этом браузере не найден. Войдите в аккаунт или свяжитесь с магазином.';
+            this.error = 'Не удалось открыть заказ. Войдите в аккаунт или свяжитесь с магазином.';
             this.loading = false;
             return;
         }

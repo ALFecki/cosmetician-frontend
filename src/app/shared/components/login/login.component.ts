@@ -151,7 +151,7 @@ export class LoginComponent {
     }
 
     openRegisterModal(content: unknown) {
-        if (this.authService.phoneCheckoutEnabled) {
+        if (this.authService.phoneCheckoutEnabled && this.authService.phoneLoginAvailable) {
             this.emailMode = false;
             return;
         }

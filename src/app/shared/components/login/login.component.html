@@ -3,10 +3,10 @@
     <button type="button" class="btn-close" aria-label="Закрыть" (click)="closeLoginModal()"><i-bs name="x-lg"></i-bs></button>
 </div>
 <div class="modal-body">
-    @if (authService.phoneCheckoutEnabled && !emailMode) {
+    @if (authService.phoneCheckoutEnabled && authService.phoneLoginAvailable && !emailMode) {
         <app-phone-auth (authenticated)="loginSucceeded()" (emailLogin)="emailMode = true" />
     } @else {
-        @if (authService.phoneCheckoutEnabled) {
+        @if (authService.phoneCheckoutEnabled && authService.phoneLoginAvailable) {
             <button type="button" class="btn btn-link mb-3" (click)="emailMode = false">← Войти по телефону</button>
         }
         <form [formGroup]="loginForm" class="login-form" (ngSubmit)="onSubmit($event)">
