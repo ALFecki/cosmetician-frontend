@@ -30,7 +30,7 @@ export class ProductModalComponent implements OnDestroy {
         private modalService: NgbModal,
         private router: Router,
         private authService: AuthService,
-        private cartService: CartService,
+        protected cartService: CartService,
         private toastService: ToastService,
         private loginModalService: LoginModalService,
     ) {}

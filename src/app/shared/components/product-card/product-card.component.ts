@@ -37,7 +37,7 @@ export class ProductCardComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private router: Router,
         private productService: ProductService,
-        private cartService: CartService,
+        protected cartService: CartService,
         private authService: AuthService,
         private loginModalService: LoginModalService,
     ) {}

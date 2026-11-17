@@ -36,6 +36,15 @@ export class OrderService extends DataService<OrderModel, CreateOrderSchema, Upd
             this.http.put<CartQuote>(`${environment.server_url}/checkout/cart`, { cartId, expectedRevision, items, promoCode }),
         );
     }
+    addCheckoutCartItem(cartId: string, variantId: string, operationId: string): Promise<CartQuote> {
+        return firstValueFrom(
+            this.http.post<CartQuote>(
+                `${environment.server_url}/checkout/cart/items`,
+                { cartId, variantId, operationId },
+                { timeout: 10_000 },
+            ),
+        );
+    }
     confirmCheckout(request: CheckoutRequest): Promise<OrderModel> {
         return firstValueFrom(this.http.post<OrderModel>(`${environment.server_url}/checkout`, request));
     }

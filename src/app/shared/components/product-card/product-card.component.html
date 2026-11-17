@@ -205,9 +205,18 @@
                                 </div>
                             }
                         </div>
-                        <button class="btn btn-primary w-100 mb-3" (click)="addToCart()">
+                        <button
+                            class="btn btn-primary w-100 mb-3"
+                            (click)="addToCart()"
+                            [disabled]="cartService.addingVariantId() !== null"
+                            [attr.aria-busy]="cartService.addingVariantId() === selectedVariantId"
+                        >
                             <i-bs name="cart-plus" class="me-2"></i-bs>
-                            Добавить в корзину
+                            {{
+                                cartService.addingVariantId() !== null && cartService.addingVariantId() === selectedVariantId
+                                    ? 'Добавляем…'
+                                    : 'Добавить в корзину'
+                            }}
                         </button>
                         <div class="features">
                             <h6 class="mb-3 text-center">

@@ -46,7 +46,7 @@ export class ProductsComponent implements OnInit, OnChanges, OnDestroy {
         private route: ActivatedRoute,
         private router: Router,
         private productService: ProductService,
-        private cartService: CartService,
+        protected cartService: CartService,
         private modalService: NgbModal,
         private authService: AuthService,
         private loginModalService: LoginModalService,

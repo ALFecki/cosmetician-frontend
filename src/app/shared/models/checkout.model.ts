@@ -27,6 +27,7 @@ export interface CheckoutDetails {
     offerConsent: boolean;
 }
 export interface CartQuote {
+    itemAddAvailable?: boolean;
     order: OrderModel;
     items: CartItemInput[];
     unavailableItems: CartItemInput[];

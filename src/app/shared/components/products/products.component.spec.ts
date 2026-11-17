@@ -28,7 +28,7 @@ describe('Rendered catalog filters and quick view', () => {
                 { provide: BrandService, useValue: { getAll: () => of({ data: [{ id: 'brand', title: 'Brand' }] }) } },
                 { provide: CategoryService, useValue: { getAll: () => of({ data: [] }) } },
                 { provide: ProductScopeService, useValue: { getAll: () => of({ data: [] }) } },
-                { provide: CartService, useValue: {} },
+                { provide: CartService, useValue: { addingVariantId: () => null } },
                 { provide: AuthService, useValue: {} },
                 { provide: LoginModalService, useValue: {} },
             ],

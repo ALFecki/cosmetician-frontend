@@ -83,9 +83,11 @@
                                         class="quantity-btn-modal"
                                         type="button"
                                         (click)="increaseQuantity(item)"
+                                        [disabled]="cartService.addingVariantId() !== null"
+                                        [attr.aria-busy]="cartService.addingVariantId() === item.variant.id"
                                         aria-label="Увеличить количество"
                                     >
-                                        +
+                                        {{ cartService.addingVariantId() === item.variant.id ? '…' : '+' }}
                                     </button>
                                 </div>
                                 <div class="item-total-modal">{{ getItemTotal(item) | number: '1.2-2' }} р.</div>
