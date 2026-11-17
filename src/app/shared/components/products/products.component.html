@@ -108,9 +108,11 @@
                                 type="button"
                                 class="add-button"
                                 (click)="addToCart(product)"
+                                [disabled]="cartService.addingVariantId() !== null"
+                                [attr.aria-busy]="cartService.addingVariantId() === getSelectedVariantId(product)"
                                 [attr.aria-label]="'Добавить в корзину: ' + product.title"
                             >
-                                +
+                                {{ cartService.addingVariantId() === getSelectedVariantId(product) ? '…' : '+' }}
                             </button>
                         </div>
                     </article>

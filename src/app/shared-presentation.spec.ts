@@ -30,7 +30,7 @@ describe('Shared customer/admin presentation boundary', () => {
                 { provide: MaintenanceService, useValue: { isMaintenanceModeEnabled: () => of(false) } },
                 { provide: BrandService, useValue: { getBrandsList: () => of([]) } },
                 { provide: CategoryService, useValue: { getCategoriesList: () => of([]) } },
-                { provide: CartService, useValue: { getProductCount: () => of(0) } },
+                { provide: CartService, useValue: { getProductCount: () => of(0), addingVariantId: () => null } },
                 { provide: BannerService, useValue: { getPublished: () => of({ data: [] }) } },
             ],
         });

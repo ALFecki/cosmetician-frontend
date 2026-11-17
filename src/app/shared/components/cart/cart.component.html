@@ -88,9 +88,11 @@
                                                     class="quantity-btn"
                                                     type="button"
                                                     (click)="increaseQuantity(item); $event.stopPropagation()"
+                                                    [disabled]="cartService.addingVariantId() !== null"
+                                                    [attr.aria-busy]="cartService.addingVariantId() === item.variant.id"
                                                     aria-label="Увеличить количество"
                                                 >
-                                                    +
+                                                    {{ cartService.addingVariantId() === item.variant.id ? '…' : '+' }}
                                                 </button>
                                             </div>
                                             <div class="item-total">{{ getItemTotal(item) | number: '1.2-2' }} р.</div>

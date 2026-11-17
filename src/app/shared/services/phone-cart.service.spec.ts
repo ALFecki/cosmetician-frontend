@@ -32,7 +32,7 @@ function quote(items: CartItemInput[]): CartQuote {
         promoCodeError: null,
     };
 }
-describe('Phone checkout guest cart', () => {
+describe('Phone checkout cart', () => {
     let service: CartService;
     let login: BehaviorSubject<boolean>;
     let logout: BehaviorSubject<boolean>;
@@ -62,7 +62,13 @@ describe('Phone checkout guest cart', () => {
         logout = new BehaviorSubject(false);
         signedIn = false;
         remote = quote([]);
-        orders = jasmine.createSpyObj<OrderService>('orders', ['quoteCart', 'getCheckoutCart', 'mergeCheckoutCart', 'replaceCheckoutCart']);
+        orders = jasmine.createSpyObj<OrderService>('orders', [
+            'quoteCart',
+            'getCheckoutCart',
+            'mergeCheckoutCart',
+            'replaceCheckoutCart',
+            'addCheckoutCartItem',
+        ]);
         orders.quoteCart.and.callFake(async request => quote(request.items));
         orders.getCheckoutCart.and.callFake(async () => remote);
         orders.mergeCheckoutCart.and.callFake(async (_id, items) => {
@@ -81,6 +87,105 @@ describe('Phone checkout guest cart', () => {
         service.ngOnDestroy();
         localStorage.removeItem('skviderm.guest-cart.v1');
     });
+    it('retries a transient add failure on the same cart with the same operation ID', async () => {
+        await service.ready;
+        signedIn = true;
+        remote.itemAddAvailable = true;
+        await service.refresh();
+        orders.addCheckoutCartItem.and.callFake(async () => {
+            if (orders.addCheckoutCartItem.calls.count() === 1) throw { status: 503 };
+            return { ...quote([{ variantId: variant, quantity: 1 }]), itemAddAvailable: true };
+        });
+
+        await service.addProductToCart(variant);
+
+        const attempts = orders.addCheckoutCartItem.calls.allArgs();
+        expect(attempts.length).toBe(2);
+        expect(attempts[0]).toEqual(['cart-one', variant, jasmine.stringMatching(/^[0-9a-f-]{36}$/)]);
+        expect(attempts[1]).toEqual(attempts[0]);
+        expect(orders.replaceCheckoutCart).not.toHaveBeenCalled();
+        expect(await firstValueFrom(service.getProductCount())).toBe(1);
+        expect(service.addingVariantId()).toBeNull();
+    });
+
+    it('ignores rapid add and quantity clicks while an authenticated addition is pending', async () => {
+        await service.ready;
+        signedIn = true;
+        remote = { ...quote([{ variantId: variant, quantity: 1 }]), itemAddAvailable: true };
+        await service.refresh();
+        let finish!: (value: CartQuote) => void;
+        let started!: () => void;
+        const requestStarted = new Promise<void>(resolve => {
+            started = resolve;
+        });
+        orders.addCheckoutCartItem.and.callFake(() => {
+            started();
+            return new Promise<CartQuote>(resolve => {
+                finish = resolve;
+            });
+        });
+
+        const addition = service.addProductToCart(variant);
+        await requestStarted;
+        expect(service.addingVariantId()).toBe(variant);
+        service.increaseQuantity((await firstValueFrom(service.getCartItems()))[0]);
+        await service.addProductToCart(variant);
+        finish({ ...quote([{ variantId: variant, quantity: 2 }]), itemAddAvailable: true });
+        await addition;
+
+        expect(orders.addCheckoutCartItem).toHaveBeenCalledTimes(1);
+        expect(await firstValueFrom(service.getProductCount())).toBe(2);
+        expect(service.addingVariantId()).toBeNull();
+        orders.addCheckoutCartItem.and.resolveTo({ ...quote([{ variantId: variant, quantity: 3 }]), itemAddAvailable: true });
+        await service.addProductToCart(variant);
+        expect(orders.addCheckoutCartItem.calls.mostRecent().args[2]).not.toBe(orders.addCheckoutCartItem.calls.first().args[2]);
+    });
+
+    it('refreshes the cart after a 409 without applying the attempted addition to the fresh cart', async () => {
+        await service.ready;
+        signedIn = true;
+        remote.itemAddAvailable = true;
+        await service.refresh();
+        remote = { ...quote([]), itemAddAvailable: true };
+        remote.order.id = 'cart-two';
+        const conflict = { status: 409 };
+        orders.addCheckoutCartItem.and.callFake(async () => {
+            throw conflict;
+        });
+
+        await expectAsync(service.addProductToCart(variant)).toBeRejectedWith(conflict);
+
+        expect(orders.addCheckoutCartItem).toHaveBeenCalledOnceWith('cart-one', variant, jasmine.any(String));
+        expect(orders.replaceCheckoutCart).not.toHaveBeenCalled();
+        expect(service.currentQuote?.order.id).toBe('cart-two');
+        expect(service.addingVariantId()).toBeNull();
+    });
+
+    it('uses the existing authenticated change when the quote has no item addition capability', async () => {
+        await service.ready;
+        signedIn = true;
+        await service.refresh();
+        const items = [{ variantId: variant, quantity: 1 }];
+        orders.replaceCheckoutCart.and.resolveTo(quote(items));
+
+        await service.addProductToCart(variant);
+
+        expect(orders.replaceCheckoutCart).toHaveBeenCalledOnceWith('cart-one', 1, items, null);
+        expect(orders.addCheckoutCartItem).not.toHaveBeenCalled();
+    });
+
+    it('saves one guest item and quotes it once during a burst of clicks', async () => {
+        await service.ready;
+        orders.quoteCart.calls.reset();
+
+        await Promise.all([service.addProductToCart(variant), service.addProductToCart(variant), service.addProductToCart(variant)]);
+
+        const items = [{ variantId: variant, quantity: 1 }];
+        expect(orders.quoteCart).toHaveBeenCalledOnceWith({ items, promoCode: null });
+        expect(orders.addCheckoutCartItem).not.toHaveBeenCalled();
+        expect(JSON.parse(localStorage.getItem('skviderm.guest-cart.v1')!).items).toEqual(items);
+    });
+
     it('removes purchased guest items from persistent storage so reload cannot restore a completed cart', async () => {
         await service.ready;
         await service.addProductToCart(variant);

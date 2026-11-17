@@ -150,9 +150,14 @@
     }
 
     <div class="action-buttons">
-        <button class="btn btn-primary btn-sm" (click)="addToCart(selectedProduct)">
+        <button
+            class="btn btn-primary btn-sm"
+            (click)="addToCart(selectedProduct)"
+            [disabled]="cartService.addingVariantId() !== null"
+            [attr.aria-busy]="cartService.addingVariantId() !== null && cartService.addingVariantId() === selectedVariantId"
+        >
             <i-bs name="cart-plus"></i-bs>
-            В корзину
+            {{ cartService.addingVariantId() !== null && cartService.addingVariantId() === selectedVariantId ? 'Добавляем…' : 'В корзину' }}
         </button>
         <button class="btn btn-outline-primary btn-sm" (click)="moreInfo()">
             <i-bs name="eye"></i-bs>

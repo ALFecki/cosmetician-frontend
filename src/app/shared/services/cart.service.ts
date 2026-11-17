@@ -2,7 +2,7 @@ import { GuestCheckoutService } from './guest-checkout.service';
 import { CartItemInput, CartQuote, CheckoutRequest } from '../models/checkout.model';
 import { apiMessage } from '../utils/api-message';
 import { ToastService } from './toast.service';
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, signal } from '@angular/core';
 import { BehaviorSubject, debounceTime, firstValueFrom, map, Observable, Subject, Subscription } from 'rxjs';
 import { CartModel } from '../models/cart.model';
 import { LoginResponse } from '../models/login.interface';
@@ -20,6 +20,8 @@ export class CartService implements OnDestroy {
     private discountAmountSubject = new BehaviorSubject<number>(0);
     private quantitySubject = new Subject<CartModel[]>();
     private pendingUpdates: CartModel[] = [];
+    private readonly pendingAddition = signal<string | null>(null);
+    readonly addingVariantId = this.pendingAddition.asReadonly();
     readonly quote$ = new BehaviorSubject<CartQuote | null>(null);
     readonly error$ = new BehaviorSubject<string | null>(null);
     readonly ready: Promise<void>;
@@ -200,8 +202,31 @@ export class CartService implements OnDestroy {
         });
     }
 
+    private async addCheckoutItem(cartId: string, variantId: string, generation: number): Promise<void> {
+        const operationId = crypto.randomUUID();
+        try {
+            const quote = await this.orderService.addCheckoutCartItem(cartId, variantId, operationId).catch(error => {
+                const status = (error as { status?: number } | null)?.status;
+                if (generation === this.generation && status !== undefined && [0, 502, 503, 504].includes(status)) {
+                    return this.orderService.addCheckoutCartItem(cartId, variantId, operationId);
+                }
+                throw error;
+            });
+            if (generation === this.generation) this.applyQuote(quote);
+        } catch (error) {
+            if (generation !== this.generation) return;
+            if ((error as { status?: number } | null)?.status === 409) {
+                const quote = await this.orderService.getCheckoutCart();
+                if (generation !== this.generation) return;
+                this.applyQuote(quote);
+            }
+            throw error;
+        }
+    }
+
     private changePhoneCart(variantId: string, delta: number | null): Promise<void> {
         const generation = this.generation;
+        const cartId = this.currentQuote?.itemAddAvailable === true ? this.currentQuote.order.id : undefined;
         return this.enqueue(() =>
             this.withGuestLock(async () => {
                 if (generation !== this.generation) return;
@@ -226,8 +251,13 @@ export class CartService implements OnDestroy {
                     }
                 }
                 if (generation !== this.generation) return;
+                const current = this.currentQuote;
+                if (delta === 1 && this.authService.isLoggedIn() && current?.itemAddAvailable === true) {
+                    await this.addCheckoutItem(cartId ?? current.order.id, variantId, generation);
+                    return;
+                }
                 const guest = this.readGuest();
-                const items = (this.authService.isLoggedIn() ? this.currentQuote?.items || [] : guest?.items || []).map(item => ({
+                const items = (this.authService.isLoggedIn() ? current?.items || [] : guest?.items || []).map(item => ({
                     ...item,
                 }));
                 const index = items.findIndex(item => item.variantId === variantId);
@@ -238,12 +268,11 @@ export class CartService implements OnDestroy {
                 if (items.length > 100) throw new Error('Too many cart items');
                 let quote: CartQuote;
                 if (this.authService.isLoggedIn()) {
-                    const current = this.currentQuote!;
                     quote = await this.orderService.replaceCheckoutCart(
-                        current.order.id,
-                        current.order.cartRevision!,
+                        current!.order.id,
+                        current!.order.cartRevision!,
                         items,
-                        current.promoCode,
+                        current!.promoCode,
                     );
                 } else {
                     localStorage.setItem(this.guestKey, JSON.stringify({ mergeId: guest?.mergeId || crypto.randomUUID(), items }));
@@ -458,34 +487,40 @@ export class CartService implements OnDestroy {
         });
     }
 
-    async addProductToCart(variantId: string): Promise<void> {
+    async addProductToCart(variantId: string, showSuccess = true): Promise<void> {
+        if (this.pendingAddition() !== null) return;
+        this.pendingAddition.set(variantId);
         const generation = this.generation;
-        await this.ready;
-        if (generation !== this.generation) return;
-        if (this.enabled) {
-            await this.changePhoneCart(variantId, 1);
-            if (generation === this.generation) this.toastService.show('Товар добавлен в корзину', 'success');
-            return;
-        }
-        const order = await this.orderService.addProductToOrder(variantId);
-        if (order) {
-            const updatedItems = order.products.map(item => ({
-                product: item.product,
-                variant: item.variant,
-                quantity: item.quantity,
-                totalPrice: this.getRowTotal(item.product, item.variant.price, item.quantity),
-            }));
-            this.cartItemsSubject.next(updatedItems);
-            this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
-            this.discountAmountSubject.next(Number((order.discountAmount || 0).toFixed(2)));
-        } else {
-            console.error('Error adding product to cart');
+        try {
+            await this.ready;
+            if (generation !== this.generation) return;
+            if (this.enabled) {
+                await this.changePhoneCart(variantId, 1);
+                if (showSuccess && generation === this.generation) this.toastService.show('Товар добавлен в корзину', 'success');
+                return;
+            }
+            const order = await this.orderService.addProductToOrder(variantId);
+            if (order) {
+                const updatedItems = order.products.map(item => ({
+                    product: item.product,
+                    variant: item.variant,
+                    quantity: item.quantity,
+                    totalPrice: this.getRowTotal(item.product, item.variant.price, item.quantity),
+                }));
+                this.cartItemsSubject.next(updatedItems);
+                this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
+                this.discountAmountSubject.next(Number((order.discountAmount || 0).toFixed(2)));
+            } else {
+                console.error('Error adding product to cart');
+            }
+        } finally {
+            this.pendingAddition.set(null);
         }
     }
 
     increaseQuantity(cartItem: CartModel): void {
         if (this.enabled) {
-            void this.changePhoneCart(cartItem.variant.id, 1).catch(() => undefined);
+            void this.addProductToCart(cartItem.variant.id, false).catch(() => undefined);
             return;
         }
         const currentItems = this.cartItemsSubject.value;
