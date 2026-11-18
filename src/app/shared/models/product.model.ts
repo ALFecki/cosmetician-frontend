@@ -40,6 +40,11 @@ export interface ProductVariantModel {
     volume: number;
     costPrice: number;
     price: number;
+    promotionPrice?: {
+        finalCents: number;
+        savingCents: number;
+        promotionId: string | null;
+    };
     isDefault: boolean;
     isDeleted: boolean;
     createdAt: Date;

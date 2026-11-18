@@ -61,4 +61,11 @@ describe('Cart row and order totals', () => {
         service.decreaseQuantity((await firstValueFrom(service.getCartItems()))[0]);
         expect(await firstValueFrom(service.getTotalPrice())).toBe(390);
     });
+    it('uses the variant’s exact quoted unit cents for multiple units', async () => {
+        const item = order.products[0];
+        item.quantity = 3;
+        Object.assign(item.variant, { promotionPrice: { finalCents: 8313, savingCents: 1887, promotionId: 'best' } });
+        await service.addProductToCart(item.variant.id);
+        expect((await firstValueFrom(service.getCartItems()))[0].totalPrice).toBe(249.39);
+    });
 });

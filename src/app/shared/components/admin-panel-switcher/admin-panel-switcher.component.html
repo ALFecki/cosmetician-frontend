@@ -138,6 +138,9 @@
                         }
                     </aside>
                 </div>
+            } @else if (currentModel === 'promotions' && !legacyPromotions) {
+                <ng-container *ngTemplateOutlet="sectionTabs"></ng-container>
+                <app-admin-promotions (unavailable)="loadLegacyPromotions()"></app-admin-promotions>
             } @else {
                 <div class="page-heading">
                     <div>
@@ -156,13 +159,7 @@
                     }
                 </div>
                 @if (referenceModels.includes(currentModel) || currentModel === 'promotions' || currentModel === 'promocodes') {
-                    <nav class="section-tabs subnavigation" aria-label="Подразделы">
-                        @for (key of referenceModels.includes(currentModel) ? referenceModels : ['promotions', 'promocodes']; track key) {
-                            <button type="button" [class.active]="currentModel === key" (click)="switchModel(key)">
-                                {{ modelTitle(key) }}
-                            </button>
-                        }
-                    </nav>
+                    <ng-container *ngTemplateOutlet="sectionTabs"></ng-container>
                 }
                 @if (currentModel === 'settings') {
                     <section class="settings-card">
@@ -307,7 +304,14 @@
                                                         {{ category.title }}{{ last ? '' : ', ' }}
                                                     }
                                                 </td>
-                                                <td class="price-cell">{{ productPrice(product) }}</td>
+                                                <td class="price-cell">
+                                                    @let price = catalogPrice(product);
+                                                    {{ price.current }}
+                                                    @if (price.discount) {
+                                                        <s class="ordinary-price" aria-label="Обычная цена">{{ price.original }}</s>
+                                                        <span class="price-discount">{{ price.discount }}</span>
+                                                    }
+                                                </td>
                                                 <td class="volume-cell">{{ productVolumes(product) }}</td>
                                                 <td>
                                                     <span class="status-badge" [class.archived]="product.isDeleted">{{
@@ -365,6 +369,21 @@
         </main>
     </div>
 </div>
+
+<ng-template #sectionTabs>
+    <nav class="section-tabs subnavigation" aria-label="Подразделы">
+        @for (key of referenceModels.includes(currentModel) ? referenceModels : ['promotions', 'promocodes']; track key) {
+            <button
+                type="button"
+                [class.active]="currentModel === key"
+                [attr.aria-current]="currentModel === key ? 'page' : null"
+                (click)="switchModel(key)"
+            >
+                {{ modelTitle(key) }}
+            </button>
+        }
+    </nav>
+</ng-template>
 
 <ng-template #itemFields>
     <form [formGroup]="itemForm" (ngSubmit)="saveItem()">

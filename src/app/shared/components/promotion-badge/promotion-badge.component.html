@@ -27,10 +27,10 @@
                     @if (promotion.description) {
                         <div class="promotion-description">{{ promotion.description }}</div>
                     }
-                    @if (promotion.buyQuantity && promotion.getQuantity) {
+                    @if (discountLabel === undefined && promotion.buyQuantity && promotion.getQuantity) {
                         <div class="promotion-details">Купи {{ promotion.buyQuantity }}, получи {{ promotion.getQuantity }} в подарок</div>
                     }
-                    @if (promotion.minQuantity) {
+                    @if (discountLabel === undefined && promotion.minQuantity) {
                         <div class="promotion-details">От {{ promotion.minQuantity }} шт.</div>
                     }
                     <div class="promotion-validity">Действует до {{ promotion.validUntil | date: 'dd.MM.yyyy' }}</div>

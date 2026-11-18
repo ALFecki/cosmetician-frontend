@@ -4,13 +4,13 @@ import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { IconsModule } from '../../base/icons/icons.module';
 import { CountryModel } from '../../models/country.model';
-import { ProductModel } from '../../models/product.model';
+import { ProductModel, ProductVariantModel } from '../../models/product.model';
 import { AuthService } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
 import { LoginModalService } from '../../services/login-modal.service';
 import { ToastService } from '../../services/toast.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
-import { calculateDiscountedPrice, PriceInfo } from '../../utils/promotion.utils';
+import { getVariantPriceInfo, PriceInfo } from '../../utils/promotion.utils';
 
 @Component({
     selector: 'app-product-modal',
@@ -80,11 +80,6 @@ export class ProductModalComponent implements OnDestroy {
         return this.selectedProduct.variants.find(v => v.id === this.selectedVariantId) || this.selectedProduct.variants[0];
     }
 
-    getSelectedVariantPrice(): number {
-        const variant = this.getSelectedVariant();
-        return variant?.price || 0;
-    }
-
     getSelectedVariantVolume(): number {
         const variant = this.getSelectedVariant();
         return variant?.volume || 0;
@@ -121,12 +116,10 @@ export class ProductModalComponent implements OnDestroy {
     }
 
     getSelectedVariantPriceInfo(): PriceInfo {
-        const variant = this.getSelectedVariant();
-        const basePrice = variant?.price || 0;
-        return calculateDiscountedPrice(basePrice, this.selectedProduct?.promotions || []);
+        return getVariantPriceInfo(this.getSelectedVariant(), this.selectedProduct?.promotions);
     }
 
-    getVariantPriceInfo(price: number): PriceInfo {
-        return calculateDiscountedPrice(price, this.selectedProduct?.promotions || []);
+    getVariantPriceInfo(variant: ProductVariantModel): PriceInfo {
+        return getVariantPriceInfo(variant, this.selectedProduct?.promotions);
     }
 }

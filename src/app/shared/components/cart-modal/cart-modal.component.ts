@@ -14,7 +14,7 @@ import { PromotionService } from '../../services/promotion.service';
 import { ToastService } from '../../services/toast.service';
 import { VerifyEmailModalService } from '../../services/verify-email-modal.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
-import { calculateDiscountedPrice, PriceInfo } from '../../utils/promotion.utils';
+import { getVariantLineTotal, getVariantPriceInfo, PriceInfo } from '../../utils/promotion.utils';
 
 @Component({
     selector: 'app-cart-modal',
@@ -47,7 +47,7 @@ export class CartModalComponent implements OnInit {
         // Load promotions for cart items
         this.cartItems$.subscribe(items => {
             items.forEach(item => {
-                this.loadProductPromotions(item.product.id);
+                if (!item.variant.promotionPrice) this.loadProductPromotions(item.product.id);
             });
         });
     }
@@ -111,10 +111,6 @@ export class CartModalComponent implements OnInit {
         this.router.navigate(['/products']);
     }
 
-    trackByProductId(index: number, item: CartModel): string {
-        return item.product.id;
-    }
-
     loadProductPromotions(productId: string): void {
         this.promotionService.getProductPromotions(productId).subscribe({
             next: promotions => {
@@ -127,14 +123,11 @@ export class CartModalComponent implements OnInit {
     }
 
     getItemPriceInfo(item: CartModel): PriceInfo {
-        const promotions = this.productPromotions[item.product.id] || [];
-        return calculateDiscountedPrice(item.variant.price, promotions);
+        return getVariantPriceInfo(item.variant, this.productPromotions[item.product.id]);
     }
 
     getItemTotal(item: CartModel): number {
-        const priceInfo = this.getItemPriceInfo(item);
-        const price = priceInfo.hasDiscount ? priceInfo.discountedPrice! : priceInfo.originalPrice;
-        return price * item.quantity;
+        return getVariantLineTotal(item.variant, item.quantity, this.productPromotions[item.product.id]);
     }
 
     getTotalWithoutDiscount(): Observable<number> {

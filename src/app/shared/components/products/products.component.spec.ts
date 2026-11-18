@@ -5,6 +5,7 @@ import { NgbConfig, NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { of } from 'rxjs';
 import { ProductsComponent } from './products.component';
 import { ProductModel } from '../../models/product.model';
+import { DiscountType, PromotionModel } from '../../models/promotion.model';
 import { ProductService } from '../../services/product.service';
 import { BrandService } from '../../services/brand.service';
 import { CategoryService } from '../../services/category.service';
@@ -150,5 +151,35 @@ describe('Rendered catalog filters and quick view', () => {
         fixture.componentInstance.selectVariant(product, 'large');
         fixture.componentInstance.openProductDetails(product);
         expect(modal.componentInstance['selectedVariantId']).toBe('large');
+    });
+    it('displays the selected variant’s quoted price and ignores old promotions when Go reports no saving', () => {
+        const product = {
+            id: 'care',
+            title: 'Care',
+            variants: [
+                { id: 'small', price: 10, volume: 10, promotionPrice: { finalCents: 625, savingCents: 375, promotionId: 'best' } },
+                { id: 'large', price: 20, volume: 20, promotionPrice: { finalCents: 2000, savingCents: 0, promotionId: null } },
+            ],
+            promotions: [
+                {
+                    id: 'legacy',
+                    discountType: DiscountType.PERCENTAGE,
+                    discountValue: 10,
+                    priority: 99,
+                    validFrom: new Date('2000-01-01'),
+                    validUntil: new Date('2999-01-01'),
+                    isActive: true,
+                } as PromotionModel,
+            ],
+        } as unknown as ProductModel;
+        fixture.componentInstance.products$ = of([product]);
+        fixture.detectChanges();
+        const card: HTMLElement = fixture.nativeElement.querySelector('.product-card');
+        expect(card.querySelector('.price')?.textContent).toContain('6.25');
+        expect(card.querySelector('.discount-badge')?.textContent).toBe('-37,5%');
+        card.querySelectorAll<HTMLButtonElement>('.variant')[1].click();
+        fixture.detectChanges();
+        expect(card.querySelector('.price')?.textContent).toContain('20.00');
+        expect(card.querySelector('.discount-badge')).toBeNull();
     });
 });

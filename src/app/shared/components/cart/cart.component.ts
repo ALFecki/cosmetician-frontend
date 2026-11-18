@@ -18,7 +18,7 @@ import { PromotionService } from '../../services/promotion.service';
 import { ToastService } from '../../services/toast.service';
 import { VerifyEmailModalService } from '../../services/verify-email-modal.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
-import { calculateDiscountedPrice, PriceInfo } from '../../utils/promotion.utils';
+import { getVariantLineTotal, getVariantPriceInfo, PriceInfo } from '../../utils/promotion.utils';
 import { ProductModalComponent } from '../product-modal/product-modal.component';
 
 @Component({
@@ -55,7 +55,7 @@ export class CartComponent {
         // Load promotions for cart items
         this.cartItems$.subscribe(items => {
             items.forEach(item => {
-                this.loadProductPromotions(item.product.id);
+                if (!item.variant.promotionPrice) this.loadProductPromotions(item.product.id);
             });
         });
     }
@@ -182,14 +182,11 @@ export class CartComponent {
     }
 
     getItemPriceInfo(item: CartModel): PriceInfo {
-        const promotions = this.productPromotions[item.product.id] || [];
-        return calculateDiscountedPrice(item.variant.price, promotions);
+        return getVariantPriceInfo(item.variant, this.productPromotions[item.product.id]);
     }
 
     getItemTotal(item: CartModel): number {
-        const priceInfo = this.getItemPriceInfo(item);
-        const price = priceInfo.hasDiscount ? priceInfo.discountedPrice! : priceInfo.originalPrice;
-        return price * item.quantity;
+        return getVariantLineTotal(item.variant, item.quantity, this.productPromotions[item.product.id]);
     }
 
     getTotalWithoutDiscount(): Observable<number> {

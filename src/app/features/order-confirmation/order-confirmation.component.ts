@@ -26,7 +26,7 @@ import { PromocodeService } from '../../shared/services/promocode.service';
 import { PromotionService } from '../../shared/services/promotion.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ImageUrlPipe } from '../../shared/utils/image-url.pipe';
-import { calculateDiscountedPrice, PriceInfo } from '../../shared/utils/promotion.utils';
+import { getVariantLineTotal, getVariantPriceInfo, PriceInfo } from '../../shared/utils/promotion.utils';
 
 @Component({
     selector: 'app-order-confirmation',
@@ -219,7 +219,7 @@ export class OrderConfirmationComponent implements OnInit, OnDestroy {
                 this.totalPrice$.next(Number(order.totalPrice.toFixed(2)));
                 // Load promotions for each product
                 order.products.forEach(item => {
-                    if (item.product?.id) {
+                    if (item.product?.id && !item.variant.promotionPrice) {
                         this.loadProductPromotions(item.product.id);
                     }
                 });
@@ -337,6 +337,7 @@ export class OrderConfirmationComponent implements OnInit, OnDestroy {
             if (version === this.quoteVersion) {
                 this.checkoutQuote = quote;
                 this.promocodeDiscount = quote.promoCodeDiscountCents / 100;
+                this.cartItems$.next(quote.order.products);
             }
         } catch (error) {
             if (version === this.quoteVersion) this.checkoutError = apiMessage(error, 'Не удалось проверить итог заказа');
@@ -734,25 +735,17 @@ export class OrderConfirmationComponent implements OnInit, OnDestroy {
         });
     }
 
+    private getItemPromotions(item: OrderProductModel): PromotionModel[] | undefined {
+        if (!item.product?.id) return undefined;
+        return this.phoneCheckout ? item.product.promotions : this.productPromotions[item.product.id];
+    }
+
     getItemPriceInfo(item: OrderProductModel): PriceInfo {
-        if (!item.product?.id) {
-            return {
-                originalPrice: item.variant.price,
-                discountedPrice: null,
-                hasDiscount: false,
-                activePromotion: null,
-                discountAmount: 0,
-                discountLabel: '',
-            };
-        }
-        const promotions = this.phoneCheckout ? item.product.promotions || [] : this.productPromotions[item.product.id] || [];
-        return calculateDiscountedPrice(item.variant.price, promotions);
+        return getVariantPriceInfo(item.variant, this.getItemPromotions(item));
     }
 
     getItemTotal(item: OrderProductModel): number {
-        const priceInfo = this.getItemPriceInfo(item);
-        const price = priceInfo.hasDiscount ? priceInfo.discountedPrice! : priceInfo.originalPrice;
-        return price * item.quantity;
+        return getVariantLineTotal(item.variant, item.quantity, this.getItemPromotions(item));
     }
 
     getCartTotal(): number {

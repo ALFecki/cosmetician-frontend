@@ -46,6 +46,7 @@
     }
 
     @if (!loading && !error && product) {
+        @let selectedPrice = getSelectedVariantPriceInfo();
         <div class="product-main-card">
             <div class="row g-4 align-items-start">
                 <div class="col-lg-5 d-flex align-items-center justify-content-center">
@@ -56,11 +57,13 @@
                         <p class="sf-eyebrow">Профессиональный уход · {{ product.brand.title }}</p>
                         <h1 class="card-title">{{ product.fullTitle ? product.fullTitle : product.title }}</h1>
 
-                        @if (this.product.promotions && this.product.promotions.length > 0) {
+                        @let badgePromotions = getBadgePromotions(selectedPrice);
+                        @if (badgePromotions.length > 0) {
                             <app-promotion-badge
-                                [promotions]="this.product.promotions"
+                                [promotions]="badgePromotions"
                                 [variant]="'full'"
-                                [basePrice]="getSelectedVariantPrice()"
+                                [basePrice]="selectedPrice.originalPrice"
+                                [discountLabel]="getSelectedVariant()?.promotionPrice ? selectedPrice.discountLabel : undefined"
                             ></app-promotion-badge>
                         }
 
@@ -103,23 +106,19 @@
                                             @if (product.isPriceHidden && !isPriceRevealed) {
                                                 <div class="variant-price text-muted">Цена скрыта</div>
                                             } @else {
-                                                @if (this.product.promotions && this.product.promotions.length > 0) {
-                                                    @let priceInfo = getVariantPriceInfo(variant.price);
-                                                    @if (priceInfo.hasDiscount) {
-                                                        <div class="variant-price-container">
-                                                            <div class="variant-price-original">
-                                                                {{ priceInfo.originalPrice | number: '1.2-2' }} р.
-                                                            </div>
-                                                            <div class="variant-price-discounted">
-                                                                {{ priceInfo.discountedPrice | number: '1.2-2' }} р.
-                                                                <span class="discount-badge">{{ priceInfo.discountLabel }}</span>
-                                                            </div>
+                                                @let priceInfo = getVariantPriceInfo(variant);
+                                                @if (priceInfo.hasDiscount) {
+                                                    <div class="variant-price-container">
+                                                        <div class="variant-price-original">
+                                                            {{ priceInfo.originalPrice | number: '1.2-2' }} р.
                                                         </div>
-                                                    } @else {
-                                                        <div class="variant-price">{{ variant.price | number: '1.2-2' }} р.</div>
-                                                    }
+                                                        <div class="variant-price-discounted">
+                                                            {{ priceInfo.discountedPrice | number: '1.2-2' }} р.
+                                                            <span class="discount-badge">{{ priceInfo.discountLabel }}</span>
+                                                        </div>
+                                                    </div>
                                                 } @else {
-                                                    <div class="variant-price">{{ variant.price | number: '1.2-2' }} р.</div>
+                                                    <div class="variant-price">{{ priceInfo.originalPrice | number: '1.2-2' }} р.</div>
                                                 }
                                             }
                                         </button>
@@ -180,22 +179,21 @@
                                     Объем: {{ getSelectedVariantVolume() }} мл
                                 </div>
                             } @else {
-                                @let priceInfo = getSelectedVariantPriceInfo();
-                                @if (priceInfo.hasDiscount) {
+                                @if (selectedPrice.hasDiscount) {
                                     <div class="price-block-with-discount animate-reveal">
                                         <div class="original-price">
-                                            {{ priceInfo.originalPrice | number: '1.2-2' }}
+                                            {{ selectedPrice.originalPrice | number: '1.2-2' }}
                                             <span class="currency">р.</span>
                                         </div>
                                         <div class="discounted-price">
-                                            {{ priceInfo.discountedPrice | number: '1.2-2' }}
+                                            {{ selectedPrice.discountedPrice | number: '1.2-2' }}
                                             <span class="currency">р.</span>
                                         </div>
-                                        <div class="discount-label-large">{{ priceInfo.discountLabel }}</div>
+                                        <div class="discount-label-large">{{ selectedPrice.discountLabel }}</div>
                                     </div>
                                 } @else {
                                     <div class="h3 price-revealed animate-reveal">
-                                        {{ getSelectedVariantPrice() | number: '1.2-2' }}
+                                        {{ selectedPrice.originalPrice | number: '1.2-2' }}
                                         <span class="currency">р.</span>
                                     </div>
                                 }

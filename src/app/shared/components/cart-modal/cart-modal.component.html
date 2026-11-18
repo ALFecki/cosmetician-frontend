@@ -39,7 +39,7 @@
             }
             @if (cartItems.length > 0) {
                 <div class="cart-items-container">
-                    @for (item of cartItems; track trackByProductId($index, item)) {
+                    @for (item of cartItems; track item.variant.id) {
                         <div class="cart-item-modal">
                             <div class="item-info-row">
                                 <img [src]="item.product.image | imageUrl" [alt]="item.product.title" class="item-image-modal" />
@@ -60,7 +60,7 @@
                                             >
                                         </div>
                                     } @else {
-                                        <div class="item-price-modal">{{ item.variant.price | number: '1.2-2' }} р.</div>
+                                        <div class="item-price-modal">{{ priceInfo.originalPrice | number: '1.2-2' }} р.</div>
                                     }
                                 </div>
                                 <button class="remove-btn-modal" type="button" (click)="removeProduct(item)" title="Удалить">

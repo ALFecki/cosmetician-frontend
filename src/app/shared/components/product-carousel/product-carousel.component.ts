@@ -86,7 +86,9 @@ export class ProductCarouselComponent implements OnInit {
         if (!product.variants || product.variants.length === 0) {
             return 0;
         }
-        return Math.min(...product.variants.map(variant => variant.price));
+        return Math.min(
+            ...product.variants.map(variant => (variant.promotionPrice ? variant.promotionPrice.finalCents / 100 : variant.price)),
+        );
     }
 
     onImageLoad(event: Event): void {
