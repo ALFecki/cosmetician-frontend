@@ -69,4 +69,15 @@ describe('Catalog search keyboard interaction', () => {
         expect(closes).toBe(1);
         fixture.destroy();
     }));
+    it('uses the authoritative search result price when visible and honors hidden prices', () => {
+        const product = {
+            id: 'care',
+            variants: [
+                { id: 'archived-default', isDefault: true, isDeleted: true, price: 1 },
+                { id: 'active', price: 20, promotionPrice: { finalCents: 1250, savingCents: 750, promotionId: 'best' } },
+            ],
+        } as ProductModel;
+        expect(fixture.componentInstance.getProductPrice(product)).toBe('12.50 р.');
+        expect(fixture.componentInstance.getProductPrice({ ...product, isPriceHidden: true })).toBe('Цена по запросу');
+    });
 });

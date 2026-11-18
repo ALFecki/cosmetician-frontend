@@ -1,0 +1,394 @@
+:host {
+    display: block;
+    --promotion-tint: #f8edf0;
+    --promotion-surface: #fff;
+}
+
+h1,
+h2,
+p,
+dl,
+dd,
+legend {
+    margin: 0;
+}
+
+h1 {
+    font-size: 27px;
+    font-weight: 650;
+    letter-spacing: -0.04em;
+}
+
+h2 {
+    font-size: 16px;
+    font-weight: 650;
+}
+
+.promotion-heading,
+.table-tools,
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.promotion-heading {
+    margin-bottom: 16px;
+}
+
+.btn {
+    min-height: 37px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--admin-accent);
+    --bs-btn-border-color: var(--admin-accent);
+    --bs-btn-hover-bg: #96324d;
+    --bs-btn-hover-border-color: #96324d;
+    --bs-btn-disabled-bg: var(--admin-accent);
+    --bs-btn-disabled-border-color: var(--admin-accent);
+}
+
+.text-button {
+    color: var(--admin-accent);
+    border: 0;
+    background: none;
+    padding: 4px 0;
+    font-size: 12px;
+    font-weight: 600;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.back-link {
+    margin-bottom: 8px;
+}
+
+.surface {
+    min-width: 0;
+    background: var(--promotion-surface);
+    border: 1px solid var(--admin-line);
+    border-radius: 8px;
+}
+
+.table-tools,
+.empty-message {
+    padding: 12px 15px;
+}
+
+.table-scroll {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+
+    th {
+        padding: 9px 12px;
+        background: #fafaf8;
+        color: var(--admin-muted);
+        font-weight: 600;
+        font-size: 11px;
+    }
+
+    td {
+        padding: 12px;
+        border-top: 1px solid var(--admin-line);
+        vertical-align: middle;
+    }
+
+    td:first-child {
+        overflow-wrap: anywhere;
+    }
+}
+
+.subtle,
+.period {
+    color: var(--admin-muted);
+    font-size: 12px;
+}
+
+.period span {
+    display: block;
+    white-space: nowrap;
+}
+
+.tag {
+    display: inline-flex;
+    padding: 4px 7px;
+    border-radius: 4px;
+    background: var(--admin-bg);
+    color: var(--admin-muted);
+    font-size: 11px;
+    white-space: nowrap;
+
+    &[data-state='active'] {
+        background: #edf5f0;
+        color: #347055;
+    }
+
+    &[data-state='scheduled'] {
+        background: #edf2f9;
+        color: #415d89;
+    }
+
+    &[data-state='draft'] {
+        background: var(--promotion-tint);
+        color: var(--admin-accent);
+    }
+}
+
+.feedback {
+    color: #347055;
+    margin-top: 10px;
+}
+
+.editor {
+    display: grid;
+    grid-template-columns: minmax(0, 1.37fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 14px;
+}
+
+.form-panel {
+    display: grid;
+    gap: 15px;
+    padding: 16px;
+}
+
+.form-part,
+.field,
+.product-pick,
+.product-dropdown,
+.product-matches,
+.preview-body {
+    min-width: 0;
+    display: grid;
+    gap: 8px;
+}
+
+.form-part + .form-part {
+    border-top: 1px solid var(--admin-line);
+    padding-top: 14px;
+}
+
+.field,
+.scope legend {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.field {
+    gap: 5px;
+}
+
+.fields-two,
+.scope {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.scope label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px;
+    border: 1px solid var(--admin-line);
+    border-radius: 6px;
+    font-size: 12px;
+
+    &:has(:checked) {
+        border-color: var(--admin-accent);
+        background: var(--promotion-tint);
+    }
+
+    input {
+        accent-color: var(--admin-accent);
+    }
+}
+
+.scope legend {
+    margin-bottom: 7px;
+}
+
+.form-control,
+.form-select {
+    border-color: var(--admin-line);
+    font-size: 13px;
+    min-height: 36px;
+}
+
+.product-pick > .btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.product-dropdown {
+    padding: 9px;
+    border: 1px solid var(--admin-line);
+    border-radius: 6px;
+    box-shadow: 0 4px 13px #33202215;
+}
+
+.product-matches {
+    gap: 0;
+    max-height: 14rem;
+    overflow: auto;
+}
+
+.product-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px;
+    min-height: 40px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    font-size: 12px;
+
+    &:hover {
+        background: var(--promotion-tint);
+    }
+
+    strong,
+    small {
+        display: block;
+        overflow-wrap: anywhere;
+    }
+
+    small {
+        color: var(--admin-muted);
+    }
+
+    span:last-child {
+        color: var(--admin-accent);
+        flex-shrink: 0;
+    }
+}
+
+.chosen-products {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.product-chip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+    padding-left: 7px;
+    background: var(--promotion-tint);
+    border-radius: 5px;
+    font-size: 12px;
+
+    span {
+        overflow-wrap: anywhere;
+    }
+
+    button {
+        padding: 2px 7px;
+        border: 0;
+        background: transparent;
+        color: var(--admin-accent);
+        font-size: 16px;
+    }
+}
+
+.preview-head,
+.preview-body {
+    padding: 14px 15px;
+}
+
+.preview-head {
+    display: grid;
+    gap: 5px;
+    border-bottom: 1px solid var(--admin-line);
+    border-radius: 7px 7px 0 0;
+    background: var(--promotion-tint);
+    font-size: 13px;
+}
+
+.preview-body dl div {
+    display: flex;
+    gap: 7px;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 6px 0;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+
+    dt {
+        color: var(--admin-muted);
+        font-weight: 400;
+    }
+
+    dd {
+        text-align: right;
+    }
+
+    &.price-total {
+        border-top: 1px solid var(--admin-line);
+        margin-top: 4px;
+        padding-top: 9px;
+
+        dt {
+            color: inherit;
+            font-weight: 650;
+        }
+
+        dd {
+            font-size: 19px;
+            font-weight: 670;
+            color: var(--admin-accent);
+        }
+    }
+}
+
+.actions {
+    justify-content: flex-end;
+    margin-top: 14px;
+}
+
+.field-error {
+    color: #a62842;
+    font-size: 12px;
+}
+
+.form-error {
+    margin-top: 12px;
+}
+
+@media (max-width: 1050px) {
+    .editor {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .dates {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .form-control,
+    .form-select {
+        font-size: 16px;
+    }
+}

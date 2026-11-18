@@ -14,6 +14,7 @@ import { FormBuilder } from '@angular/forms';
 import { of, Subject } from 'rxjs';
 import { OrderConfirmationComponent } from './order-confirmation.component';
 import { OrderModel, OrderProductModel } from '../../shared/models/order.model';
+import { CartQuote } from '../../shared/models/checkout.model';
 import { ListResponse } from '../../shared/base/schemas/base_schema';
 import { PostPlacement } from '../../shared/models/utils.interface';
 
@@ -270,6 +271,47 @@ describe('Phone checkout recovery', () => {
     afterEach(() => {
         component.ngOnDestroy();
         sessionStorage.removeItem('skviderm.checkout.customer');
+    });
+    it('uses fresh quote line prices alongside the checkout total', async () => {
+        const oldItem = {
+            product: { id: 'product' },
+            variant: { id: 'variant', price: 10, promotionPrice: { finalCents: 875, savingCents: 125, promotionId: 'old' } },
+            quantity: 2,
+        } as OrderProductModel;
+        const cartQuote = {
+            items: [{ variantId: 'variant', quantity: 2 }],
+            order: { products: [oldItem] },
+        } as CartQuote;
+        Object.defineProperty(cart, 'currentQuote', { value: cartQuote });
+        component.cartItems$.next([oldItem]);
+        const newItem = {
+            ...oldItem,
+            variant: { ...oldItem.variant, promotionPrice: { finalCents: 650, savingCents: 350, promotionId: 'new' } },
+        };
+        orders.quoteCart.and.resolveTo({
+            ...cartQuote,
+            order: { ...cartQuote.order, products: [newItem] },
+            subtotalCents: 2000,
+            promotionDiscountCents: 700,
+            totalCents: 1300,
+        });
+        await component.refreshQuote();
+        expect(component.getItemTotal(component.cartItems$.value[0])).toBe(13);
+        expect(component.getCartTotal()).toBe(13);
+
+        orders.quoteCart.and.resolveTo({
+            ...cartQuote,
+            order: {
+                ...cartQuote.order,
+                products: [{ ...newItem, variant: { id: 'variant', price: 10 } as OrderProductModel['variant'] }],
+            },
+            subtotalCents: 2000,
+            promotionDiscountCents: 0,
+            totalCents: 2000,
+        });
+        await component.refreshQuote();
+        expect(component.getItemTotal(component.cartItems$.value[0])).toBe(20);
+        expect(component.getCartTotal()).toBe(20);
     });
     it('can recover after a transient error despite an empty cart and invalid new-order form', async () => {
         sessionStorage.setItem(

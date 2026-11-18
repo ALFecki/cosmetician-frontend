@@ -1,0 +1,302 @@
+@if (!editorOpen) {
+    <div class="promotion-heading">
+        <h1>Акции</h1>
+        <button type="button" class="btn btn-primary" [disabled]="loading || !!error" (click)="openEditor()">
+            <i-bs name="plus-lg"></i-bs> Создать акцию
+        </button>
+    </div>
+    @if (loading) {
+        <p role="status" class="subtle">Загружаем акции…</p>
+    } @else if (error) {
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+            <button type="button" class="btn btn-light btn-sm" (click)="load()">Повторить</button>
+        </div>
+    } @else {
+        <section class="surface" aria-label="Список акций">
+            <div class="table-tools">
+                <span class="subtle">Акций: {{ visiblePromotions.length }}</span>
+                <label>
+                    <span class="visually-hidden">Фильтр по статусу</span>
+                    <select class="form-select" [formControl]="statusFilter">
+                        <option value="all">Все статусы</option>
+                        @for (status of statusKeys; track status) {
+                            <option [value]="status">{{ statuses[status] }}</option>
+                        }
+                    </select>
+                </label>
+            </div>
+            <div class="table-scroll">
+                <table aria-label="Список акций">
+                    <thead>
+                        <tr>
+                            <th scope="col">Акция</th>
+                            <th scope="col">Скидка</th>
+                            <th scope="col">На что действует</th>
+                            <th scope="col">Период (Минск)</th>
+                            <th scope="col">Статус</th>
+                            <th scope="col">Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (promotion of visiblePromotions; track promotion.id) {
+                            @let state = status(promotion);
+                            <tr>
+                                <td>
+                                    <strong>{{ promotion.title }}</strong>
+                                </td>
+                                <td>{{ discountLabel(promotion) }}</td>
+                                <td>{{ scopeLabel(promotion) }}</td>
+                                <td class="period">
+                                    <span>{{ promotion.validFrom ? formatDate(promotion.validFrom) : '—' }}</span>
+                                    @if (promotion.validUntil) {
+                                        <span>до {{ formatDate(promotion.validUntil) }}</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="tag" [attr.data-state]="state">{{ statuses[state] }}</span>
+                                </td>
+                                <td>
+                                    <button
+                                        type="button"
+                                        class="text-button"
+                                        [attr.aria-label]="'Открыть акцию «' + promotion.title + '»'"
+                                        (click)="openEditor(promotion)"
+                                    >
+                                        {{ promotion.targetType === 'all' || promotion.targetType === 'product' ? 'Изменить' : 'Открыть' }}
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (visiblePromotions.length === 0) {
+                <p class="empty-message subtle">Акций с этим статусом пока нет.</p>
+            }
+        </section>
+    }
+    @if (feedback) {
+        <p class="feedback" role="status">{{ feedback }}</p>
+    }
+} @else {
+    <button type="button" class="text-button back-link" [disabled]="saving" (click)="closeEditor()">
+        <i-bs name="arrow-left"></i-bs> К списку акций
+    </button>
+    <div class="promotion-heading">
+        <h1>{{ editing?.title || 'Новая акция' }}</h1>
+    </div>
+    @if (isLegacyTarget && editing) {
+        <div class="surface form-panel">
+            <h2>{{ scopeLabel(editing) }}</h2>
+            <p>
+                {{ discountLabel(editing) }} · {{ statuses[status(editing)] }}
+                @if (editing.validFrom && editing.validUntil) {
+                    · {{ formatDate(editing.validFrom) }} — {{ formatDate(editing.validUntil) }} (Минск)
+                }
+            </p>
+            <p class="subtle">Для акций по брендам и категориям доступна приостановка.</p>
+        </div>
+    } @else {
+        <form id="admin-promotion-form" class="editor" [formGroup]="form" (ngSubmit)="saveDraftOrPublish(false)">
+            <fieldset class="surface form-panel" [disabled]="saving">
+                <section class="form-part" aria-label="Скидка и товары">
+                    <h2>Скидка и товары</h2>
+                    <label class="field">
+                        Название акции
+                        <input
+                            name="title"
+                            class="form-control"
+                            formControlName="title"
+                            maxlength="80"
+                            placeholder="Например, Скидка выходных"
+                        />
+                    </label>
+                    <fieldset class="scope">
+                        <legend>На что действует</legend>
+                        <label><input type="radio" name="targetType" formControlName="targetType" value="all" /> Весь каталог</label>
+                        <label
+                            ><input type="radio" name="targetType" formControlName="targetType" value="product" /> Выбранные товары</label
+                        >
+                    </fieldset>
+                    @if (form.controls.targetType.value === 'product') {
+                        <div class="product-pick" tabindex="-1" (keydown.escape)="pickerOpen = false; pickerToggle.focus()">
+                            <button
+                                #pickerToggle
+                                type="button"
+                                class="btn btn-light"
+                                [attr.aria-expanded]="pickerOpen"
+                                aria-controls="admin-promotion-picker"
+                                (click)="togglePicker()"
+                            >
+                                Добавить товары <i-bs name="chevron-down"></i-bs>
+                            </button>
+                            @if (selectedProducts.length) {
+                                <ul class="chosen-products" aria-label="Выбранные товары">
+                                    @for (product of selectedProducts; track product.id) {
+                                        <li class="product-chip">
+                                            <span>{{ product.fullTitle || product.title }}</span>
+                                            <button
+                                                type="button"
+                                                [attr.aria-label]="'Убрать ' + (product.fullTitle || product.title)"
+                                                (click)="removeProduct(product.id)"
+                                            >
+                                                ×
+                                            </button>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            @if (selectedProductsError) {
+                                <p class="field-error" role="alert">
+                                    Не удалось загрузить названия выбранных товаров.
+                                    <button type="button" class="text-button" (click)="loadSelectedProducts()">Повторить</button>
+                                </p>
+                            }
+                            @if (pickerOpen) {
+                                <div class="product-dropdown" id="admin-promotion-picker">
+                                    <label class="field">
+                                        Поиск товаров
+                                        <input
+                                            #searchInput
+                                            type="search"
+                                            name="productSearch"
+                                            class="form-control"
+                                            [formControl]="search"
+                                            autocomplete="off"
+                                            maxlength="120"
+                                            placeholder="Название или бренд"
+                                            (keydown.enter)="$event.preventDefault()"
+                                        />
+                                    </label>
+                                    @if (selectedProducts.length >= maxProducts) {
+                                        <p class="subtle" role="status">Можно выбрать до {{ maxProducts }} товаров.</p>
+                                    } @else if (searchError) {
+                                        <p class="field-error" role="status">Ошибка поиска. Измените запрос или попробуйте позже.</p>
+                                    } @else if (matches === null || (!search.value.trim() && samplesLoading)) {
+                                        <p class="subtle" role="status">Ищем товары…</p>
+                                    } @else if (productMatches.length === 0) {
+                                        <p class="subtle" role="status">Нет подходящих товаров.</p>
+                                    } @else {
+                                        <div class="product-matches">
+                                            @for (product of productMatches; track product.id) {
+                                                <button type="button" class="product-option" (click)="selectProduct(product)">
+                                                    <span
+                                                        ><strong>{{ product.fullTitle || product.title }}</strong
+                                                        ><small>{{ product.brandTitle }}</small></span
+                                                    >
+                                                    <span>Добавить</span>
+                                                </button>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                    <div class="fields-two">
+                        <label class="field">
+                            Тип скидки
+                            <select class="form-select" formControlName="discountType">
+                                <option value="percentage">Процент</option>
+                                <option value="fixed">Сумма в BYN</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            Размер скидки, {{ form.controls.discountType.value === 'percentage' ? '%' : 'BYN' }}
+                            <input
+                                name="discountValue"
+                                class="form-control"
+                                formControlName="discountValue"
+                                type="number"
+                                min="0.01"
+                                [attr.max]="form.controls.discountType.value === 'percentage' ? 100 : null"
+                                step="0.01"
+                                inputmode="decimal"
+                            />
+                        </label>
+                    </div>
+                </section>
+                <section class="form-part" aria-label="Срок действия">
+                    <h2>Срок действия</h2>
+                    <p class="subtle">Время Минска</p>
+                    <div class="fields-two dates">
+                        <label class="field">
+                            Начало
+                            <input class="form-control" name="validFrom" type="datetime-local" formControlName="validFrom" />
+                        </label>
+                        <label class="field">
+                            Окончание
+                            <input class="form-control" name="validUntil" type="datetime-local" formControlName="validUntil" />
+                        </label>
+                    </div>
+                </section>
+            </fieldset>
+            <aside class="surface" aria-label="Предпросмотр акции">
+                <div class="preview-head">
+                    <h2>Что увидит покупатель</h2>
+                    @let input = editorInput;
+                    <p>
+                        {{ discountLabel(input) }} · {{ scopeLabel(input) }}
+                        @if (input.validUntil) {
+                            · до {{ formatDate(input.validUntil) }}
+                        }
+                    </p>
+                </div>
+                <div class="preview-body">
+                    @if (preview; as price) {
+                        @let currentPreview = previewProduct;
+                        <label class="field">
+                            Товар для примера
+                            <select #previewSelect class="form-select" (change)="previewProductId.setValue(previewSelect.value)">
+                                @for (product of previewProducts; track product.id) {
+                                    <option [value]="product.id" [selected]="product.id === currentPreview?.id">
+                                        {{ product.fullTitle || product.title }}
+                                    </option>
+                                }
+                            </select>
+                        </label>
+                        <div aria-live="polite" aria-atomic="true">
+                            <dl>
+                                <div>
+                                    <dt>Обычная цена</dt>
+                                    <dd>{{ formatPrice(price.base) }}</dd>
+                                </div>
+                                <div>
+                                    <dt>По новой акции</dt>
+                                    <dd>{{ price.proposed }}</dd>
+                                </div>
+                                <div class="price-total">
+                                    <dt>Цена покупателю</dt>
+                                    <dd>{{ formatPrice(price.final) }}</dd>
+                                </div>
+                            </dl>
+                            <p class="subtle">{{ price.note }}</p>
+                        </div>
+                    } @else if (samplesLoading) {
+                        <p class="subtle" role="status">Загружаем товары…</p>
+                    } @else if (!samplesLoaded) {
+                        <p class="subtle" role="status">
+                            Не удалось загрузить товары.
+                            <button type="button" class="text-button" (click)="loadSamples()">Повторить</button>
+                        </p>
+                    } @else {
+                        <p class="subtle">Нет товаров с доступной ценой.</p>
+                    }
+                </div>
+            </aside>
+        </form>
+    }
+    @if (error) {
+        <p class="field-error form-error" role="alert">{{ error }}</p>
+    }
+    <div class="actions">
+        @if (editing?.isActive) {
+            <button type="button" class="btn btn-light" [disabled]="saving" (click)="pause()">Выключить акцию</button>
+        }
+        @if (!isLegacyTarget) {
+            <button type="button" class="btn btn-light" [disabled]="saving" (click)="saveDraftOrPublish(true)">Сохранить черновик</button>
+            <button type="submit" form="admin-promotion-form" class="btn btn-primary" [disabled]="saving">{{ publishLabel }}</button>
+        }
+    </div>
+}

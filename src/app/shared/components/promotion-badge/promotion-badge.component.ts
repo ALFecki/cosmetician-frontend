@@ -13,8 +13,10 @@ export class PromotionBadgeComponent {
     @Input() promotions: PromotionModel[] = [];
     @Input() variant: 'compact' | 'full' = 'compact';
     @Input() basePrice?: number;
+    @Input() discountLabel?: string;
 
     getDiscountText(promotion: PromotionModel): string {
+        if (this.discountLabel !== undefined) return this.discountLabel;
         if (promotion.discountValue == 0) {
             return '';
         }
@@ -30,17 +32,17 @@ export class PromotionBadgeComponent {
     }
 
     getPromotionDescription(promotion: PromotionModel): string {
-        if (promotion.buyQuantity && promotion.getQuantity) {
+        if (this.discountLabel === undefined && promotion.buyQuantity && promotion.getQuantity) {
             return `${promotion.buyQuantity}+${promotion.getQuantity}`;
         }
-        if (promotion.minQuantity) {
+        if (this.discountLabel === undefined && promotion.minQuantity) {
             return `От ${promotion.minQuantity} шт.`;
         }
         return this.getDiscountText(promotion);
     }
 
     getBadgeClass(promotion: PromotionModel): string {
-        if (promotion.buyQuantity && promotion.getQuantity) {
+        if (this.discountLabel === undefined && promotion.buyQuantity && promotion.getQuantity) {
             return 'badge-gift';
         }
         if (promotion.discountType === DiscountType.PERCENTAGE) {

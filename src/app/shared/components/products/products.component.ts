@@ -12,7 +12,7 @@ import { CartService } from '../../services/cart.service';
 import { LoginModalService } from '../../services/login-modal.service';
 import { ProductService } from '../../services/product.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
-import { calculateDiscountedPrice, PriceInfo } from '../../utils/promotion.utils';
+import { getVariantPriceInfo, PriceInfo } from '../../utils/promotion.utils';
 import { PaginationComponent } from '../pagination/pagination.component';
 import { ProductFilterComponent } from '../product-filter/product-filter.component';
 import { ProductModalComponent } from '../product-modal/product-modal.component';
@@ -278,11 +278,6 @@ export class ProductsComponent implements OnInit, OnChanges, OnDestroy {
         return product.variants?.find(v => v.id === selectedId) || product.variants?.[0];
     }
 
-    getSelectedVariantPrice(product: ProductModel): number {
-        const variant = this.getSelectedVariant(product);
-        return variant?.price || 0;
-    }
-
     getSelectedVariantVolume(product: ProductModel): number {
         const variant = this.getSelectedVariant(product);
         return variant?.volume || 0;
@@ -317,9 +312,6 @@ export class ProductsComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     getProductPriceInfo(product: ProductModel): PriceInfo {
-        const variant = this.getSelectedVariant(product);
-        const basePrice = variant?.price || 0;
-        const promotions = product.promotions || [];
-        return calculateDiscountedPrice(basePrice, promotions);
+        return getVariantPriceInfo(this.getSelectedVariant(product), product.promotions);
     }
 }

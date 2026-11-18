@@ -2,13 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IconsModule } from '../../base/icons/icons.module';
-import { ProductModel } from '../../models/product.model';
+import { ProductModel, ProductVariantModel } from '../../models/product.model';
+import { PromotionModel } from '../../models/promotion.model';
 import { AuthService } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
 import { LoginModalService } from '../../services/login-modal.service';
 import { ProductService } from '../../services/product.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
-import { calculateDiscountedPrice, PriceInfo } from '../../utils/promotion.utils';
+import { getVariantPriceInfo, PriceInfo } from '../../utils/promotion.utils';
 import { ProductCarouselComponent } from '../product-carousel/product-carousel.component';
 import { PromotionBadgeComponent } from '../promotion-badge/promotion-badge.component';
 
@@ -75,19 +76,18 @@ export class ProductCardComponent implements OnInit, OnDestroy {
         return this.product.variants.find(v => v.id === this.selectedVariantId) || this.product.variants[0];
     }
 
-    getSelectedVariantPrice(): number {
-        const variant = this.getSelectedVariant();
-        return variant?.price || 0;
-    }
-
     getSelectedVariantPriceInfo(): PriceInfo {
-        const variant = this.getSelectedVariant();
-        const basePrice = variant?.price || 0;
-        return calculateDiscountedPrice(basePrice, this.product.promotions || []);
+        return getVariantPriceInfo(this.getSelectedVariant(), this.product.promotions);
     }
 
-    getVariantPriceInfo(price: number): PriceInfo {
-        return calculateDiscountedPrice(price, this.product.promotions || []);
+    getVariantPriceInfo(variant: ProductVariantModel): PriceInfo {
+        return getVariantPriceInfo(variant, this.product.promotions);
+    }
+
+    getBadgePromotions(price: PriceInfo): PromotionModel[] {
+        if (!this.getSelectedVariant()?.promotionPrice) return this.product.promotions || [];
+        if (this.product.isPriceHidden && !this.isPriceRevealed) return [];
+        return price.activePromotion ? [price.activePromotion] : [];
     }
 
     getSelectedVariantVolume(): number {

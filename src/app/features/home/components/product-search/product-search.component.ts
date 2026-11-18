@@ -132,7 +132,11 @@ export class ProductSearchComponent implements OnInit, OnDestroy {
             return 'Цена по запросу';
         }
 
-        const defaultVariant = product.variants?.find(v => v.isDefault) || product.variants?.[0];
+        const variants = product.variants?.filter(variant => !variant.isDeleted);
+        const defaultVariant = variants?.find(variant => variant.isDefault) || variants?.[0];
+        if (defaultVariant?.promotionPrice) {
+            return `${(defaultVariant.promotionPrice.finalCents / 100).toFixed(2)} р.`;
+        }
         if (defaultVariant) {
             return `${defaultVariant.price} р.`;
         }

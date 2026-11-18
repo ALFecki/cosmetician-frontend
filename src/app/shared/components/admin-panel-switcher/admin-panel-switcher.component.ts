@@ -6,6 +6,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, catchError, forkJoin, of, tap } from 'rxjs';
 import { IconsModule } from '../../base/icons/icons.module';
+import { ProductVariantModel } from '../../models/product.model';
 import { FilterBrandSchema } from '../../schemas/brand.schema';
 import { FilterCategorySchema } from '../../schemas/category.schema';
 import { FilterCountrySchema } from '../../schemas/country.schema';
@@ -27,8 +28,15 @@ import { StatisticsService } from '../../services/statistics.service';
 import { ToastService } from '../../services/toast.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
 import { AdminOrdersComponent } from '../admin-orders/admin-orders.component';
+import { AdminPromotionsComponent } from '../admin-promotions/admin-promotions.component';
 import { GenericTableComponent } from '../generic-table/generic-table.component';
 import { StatisticsComponent } from '../statistics/statistics.component';
+
+type PricedVariant = Pick<ProductVariantModel, 'price' | 'promotionPrice' | 'isDeleted'>;
+interface PricedProduct {
+    variants?: PricedVariant[];
+    isPriceHidden?: boolean;
+}
 
 interface ModelConfig {
     key: string;
@@ -70,6 +78,7 @@ interface ModelConfig {
         ReactiveFormsModule,
         StatisticsComponent,
         AdminOrdersComponent,
+        AdminPromotionsComponent,
         GenericTableComponent,
         IconsModule,
         ImageUrlPipe,
@@ -79,6 +88,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
     @ViewChild('itemModal') itemModal!: TemplateRef<any>;
     @ViewChild('deleteModal') deleteModal!: TemplateRef<any>;
     @ViewChild('variantModal') variantModal!: TemplateRef<any>;
+    @ViewChild(AdminPromotionsComponent) private adminPromotions?: AdminPromotionsComponent;
 
     availableModels = [
         { key: 'orders', title: 'Заказы' },
@@ -129,6 +139,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
     readonly pageSize = 20;
     compact = false;
     currentModel = 'products';
+    legacyPromotions = false;
     currentModelData: any[] = [];
     filteredData: any[] = [];
 
@@ -626,7 +637,10 @@ export class AdminPanelSwitcherComponent implements OnInit {
     }
 
     get hasList(): boolean {
-        return !['statistics', 'orders', 'settings'].includes(this.currentModel);
+        return (
+            !['statistics', 'orders', 'settings'].includes(this.currentModel) &&
+            (this.currentModel !== 'promotions' || this.legacyPromotions)
+        );
     }
 
     get pageCount(): number {
@@ -651,19 +665,42 @@ export class AdminPanelSwitcherComponent implements OnInit {
     getOptions(key: string): any[] {
         return this.modelConfigs['products'].fields.find(field => field.key === key)?.options || [];
     }
-    activeVariants(product: any): any[] {
-        return (product.variants || []).filter((variant: any) => !variant.isDeleted);
+    activeVariants<Variant extends { isDeleted?: boolean }>(product: { variants?: Variant[] }): Variant[] {
+        return (product.variants || []).filter(variant => !variant.isDeleted);
     }
-    productPrice(product: any, hidden = product.isPriceHidden): string {
+    productPrice(product: PricedProduct, hidden = product.isPriceHidden): string {
         if (hidden) return 'Скрыта';
-        const prices = this.activeVariants(product).map(variant => Number(variant.price));
+        return this.formatPriceRange(this.activeVariants(product).map(variant => Number(variant.price)));
+    }
+    private formatPriceRange(prices: number[]): string {
         if (!prices.length) return 'Нет вариантов';
         return (
             (new Set(prices).size > 1 ? 'от ' : '') +
             Math.min(...prices).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
         );
     }
-    productVolumes(product: any): string {
+    private effectivePrice(variant: PricedVariant): number {
+        return variant.promotionPrice ? variant.promotionPrice.finalCents / 100 : Number(variant.price);
+    }
+
+    catalogPrice(product: PricedProduct) {
+        if (product.isPriceHidden) return { current: 'Скрыта', original: '', discount: '' };
+        const variants = this.activeVariants(product);
+        const prices = variants.map(variant => this.effectivePrice(variant));
+        const current = this.formatPriceRange(prices);
+        const offer = variants[prices.indexOf(Math.min(...prices))]?.promotionPrice;
+        if (!offer?.savingCents) return { current, original: '', discount: '' };
+        const saving = offer.savingCents;
+        const base = offer.finalCents + saving;
+        const discount = (100 * saving) / base;
+        return {
+            current,
+            original: this.formatPriceRange([base / 100]),
+            discount: discount < 0.01 ? '−<0,01%' : '−' + discount.toLocaleString('ru-RU', { maximumFractionDigits: 2 }) + '%',
+        };
+    }
+
+    productVolumes(product: { variants?: Pick<ProductVariantModel, 'volume' | 'isDeleted'>[] }): string {
         const volumes = this.activeVariants(product).map(variant => variant.volume);
         return volumes.length ? volumes.join(' · ') + ' мл' : '—';
     }
@@ -673,13 +710,20 @@ export class AdminPanelSwitcherComponent implements OnInit {
     }
 
     canLeave(): boolean {
+        if (this.currentModel === 'promotions' && this.adminPromotions && !this.adminPromotions.canLeave()) return false;
         if (this.saving || this.savingVariant || this.deleting || this.restoring || this.deletingVariant) return false;
         return !this.editorOpen || !this.hasUnsavedChanges || window.confirm('Есть несохранённые изменения. Выйти без сохранения?');
     }
 
     @HostListener('window:beforeunload', ['$event'])
     beforeUnload(event: BeforeUnloadEvent): void {
-        if (this.saving || this.savingVariant || this.deletingVariant || (this.editorOpen && this.hasUnsavedChanges)) {
+        if (
+            this.saving ||
+            this.savingVariant ||
+            this.deletingVariant ||
+            (this.editorOpen && this.hasUnsavedChanges) ||
+            this.adminPromotions?.hasPendingChanges
+        ) {
             event.preventDefault();
             event.returnValue = '';
         }
@@ -696,6 +740,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
     switchModel(modelKey: string) {
         if (this.currentModel === modelKey || !this.closeEditor()) return;
         this.currentModel = modelKey;
+        this.legacyPromotions = false;
         this.searchText = '';
         this.brandFilter = '';
         this.categoryFilter = '';
@@ -705,6 +750,12 @@ export class AdminPanelSwitcherComponent implements OnInit {
         this.filteredData = [];
         if (this.hasList) this.loadData();
         else this.loading = false;
+    }
+
+    loadLegacyPromotions(): void {
+        if (this.currentModel !== 'promotions') return;
+        this.legacyPromotions = true;
+        this.loadData();
     }
 
     loadData() {
@@ -809,8 +860,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
         if (this.currentModel === 'products') {
             this.filteredData.sort((left, right) => {
                 if (this.sortOrder === 'price') {
-                    const a = Math.min(...this.activeVariants(left).map(variant => Number(variant.price)));
-                    const b = Math.min(...this.activeVariants(right).map(variant => Number(variant.price)));
+                    const a = Math.min(...this.activeVariants<PricedVariant>(left).map(variant => this.effectivePrice(variant)));
+                    const b = Math.min(...this.activeVariants<PricedVariant>(right).map(variant => this.effectivePrice(variant)));
                     if (a !== b) return a - b;
                 }
                 return left.title.localeCompare(right.title, 'ru');

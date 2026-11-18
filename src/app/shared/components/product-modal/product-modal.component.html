@@ -19,7 +19,7 @@
                         <span class="discount-badge-inline">{{ priceInfo.discountLabel }}</span>
                     </div>
                 } @else {
-                    <span class="price-value">{{ getSelectedVariantPrice() | number: '1.2-2' }} р.</span>
+                    <span class="price-value">{{ priceInfo.originalPrice | number: '1.2-2' }} р.</span>
                 }
             </div>
         }
@@ -47,7 +47,7 @@
                                 @if (selectedProduct?.isPriceHidden && !isPriceRevealed) {
                                     <div class="variant-price text-muted">Цена скрыта</div>
                                 } @else {
-                                    @let priceInfo = getVariantPriceInfo(variant.price);
+                                    @let priceInfo = getVariantPriceInfo(variant);
                                     @if (priceInfo.hasDiscount) {
                                         <div class="variant-price-container">
                                             <div class="variant-price-original">{{ priceInfo.originalPrice | number: '1.2-2' }} р.</div>
@@ -57,7 +57,7 @@
                                             </div>
                                         </div>
                                     } @else {
-                                        <div class="variant-price">{{ variant.price | number: '1.2-2' }} р.</div>
+                                        <div class="variant-price">{{ priceInfo.originalPrice | number: '1.2-2' }} р.</div>
                                     }
                                 }
                             </button>

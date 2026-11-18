@@ -143,7 +143,7 @@ export class CartService implements OnDestroy {
                 product: item.product,
                 variant: item.variant,
                 quantity: item.quantity,
-                totalPrice: this.getRowTotal(item.product, item.variant.price, item.quantity),
+                totalPrice: this.getRowTotal(item.product, item.variant, item.quantity),
             })),
         );
         this.totalPriceSubject.next(quote.totalCents / 100);
@@ -404,7 +404,7 @@ export class CartService implements OnDestroy {
                     product: item.product,
                     variant: item.variant,
                     quantity: item.quantity,
-                    totalPrice: this.getRowTotal(item.product, item.variant.price, item.quantity),
+                    totalPrice: this.getRowTotal(item.product, item.variant, item.quantity),
                 }));
                 this.cartItemsSubject.next(updatedItems);
                 this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
@@ -440,7 +440,7 @@ export class CartService implements OnDestroy {
                             product: item.product,
                             variant: item.variant,
                             quantity: item.quantity,
-                            totalPrice: this.getRowTotal(item.product, item.variant.price, item.quantity),
+                            totalPrice: this.getRowTotal(item.product, item.variant, item.quantity),
                         }));
                         this.cartItemsSubject.next(items);
                         this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
@@ -505,7 +505,7 @@ export class CartService implements OnDestroy {
                     product: item.product,
                     variant: item.variant,
                     quantity: item.quantity,
-                    totalPrice: this.getRowTotal(item.product, item.variant.price, item.quantity),
+                    totalPrice: this.getRowTotal(item.product, item.variant, item.quantity),
                 }));
                 this.cartItemsSubject.next(updatedItems);
                 this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
@@ -529,17 +529,17 @@ export class CartService implements OnDestroy {
                 return {
                     ...item,
                     quantity: item.quantity + 1,
-                    totalPrice: this.getRowTotal(item.product, item.variant.price, item.quantity + 1),
+                    totalPrice: this.getRowTotal(item.product, item.variant, item.quantity + 1),
                 };
             }
             return item;
         });
 
         cartItem.quantity += 1;
-        cartItem.totalPrice = this.getRowTotal(cartItem.product, cartItem.variant.price, cartItem.quantity);
+        cartItem.totalPrice = this.getRowTotal(cartItem.product, cartItem.variant, cartItem.quantity);
 
         this.totalPriceSubject.next(
-            Number((this.totalPriceSubject.value + this.getRowTotal(cartItem.product, cartItem.variant.price, 1)).toFixed(2)),
+            Number((this.totalPriceSubject.value + this.getRowTotal(cartItem.product, cartItem.variant, 1)).toFixed(2)),
         );
         this.cartItemsSubject.next(updatedItems);
         this.addToPendingUpdates(cartItem);
@@ -558,17 +558,17 @@ export class CartService implements OnDestroy {
                 return {
                     ...item,
                     quantity: item.quantity - 1,
-                    totalPrice: this.getRowTotal(item.product, item.variant.price, item.quantity - 1),
+                    totalPrice: this.getRowTotal(item.product, item.variant, item.quantity - 1),
                 };
             }
             return item;
         });
 
         cartItem.quantity -= 1;
-        cartItem.totalPrice = this.getRowTotal(cartItem.product, cartItem.variant.price, cartItem.quantity);
+        cartItem.totalPrice = this.getRowTotal(cartItem.product, cartItem.variant, cartItem.quantity);
 
         this.totalPriceSubject.next(
-            Number((this.totalPriceSubject.value - this.getRowTotal(cartItem.product, cartItem.variant.price, 1)).toFixed(2)),
+            Number((this.totalPriceSubject.value - this.getRowTotal(cartItem.product, cartItem.variant, 1)).toFixed(2)),
         );
         this.cartItemsSubject.next(updatedItems);
         this.addToPendingUpdates(cartItem);
@@ -590,7 +590,7 @@ export class CartService implements OnDestroy {
                 product: item.product,
                 variant: item.variant,
                 quantity: item.quantity,
-                totalPrice: this.getRowTotal(item.product, item.variant.price, item.quantity),
+                totalPrice: this.getRowTotal(item.product, item.variant, item.quantity),
             }));
             this.cartItemsSubject.next(updatedItems);
             this.totalPriceSubject.next(Number(order.totalPrice.toFixed(2)));
@@ -598,8 +598,9 @@ export class CartService implements OnDestroy {
         }
     }
 
-    private getRowTotal(product: CartModel['product'], price: number, quantity: number): number {
-        const priceInfo = calculateDiscountedPrice(price, product.promotions);
+    private getRowTotal(product: CartModel['product'], variant: CartModel['variant'], quantity: number): number {
+        if (variant.promotionPrice) return (variant.promotionPrice.finalCents * quantity) / 100;
+        const priceInfo = calculateDiscountedPrice(variant.price, product.promotions);
         return Number(((priceInfo.discountedPrice ?? priceInfo.originalPrice) * quantity).toFixed(2));
     }
 

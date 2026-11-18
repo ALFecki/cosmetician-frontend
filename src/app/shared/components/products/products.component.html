@@ -97,9 +97,7 @@
                                             ><span class="price">{{ priceInfo.discountedPrice | number: '1.2-2' }} <small>BYN</small></span
                                             ><span class="discount-badge">{{ priceInfo.discountLabel }}</span>
                                         } @else {
-                                            <span class="price"
-                                                >{{ getSelectedVariantPrice(product) | number: '1.2-2' }} <small>BYN</small></span
-                                            >
+                                            <span class="price">{{ priceInfo.originalPrice | number: '1.2-2' }} <small>BYN</small></span>
                                         }
                                     </div>
                                 }
