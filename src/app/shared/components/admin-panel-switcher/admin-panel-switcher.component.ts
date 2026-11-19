@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Component, HostListener, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, HostListener, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, catchError, forkJoin, of, tap } from 'rxjs';
 import { IconsModule } from '../../base/icons/icons.module';
@@ -139,6 +140,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
     readonly pageSize = 20;
     compact = false;
     currentModel = 'products';
+    private readonly route = inject(ActivatedRoute, { optional: true });
     legacyPromotions = false;
     currentModelData: any[] = [];
     filteredData: any[] = [];
@@ -197,6 +199,9 @@ export class AdminPanelSwitcherComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
+        if (this.route?.snapshot.queryParamMap.get('section') === 'orders') {
+            this.currentModel = 'orders';
+        }
         this.setupModelConfigs();
         this.setupVariantForm();
         this.availableModels = Object.keys(this.modelConfigs).map(key => ({
