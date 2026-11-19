@@ -2,10 +2,10 @@ name: Release frontend
 
 on:
     workflow_dispatch:
+    workflow_call:
     push:
         branches:
             - main
-            - codex/reliable-deployment
     pull_request:
 
 permissions:
@@ -27,6 +27,12 @@ jobs:
               run: yarn lint
             - name: Formatting
               run: yarn fmt:check
+            - name: Browser tests
+              run: yarn test --watch=false --browsers=ChromeHeadless
+            - name: Test storefront preview
+              run: yarn test:storefront-preview
+            - name: Test release transport
+              run: python3 -B -m unittest discover -s tools -p test_deploy_production.py
             - name: Production build
               run: yarn build --configuration production
             - name: Package release
@@ -43,6 +49,7 @@ jobs:
                       'repository': os.environ['GITHUB_REPOSITORY'],
                       'commit': os.environ['GITHUB_SHA'],
                       'run_id': os.environ['GITHUB_RUN_ID'],
+                      'build_source': 'github-actions',
                       'files': {'frontend.tar.gz': hashlib.sha256(archive.read_bytes()).hexdigest()},
                   }
                   pathlib.Path('release/manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
@@ -52,3 +59,4 @@ jobs:
                   name: frontend-${{ github.sha }}
                   path: release/
                   retention-days: 30
+                  overwrite: true

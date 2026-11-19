@@ -1,0 +1,77 @@
+name: Deploy production
+
+on:
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: skviderm-production
+    cancel-in-progress: false
+
+jobs:
+    revisions:
+        if: github.ref == 'refs/heads/main'
+        runs-on: ubuntu-24.04
+        timeout-minutes: 5
+        outputs:
+            backend: ${{ steps.main.outputs.backend }}
+        steps:
+            - name: Resolve Go main
+              id: main
+              run: |
+                  set -euo pipefail
+                  backend="$(git ls-remote --exit-code https://github.com/ALFecki/cosmetician-backend-go.git refs/heads/main | cut -f1)"
+                  [[ "$backend" =~ ^[a-f0-9]{40}$ ]]
+                  echo "backend=$backend" >> "$GITHUB_OUTPUT"
+
+    frontend:
+        needs: revisions
+        uses: ./.github/workflows/release.yml
+
+    backend:
+        needs: revisions
+        uses: ALFecki/cosmetician-backend-go/.github/workflows/check.yml@d9d710da7e504177886e631d82789dc6bdf2a492
+        with:
+            revision: ${{ needs.revisions.outputs.backend }}
+
+    deploy:
+        if: github.ref == 'refs/heads/main'
+        needs: [revisions, frontend, backend]
+        runs-on: ubuntu-24.04
+        timeout-minutes: 45
+        environment:
+            name: production
+            url: https://skviderm.by/
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+            - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+              with:
+                  name: frontend-${{ github.sha }}
+                  path: release/frontend
+            - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+              with:
+                  name: backend-${{ needs.revisions.outputs.backend }}
+                  path: release/backend
+            - name: Recheck main revisions
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  BACKEND_SHA: ${{ needs.revisions.outputs.backend }}
+              run: |
+                  set -euo pipefail
+                  frontend="$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)"
+                  backend="$(git ls-remote --exit-code https://github.com/ALFecki/cosmetician-backend-go.git refs/heads/main | cut -f1)"
+                  if [[ "$frontend" != "$GITHUB_SHA" || "$backend" != "$BACKEND_SHA" ]]; then
+                      echo "::error::Main changed during the build. Start a new deployment."
+                      exit 1
+                  fi
+            - name: Deploy both verified artifacts
+              env:
+                  SKVIDERM_DEPLOY_KEY: ${{ secrets.SKVIDERM_DEPLOY_KEY }}
+                  SKVIDERM_DEPLOY_HOST: ${{ vars.SKVIDERM_DEPLOY_HOST }}
+                  SKVIDERM_DEPLOY_HOST_KEY: ${{ vars.SKVIDERM_DEPLOY_HOST_KEY }}
+                  BACKEND_SHA: ${{ needs.revisions.outputs.backend }}
+              run: python3 -B tools/deploy_production.py release "$BACKEND_SHA" "$GITHUB_SHA" "$GITHUB_RUN_ID"
