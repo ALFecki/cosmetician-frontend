@@ -29,6 +29,8 @@ jobs:
     frontend:
         needs: revisions
         uses: ./.github/workflows/release.yml
+        with:
+            build_only: true
 
     backend:
         needs: revisions
@@ -74,4 +76,4 @@ jobs:
                   SKVIDERM_DEPLOY_HOST: ${{ vars.SKVIDERM_DEPLOY_HOST }}
                   SKVIDERM_DEPLOY_HOST_KEY: ${{ vars.SKVIDERM_DEPLOY_HOST_KEY }}
                   BACKEND_SHA: ${{ needs.revisions.outputs.backend }}
-              run: python3 -B tools/deploy_production.py release "$BACKEND_SHA" "$GITHUB_SHA" "$GITHUB_RUN_ID"
+              run: python3 -B tools/deploy_production.py release "$GITHUB_SHA" "$GITHUB_RUN_ID" --backend "$BACKEND_SHA"
