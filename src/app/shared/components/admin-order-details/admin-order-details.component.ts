@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { BehaviorSubject } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, firstValueFrom, map, Observable, of, switchMap, tap } from 'rxjs';
 import { IconsModule } from '../../base/icons/icons.module';
-import { OrderModel } from '../../models/order.model';
+import { OrderMinimalModel, OrderModel } from '../../models/order.model';
 import { PersonModel } from '../../models/person.model';
 import { ProductModel } from '../../models/product.model';
 import { AuthService } from '../../services/auth.service';
@@ -14,38 +15,58 @@ import { PersonService } from '../../services/person.service';
 import { ToastService } from '../../services/toast.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
 import { ProductModalComponent } from '../product-modal/product-modal.component';
+import { adminOrderStatuses, adminOrderStatusLabel } from './admin-order-status';
+
+const deliveryMethods: Record<string, string> = {
+    standart: 'Стандартная доставка',
+    post: 'Европочта',
+    pickup: 'Самовывоз',
+};
+
+const paymentMethods: Record<string, string> = {
+    card: 'Картой при получении',
+    cash: 'Наличными',
+    online: 'Онлайн картой',
+};
+
+const paymentStatuses: Record<string, string> = {
+    completed: 'Оплачено',
+    pending: 'Ожидает оплаты',
+    notpaid: 'Ожидает оплаты',
+    processing: 'Обработка оплаты',
+    failed: 'Ошибка оплаты',
+};
 
 @Component({
     selector: 'app-admin-order-details',
     templateUrl: './admin-order-details.component.html',
     styleUrl: './admin-order-details.component.scss',
-    imports: [CommonModule, RouterModule, ImageUrlPipe, IconsModule],
+    imports: [CommonModule, FormsModule, RouterLink, ImageUrlPipe, IconsModule],
 })
 export class AdminOrderDetailsComponent implements OnInit {
-    order: BehaviorSubject<OrderModel | null> = new BehaviorSubject<OrderModel | null>(null);
-    orderUser: BehaviorSubject<PersonModel | null> = new BehaviorSubject<PersonModel | null>(null);
+    @Input() orderId?: string;
+    @Input() customer?: PersonModel;
+    @Output() closeDetails = new EventEmitter<void>();
+    @Input() onStatusSaved?: (order: OrderMinimalModel) => void;
+
+    private readonly destroyRef = inject(DestroyRef);
+    private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
+    private readonly authService = inject(AuthService);
+    private readonly orderService = inject(OrderService);
+    private readonly personService = inject(PersonService);
+    private readonly toastService = inject(ToastService);
+    private readonly modalService = inject(NgbModal);
+
+    readonly orderStatuses = adminOrderStatuses;
+    readonly statusLabel = adminOrderStatusLabel;
+    order: OrderModel | null = null;
+    contact: OrderModel['contactSnapshot'] | PersonModel = null;
     loading = true;
-    error: string | null = null;
-    updatingStatus = false;
-
-    statusOptions = [
-        { value: 'Checked', label: 'Подтвержден' },
-        { value: 'Processing', label: 'В обработке' },
-        { value: 'InDelivery', label: 'В доставке' },
-        { value: 'Delivered', label: 'Доставлен' },
-        { value: 'Completed', label: 'Завершен' },
-        { value: 'Cancelled', label: 'Отменен' },
-    ];
-
-    constructor(
-        private route: ActivatedRoute,
-        private router: Router,
-        private authService: AuthService,
-        private orderService: OrderService,
-        private personService: PersonService,
-        private toastService: ToastService,
-        private modalService: NgbModal,
-    ) {}
+    error = '';
+    statusError = '';
+    selectedStatus = '';
+    saving = false;
 
     ngOnInit(): void {
         if (!this.authService.isAdmin()) {
@@ -53,158 +74,112 @@ export class AdminOrderDetailsComponent implements OnInit {
             return;
         }
 
-        this.loadOrderDetails();
+        const ids = this.orderId ? of(this.orderId) : this.route.paramMap.pipe(map(params => params.get('id')));
+        ids.pipe(
+            distinctUntilChanged(),
+            tap(() => {
+                this.order = null;
+                this.contact = null;
+                this.loading = true;
+                this.error = '';
+                this.statusError = '';
+            }),
+            switchMap(id => {
+                const order: Observable<OrderModel | null> = id
+                    ? this.orderService.getById(id).pipe(map(response => response.data ?? null))
+                    : of(null);
+                return order.pipe(
+                    catchError(() => of(null)),
+                    tap(entry => {
+                        this.loading = false;
+                        this.order = entry;
+                        if (!entry) {
+                            this.error = 'Не удалось загрузить заказ';
+                            return;
+                        }
+                        this.selectedStatus =
+                            this.orderStatuses.find(option => option.value.toLowerCase() === entry.status.toLowerCase())?.value ??
+                            entry.status;
+                    }),
+                    switchMap(entry => this.loadContact(entry)),
+                );
+            }),
+            takeUntilDestroyed(this.destroyRef),
+        ).subscribe(contact => (this.contact = contact));
     }
 
-    loadOrderDetails(): void {
-        this.loading = true;
-        this.error = null;
-
-        this.route.paramMap
-            .pipe(
-                switchMap(params => {
-                    const orderId = params.get('id');
-                    if (!orderId) {
-                        throw new Error('Order ID is required');
-                    }
-                    return this.orderService.getById(orderId);
-                }),
-            )
-            .subscribe({
-                next: response => {
-                    this.order.next(response.data);
-                    this.loadOrderUser(response.data.personId);
-                },
-                error: error => {
-                    this.error = 'Не удалось загрузить информацию о заказе: ' + (error.message || 'Неизвестная ошибка');
-                    this.loading = false;
-                },
-            });
+    private loadContact(order: OrderModel | null): Observable<OrderModel['contactSnapshot'] | PersonModel> {
+        if (!order) return of(null);
+        if (order.contactSnapshot) return of(order.contactSnapshot);
+        if (this.customer) return of(this.customer);
+        if (!order.personId) return of(null);
+        return this.personService.getById(order.personId).pipe(
+            map(response => response.data),
+            catchError(() => of(null)),
+        );
     }
 
-    loadOrderUser(personId: string): void {
-        if (!personId) {
-            this.loading = false;
+    get canSaveStatus(): boolean {
+        return (
+            !!this.order &&
+            !this.saving &&
+            this.order.status.toLowerCase() !== this.selectedStatus.toLowerCase() &&
+            this.orderStatuses.some(option => option.value === this.selectedStatus)
+        );
+    }
+
+    async saveStatus(): Promise<void> {
+        const order = this.order;
+        if (!order || !this.canSaveStatus) return;
+
+        this.saving = true;
+        this.statusError = '';
+        try {
+            const updatedOrder = await firstValueFrom(this.orderService.updateStatus(order.personId, order.id, this.selectedStatus));
+            if (!updatedOrder) {
+                if (this.order === order) this.statusError = 'Не удалось изменить статус заказа';
+                return;
+            }
+            this.onStatusSaved?.(updatedOrder);
+            if (this.order !== order || this.destroyRef.destroyed) return;
+            this.order = { ...order, status: updatedOrder.status, updatedAt: updatedOrder.updatedAt };
+            this.selectedStatus = updatedOrder.status;
+        } catch {
+            if (this.order === order) this.statusError = 'Не удалось изменить статус заказа';
+        } finally {
+            this.saving = false;
+        }
+    }
+
+    async copyLink(order: OrderModel): Promise<void> {
+        const path = this.router.serializeUrl(this.router.createUrlTree(['/admin/order', order.id]));
+        try {
+            await navigator.clipboard.writeText(new URL(path, window.location.origin).href);
+            this.toastService.show('Ссылка скопирована в буфер обмена', 'success');
+        } catch {
+            this.toastService.show('Не удалось скопировать ссылку', 'error');
+        }
+    }
+
+    openProduct(product: ProductModel): void {
+        this.modalService.dismissAll();
+        if (window.innerWidth < 768) {
+            this.router.navigate(['/product', product.id]);
             return;
         }
-
-        this.personService.getById(personId).subscribe({
-            next: response => {
-                const snapshot = this.order.value?.contactSnapshot;
-                this.orderUser.next(
-                    snapshot
-                        ? {
-                              ...response.data,
-                              firstName: snapshot.firstName,
-                              secondName: snapshot.secondName,
-                              phone: snapshot.phone,
-                              email: snapshot.email,
-                              surname: null,
-                          }
-                        : response.data,
-                );
-                this.loading = false;
-            },
-            error: error => {
-                console.error('Error loading user:', error);
-                this.loading = false;
-            },
-        });
+        const modal = this.modalService.open(ProductModalComponent, { size: 'lg', centered: true, scrollable: true });
+        modal.componentInstance.selectedProduct = product;
     }
 
-    async updateOrderStatus(newStatus: string): Promise<void> {
-        const currentOrder = this.order.value;
-        if (this.updatingStatus || !currentOrder?.id) return;
-
-        this.updatingStatus = true;
-        try {
-            await this.orderService.updateStatus(currentOrder.personId, currentOrder.id, newStatus).toPromise();
-            currentOrder.status = newStatus;
-            this.order.next(currentOrder);
-            this.toastService.show('Статус заказа успешно обновлен', 'success');
-        } catch (error) {
-            this.toastService.show('Ошибка при обновлении статуса заказа', 'error');
-            console.error('Error updating order status:', error);
-        } finally {
-            this.updatingStatus = false;
-        }
+    getDeliveryMethod(method: string): string {
+        return deliveryMethods[method?.toLowerCase()] ?? 'Не указан';
     }
 
-    getOrderStatusClass(status: string): string {
-        switch (status?.toLowerCase()) {
-            case 'completed':
-                return 'bg-success';
-            case 'delivered':
-                return 'bg-info';
-            case 'indelivery':
-                return 'bg-primary';
-            case 'processing':
-                return 'bg-warning';
-            case 'checked':
-                return 'bg-secondary';
-            case 'cancelled':
-                return 'bg-danger';
-            default:
-                return 'bg-light text-dark';
-        }
+    getPaymentMethod(method: string): string {
+        return paymentMethods[method?.toLowerCase()] ?? 'Не указан';
     }
 
-    getOrderStatusText(status: string): string {
-        const option = this.statusOptions.find(opt => opt.value.toLowerCase() === status?.toLowerCase());
-        return option ? option.label : status;
-    }
-
-    getTotalOrderValue(order: OrderModel): number {
-        return order.products?.reduce((total, item) => total + item.historicalPrice * item.quantity, 0) || 0;
-    }
-
-    getOrderItemsCount(order: OrderModel): number {
-        return order.products?.reduce((total, item) => total + item.quantity, 0) || 0;
-    }
-
-    goBackToAdmin(): void {
-        this.router.navigate(['/admin']);
-    }
-
-    openProductDetails(product: ProductModel) {
-        const isMobile = window.innerWidth < 768;
-
-        if (isMobile) {
-            this.router.navigate([`/product/${product.id}`]);
-        } else {
-            this.modalService.dismissAll();
-            const activeModal = this.modalService.open(ProductModalComponent, {
-                size: 'lg',
-                centered: true,
-                scrollable: true,
-            });
-            activeModal.componentInstance.selectedProduct = product;
-        }
-    }
-
-    getPaymentMethodText(method: string): string {
-        switch (method?.toLowerCase()) {
-            case 'card':
-                return 'Банковская карта';
-            case 'cash':
-                return 'Наличные';
-            case 'online':
-                return 'Онлайн оплата';
-            default:
-                return 'Не указано';
-        }
-    }
-
-    getDeliveryMethodText(method: string): string {
-        switch (method?.toLowerCase()) {
-            case 'standart':
-                return 'Стандартная доставка';
-            case 'post':
-                return 'Европочта';
-            case 'pickup':
-                return 'Самовывоз';
-            default:
-                return 'Не указано';
-        }
+    getPaymentStatus(status: string): string {
+        return paymentStatuses[status?.toLowerCase()] ?? 'Не указан';
     }
 }

@@ -1,282 +1,217 @@
-<div class="container my-5">
-    <div class="card">
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">
-                <i-bs name="shield-check" class="me-2"></i-bs>
-                Админ: Детали заказа
-            </h4>
-            <button class="btn btn-sm btn-outline-secondary" (click)="goBackToAdmin()">
-                <i-bs name="arrow-left" class="me-1"></i-bs>
-                Назад к админ панели
-            </button>
+<div class="order-workspace" [class.quick-view]="orderId">
+    <section class="order-page" aria-labelledby="admin-order-title">
+        <div class="order-navigation">
+            @if (orderId) {
+                @if (order; as entry) {
+                    <a
+                        class="order-link"
+                        [routerLink]="saving ? null : ['/admin/order', entry.id]"
+                        [attr.aria-disabled]="saving ? 'true' : null"
+                        (click)="!saving && closeDetails.emit()"
+                    >
+                        <i-bs name="box-arrow-up-right" aria-hidden="true"></i-bs> Открыть страницу
+                    </a>
+                }
+                <button type="button" class="btn-close order-close" aria-label="Закрыть" (click)="closeDetails.emit()"></button>
+            } @else {
+                <a
+                    class="order-link"
+                    [routerLink]="saving ? null : '/admin'"
+                    [queryParams]="{ section: 'orders' }"
+                    [attr.aria-disabled]="saving ? 'true' : null"
+                >
+                    <i-bs name="arrow-left" aria-hidden="true"></i-bs> К заказам
+                </a>
+            }
         </div>
 
-        <div class="card-body">
-            @if (loading) {
-                <div class="text-center my-5">
-                    <div class="spinner-border" role="status">
-                        <span class="visually-hidden">Загрузка...</span>
+        @if (order; as entry) {
+            <header class="order-header">
+                <div class="order-title">
+                    <div class="order-title-row">
+                        <h1 id="admin-order-title">Заказ № {{ entry.orderId ?? entry.id }}</h1>
+                        <span class="order-status" [attr.data-status]="entry.status.toLowerCase()">{{ statusLabel(entry.status) }}</span>
                     </div>
+                    <p>Оформлен {{ entry.createdAt | date: 'dd.MM.yyyy, HH:mm' : 'GMT+3' }}</p>
                 </div>
-            }
+                <button type="button" class="order-button order-copy" (click)="copyLink(entry)">
+                    <i-bs name="link-45deg" aria-hidden="true"></i-bs> Копировать ссылку
+                </button>
+            </header>
 
-            @if (error) {
-                <div class="alert alert-danger">
-                    {{ error }}
-                </div>
-            }
-
-            @if (!loading && !error && order) {
-                <div>
-                    <div class="order-header mb-4">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5 class="text-muted mb-1">Заказ №{{ (order | async)?.orderId ?? (order | async)?.id }}</h5>
-                                <p class="mb-0">от {{ (order | async)?.createdAt | date: 'dd.MM.yyyy HH:mm' }}</p>
-                            </div>
-                            <div class="col-md-6 text-md-end">
-                                <span
-                                    class="badge rounded-pill order-status-badge {{
-                                        getOrderStatusClass((order | async)?.status || '')
-                                    }} fs-6 mb-2"
-                                >
-                                    {{ getOrderStatusText((order | async)?.status || '') }}
-                                </span>
-                            </div>
-                        </div>
-                        <hr class="my-3" />
-                    </div>
-                    @if (orderUser | async; as user) {
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h6 class="mb-0">
-                                            <i-bs name="person" class="me-2"></i-bs>
-                                            Информация о клиенте
-                                        </h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <p class="mb-1"><strong>Имя:</strong> {{ user.firstName }} {{ user.secondName }}</p>
-                                        <p class="mb-1"><strong>Email:</strong> {{ user.email || 'Не указан' }}</p>
-                                        <p class="mb-0"><strong>Телефон:</strong> {{ user.phone || 'Не указан' }}</p>
-                                        @if ((order | async)?.contactSnapshot?.phoneVerified === false) {
-                                            <span class="badge bg-warning text-dark">Номер не подтверждён</span>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h6 class="mb-0">
-                                            <i-bs name="info-circle" class="me-2"></i-bs>
-                                            Информация о заказе
-                                        </h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <p class="mb-1">
-                                            <strong>Дата создания:</strong> {{ (order | async)?.createdAt | date: 'dd.MM.yyyy HH:mm' }}
-                                        </p>
-                                        <p class="mb-1">
-                                            <strong>Обновлен:</strong> {{ (order | async)?.updatedAt | date: 'dd.MM.yyyy HH:mm' }}
-                                        </p>
-                                        <p class="mb-0">
-                                            <strong>Общая сумма:</strong> {{ (order | async)?.totalPrice | number: '1.2-2' }} р.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <form class="status-form" (ngSubmit)="saveStatus()">
+                <label for="admin-order-status">Изменить статус</label>
+                <select id="admin-order-status" name="orderStatus" class="form-select" [(ngModel)]="selectedStatus" [disabled]="saving">
+                    @if (entry.status.toLowerCase() === 'notchecked') {
+                        <option value="NotChecked" disabled>Не оформлен</option>
                     }
+                    @for (status of orderStatuses; track status.value) {
+                        <option [value]="status.value">{{ status.label }}</option>
+                    }
+                </select>
+                <button type="submit" class="order-button order-button-primary" [disabled]="!canSaveStatus">
+                    {{ saving ? 'Сохраняем…' : 'Сохранить' }}
+                </button>
+                @if (statusError) {
+                    <p class="order-error" role="alert">{{ statusError }}</p>
+                }
+            </form>
 
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h6 class="mb-0">
-                                        <i-bs name="truck" class="me-2"></i-bs>
-                                        Информация о доставке
-                                    </h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-4 mb-3">
-                                            <div class="delivery-info-item">
-                                                <strong>Способ доставки:</strong>
-                                                <div class="mt-1">
-                                                    <span class="badge {{ (order | async)?.isCourierDelivery ? 'bg-success' : 'bg-info' }}">
-                                                        {{ getDeliveryMethodText((order | async)?.deliveryMethod!) }}
-                                                    </span>
-                                                    <br />
-                                                    <span class="badge bg-secondary mt-1">
-                                                        @if ((order | async)?.isCourierDelivery) {
-                                                            {{ 'Курьерская доставка' }}
-                                                        }
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 mb-3">
-                                            <div class="delivery-info-item">
-                                                <strong>Дата доставки:</strong>
-                                                <div class="mt-1">
-                                                    @if ((order | async)?.deliveryDate) {
-                                                        <span class="text-info">{{
-                                                            (order | async)?.deliveryDate | date: 'dd.MM.yyyy'
-                                                        }}</span>
-                                                    } @else {
-                                                        <span class="text-muted">Не указана</span>
-                                                    }
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 mb-3">
-                                            <div class="delivery-info-item">
-                                                <strong>Способ оплаты:</strong>
-                                                <div class="mt-1">
-                                                    @if ((order | async)?.paymentMethod) {
-                                                        <span class="text-info">{{
-                                                            getPaymentMethodText((order | async)?.paymentMethod!)
-                                                        }}</span>
-                                                    } @else {
-                                                        <span class="text-muted">Не указан</span>
-                                                    }
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    @if ((order | async)?.deliveryAddress) {
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <div class="delivery-info-item">
-                                                    <strong>Адрес доставки:</strong>
-                                                    <div class="mt-1 text-info">{{ (order | async)?.deliveryAddress }}</div>
-                                                </div>
-                                            </div>
-                                            @if ((order | async)?.deliveryPostAddress) {
-                                                <div class="col-md-6 mb-3">
-                                                    <div class="delivery-info-item">
-                                                        <strong>Почтовый адрес:</strong>
-                                                        <div class="mt-1 text-info">{{ (order | async)?.deliveryPostAddress }}</div>
-                                                    </div>
-                                                </div>
-                                            }
-                                        </div>
-                                    }
-
-                                    @if ((order | async)?.comment) {
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div class="delivery-info-item">
-                                                    <strong>Комментарий к заказу:</strong>
-                                                    <div class="mt-2">
-                                                        <div class="alert alert-light border-start border-info border-3">
-                                                            {{ (order | async)?.comment }}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="order-items mb-4">
-                        <h5>Товары в заказе</h5>
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
+            <div class="order-grid">
+                <section class="order-panel order-products" aria-labelledby="admin-order-products">
+                    <h2 id="admin-order-products">Товары</h2>
+                    @if (entry.products.length) {
+                        <table class="order-items">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Товар</th>
+                                    <th scope="col">За ед.</th>
+                                    <th scope="col">Кол-во</th>
+                                    <th scope="col">Сумма</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (item of entry.products; track item) {
                                     <tr>
-                                        <th style="width: 80px">Фото</th>
-                                        <th>Товар</th>
-                                        <th class="text-end">Цена</th>
-                                        <th class="text-center">Кол-во</th>
-                                        <th class="text-end">Сумма</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (item of (order | async)?.products; track item) {
-                                        <tr>
-                                            <td>
-                                                <img
-                                                    [src]="item.product.image | imageUrl"
-                                                    class="img-thumbnail order-item-img"
-                                                    [alt]="item.product.title || 'Product'"
-                                                    style="width: 50px; height: 50px; object-fit: cover"
-                                                />
-                                            </td>
-                                            <td>
-                                                <div class="fw-medium">
-                                                    <a
-                                                        class="item-title"
-                                                        (click)="openProductDetails(item.product)"
-                                                        (keyup.enter)="openProductDetails(item.product)"
-                                                        (keyup.space)="openProductDetails(item.product)"
-                                                        tabindex="0"
-                                                        role="link"
-                                                    >
+                                        <td>
+                                            <div class="order-product">
+                                                <img [src]="item.product.image | imageUrl" alt="" width="44" height="48" loading="lazy" />
+                                                <div>
+                                                    <button type="button" class="order-product-link" (click)="openProduct(item.product)">
                                                         {{ item.product.title }}
-                                                    </a>
+                                                    </button>
+                                                    @if (item.variant.volume) {
+                                                        <span>{{ item.variant.volume }} мл</span>
+                                                    }
                                                 </div>
-                                                <small class="text-muted">{{ item.variant.volume || '-' }} мл</small>
-                                            </td>
-                                            <td class="text-end">{{ item.historicalPrice | number: '1.2-2' }} р.</td>
-                                            <td class="text-center">{{ item.quantity }}</td>
-                                            <td class="text-end fw-bold">
-                                                {{ item.historicalPrice * item.quantity | number: '1.2-2' }} р.
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="4" class="text-end fw-bold">Итого:</td>
-                                        <td class="text-end fw-bold fs-5">{{ (order | async)?.totalPrice | number: '1.2-2' }} р.</td>
+                                            </div>
+                                        </td>
+                                        <td>{{ item.historicalPrice | number: '1.2-2' }}</td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td>{{ item.historicalPrice * item.quantity | number: '1.2-2' }}</td>
                                     </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="card mt-3">
-                        <div class="card-header">
-                            <h6 class="mb-0">
-                                <i-bs name="gear" class="me-2"></i-bs>
-                                Изменить статус
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col-md-8">
-                                    <select
-                                        class="form-select"
-                                        [value]="(order | async)?.status"
-                                        (change)="updateOrderStatus($any($event.target).value)"
-                                        [disabled]="updatingStatus"
-                                    >
-                                        @for (status of statusOptions; track status) {
-                                            <option [value]="status.value">
-                                                {{ status.label }}
-                                            </option>
-                                        }
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    @if (updatingStatus) {
-                                        <span class="text-muted">
-                                            <i-bs name="arrow-clockwise" class="spin me-1"></i-bs>
-                                            Обновление...
-                                        </span>
-                                    }
-                                </div>
+                                }
+                            </tbody>
+                        </table>
+                    } @else {
+                        <p class="order-empty">В заказе нет товаров</p>
+                    }
+                    <dl class="order-totals">
+                        @if (entry.discountAmount && entry.discountAmount > 0) {
+                            <div>
+                                <dt>Скидка</dt>
+                                <dd class="order-discount">−{{ entry.discountAmount | number: '1.2-2' }} BYN</dd>
                             </div>
+                        }
+                        <div>
+                            <dt>Доставка</dt>
+                            <dd>{{ entry.deliveryCost | number: '1.2-2' }} BYN</dd>
                         </div>
-                    </div>
+                        <div class="order-total">
+                            <dt>Итого</dt>
+                            <dd>{{ entry.totalPrice | number: '1.2-2' }} BYN</dd>
+                        </div>
+                    </dl>
+                </section>
+
+                <div class="order-summary">
+                    <section class="order-panel" aria-labelledby="admin-order-customer">
+                        <h2 id="admin-order-customer">Покупатель</h2>
+                        @if (contact; as customerContact) {
+                            <p class="customer-name">{{ customerContact.firstName }} {{ customerContact.secondName }}</p>
+                            <dl class="order-fields">
+                                <div>
+                                    <dt>Телефон</dt>
+                                    <dd>
+                                        @if (customerContact.phone) {
+                                            <a [href]="'tel:' + customerContact.phone">{{ customerContact.phone }}</a>
+                                            @if (entry.contactSnapshot?.phoneVerified === false) {
+                                                <span class="phone-unverified">Номер не подтверждён</span>
+                                            }
+                                        } @else {
+                                            —
+                                        }
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>Почта</dt>
+                                    <dd>
+                                        @if (customerContact.email) {
+                                            <a [href]="'mailto:' + customerContact.email">{{ customerContact.email }}</a>
+                                        } @else {
+                                            —
+                                        }
+                                    </dd>
+                                </div>
+                            </dl>
+                        } @else {
+                            <p class="order-empty">Контакты недоступны</p>
+                        }
+                    </section>
+
+                    <section class="order-panel" aria-labelledby="admin-order-delivery">
+                        <h2 id="admin-order-delivery">Доставка</h2>
+                        <dl class="order-fields">
+                            <div>
+                                <dt>Способ</dt>
+                                <dd>
+                                    {{ getDeliveryMethod(entry.deliveryMethod) }}
+                                    @if (entry.isCourierDelivery) {
+                                        <span class="delivery-courier">Курьерская доставка</span>
+                                    }
+                                </dd>
+                            </div>
+                            @if (entry.deliveryDate) {
+                                <div>
+                                    <dt>Дата</dt>
+                                    <dd>{{ entry.deliveryDate | date: 'dd.MM.yyyy' : 'GMT+3' }}</dd>
+                                </div>
+                            }
+                            @if (entry.deliveryAddress) {
+                                <div>
+                                    <dt>Адрес</dt>
+                                    <dd>{{ entry.deliveryAddress }}</dd>
+                                </div>
+                            }
+                            @if (entry.deliveryPostAddress) {
+                                <div>
+                                    <dt>Пункт выдачи</dt>
+                                    <dd>{{ entry.deliveryPostAddress }}</dd>
+                                </div>
+                            }
+                            @if (entry.comment) {
+                                <div class="order-comment">
+                                    <dt>Комментарий</dt>
+                                    <dd>{{ entry.comment }}</dd>
+                                </div>
+                            }
+                        </dl>
+                    </section>
+
+                    <section class="order-panel" aria-labelledby="admin-order-payment">
+                        <h2 id="admin-order-payment">Оплата</h2>
+                        <dl class="order-fields">
+                            <div>
+                                <dt>Способ</dt>
+                                <dd>{{ getPaymentMethod(entry.paymentMethod) }}</dd>
+                            </div>
+                            <div>
+                                <dt>Статус</dt>
+                                <dd>{{ getPaymentStatus(entry.paymentStatus) }}</dd>
+                            </div>
+                        </dl>
+                    </section>
                 </div>
+            </div>
+            <p class="order-updated">Обновлён {{ entry.updatedAt | date: 'dd.MM.yyyy, HH:mm' : 'GMT+3' }}</p>
+        } @else {
+            <h1 id="admin-order-title">Детали заказа</h1>
+            @if (loading) {
+                <p class="order-empty" role="status">Загружаем заказ…</p>
             }
-        </div>
-    </div>
+            @if (error) {
+                <p class="order-error" role="alert">{{ error }}</p>
+            }
+        }
+    </section>
 </div>

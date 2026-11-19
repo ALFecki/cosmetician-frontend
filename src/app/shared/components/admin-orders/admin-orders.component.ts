@@ -1,25 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { forkJoin, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { catchError, forkJoin, map, Observable, of, shareReplay, take } from 'rxjs';
 import { IconsModule } from '../../base/icons/icons.module';
-import { OrderMinimalModel, OrderModel } from '../../models/order.model';
+import { OrderMinimalModel } from '../../models/order.model';
 import { PersonModel } from '../../models/person.model';
-import { ProductModel } from '../../models/product.model';
 import { OrderService } from '../../services/order.service';
 import { PersonService } from '../../services/person.service';
 import { ToastService } from '../../services/toast.service';
-import { ImageUrlPipe } from '../../utils/image-url.pipe';
-import { ProductModalComponent } from '../product-modal/product-modal.component';
+import { AdminOrderDetailsComponent } from '../admin-order-details/admin-order-details.component';
+import { adminOrderStatuses, adminOrderStatusLabel } from '../admin-order-details/admin-order-status';
 
 interface OrderMinimalWithUser extends OrderMinimalModel {
-    user?: PersonModel;
-}
-
-interface OrderWithUser extends OrderModel {
     user?: PersonModel;
 }
 
@@ -30,14 +24,14 @@ type SortDirection = 'asc' | 'desc';
     selector: 'app-admin-orders',
     templateUrl: './admin-orders.component.html',
     styleUrl: './admin-orders.component.scss',
-    imports: [CommonModule, FormsModule, ImageUrlPipe, IconsModule],
+    imports: [CommonModule, FormsModule, IconsModule, AdminOrderDetailsComponent],
 })
 export class AdminOrdersComponent implements OnInit {
     orders$!: Observable<OrderMinimalWithUser[]>;
     filteredOrders$!: Observable<OrderMinimalWithUser[]>;
     loading = true;
     error: string | null = null;
-    selectedOrder: OrderWithUser | null = null;
+    selectedOrder: OrderMinimalWithUser | null = null;
     updatingStatus = false;
 
     // Tab and filtering
@@ -47,14 +41,8 @@ export class AdminOrdersComponent implements OnInit {
     sortField: SortField = 'updatedAt';
     sortDirection: SortDirection = 'desc';
 
-    statusOptions = [
-        { value: 'Checked', label: 'Подтвержден' },
-        { value: 'Processing', label: 'В обработке' },
-        { value: 'InDelivery', label: 'В доставке' },
-        { value: 'Delivered', label: 'Доставлен' },
-        { value: 'Completed', label: 'Завершен' },
-        { value: 'Cancelled', label: 'Отменен' },
-    ];
+    readonly statusOptions = adminOrderStatuses;
+    readonly getOrderStatusText = adminOrderStatusLabel;
 
     constructor(
         private router: Router,
@@ -83,19 +71,20 @@ export class AdminOrdersComponent implements OnInit {
                         map(response => {
                             personMap[id] = response.data;
                         }),
+                        catchError(() => of(undefined)),
                     ),
                 );
 
-                const ordersWithUsers$ = forkJoin(personRequests).pipe(
+                const profiles$ = personRequests.length ? forkJoin(personRequests) : of([]);
+                this.orders$ = profiles$.pipe(
                     map(() => {
                         return filteredOrders.map(order => ({
                             ...order,
-                            user: personMap[order.personId!],
+                            user: personMap[order.personId],
                         }));
                     }),
+                    shareReplay({ bufferSize: 1, refCount: true }),
                 );
-
-                this.orders$ = ordersWithUsers$.pipe(map(orders => this.sortOrders(orders)));
 
                 this.updateFilteredOrders();
             },
@@ -125,7 +114,7 @@ export class AdminOrdersComponent implements OnInit {
                     filtered = orders.filter(order => order.status === 'Checked');
                 }
 
-                return filtered;
+                return this.sortOrders(filtered);
             }),
         );
     }
@@ -137,8 +126,6 @@ export class AdminOrdersComponent implements OnInit {
             this.sortField = field;
             this.sortDirection = 'asc';
         }
-
-        this.orders$ = this.orders$.pipe(map(orders => this.sortOrders(orders)));
 
         this.updateFilteredOrders();
     }
@@ -211,37 +198,27 @@ export class AdminOrdersComponent implements OnInit {
         }
     }
 
-    getOrderStatusText(status: string): string {
-        const option = this.statusOptions.find(opt => opt.value.toLowerCase() === status?.toLowerCase());
-        return option ? option.label : status;
+    openOrderDetails(order: OrderMinimalWithUser, content: TemplateRef<unknown>): void {
+        this.selectedOrder = order;
+        this.modalService.open(content, {
+            size: 'xl',
+            centered: true,
+            scrollable: true,
+            windowClass: 'skviderm-admin-modal',
+            ariaLabelledBy: 'admin-order-title',
+        });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    openOrderDetails(order: OrderMinimalWithUser, content: any): void {
-        this.orderService
-            .getById(order.id)
-            .toPromise()
-            .then(response => {
-                this.selectedOrder = { ...response!.data, user: order.user };
-            });
-        this.modalService.open(content, { size: 'xl', centered: true });
-    }
-
-    openProductDetails(product: ProductModel) {
-        const isMobile = window.innerWidth < 768;
-
-        if (isMobile) {
-            this.router.navigate([`/product/${product.id}`]);
-        } else {
-            this.modalService.dismissAll();
-            const activeModal = this.modalService.open(ProductModalComponent, {
-                size: 'lg',
-                centered: true,
-                scrollable: true,
-            });
-            activeModal.componentInstance.selectedProduct = product;
-        }
-    }
+    readonly onOrderDetailsSaved = (updated: OrderMinimalModel): void => {
+        this.orders$.pipe(take(1)).subscribe(orders => {
+            const order = orders.find(entry => entry.id === updated.id);
+            if (order) {
+                order.status = updated.status;
+                order.updatedAt = updated.updatedAt;
+                this.updateFilteredOrders();
+            }
+        });
+    };
 
     viewOrderDetails(order: OrderMinimalWithUser): void {
         this.router.navigate(['/admin/order', order.id]);
@@ -264,48 +241,13 @@ export class AdminOrdersComponent implements OnInit {
 
         this.updatingStatus = true;
         try {
-            await this.orderService.updateStatus(order.personId, order.id, newStatus).toPromise();
-            order.status = newStatus;
-            this.toastService.show('Статус заказа успешно обновлен', 'success');
+            const updated = await this.orderService.updateStatus(order.personId, order.id, newStatus).toPromise();
+            if (updated) this.onOrderDetailsSaved(updated);
         } catch (error) {
             this.toastService.show('Ошибка при обновлении статуса заказа', 'error');
             console.error('Error updating order status:', error);
         } finally {
             this.updatingStatus = false;
-        }
-    }
-
-    getTotalOrderValue(order: OrderModel): number {
-        return order.products?.reduce((total, item) => total + item.historicalPrice * item.quantity, 0) || 0;
-    }
-
-    getOrderItemsCount(order: OrderModel): number {
-        return order.products?.reduce((total, item) => total + item.quantity, 0) || 0;
-    }
-
-    getPaymentMethodText(method: string): string {
-        switch (method?.toLowerCase()) {
-            case 'card':
-                return 'Банковская карта';
-            case 'cash':
-                return 'Наличные';
-            case 'online':
-                return 'Онлайн оплата';
-            default:
-                return 'Не указано';
-        }
-    }
-
-    getDeliveryMethodText(method: string): string {
-        switch (method?.toLowerCase()) {
-            case 'standart':
-                return 'Стандартная доставка';
-            case 'post':
-                return 'Европочта';
-            case 'pickup':
-                return 'Самовывоз';
-            default:
-                return 'Не указано';
         }
     }
 }
