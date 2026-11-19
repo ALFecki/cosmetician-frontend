@@ -9,6 +9,6 @@ export class BannerService extends DataService<BannerModel, BannerInput, Partial
     protected override endpoint = 'admin/banner';
 
     getPublished(): Observable<ListResponse<BannerModel>> {
-        return this.http.get<ListResponse<BannerModel>>(`${this.apiUrl}/banner`, { transferCache: false });
+        return this.http.get<ListResponse<BannerModel>>(`${this.apiUrl}/banner`, { params: { home: 'true' }, transferCache: false });
     }
 }

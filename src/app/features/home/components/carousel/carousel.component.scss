@@ -1,6 +1,19 @@
 :host {
     display: block;
 }
+.carousel-placeholder {
+    height: 520px;
+    margin-top: 30px;
+    background: #eee7df;
+}
+
+@media (max-width: 700px) {
+    .carousel-placeholder {
+        height: 650px;
+        margin-top: 0;
+    }
+}
+
 .carousel {
     position: relative;
     background: #eee7df;

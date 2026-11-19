@@ -3,6 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { Component, PLATFORM_ID } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { environment } from '../../../../../environments/environment';
+import { homeBannerId } from '../../../../shared/models/banner.model';
 import { CarouselComponent } from './carousel.component';
 
 describe('Published homepage banners', () => {
@@ -30,7 +31,7 @@ describe('Published homepage banners', () => {
     afterEach(() => http.verify());
 
     it('uses server content and resolves uploaded images in both layers', () => {
-        http.expectOne(`${environment.server_url}/banner`).flush({ status: 'success', data: [slide], length: 1 });
+        http.expectOne(`${environment.server_url}/banner?home=true`).flush({ status: 'success', data: [slide], length: 1 });
         fixture.detectChanges();
         const element: HTMLElement = fixture.nativeElement;
         expect(element.querySelector('h2')?.textContent).toBe(slide.title);
@@ -44,7 +45,7 @@ describe('Published homepage banners', () => {
     });
 
     it('keeps only the selected banner accessible while navigating and wrapping', () => {
-        http.expectOne(`${environment.server_url}/banner`).flush({
+        http.expectOne(`${environment.server_url}/banner?home=true`).flush({
             status: 'success',
             length: 2,
             data: [slide, { ...slide, id: 'banner-2', title: 'Второй' }],
@@ -62,7 +63,7 @@ describe('Published homepage banners', () => {
 
     for (const failed of [false, true]) {
         it(`hides the carousel when the API is ${failed ? 'unavailable' : 'empty'}`, () => {
-            const request = http.expectOne(`${environment.server_url}/banner`);
+            const request = http.expectOne(`${environment.server_url}/banner?home=true`);
             if (failed) request.flush({}, { status: 503, statusText: 'Unavailable' });
             else request.flush({ status: 'success', data: [], length: 0 });
             fixture.detectChanges();
@@ -71,7 +72,7 @@ describe('Published homepage banners', () => {
     }
 
     it('navigates in server order and omits an empty button', () => {
-        http.expectOne(`${environment.server_url}/banner`).flush({
+        http.expectOne(`${environment.server_url}/banner?home=true`).flush({
             status: 'success',
             length: 2,
             data: [slide, { ...slide, id: 'banner-2', title: 'Второй', buttonText: '', buttonLink: '' }],
@@ -92,7 +93,7 @@ describe('Banner prerender', () => {
         }).compileComponents();
         const fixture = TestBed.createComponent(CarouselComponent);
         fixture.detectChanges();
-        TestBed.inject(HttpTestingController).expectNone(`${environment.server_url}/banner`);
+        TestBed.inject(HttpTestingController).expectNone(`${environment.server_url}/banner?home=true`);
         expect(fixture.nativeElement.querySelector('.carousel')).toBeNull();
     });
 });
@@ -100,36 +101,38 @@ describe('Banner prerender', () => {
 @Component({
     standalone: true,
     imports: [CarouselComponent],
-    template: `<app-carousel [showIntro]="true"
-        ><div carouselIntro>
-            <h1>Внимание к коже. Забота о себе.</h1>
-            <a href="/products">Найти свой уход</a>
-        </div></app-carousel
-    >`,
+    template: `<app-carousel [homeBanner]="hero"></app-carousel>
+        <ng-template #hero let-slide>
+            <h2>{{ slide.title }}</h2>
+            <p>{{ slide.subtitle }}</p>
+            @if (slide.buttonText && slide.buttonLink) {
+                <a [href]="slide.buttonLink">{{ slide.buttonText }}</a>
+            }
+        </ng-template>`,
 })
 class HeroHostComponent {}
 
-describe('Approved main hero composition', () => {
+describe('Editable home banner', () => {
     let fixture: ComponentFixture<HeroHostComponent>;
     let http: HttpTestingController;
-    const slides = [
-        {
-            id: 'first',
-            title: 'Первый серверный баннер',
-            subtitle: 'Первый текст',
-            image: '/images/first.png',
-            buttonText: 'Первый переход',
-            buttonLink: '/first',
-        },
-        {
-            id: 'second',
-            title: 'Второй серверный баннер',
-            subtitle: 'Второй текст',
-            image: '/images/second.png',
-            buttonText: 'Второй переход',
-            buttonLink: '/second',
-        },
-    ];
+    const hero = {
+        id: homeBannerId,
+        title: 'Обновлённый заголовок',
+        subtitle: 'Текст из админки',
+        image: '/images/hero.png',
+        buttonText: 'Новый переход',
+        buttonLink: '/updated',
+        sortOrder: 0,
+        isActive: true,
+    };
+    const second = {
+        ...hero,
+        id: 'second',
+        title: 'Второй баннер',
+        buttonLink: '/second',
+        sortOrder: 20,
+    };
+
     beforeEach(() => {
         TestBed.configureTestingModule({ imports: [HeroHostComponent], providers: [provideHttpClient(), provideHttpClientTesting()] });
         http = TestBed.inject(HttpTestingController);
@@ -137,70 +140,62 @@ describe('Approved main hero composition', () => {
         fixture.detectChanges();
     });
     afterEach(() => http.verify());
-    function publish() {
-        http.expectOne(`${environment.server_url}/banner`).flush({ data: slides, length: 2 });
+
+    function publish(slides = [hero, second]) {
+        http.expectOne(`${environment.server_url}/banner?home=true`).flush({ data: slides, length: slides.length });
         fixture.detectChanges();
     }
+
     function active(): HTMLElement | null {
         return fixture.nativeElement.querySelector('.carousel-item[aria-hidden="false"]');
     }
-    it('starts with the introduction and cycles through live banners in server order', () => {
-        publish();
-        expect(active()?.querySelector('h1')?.textContent).toContain('Внимание к коже');
-        expect(fixture.nativeElement.querySelectorAll('.indicator').length).toBe(3);
-        fixture.nativeElement.querySelector('.carousel-control-next').click();
-        fixture.detectChanges();
-        expect(active()?.querySelector('h2')?.textContent).toBe(slides[0].title);
-        expect(active()?.querySelector('a')?.getAttribute('href')).toBe('/first');
-        fixture.nativeElement.querySelector('.carousel-control-next').click();
-        fixture.detectChanges();
-        expect(active()?.querySelector('h2')?.textContent).toBe(slides[1].title);
-        fixture.nativeElement.querySelector('.carousel-control-next').click();
-        fixture.detectChanges();
-        expect(active()?.querySelector('h1')?.textContent).toContain('Внимание к коже');
-        expect(fixture.nativeElement.querySelectorAll('.carousel-item[aria-hidden="false"]').length).toBe(1);
+
+    it('reserves the home layout while loading and clears it when the feed is empty', () => {
+        expect(fixture.nativeElement.querySelector('.carousel-placeholder')).not.toBeNull();
+        publish([]);
+        expect(fixture.nativeElement.querySelector('.carousel-placeholder')).toBeNull();
+        expect(fixture.nativeElement.querySelector('.carousel')).toBeNull();
     });
+
+    it('renders edited content in the welcome layout exactly once and follows the saved order', () => {
+        publish([second, { ...hero, sortOrder: 30 }]);
+        expect(active()?.querySelector('h2')?.textContent).toBe(second.title);
+        expect(fixture.nativeElement.querySelectorAll('.indicator').length).toBe(2);
+        fixture.nativeElement.querySelector('.carousel-control-next').click();
+        fixture.detectChanges();
+        expect(active()?.classList.contains('intro-slide')).toBeTrue();
+        expect(active()?.querySelector('h2')?.textContent).toBe(hero.title);
+        expect(active()?.querySelector('p')?.textContent).toBe(hero.subtitle);
+        expect(active()?.querySelector('a')?.getAttribute('href')).toBe(hero.buttonLink);
+        fixture.nativeElement.querySelector('.carousel-control-next').click();
+        fixture.detectChanges();
+        expect(active()?.querySelector('h2')?.textContent).toBe(second.title);
+    });
+
     it('accepts horizontal swipes while leaving vertical page scrolling alone', () => {
         publish();
-        const hero: HTMLElement = fixture.nativeElement.querySelector('.carousel');
+        const carousel: HTMLElement = fixture.nativeElement.querySelector('.carousel');
         function touch(type: string, x: number, y: number) {
             const event = new Event(type);
             Object.defineProperty(event, 'changedTouches', { value: [{ screenX: x, screenY: y }] });
-            hero.dispatchEvent(event);
+            carousel.dispatchEvent(event);
             fixture.detectChanges();
         }
         touch('touchstart', 200, 100);
         touch('touchend', 180, 250);
-        expect(active()?.querySelector('h1')?.textContent).toContain('Внимание к коже');
+        expect(active()?.querySelector('h2')?.textContent).toBe(hero.title);
         touch('touchstart', 220, 100);
         touch('touchend', 100, 110);
-        expect(active()?.querySelector('h2')?.textContent).toBe(slides[0].title);
+        expect(active()?.querySelector('h2')?.textContent).toBe(second.title);
         touch('touchstart', 100, 100);
         touch('touchend', 220, 110);
-        expect(active()?.querySelector('h1')?.textContent).toContain('Внимание к коже');
+        expect(active()?.querySelector('h2')?.textContent).toBe(hero.title);
     });
-    for (const unavailable of [false, true]) {
-        it(`retains the introduction without redundant controls when API is ${unavailable ? 'unavailable' : 'empty'}`, () => {
-            const request = http.expectOne(`${environment.server_url}/banner`);
-            if (unavailable) request.flush({}, { status: 503, statusText: 'Unavailable' });
-            else request.flush({ data: [], length: 0 });
-            fixture.detectChanges();
-            expect(active()?.querySelector('h1')?.textContent).toContain('Внимание к коже');
-            expect(fixture.nativeElement.querySelector('.carousel-control')).toBeNull();
-        });
-    }
-});
 
-describe('Main hero prerender', () => {
-    it('keeps the introduction in static HTML without embedding changeable API banners', () => {
-        TestBed.configureTestingModule({
-            imports: [HeroHostComponent],
-            providers: [provideHttpClient(), provideHttpClientTesting(), { provide: PLATFORM_ID, useValue: 'server' }],
-        });
-        const fixture = TestBed.createComponent(HeroHostComponent);
-        fixture.detectChanges();
-        TestBed.inject(HttpTestingController).expectNone(`${environment.server_url}/banner`);
-        expect(fixture.nativeElement.querySelector('h1')?.textContent).toContain('Внимание к коже');
+    it('omits the welcome slide and redundant controls when the welcome slide is hidden', () => {
+        publish([second]);
+        expect(active()?.querySelector('h2')?.textContent).toBe(second.title);
+        expect(fixture.nativeElement.querySelector('.intro-slide')).toBeNull();
         expect(fixture.nativeElement.querySelector('.carousel-control')).toBeNull();
     });
 });
