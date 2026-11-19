@@ -1,0 +1,49 @@
+import io
+import subprocess
+import tempfile
+import unittest
+from pathlib import Path
+from unittest.mock import patch
+
+from deploy_production import FILES, ssh_command, wait_for_release, write_frames
+
+
+class DeploymentTransportTest(unittest.TestCase):
+    def test_artifacts_are_sent_in_fixed_order_with_exact_byte_lengths(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            payloads = [bytes([index, 10, 0]) for index in range(len(FILES))]
+            for name, payload in zip(FILES, payloads):
+                path = root / name
+                path.parent.mkdir(exist_ok=True)
+                path.write_bytes(payload)
+            stream = io.BytesIO()
+            write_frames(root, stream)
+            self.assertEqual(stream.getvalue(), b"".join(b"3\n" + payload for payload in payloads))
+
+    def test_ssh_disallows_target_injection_and_requires_the_pinned_host_key(self):
+        with self.assertRaises(ValueError):
+            ssh_command(Path("/tmp/ssh"), "user@server -o ProxyCommand=bad")
+        command = ssh_command(Path("/tmp/ssh"), "user@server")
+        self.assertIn("StrictHostKeyChecking=yes", command)
+        self.assertIn("UserKnownHostsFile=/tmp/ssh/known_hosts", command)
+        self.assertIn("IdentitiesOnly=yes", command)
+
+    @patch("deploy_production.time.sleep")
+    @patch("deploy_production.result")
+    def test_status_polling_retries_transport_errors_and_verifies_both_revisions(self, result, sleep):
+        result.side_effect = [
+            subprocess.TimeoutExpired("ssh", 30),
+            {"id": "release", "status": "running", "phase": "stopping"},
+            {"id": "release", "status": "running"},
+            {"id": "release", "status": "success", "backend_commit": "b", "frontend_commit": "f",
+             "last_backup": "20261119T101500Z"},
+        ]
+        self.assertEqual(wait_for_release(["ssh"], "release", "b", "f"), "20261119T101500Z")
+        self.assertEqual(sleep.call_count, 3)
+
+    @patch("deploy_production.result")
+    def test_status_for_a_different_live_revision_is_a_failure(self, result):
+        result.return_value = {"id": "release", "status": "success", "backend_commit": "old", "frontend_commit": "f"}
+        with self.assertRaisesRegex(RuntimeError, "does not match"):
+            wait_for_release(["ssh"], "release", "b", "f")
