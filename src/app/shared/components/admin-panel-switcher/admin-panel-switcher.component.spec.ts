@@ -3,6 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { ComponentFixture, TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
+import { homeBannerId } from '../../models/banner.model';
 import { AdminPanelSwitcherComponent } from './admin-panel-switcher.component';
 
 describe('Banner administration', () => {
@@ -59,6 +60,43 @@ describe('Banner administration', () => {
         request.flush({ status: 'success', data: {} });
         await saving;
         expect(component.loadData).toHaveBeenCalled();
+    });
+
+    it('edits the welcome banner with its line break and saves revised visibility', async () => {
+        spyOn(component, 'loadMaintenanceStatus');
+        fixture.detectChanges();
+        const banner = {
+            id: homeBannerId,
+            title: 'Внимание к коже.\nЗабота о себе.',
+            subtitle: 'Описание',
+            image: 'assets/images/hero-still-life.jpg',
+            buttonText: 'Найти свой уход',
+            buttonLink: '/products',
+            sortOrder: 0,
+            isActive: true,
+        };
+        component.isEditMode = true;
+        component.selectedItemId = banner.id;
+        component.editingItem = banner;
+        component.itemForm = component.buildForm(banner);
+        const view = component.itemModal.createEmbeddedView({});
+        view.detectChanges();
+        const form = view.rootNodes.find((node: HTMLElement) => node.querySelector?.('textarea#title'));
+        const title = form.querySelector('textarea#title') as HTMLTextAreaElement;
+        expect(title.value).toBe(banner.title);
+        title.value = 'Новый заголовок\nНовый акцент';
+        title.dispatchEvent(new Event('input'));
+        component.itemForm.patchValue({ isActive: false, sortOrder: 30 });
+
+        const saving = component.saveItem();
+        const request = http.expectOne(`${environment.server_url}/admin/banner/${homeBannerId}`);
+        expect(request.request.method).toBe('PATCH');
+        expect(request.request.body.title).toBe('Новый заголовок\nНовый акцент');
+        expect(request.request.body.sortOrder).toBe(30);
+        expect(request.request.body.isActive).toBeFalse();
+        request.flush({ status: 'success', data: { ...banner, ...request.request.body } });
+        await saving;
+        view.destroy();
     });
 
     it('creates hidden banners and uploads the selected image through the existing API', fakeAsync(() => {

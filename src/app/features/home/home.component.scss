@@ -1,7 +1,7 @@
 .hero {
     margin-top: 0;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     background: #eee7df;
     min-height: 520px;
     height: 100%;
@@ -9,13 +9,16 @@
 .hero-copy {
     padding: 65px 45px 95px;
     align-self: center;
-    h1 {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    h2 {
         font-size: clamp(34px, 4.2vw, 58px);
         line-height: 1.15;
         margin-bottom: 25px;
         em {
             color: var(--sf-rose);
             font-weight: 400;
+            white-space: pre-line;
         }
     }
 }
@@ -165,13 +168,13 @@
     .hero {
         width: 100%;
         margin-top: 0;
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         grid-template-rows: minmax(0, 1fr) 290px;
         min-height: 0;
     }
     .hero-copy {
         padding: 35px 26px 90px;
-        h1 {
+        h2 {
             font-size: clamp(32px, 9vw, 40px);
         }
     }

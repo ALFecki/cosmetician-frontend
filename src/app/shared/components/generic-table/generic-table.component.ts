@@ -15,6 +15,7 @@ export class GenericTableComponent implements OnChanges {
     @Input() data: any[] = [];
     @Input() columns: { key: string; title: string; type?: string }[] = [];
     @Input() key = '';
+    @Input() protectedItemId?: string;
 
     @Output() editItem = new EventEmitter<any>();
     @Output() deleteItem = new EventEmitter<any>();

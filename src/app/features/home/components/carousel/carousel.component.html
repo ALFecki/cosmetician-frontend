@@ -1,7 +1,7 @@
 @if (slideCount) {
     <section
         class="carousel sf-container"
-        [class.hero-carousel]="showIntro"
+        [class.hero-carousel]="homeBanner"
         (touchstart)="onTouchStart($event)"
         (touchend)="onTouchEnd($event)"
         aria-label="Предложения магазина"
@@ -11,44 +11,42 @@
     >
         <div class="carousel-background" aria-hidden="true">
             @for (slide of slides; track slide.id; let i = $index) {
-                <div
-                    class="background-slide"
-                    [class.active]="i + introOffset === currentIndex"
-                    [style.background-image]="'url(' + (slide.image | imageUrl) + ')'"
-                ></div>
+                @if (!homeBanner || slide.id !== homeBannerId) {
+                    <div
+                        class="background-slide"
+                        [class.active]="i === currentIndex"
+                        [style.background-image]="'url(' + (slide.image | imageUrl) + ')'"
+                    ></div>
+                }
             }
         </div>
         <div class="carousel-inner" aria-live="polite">
-            @if (showIntro) {
-                <div
-                    class="carousel-item intro-slide"
-                    [class.active]="currentIndex === 0"
-                    [attr.aria-hidden]="currentIndex !== 0"
-                    [attr.inert]="currentIndex !== 0 ? '' : null"
-                    role="group"
-                    [attr.aria-label]="'1 из ' + slideCount"
-                >
-                    <ng-content select="[carouselIntro]"></ng-content>
-                </div>
-            }
             @for (slide of slides; track slide.id; let i = $index) {
                 <div
                     class="carousel-item"
-                    [class.active]="i + introOffset === currentIndex"
-                    [attr.aria-hidden]="i + introOffset !== currentIndex"
-                    [attr.inert]="i + introOffset !== currentIndex ? '' : null"
+                    [class.intro-slide]="homeBanner && slide.id === homeBannerId"
+                    [class.active]="i === currentIndex"
+                    [attr.aria-hidden]="i !== currentIndex"
+                    [attr.inert]="i !== currentIndex ? '' : null"
                     role="group"
-                    [attr.aria-label]="i + introOffset + 1 + ' из ' + slideCount"
+                    [attr.aria-label]="i + 1 + ' из ' + slideCount"
                 >
-                    <img [src]="slide.image | imageUrl" [alt]="slide.title" />
-                    <div class="slide-content">
-                        <p class="sf-eyebrow">Внимание к вашему уходу</p>
-                        <h2>{{ slide.title }}</h2>
-                        <p>{{ slide.subtitle }}</p>
-                        @if (slide.buttonText && slide.buttonLink) {
-                            <a class="sf-button" [href]="slide.buttonLink">{{ slide.buttonText }} <span aria-hidden="true">→</span></a>
-                        }
-                    </div>
+                    @if (homeBanner && slide.id === homeBannerId) {
+                        <ng-container
+                            [ngTemplateOutlet]="homeBanner"
+                            [ngTemplateOutletContext]="{ $implicit: slide, first: i === 0 }"
+                        ></ng-container>
+                    } @else {
+                        <img [src]="slide.image | imageUrl" [alt]="slide.title" />
+                        <div class="slide-content">
+                            <p class="sf-eyebrow">Внимание к вашему уходу</p>
+                            <h2>{{ slide.title }}</h2>
+                            <p>{{ slide.subtitle }}</p>
+                            @if (slide.buttonText && slide.buttonLink) {
+                                <a class="sf-button" [href]="slide.buttonLink">{{ slide.buttonText }} <span aria-hidden="true">→</span></a>
+                            }
+                        </div>
+                    }
                 </div>
             }
         </div>
@@ -71,7 +69,7 @@
                         </button>
                     }
                 </div>
-                @if (showIntro) {
+                @if (homeBanner) {
                     <span class="carousel-count" aria-hidden="true">{{ currentIndex + 1 }} / {{ slideCount }}</span>
                 }
                 <button type="button" class="carousel-control carousel-control-next" (click)="nextSlide()" aria-label="Следующий слайд">
@@ -80,4 +78,6 @@
             </div>
         }
     </section>
+} @else if (homeBanner && loading) {
+    <div class="sf-container carousel-placeholder" aria-hidden="true"></div>
 }

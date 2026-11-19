@@ -358,6 +358,7 @@
                                 [data]="filteredData"
                                 [columns]="currentModelColumns"
                                 [key]="currentModel"
+                                [protectedItemId]="currentModel === 'banners' ? homeBannerId : undefined"
                                 (editItem)="editItem($event)"
                                 (deleteItem)="openDeleteModal($event)"
                                 (cascadeDeleteItem)="openCascadeDeleteModal($event)"
@@ -502,6 +503,9 @@
                     }
                     @if (field.type === 'textarea') {
                         <textarea class="form-control" [id]="field.key" [formControlName]="field.key" rows="3"></textarea>
+                        @if (currentModel === 'banners' && editingItem?.id === homeBannerId && field.key === 'title') {
+                            <small class="form-text">Текст со второй строки выделяется цветом и курсивом.</small>
+                        }
                     }
                     @if (field.type === 'select') {
                         <select class="form-select" [id]="field.key" [formControlName]="field.key" [value]="itemForm.get(field.key)?.value">

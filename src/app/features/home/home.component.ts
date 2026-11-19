@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule, UrlTree } from '@angular/router';
 import { map } from 'rxjs';
 import { IconsModule } from '../../shared/base/icons/icons.module';
 import { ProductCarouselComponent } from '../../shared/components/product-carousel/product-carousel.component';
@@ -29,9 +29,14 @@ import { CarouselComponent } from './components/carousel/carousel.component';
     ],
 })
 export class HomeComponent {
+    private readonly router = inject(Router);
     private categoryService = inject(CategoryService);
     private feedbackModalService = inject(FeedbackModalService);
     categories$ = this.categoryService.getCategoriesList().pipe(map(categories => categories.slice(0, 4)));
+    catalogLink(link: string): UrlTree | null {
+        return /^\/products(?:[?#]|$)/.test(link) ? this.router.parseUrl(link) : null;
+    }
+
     openConsultation(): void {
         this.feedbackModalService.openFeedbackModal();
     }

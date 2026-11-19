@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, catchError, forkJoin, of, tap } from 'rxjs';
 import { IconsModule } from '../../base/icons/icons.module';
+import { homeBannerId } from '../../models/banner.model';
 import { ProductVariantModel } from '../../models/product.model';
 import { FilterBrandSchema } from '../../schemas/brand.schema';
 import { FilterCategorySchema } from '../../schemas/category.schema';
@@ -139,6 +140,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
     page = 1;
     readonly pageSize = 20;
     compact = false;
+    readonly homeBannerId = homeBannerId;
     currentModel = 'products';
     private readonly route = inject(ActivatedRoute, { optional: true });
     legacyPromotions = false;
@@ -257,7 +259,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
             service: this.bannerService,
             fields: [
                 { key: 'image', label: 'Изображение', type: 'image', required: true },
-                { key: 'title', label: 'Заголовок', type: 'text' },
+                { key: 'title', label: 'Заголовок', type: 'textarea' },
                 { key: 'subtitle', label: 'Подпись', type: 'textarea' },
                 { key: 'buttonText', label: 'Текст кнопки', type: 'text' },
                 { key: 'buttonLink', label: 'Ссылка кнопки (путь /products или https://...)', type: 'text' },

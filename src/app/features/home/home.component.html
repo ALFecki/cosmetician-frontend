@@ -1,26 +1,45 @@
-<app-carousel [showIntro]="true"
-    ><section class="hero" carouselIntro>
+<h1 class="visually-hidden">SkViDerm — профессиональная косметика</h1>
+<app-carousel [homeBanner]="homeBanner"></app-carousel>
+<ng-template #homeBanner let-slide let-first="first">
+    @let headline = slide.title.split('\n');
+    <section class="hero">
         <div class="hero-copy">
             <p class="sf-eyebrow">SkViDerm · осознанный уход</p>
-            <h1>Внимание к коже.<br /><em>Забота о себе.</em></h1>
-            <p class="hero-description">Профессиональная косметика и помощь косметолога — чтобы найти уход, который подходит именно вам.</p>
+            @if (slide.title) {
+                <h2>
+                    {{ headline[0] }}
+                    @if (headline.length > 1) {
+                        <br /><em>{{ headline.slice(1).join('\n') }}</em>
+                    }
+                </h2>
+            }
+            @if (slide.subtitle) {
+                <p class="hero-description">{{ slide.subtitle }}</p>
+            }
             <div class="hero-actions">
-                <a class="sf-button" routerLink="/products">Найти свой уход <span aria-hidden="true">→</span></a
-                ><button type="button" class="sf-text-link" (click)="openConsultation()">Нужна консультация</button>
+                @if (slide.buttonText && slide.buttonLink) {
+                    @if (catalogLink(slide.buttonLink); as link) {
+                        <a class="sf-button" [routerLink]="link"> {{ slide.buttonText }} <span aria-hidden="true">→</span> </a>
+                    } @else {
+                        <a class="sf-button" [href]="slide.buttonLink">{{ slide.buttonText }} <span aria-hidden="true">→</span></a>
+                    }
+                }
+                <button type="button" class="sf-text-link" (click)="openConsultation()">Нужна консультация</button>
             </div>
         </div>
         <div class="hero-image">
             <img
-                src="assets/images/hero-still-life.jpg"
-                alt="Косметические флаконы и крем на тёплой каменной поверхности"
+                [src]="slide.image | imageUrl"
+                alt=""
                 width="1200"
                 height="800"
-                loading="eager"
-                fetchpriority="high"
-            /><span>Больше внимания к себе</span>
+                [attr.loading]="first ? 'eager' : 'lazy'"
+                [attr.fetchpriority]="first ? 'high' : null"
+            />
+            <span>Больше внимания к себе</span>
         </div>
-    </section></app-carousel
->
+    </section>
+</ng-template>
 <div class="sf-container assurance-strip">
     <span><i-bs name="check-circle"></i-bs>Профессиональные бренды</span><span><i-bs name="person"></i-bs>Подбор с косметологом</span
     ><span><i-bs name="truck"></i-bs>Доставка по всей Беларуси</span>

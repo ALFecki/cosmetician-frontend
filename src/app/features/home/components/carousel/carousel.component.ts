@@ -1,10 +1,10 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Component, inject, Input, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit, PLATFORM_ID, TemplateRef } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { IconsModule } from '../../../../shared/base/icons/icons.module';
 import { ImageUrlPipe } from '../../../../shared/utils/image-url.pipe';
 import { Subscription } from 'rxjs';
-import { BannerModel } from '../../../../shared/models/banner.model';
+import { BannerModel, homeBannerId } from '../../../../shared/models/banner.model';
 import { BannerService } from '../../../../shared/services/banner.service';
 
 @Component({
@@ -14,8 +14,10 @@ import { BannerService } from '../../../../shared/services/banner.service';
     imports: [ImageUrlPipe, CommonModule, IconsModule, RouterModule],
 })
 export class CarouselComponent implements OnInit, OnDestroy {
-    @Input() showIntro = false;
+    @Input() homeBanner?: TemplateRef<{ $implicit: BannerModel; first: boolean }>;
+    readonly homeBannerId = homeBannerId;
     slides: BannerModel[] = [];
+    loading = true;
     private subscription?: Subscription;
     private platformId = inject(PLATFORM_ID);
 
@@ -24,11 +26,8 @@ export class CarouselComponent implements OnInit, OnDestroy {
     currentIndex = 0;
     private touchStartX = 0;
     private touchStartY = 0;
-    get introOffset(): number {
-        return this.showIntro ? 1 : 0;
-    }
     get slideCount(): number {
-        return this.slides.length + this.introOffset;
+        return this.slides.length;
     }
     get slidePositions(): number[] {
         return Array.from({ length: this.slideCount }, (_, index) => index);
@@ -59,11 +58,13 @@ export class CarouselComponent implements OnInit, OnDestroy {
         this.subscription = this.bannerService.getPublished().subscribe({
             next: response => {
                 this.slides = response.data;
+                this.loading = false;
                 this.currentIndex = 0;
                 this.startAutoSlide();
             },
             error: () => {
                 this.slides = [];
+                this.loading = false;
             },
         });
     }
