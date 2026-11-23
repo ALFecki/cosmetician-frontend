@@ -153,9 +153,19 @@
                         <p>{{ currentModel === 'products' ? 'Каталог, цены и информация о товарах' : 'Управление магазином SkViDerm' }}</p>
                     </div>
                     @if (hasList) {
-                        <button type="button" class="btn btn-primary" (click)="openAddModal()" [disabled]="loading || !!error">
-                            <i-bs name="plus-lg"></i-bs> {{ currentModel === 'products' ? 'Добавить товар' : 'Добавить' }}
-                        </button>
+                        <div class="heading-actions">
+                            @if (currentModel === 'products') {
+                                <app-admin-catalog-prices
+                                    [products]="currentModelData"
+                                    [brands]="getOptions('brandId')"
+                                    [disabled]="loading || !!error"
+                                    (applied)="reloadCatalog()"
+                                ></app-admin-catalog-prices>
+                            }
+                            <button type="button" class="btn btn-primary" (click)="openAddModal()" [disabled]="loading || !!error">
+                                <i-bs name="plus-lg"></i-bs> {{ currentModel === 'products' ? 'Добавить товар' : 'Добавить' }}
+                            </button>
+                        </div>
                     }
                 </div>
                 @if (referenceModels.includes(currentModel) || currentModel === 'promotions' || currentModel === 'promocodes') {

@@ -30,6 +30,7 @@ describe('Promotion administration', () => {
         const loadData = spyOn(fixture.componentInstance, 'loadData');
         spyOn(fixture.componentInstance, 'loadMaintenanceStatus');
         fixture.detectChanges();
+        http.expectOne(api + '/admin/catalog-prices').flush(null, { status: 404, statusText: 'Not Found' });
         loadData.and.callThrough();
     });
 
