@@ -212,6 +212,7 @@ describe('Article administration', () => {
         http.expectOne(publicUrl).flush({ status: 'success', length: 1, data: [published] });
         fixture.detectChanges();
 
+        expect(fixture.nativeElement.querySelector('input[type="checkbox"]')).toBeNull();
         click('Вторая');
         http.expectOne(`${url}/${second.id}`).flush({ status: 'success', data: published });
         fixture.detectChanges();
@@ -239,5 +240,229 @@ describe('Article administration', () => {
         expect(fixture.nativeElement.querySelector('input').value).toBe('  Черновик  ');
         expect(fixture.nativeElement.querySelector('[role="alert"]')).not.toBeNull();
         http.expectNone(publicUrl);
+    });
+
+    it('uploads a cover and preserves text order and photo placement through edits and removal', () => {
+        const coverImage = { image: '/images/00000000-0000-4000-8000-000000000001.jpg', alt: 'Обложка' };
+        const oldImage = { image: '/images/00000000-0000-4000-8000-000000000002.png', alt: 'Старая иллюстрация', afterParagraph: 1 };
+        const image = '/images/00000000-0000-4000-8000-000000000003.png';
+        const article = {
+            ...first,
+            coverImage: null,
+            featuredPosition: null,
+            body: 'Первый абзац\r\n\u0085\r\n\uFEFF\nСледующий\nПоследний',
+            bodyImages: [oldImage],
+        };
+        click('Статьи');
+        http.expectOne(url).flush({ status: 'success', length: 1, data: [article] });
+        fixture.detectChanges();
+        click('Первая');
+        http.expectOne(`${url}/${article.id}`).flush({ status: 'success', data: article });
+        fixture.detectChanges();
+
+        function upload(label: string, path: string, index = 0) {
+            const labels: NodeListOf<HTMLLabelElement> = fixture.nativeElement.querySelectorAll('label');
+            const control = Array.from(labels).filter(element => element.textContent?.trim() === label)[index]?.control as HTMLInputElement;
+            expect(control).withContext(label).toBeDefined();
+            if (!control) return;
+            const transfer = new DataTransfer();
+            transfer.items.add(new File(['image'], 'photo.png', { type: 'image/png' }));
+            control.files = transfer.files;
+            control.dispatchEvent(new Event('change'));
+            const request = http.expectOne(environment.server_url + '/upload/image');
+            expect(request.request.method).toBe('POST');
+            expect(request.request.body.get('file').name).toBe('photo.png');
+            request.flush({ status: 'success', data: { path } });
+            fixture.detectChanges();
+        }
+
+        upload('Загрузить обложку', coverImage.image);
+        enter('Описание обложки', coverImage.alt);
+        click('Удалить иллюстрацию');
+        const text = fixture.nativeElement.querySelector('textarea[id="article-body"]') as HTMLTextAreaElement;
+        expect(text.value).toBe('Первый абзац\n\u0085\n\uFEFF\nСледующий\nПоследний');
+        const startOfParagraph = text.value.indexOf('Следующий');
+        text.setSelectionRange(startOfParagraph, startOfParagraph);
+        upload('Добавить иллюстрацию', image);
+        enter('Описание иллюстрации', 'Как нанести крем');
+        enter('Подпись к иллюстрации', 'Дневной уход');
+        enter('Текст после иллюстрации 1', 'Новый последний абзац');
+        click('Сохранить черновик');
+        const save = http.expectOne(`${url}/${article.id}`);
+        const bodyImages = [{ image, alt: 'Как нанести крем', caption: 'Дневной уход', afterParagraph: 3 }];
+        expect(save.request.body).toEqual({
+            title: 'Первая',
+            summary: '',
+            body: 'Первый абзац\r\n\u0085\r\n\uFEFF\nСледующий\nНовый последний абзац',
+            isPublished: false,
+            media: { coverImage, bodyImages },
+        });
+        const updated = { ...article, coverImage, bodyImages, body: save.request.body.body };
+        save.flush({ status: 'success', data: updated });
+        http.expectOne(publicUrl).flush({ status: 'success', length: 0, data: [] });
+        fixture.detectChanges();
+
+        click('Первая');
+        http.expectOne(`${url}/${article.id}`).flush({ status: 'success', data: updated });
+        fixture.detectChanges();
+        click('Удалить обложку');
+        click('Сохранить черновик');
+        const removal = http.expectOne(`${url}/${article.id}`);
+        expect(removal.request.body.media).toEqual({ coverImage: null, bodyImages });
+        expect(removal.request.body.body).toBe(updated.body);
+        removal.flush({ status: 'success', data: { ...updated, coverImage: null } });
+        http.expectOne(publicUrl).flush({ status: 'success', length: 0, data: [] });
+    });
+
+    it('keeps the original body bytes when editing image metadata and removing an illustration', () => {
+        const body = ' \r\nПервый абзац\r\nВторой абзац\r\n  ';
+        const bodyImage = { image: '/images/00000000-0000-4000-8000-000000000001.jpg', alt: 'Иллюстрация', afterParagraph: 1 };
+        const article = { ...first, body, coverImage: null, bodyImages: [bodyImage], featuredPosition: null };
+        click('Статьи');
+        http.expectOne(url).flush({ status: 'success', length: 1, data: [article] });
+        fixture.detectChanges();
+
+        click('Первая');
+        http.expectOne(`${url}/${article.id}`).flush({ status: 'success', data: article });
+        fixture.detectChanges();
+        enter('Подпись к иллюстрации', 'Новая подпись');
+        click('Сохранить черновик');
+        const update = http.expectOne(`${url}/${article.id}`);
+        const updated = { ...article, bodyImages: [{ ...bodyImage, caption: 'Новая подпись' }] };
+        expect(update.request.body.body).toBe(body);
+        expect(update.request.body.media).toEqual({ coverImage: null, bodyImages: updated.bodyImages });
+        update.flush({ status: 'success', data: updated });
+        http.expectOne(publicUrl).flush({ status: 'success', length: 0, data: [] });
+        fixture.detectChanges();
+
+        click('Первая');
+        http.expectOne(`${url}/${article.id}`).flush({ status: 'success', data: updated });
+        fixture.detectChanges();
+        click('Удалить иллюстрацию');
+        click('Сохранить черновик');
+        const removal = http.expectOne(`${url}/${article.id}`);
+        expect(removal.request.body.body).toBe(body);
+        expect(removal.request.body.media).toEqual({ coverImage: null, bodyImages: [] });
+        removal.flush({ status: 'success', data: { ...article, bodyImages: [] } });
+        http.expectOne(publicUrl).flush({ status: 'success', length: 0, data: [] });
+    });
+
+    it('rejects publication when the existing body contains only whitespace', () => {
+        const body = ' \r\n\u0085 ';
+        click('Статьи');
+        http.expectOne(url).flush({ status: 'success', length: 1, data: [first] });
+        fixture.detectChanges();
+        click('Первая');
+        http.expectOne(`${url}/${first.id}`).flush({ status: 'success', data: { ...first, body } });
+        fixture.detectChanges();
+
+        click('Опубликовать');
+        expect(fixture.nativeElement.querySelector('[role="alert"]')).not.toBeNull();
+        http.expectNone(`${url}/${first.id}`);
+    });
+
+    for (const legacyList of [false, true]) {
+        it(`hides media uploads after a legacy response from ${legacyList ? 'the list' : 'article details'}`, () => {
+            const coverSelector = '#article-cover-upload';
+            const bodySelector = '#article-photo-upload-0';
+            click('Статьи');
+            const listItem = legacyList ? first : { ...first, coverImage: null, featuredPosition: null };
+            http.expectOne(url).flush({ status: 'success', length: 1, data: [listItem] });
+            fixture.detectChanges();
+            if (legacyList) {
+                click('Новая статья');
+            } else {
+                click('Первая');
+                http.expectOne(`${url}/${first.id}`).flush({ status: 'success', data: { ...first, body: 'Текст' } });
+                fixture.detectChanges();
+            }
+            expect(fixture.nativeElement.querySelector(coverSelector)).toBeNull();
+            expect(fixture.nativeElement.querySelector(bodySelector)).toBeNull();
+        });
+    }
+
+    it('reloads the selection after a featured article is removed by another editor', () => {
+        const date = '2026-11-23T10:00:00Z';
+        const existing = { ...first, publishedAt: date, coverImage: null, featuredPosition: 1 };
+        const removed = { ...second, publishedAt: date, coverImage: null, featuredPosition: null };
+        click('Статьи');
+        http.expectOne(url).flush({ status: 'success', length: 2, data: [existing, removed] });
+        fixture.detectChanges();
+        const choices: NodeListOf<HTMLInputElement> = fixture.nativeElement.querySelectorAll('input[type="checkbox"]');
+        choices[1].click();
+        fixture.detectChanges();
+        click('Сохранить подборку');
+        http.expectOne(url + '/featured').flush('Invalid article', { status: 400, statusText: 'Bad Request' });
+        http.expectOne(url).flush({ status: 'success', length: 1, data: [existing] });
+        fixture.detectChanges();
+        const remaining: NodeListOf<HTMLInputElement> = fixture.nativeElement.querySelectorAll('input[type="checkbox"]');
+        expect(remaining.length).toBe(1);
+        expect(remaining[0].checked).toBeTrue();
+        expect(fixture.nativeElement.querySelector('[role="alert"]')).not.toBeNull();
+        http.expectNone(publicUrl);
+    });
+
+    it('hides the selection when the API rolls back while the article list is open', () => {
+        const article = { ...first, publishedAt: '2026-11-23T10:00:00Z' };
+        click('Статьи');
+        http.expectOne(url).flush({ status: 'success', length: 1, data: [{ ...article, coverImage: null, featuredPosition: null }] });
+        fixture.detectChanges();
+        const choice: HTMLInputElement = fixture.nativeElement.querySelector('input[type="checkbox"]');
+        choice.click();
+        fixture.detectChanges();
+        click('Сохранить подборку');
+        http.expectOne(url + '/featured').flush('Not found', { status: 404, statusText: 'Not Found' });
+        http.expectOne(url).flush({ status: 'success', length: 1, data: [article] });
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.querySelector('#admin-featured-heading')).toBeNull();
+        expect(fixture.nativeElement.querySelector('.article-list')?.textContent).toContain(article.title);
+        http.expectNone(publicUrl);
+    });
+
+    it('saves no more than three published articles in selection order and can clear them', () => {
+        const date = '2026-11-23T10:00:00Z';
+        const thirdId = '90ba97b2-c1ff-477b-a99f-8a650b0db8a0';
+        const items = [
+            { ...first, publishedAt: date, featuredPosition: null, coverImage: null },
+            { ...second, publishedAt: date, featuredPosition: null, coverImage: null },
+            { ...first, id: thirdId, title: 'Третья', publishedAt: date, featuredPosition: null, coverImage: null },
+            {
+                ...first,
+                id: '64882815-e06e-4bb1-8b53-f4029d9fdb4e',
+                title: 'Четвёртая',
+                publishedAt: date,
+                featuredPosition: null,
+                coverImage: null,
+            },
+            { ...first, id: 'ec174ca5-cb36-45d0-86ed-7a59e521cfef', title: 'Черновик', featuredPosition: null, coverImage: null },
+        ];
+        click('Статьи');
+        http.expectOne(url).flush({ status: 'success', length: items.length, data: items });
+        fixture.detectChanges();
+        const selection = Array.from(fixture.nativeElement.querySelectorAll('input[type="checkbox"]')) as HTMLInputElement[];
+        expect(selection.length).toBe(4);
+        for (const index of [2, 0, 1]) {
+            selection[index].click();
+            fixture.detectChanges();
+        }
+        expect(selection[3].disabled).toBeTrue();
+        click('Сохранить подборку');
+        const update = http.expectOne(url + '/featured');
+        expect(update.request.method).toBe('PUT');
+        expect(update.request.body).toEqual({ ids: [thirdId, first.id, second.id] });
+        update.flush({ status: 'success', data: update.request.body });
+        http.expectOne(publicUrl).flush({ status: 'success', length: 0, data: [] });
+        fixture.detectChanges();
+
+        for (const index of [2, 0, 1]) {
+            selection[index].click();
+            fixture.detectChanges();
+        }
+        click('Сохранить подборку');
+        const clear = http.expectOne(url + '/featured');
+        expect(clear.request.body).toEqual({ ids: [] });
+        clear.flush({ status: 'success', data: { ids: [] } });
+        http.expectOne(publicUrl).flush({ status: 'success', length: 0, data: [] });
     });
 });

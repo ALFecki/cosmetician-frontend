@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { uploadImage } from '../../utils/upload-image';
 import { ListResponse, SingleResponse } from '../schemas/base_schema';
 
 @Injectable({
@@ -66,14 +67,7 @@ export abstract class DataService<Model, CreateSchema, UpdateSchema, FilterSchem
     }
 
     protected async uploadImage(file: File): Promise<string> {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await firstValueFrom(
-            this.http.post<{ status: string; data: { path: string } }>(`${this.apiUrl}/upload/image`, formData),
-        );
-
-        return response.data.path;
+        return firstValueFrom(uploadImage(this.http, this.apiUrl, file));
     }
 
     async create(data: CreateSchema): Promise<SingleResponse<Model>> {

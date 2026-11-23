@@ -1,0 +1,91 @@
+.article-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(12px, 2vw, 24px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+        border-bottom: 1px solid var(--sf-line);
+    }
+
+    a {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        color: var(--sf-ink);
+        text-decoration: none;
+        overflow-wrap: anywhere;
+    }
+
+    a:hover .card-title,
+    a:focus-visible .card-title {
+        color: var(--sf-rose);
+    }
+
+    img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+    }
+}
+
+.card-copy {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 0;
+
+    time,
+    p,
+    span {
+        font-size: 13px;
+    }
+
+    time,
+    p {
+        color: var(--sf-muted);
+    }
+
+    p {
+        margin: 0;
+    }
+
+    .card-title {
+        margin: 0;
+        font:
+            500 clamp(17px, 2vw, 22px) / 1.25 'Lora',
+            Georgia,
+            serif;
+    }
+
+    span {
+        margin-top: auto;
+        color: var(--sf-rose);
+    }
+}
+
+@media (max-width: 700px) {
+    .article-cards {
+        grid-template-columns: minmax(0, 1fr);
+
+        li + li a:has(img) {
+            display: grid;
+            grid-template-columns: minmax(72px, 27%) minmax(0, 1fr);
+            gap: 12px;
+            align-items: start;
+            padding-bottom: 12px;
+
+            .card-copy {
+                padding: 0;
+            }
+        }
+
+        li + li p {
+            display: none;
+        }
+    }
+}

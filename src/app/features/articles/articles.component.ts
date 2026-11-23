@@ -1,15 +1,16 @@
-import { AsyncPipe, DatePipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ArticleService } from '../../shared/services/article.service';
+import { ArticleCardsComponent } from './article-cards.component';
 
 @Component({
     selector: 'app-articles',
-    imports: [AsyncPipe, DatePipe, RouterLink],
+    imports: [AsyncPipe, RouterLink, ArticleCardsComponent],
     styleUrl: './articles.component.scss',
     template: `
         <div class="sf-container articles">
-            <section class="article-column" aria-labelledby="articles-heading">
+            <section aria-labelledby="articles-heading">
                 <h1 id="articles-heading">Статьи</h1>
                 @if (published$ | async; as published) {
                     @switch (published.kind) {
@@ -21,26 +22,12 @@ import { ArticleService } from '../../shared/services/article.service';
                             <a class="sf-text-link" routerLink="/">На главную</a>
                         }
                         @case ('ready') {
-                            <ul class="article-list">
-                                @for (article of published.articles; track article.id) {
-                                    <li>
-                                        <a [routerLink]="['/articles', article.id]">
-                                            <time [attr.datetime]="article.publishedAt">{{
-                                                article.publishedAt | date: 'dd.MM.yyyy'
-                                            }}</time>
-                                            <h2>{{ article.title }}</h2>
-                                            @if (article.summary) {
-                                                <p>{{ article.summary }}</p>
-                                            }
-                                        </a>
-                                    </li>
-                                } @empty {
-                                    <li>
-                                        <p>Статей пока нет.</p>
-                                        <a class="sf-text-link" routerLink="/">На главную</a>
-                                    </li>
-                                }
-                            </ul>
+                            @if (published.articles.length) {
+                                <app-article-cards [articles]="published.articles" />
+                            } @else {
+                                <p>Статей пока нет.</p>
+                                <a class="sf-text-link" routerLink="/">На главную</a>
+                            }
                         }
                     }
                 }

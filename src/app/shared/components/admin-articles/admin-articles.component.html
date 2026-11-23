@@ -1,7 +1,9 @@
 <div class="article-heading mb-4">
     <h1>{{ editorOpen ? (editing ? 'Редактирование статьи' : 'Новая статья') : 'Статьи' }}</h1>
     @if (!editorOpen) {
-        <button type="button" class="btn btn-primary" (click)="create()" [disabled]="!articles || !!loadingId">Новая статья</button>
+        <button type="button" class="btn btn-primary" (click)="create()" [disabled]="!articles || !!loadingId || saving">
+            Новая статья
+        </button>
     }
 </div>
 
@@ -14,7 +16,7 @@
 
 @if (editorOpen) {
     <form class="editor" [formGroup]="form" (ngSubmit)="save()">
-        <fieldset [disabled]="saving">
+        <fieldset [disabled]="saving || uploading">
             @if (editing) {
                 <p>{{ editing.publishedAt ? 'Опубликована' : 'Черновик' }}</p>
             }
@@ -26,9 +28,94 @@
                 <label for="article-summary" class="form-label">Краткое описание</label>
                 <textarea id="article-summary" class="form-control" rows="3" formControlName="summary"></textarea>
             </div>
+            @if (canUploadMedia || coverImage) {
+                <section class="editor-media mb-4" aria-labelledby="cover-heading">
+                    <h2 id="cover-heading">Обложка</h2>
+                    @if (coverImage; as cover) {
+                        <img [src]="cover.image | imageUrl" [alt]="cover.alt" />
+                        <label for="article-cover-alt" class="form-label">Описание обложки</label>
+                        <input
+                            id="article-cover-alt"
+                            #coverAlt
+                            class="form-control"
+                            type="text"
+                            [value]="cover.alt"
+                            (input)="cover.alt = coverAlt.value; markMediaChanged()"
+                        />
+                    }
+                    <div class="d-flex flex-wrap gap-2 mt-2">
+                        @if (canUploadMedia) {
+                            <label for="article-cover-upload" class="btn btn-outline-primary">
+                                {{ coverImage ? 'Заменить обложку' : 'Загрузить обложку' }}
+                            </label>
+                            <input
+                                #coverUpload
+                                id="article-cover-upload"
+                                type="file"
+                                class="visually-hidden"
+                                accept="image/jpeg,image/png,image/gif,image/webp"
+                                (change)="uploadCover(coverUpload)"
+                            />
+                        }
+                        @if (coverImage) {
+                            <button type="button" class="btn btn-light" (click)="removeCover()">Удалить обложку</button>
+                        }
+                    </div>
+                </section>
+            }
             <div class="mb-4">
-                <label for="article-body" class="form-label">Текст статьи</label>
-                <textarea id="article-body" class="form-control" rows="12" formControlName="body"></textarea>
+                @for (section of bodySections.controls; track section; let i = $index) {
+                    <div class="mb-3">
+                        <label [for]="i === 0 ? 'article-body' : 'article-body-' + i" class="form-label">
+                            {{ i === 0 ? 'Текст статьи' : 'Текст после иллюстрации ' + i }}
+                        </label>
+                        <textarea
+                            #text
+                            [id]="i === 0 ? 'article-body' : 'article-body-' + i"
+                            class="form-control"
+                            [rows]="bodyImages.length ? 5 : 10"
+                            [formControl]="section"
+                        ></textarea>
+                        @if (canUploadMedia && bodyImages.length < maxBodyImages) {
+                            @if (i === 0) {
+                                <p class="form-text mb-2">Поставьте курсор в нужный абзац и добавьте иллюстрацию после него.</p>
+                            }
+                            <label [for]="'article-photo-upload-' + i" class="btn btn-sm btn-outline-primary">Добавить иллюстрацию</label>
+                            <input
+                                #bodyUpload
+                                [id]="'article-photo-upload-' + i"
+                                type="file"
+                                class="visually-hidden"
+                                accept="image/jpeg,image/png,image/gif,image/webp"
+                                (change)="uploadBodyImage(bodyUpload, i, text)"
+                            />
+                        }
+                    </div>
+                    @if (bodyImages[i]; as photo) {
+                        <section class="editor-media mb-3" [attr.aria-label]="'Иллюстрация ' + (i + 1)">
+                            <img [src]="photo.image | imageUrl" [alt]="photo.alt" />
+                            <label [for]="'article-photo-alt-' + i" class="form-label">Описание иллюстрации</label>
+                            <input
+                                #photoAlt
+                                [id]="'article-photo-alt-' + i"
+                                class="form-control mb-2"
+                                type="text"
+                                [value]="photo.alt"
+                                (input)="photo.alt = photoAlt.value; markMediaChanged()"
+                            />
+                            <label [for]="'article-photo-caption-' + i" class="form-label">Подпись к иллюстрации</label>
+                            <input
+                                #photoCaption
+                                [id]="'article-photo-caption-' + i"
+                                class="form-control"
+                                type="text"
+                                [value]="photo.caption ?? ''"
+                                (input)="photo.caption = photoCaption.value; markMediaChanged()"
+                            />
+                            <button type="button" class="btn btn-light mt-2" (click)="removeBodyImage(i)">Удалить иллюстрацию</button>
+                        </section>
+                    }
+                }
             </div>
             <div class="d-flex flex-wrap gap-2">
                 <button type="submit" class="btn btn-primary">
@@ -42,8 +129,8 @@
                 <button type="button" class="btn btn-light" (click)="closeEditor()">Отмена</button>
             </div>
         </fieldset>
-        @if (saving) {
-            <p class="mt-3 mb-0" role="status">Сохранение…</p>
+        @if (saving || uploading) {
+            <p class="mt-3 mb-0" role="status">{{ uploading ? 'Загрузка фотографии…' : 'Сохранение…' }}</p>
         }
     </form>
 } @else if (loading) {
@@ -52,10 +139,41 @@
     @if (loadingId) {
         <p role="status">Загрузка статьи…</p>
     }
+    @if (canSelectFeatured) {
+        <section class="featured-editor mb-4" aria-labelledby="admin-featured-heading">
+            <h2 id="admin-featured-heading">Статьи на главной</h2>
+            <p>Выберите до трёх опубликованных статей в порядке показа.</p>
+            <fieldset [disabled]="saving || !!loadingId">
+                <legend class="visually-hidden">Опубликованные статьи</legend>
+                @for (article of publishedArticles; track article.id) {
+                    @let position = featuredIds.indexOf(article.id) + 1;
+                    <label class="featured-choice">
+                        <input
+                            type="checkbox"
+                            class="form-check-input"
+                            [checked]="position > 0"
+                            [disabled]="!position && featuredIds.length === maxFeatured"
+                            (change)="toggleFeatured(article.id)"
+                        />
+                        {{ article.title }}
+                        @if (position) {
+                            <span>Место {{ position }}</span>
+                        }
+                    </label>
+                }
+                <div class="featured-actions">
+                    <button type="button" class="btn btn-primary" [disabled]="!featuredChanged" (click)="saveFeatured()">
+                        Сохранить подборку
+                    </button>
+                    <span role="status">Выбрано {{ featuredIds.length }} из {{ maxFeatured }}</span>
+                </div>
+            </fieldset>
+        </section>
+    }
     <ul class="article-list list-unstyled">
         @for (article of articles; track article.id) {
             <li>
-                <button type="button" class="btn btn-link text-start p-0" [disabled]="!!loadingId" (click)="edit(article.id)">
+                <button type="button" class="btn btn-link text-start p-0" [disabled]="!!loadingId || saving" (click)="edit(article.id)">
                     {{ article.title }}
                 </button>
                 <span>
