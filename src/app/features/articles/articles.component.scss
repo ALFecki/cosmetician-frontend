@@ -12,41 +12,6 @@ h1 {
     margin-bottom: 24px;
 }
 
-time {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--sf-muted);
-    font-size: 13px;
-}
-
 .article-back {
     margin-bottom: 24px;
-}
-
-.article-summary {
-    color: var(--sf-muted);
-    font-size: clamp(16px, 2vw, 19px);
-    margin-bottom: 24px;
-}
-
-.article-body {
-    margin-top: 28px;
-    font-size: clamp(15px, 2vw, 18px);
-}
-
-.article-cover,
-.article-body img {
-    display: block;
-    width: 100%;
-    height: auto;
-}
-
-.article-body figure {
-    margin: 24px 0;
-}
-
-.article-body figcaption {
-    margin-top: 8px;
-    color: var(--sf-muted);
-    font-size: 13px;
 }
