@@ -60,40 +60,47 @@
         </div>
     }
     @if (step === 'details') {
-        <h3>Как к вам обращаться?</h3>
-        <p class="phone-hint">Сохраним данные для следующих заказов. Их можно будет изменить.</p>
+        @if (reusesOrderContact) {
+            <h3>Номер подтверждён</h3>
+            <p class="phone-hint">Используем контактные данные из прошлого заказа. Их можно изменить в профиле.</p>
+        } @else {
+            <h3>Как к вам обращаться?</h3>
+            <p class="phone-hint">Сохраним данные для следующих заказов. Их можно будет изменить.</p>
+        }
         <form [formGroup]="form" (ngSubmit)="complete()">
-            <div class="phone-names">
-                <div>
-                    <label for="phone-first-name">Имя</label
-                    ><input
-                        id="phone-first-name"
-                        class="form-control"
-                        autocomplete="given-name"
-                        formControlName="firstName"
-                        maxlength="100"
-                    />
+            @if (!reusesOrderContact) {
+                <div class="phone-names">
+                    <div>
+                        <label for="phone-first-name">Имя</label
+                        ><input
+                            id="phone-first-name"
+                            class="form-control"
+                            autocomplete="given-name"
+                            formControlName="firstName"
+                            maxlength="100"
+                        />
+                    </div>
+                    <div>
+                        <label for="phone-last-name">Фамилия</label
+                        ><input
+                            id="phone-last-name"
+                            class="form-control"
+                            autocomplete="family-name"
+                            formControlName="secondName"
+                            maxlength="100"
+                        />
+                    </div>
                 </div>
-                <div>
-                    <label for="phone-last-name">Фамилия</label
-                    ><input
-                        id="phone-last-name"
-                        class="form-control"
-                        autocomplete="family-name"
-                        formControlName="secondName"
-                        maxlength="100"
-                    />
-                </div>
-            </div>
-            <label for="phone-email">Email <span class="phone-hint">— необязательно</span></label>
-            <input
-                id="phone-email"
-                class="form-control"
-                type="email"
-                autocomplete="email"
-                formControlName="email"
-                placeholder="Для уведомлений о заказе"
-            />
+                <label for="phone-email">Email <span class="phone-hint">— необязательно</span></label>
+                <input
+                    id="phone-email"
+                    class="form-control"
+                    type="email"
+                    autocomplete="email"
+                    formControlName="email"
+                    placeholder="Для уведомлений о заказе"
+                />
+            }
             <label class="phone-consent"
                 ><input type="checkbox" formControlName="consent" /><span
                     >Согласен(на) на <a routerLink="/personal-data" target="_blank" rel="noopener">обработку персональных данных</a></span
@@ -101,6 +108,13 @@
             >
             <button type="submit" class="btn btn-primary" [disabled]="busy">{{ busy ? 'Сохраняем…' : 'Продолжить' }}</button>
         </form>
-        <button type="button" class="phone-link" (click)="editPhone()" [disabled]="busy">Подтвердить номер заново</button>
+        <div class="phone-actions">
+            @if (!reusesOrderContact && purpose === 'login') {
+                <button type="button" class="phone-link" (click)="editPhone(); emailLogin.emit()" [disabled]="busy">
+                    Уже есть аккаунт? Войти по email
+                </button>
+            }
+            <button type="button" class="phone-link" (click)="editPhone()" [disabled]="busy">Подтвердить номер заново</button>
+        </div>
     }
 </div>
