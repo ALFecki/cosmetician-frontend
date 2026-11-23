@@ -1,6 +1,8 @@
-<div class="article-heading mb-4">
+<div class="article-heading mb-4" [class.editor-width]="editorOpen">
     <h1>{{ editorOpen ? (editing ? 'Редактирование статьи' : 'Новая статья') : 'Статьи' }}</h1>
-    @if (!editorOpen) {
+    @if (editorOpen) {
+        <span class="editor-status" [class.published]="editing?.publishedAt">{{ editing?.publishedAt ? 'Опубликована' : 'Черновик' }}</span>
+    } @else {
         <button type="button" class="btn btn-primary" (click)="create()" [disabled]="!articles || !!loadingId || saving">
             Новая статья
         </button>
@@ -8,131 +10,238 @@
 </div>
 
 @if (error) {
-    <p class="alert alert-danger" role="alert">{{ error }}</p>
+    <p class="alert alert-danger" [class.editor-width]="editorOpen" role="alert">{{ error }}</p>
 }
 @if (feedback) {
     <p class="alert alert-success" role="status">{{ feedback }}</p>
 }
 
 @if (editorOpen) {
-    <form class="editor" [formGroup]="form" (ngSubmit)="save()">
-        <fieldset [disabled]="saving || uploading">
-            @if (editing) {
-                <p>{{ editing.publishedAt ? 'Опубликована' : 'Черновик' }}</p>
-            }
-            <div class="mb-3">
-                <label for="article-title" class="form-label">Заголовок</label>
-                <input id="article-title" class="form-control" type="text" formControlName="title" required />
-            </div>
-            <div class="mb-3">
-                <label for="article-summary" class="form-label">Краткое описание</label>
-                <textarea id="article-summary" class="form-control" rows="3" formControlName="summary"></textarea>
-            </div>
-            @if (canUploadMedia || coverImage) {
-                <section class="editor-media mb-4" aria-labelledby="cover-heading">
-                    <h2 id="cover-heading">Обложка</h2>
-                    @if (coverImage; as cover) {
-                        <img [src]="cover.image | imageUrl" [alt]="cover.alt" />
-                        <label for="article-cover-alt" class="form-label">Описание обложки</label>
-                        <input
-                            id="article-cover-alt"
-                            #coverAlt
-                            class="form-control"
-                            type="text"
-                            [value]="cover.alt"
-                            (input)="cover.alt = coverAlt.value; markMediaChanged()"
-                        />
-                    }
-                    <div class="d-flex flex-wrap gap-2 mt-2">
-                        @if (canUploadMedia) {
-                            <label for="article-cover-upload" class="btn btn-outline-primary">
-                                {{ coverImage ? 'Заменить обложку' : 'Загрузить обложку' }}
-                            </label>
-                            <input
-                                #coverUpload
-                                id="article-cover-upload"
-                                type="file"
-                                class="visually-hidden"
-                                accept="image/jpeg,image/png,image/gif,image/webp"
-                                (change)="uploadCover(coverUpload)"
-                            />
-                        }
-                        @if (coverImage) {
-                            <button type="button" class="btn btn-light" (click)="removeCover()">Удалить обложку</button>
-                        }
-                    </div>
-                </section>
-            }
-            <div class="mb-4">
-                @for (section of bodySections.controls; track section; let i = $index) {
-                    <div class="mb-3">
-                        <label [for]="i === 0 ? 'article-body' : 'article-body-' + i" class="form-label">
-                            {{ i === 0 ? 'Текст статьи' : 'Текст после иллюстрации ' + i }}
-                        </label>
-                        <textarea
-                            #text
-                            [id]="i === 0 ? 'article-body' : 'article-body-' + i"
-                            class="form-control"
-                            [rows]="bodyImages.length ? 5 : 10"
-                            [formControl]="section"
-                        ></textarea>
-                        @if (canUploadMedia && bodyImages.length < maxBodyImages) {
-                            @if (i === 0) {
-                                <p class="form-text mb-2">Поставьте курсор в нужный абзац и добавьте иллюстрацию после него.</p>
-                            }
-                            <label [for]="'article-photo-upload-' + i" class="btn btn-sm btn-outline-primary">Добавить иллюстрацию</label>
-                            <input
-                                #bodyUpload
-                                [id]="'article-photo-upload-' + i"
-                                type="file"
-                                class="visually-hidden"
-                                accept="image/jpeg,image/png,image/gif,image/webp"
-                                (change)="uploadBodyImage(bodyUpload, i, text)"
-                            />
-                        }
-                    </div>
-                    @if (bodyImages[i]; as photo) {
-                        <section class="editor-media mb-3" [attr.aria-label]="'Иллюстрация ' + (i + 1)">
-                            <img [src]="photo.image | imageUrl" [alt]="photo.alt" />
-                            <label [for]="'article-photo-alt-' + i" class="form-label">Описание иллюстрации</label>
-                            <input
-                                #photoAlt
-                                [id]="'article-photo-alt-' + i"
-                                class="form-control mb-2"
-                                type="text"
-                                [value]="photo.alt"
-                                (input)="photo.alt = photoAlt.value; markMediaChanged()"
-                            />
-                            <label [for]="'article-photo-caption-' + i" class="form-label">Подпись к иллюстрации</label>
-                            <input
-                                #photoCaption
-                                [id]="'article-photo-caption-' + i"
-                                class="form-control"
-                                type="text"
-                                [value]="photo.caption ?? ''"
-                                (input)="photo.caption = photoCaption.value; markMediaChanged()"
-                            />
-                            <button type="button" class="btn btn-light mt-2" (click)="removeBodyImage(i)">Удалить иллюстрацию</button>
-                        </section>
-                    }
-                }
-            </div>
-            <div class="d-flex flex-wrap gap-2">
-                <button type="submit" class="btn btn-primary">
-                    {{ editing?.publishedAt ? 'Сохранить изменения' : 'Сохранить черновик' }}
+    <div class="editor-width editor-workspace">
+        <div class="editor-toolbar">
+            <div class="editor-switch" role="group" aria-label="Режим статьи">
+                <button #editorMode type="button" [attr.aria-pressed]="!previewArticle" (click)="previewArticle = null">Редактор</button>
+                <button type="button" [attr.aria-pressed]="!!previewArticle" [disabled]="saving || uploading" (click)="showPreview()">
+                    Предпросмотр
                 </button>
-                @if (editing?.publishedAt) {
-                    <button type="button" class="btn btn-outline-primary" (click)="unpublish()">Снять с публикации</button>
-                } @else if (editing) {
-                    <button type="button" class="btn btn-outline-primary" (click)="save(true)">Опубликовать</button>
-                }
-                <button type="button" class="btn btn-light" (click)="closeEditor()">Отмена</button>
             </div>
-        </fieldset>
-        @if (saving || uploading) {
-            <p class="mt-3 mb-0" role="status">{{ uploading ? 'Загрузка фотографии…' : 'Сохранение…' }}</p>
+            @if (saving || uploading) {
+                <span class="editor-progress" role="status">{{ uploading ? 'Загрузка фотографии…' : 'Сохранение…' }}</span>
+            }
+        </div>
+        @if (previewArticle; as article) {
+            <section class="editor-preview" aria-label="Предпросмотр статьи">
+                <div class="editor-preview-toolbar">
+                    <span class="editor-progress" role="status">{{ form.dirty ? 'Несохранённые изменения' : 'Текущая версия' }}</span>
+                    <div class="editor-switch" role="group" aria-label="Ширина предпросмотра">
+                        <button type="button" [attr.aria-pressed]="!phonePreview" (click)="phonePreview = false">Широкий экран</button>
+                        <button type="button" [attr.aria-pressed]="phonePreview" (click)="phonePreview = true">Телефон</button>
+                    </div>
+                </div>
+                <div class="editor-preview-stage">
+                    <div class="editor-preview-frame" [class.phone]="phonePreview">
+                        @if (article.title || article.summary || article.body || article.coverImage || article.bodyImages?.length) {
+                            <app-article-content [article]="article"></app-article-content>
+                        } @else {
+                            <p class="editor-empty mb-0">Добавьте текст или фотографию, чтобы увидеть статью.</p>
+                        }
+                    </div>
+                </div>
+                <div class="editor-actions">
+                    <button type="button" class="btn btn-primary" (click)="previewArticle = null; editorMode.focus()">
+                        Вернуться к редактированию
+                    </button>
+                </div>
+            </section>
+        } @else {
+            <form class="editor" [formGroup]="form" (ngSubmit)="save()">
+                <fieldset [disabled]="saving || uploading">
+                    <section class="editor-card" aria-labelledby="intro-heading">
+                        <h2 id="intro-heading">О статье</h2>
+                        <div>
+                            <label for="article-title" class="form-label">Заголовок</label>
+                            <input id="article-title" class="form-control title-input" type="text" formControlName="title" required />
+                        </div>
+                        <div>
+                            <label for="article-summary" class="form-label">Краткое описание</label>
+                            <textarea id="article-summary" class="form-control" rows="3" formControlName="summary"></textarea>
+                        </div>
+                        @if (canUploadMedia || coverImage) {
+                            <section class="editor-cover" aria-labelledby="cover-heading">
+                                <h3 id="cover-heading">Обложка</h3>
+                                <div class="editor-cover-content" [class.has-cover]="coverImage">
+                                    @if (coverImage; as cover) {
+                                        <img class="editor-thumbnail cover-thumbnail" [src]="cover.image | imageUrl" [alt]="cover.alt" />
+                                    }
+                                    <div class="editor-media-fields">
+                                        @if (coverImage; as cover) {
+                                            <div>
+                                                <label for="article-cover-alt" class="form-label">Описание обложки</label>
+                                                <input
+                                                    id="article-cover-alt"
+                                                    #coverAlt
+                                                    class="form-control"
+                                                    type="text"
+                                                    [value]="cover.alt"
+                                                    (input)="cover.alt = coverAlt.value; markMediaChanged()"
+                                                />
+                                            </div>
+                                        }
+                                        <div class="editor-media-actions">
+                                            @if (canUploadMedia) {
+                                                <label for="article-cover-upload" class="btn btn-outline-primary">
+                                                    {{ coverImage ? 'Заменить обложку' : 'Загрузить обложку' }}
+                                                </label>
+                                                <input
+                                                    #coverUpload
+                                                    id="article-cover-upload"
+                                                    type="file"
+                                                    class="visually-hidden"
+                                                    accept="image/jpeg,image/png,image/gif,image/webp"
+                                                    (change)="uploadCover(coverUpload)"
+                                                />
+                                            }
+                                            @if (coverImage) {
+                                                <button type="button" class="btn btn-light" (click)="removeCover()">Удалить обложку</button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        }
+                    </section>
+                    <section class="editor-card" aria-labelledby="body-heading">
+                        <h2 id="body-heading">Текст и иллюстрации</h2>
+                        <div class="editor-blocks">
+                            @for (section of bodySections.controls; track section; let i = $index) {
+                                @let placementOpen = placementSection === section;
+                                <div class="editor-text-block">
+                                    <label [for]="i === 0 ? 'article-body' : 'article-body-' + i" class="form-label">
+                                        {{ i === 0 ? 'Текст статьи' : 'Текст после иллюстрации ' + i }}
+                                    </label>
+                                    <textarea
+                                        #text
+                                        [id]="i === 0 ? 'article-body' : 'article-body-' + i"
+                                        class="form-control editor-body-text"
+                                        [rows]="bodyImages.length ? 5 : 10"
+                                        [formControl]="section"
+                                        (input)="updatePlacement(section, text.value)"
+                                    ></textarea>
+                                    @if (canUploadMedia && bodyImages.length < maxBodyImages) {
+                                        <div class="editor-insert">
+                                            <button
+                                                #addIllustration
+                                                type="button"
+                                                class="btn btn-outline-primary insert-button"
+                                                [attr.aria-expanded]="placementOpen"
+                                                [attr.aria-controls]="placementOpen ? 'article-insert-' + i : null"
+                                                (click)="togglePlacement(section)"
+                                            >
+                                                Добавить иллюстрацию
+                                            </button>
+                                        </div>
+                                        @if (placementOpen) {
+                                            <div class="editor-placement" [id]="'article-insert-' + i">
+                                                <div>
+                                                    <label [for]="'article-photo-position-' + i" class="form-label">Вставить после</label>
+                                                    <select
+                                                        #position
+                                                        [id]="'article-photo-position-' + i"
+                                                        class="form-select"
+                                                        (change)="placementPosition = +position.value"
+                                                    >
+                                                        @if (placementPosition === null) {
+                                                            <option value="" [selected]="true" disabled>Выберите позицию</option>
+                                                        }
+                                                        <option value="0" [selected]="placementPosition === 0">В начале блока</option>
+                                                        @for (paragraph of placementParagraphs; track $index) {
+                                                            <option [value]="$index + 1" [selected]="placementPosition === $index + 1">
+                                                                {{ $index + 1 }}. {{ paragraphSnippet(paragraph) }}
+                                                            </option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <div class="editor-media-actions">
+                                                    <label
+                                                        [for]="'article-photo-upload-' + i"
+                                                        class="btn btn-primary"
+                                                        [class.disabled]="placementPosition === null"
+                                                        >Выбрать файл</label
+                                                    >
+                                                    <input
+                                                        #bodyUpload
+                                                        [id]="'article-photo-upload-' + i"
+                                                        type="file"
+                                                        class="visually-hidden"
+                                                        [disabled]="placementPosition === null"
+                                                        accept="image/jpeg,image/png,image/gif,image/webp"
+                                                        (change)="uploadBodyImage(bodyUpload, i)"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-light"
+                                                        (click)="togglePlacement(section); addIllustration.focus()"
+                                                    >
+                                                        Отменить вставку
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                                @if (bodyImages[i]; as photo) {
+                                    <section class="editor-photo" [attr.aria-label]="'Иллюстрация ' + (i + 1)">
+                                        <img class="editor-thumbnail" [src]="photo.image | imageUrl" [alt]="photo.alt" />
+                                        <div class="editor-media-fields">
+                                            <h3>Иллюстрация {{ i + 1 }}</h3>
+                                            <div>
+                                                <label [for]="'article-photo-alt-' + i" class="form-label">Описание иллюстрации</label>
+                                                <input
+                                                    #photoAlt
+                                                    [id]="'article-photo-alt-' + i"
+                                                    class="form-control"
+                                                    type="text"
+                                                    [value]="photo.alt"
+                                                    (input)="photo.alt = photoAlt.value; markMediaChanged()"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label [for]="'article-photo-caption-' + i" class="form-label">Подпись к иллюстрации</label>
+                                                <input
+                                                    #photoCaption
+                                                    [id]="'article-photo-caption-' + i"
+                                                    class="form-control"
+                                                    type="text"
+                                                    [value]="photo.caption ?? ''"
+                                                    (input)="photo.caption = photoCaption.value; markMediaChanged()"
+                                                />
+                                            </div>
+                                            <div>
+                                                <button type="button" class="btn btn-light" (click)="removeBodyImage(i)">
+                                                    Удалить иллюстрацию
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </section>
+                                }
+                            }
+                        </div>
+                    </section>
+                    <div class="editor-actions">
+                        <button type="submit" class="btn btn-primary">
+                            {{ editing?.publishedAt ? 'Сохранить изменения' : 'Сохранить черновик' }}
+                        </button>
+                        @if (editing?.publishedAt) {
+                            <button type="button" class="btn btn-outline-primary" (click)="unpublish()">Снять с публикации</button>
+                        } @else if (editing) {
+                            <button type="button" class="btn btn-outline-primary" (click)="save(true)">Опубликовать</button>
+                        }
+                        <button type="button" class="btn btn-light editor-cancel" (click)="closeEditor()">Отмена</button>
+                    </div>
+                </fieldset>
+            </form>
         }
-    </form>
+    </div>
 } @else if (loading) {
     <p role="status">Загрузка статей…</p>
 } @else if (articles?.length) {

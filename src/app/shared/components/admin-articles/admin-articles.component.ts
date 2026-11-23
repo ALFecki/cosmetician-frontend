@@ -3,11 +3,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { ArticleContentComponent, ArticleContentData } from '../../../features/articles/article-content.component';
 import {
     Article,
     ArticleBodyImage,
     ArticleImage,
     ArticleInput,
+    ArticleMedia,
     ArticleService,
     ArticleSummary,
     maxFeaturedArticles,
@@ -18,7 +20,7 @@ import { ImageUrlPipe } from '../../utils/image-url.pipe';
 
 @Component({
     selector: 'app-admin-articles',
-    imports: [DatePipe, ImageUrlPipe, ReactiveFormsModule],
+    imports: [ArticleContentComponent, DatePipe, ImageUrlPipe, ReactiveFormsModule],
     templateUrl: './admin-articles.component.html',
     styleUrl: './admin-articles.component.scss',
 })
@@ -33,6 +35,11 @@ export class AdminArticlesComponent implements OnInit {
 
     coverImage: ArticleImage | null = null;
     bodyImages: Omit<ArticleBodyImage, 'afterParagraph'>[] = [];
+    placementSection: FormControl<string> | null = null;
+    placementParagraphs: string[] = [];
+    placementPosition: number | null = null;
+    previewArticle: ArticleContentData | null = null;
+    phonePreview = false;
     uploading = false;
     featuredIds: string[] = [];
     private mediaChanged = false;
@@ -76,6 +83,10 @@ export class AdminArticlesComponent implements OnInit {
             !this.articles?.length ||
             this.articles.some(article => article.coverImage !== undefined && article.featuredPosition !== undefined)
         );
+    }
+
+    paragraphSnippet(paragraph: string): string {
+        return paragraph.replace(/^(.{64}).+/su, '$1…');
     }
 
     toggleFeatured(id: string): void {
@@ -166,7 +177,14 @@ export class AdminArticlesComponent implements OnInit {
         if (this.saving || this.uploading || (this.form.dirty && !this.confirmDiscard())) return;
         this.editorOpen = false;
         this.editing = undefined;
+        this.previewArticle = null;
         this.error = '';
+    }
+
+    showPreview(): void {
+        if (this.saving || this.uploading) return;
+        this.placementSection = null;
+        this.previewArticle = { ...this.composeArticle(), publishedAt: this.editing?.publishedAt ?? null };
     }
 
     uploadCover(input: HTMLInputElement): void {
@@ -180,20 +198,36 @@ export class AdminArticlesComponent implements OnInit {
         this.markMediaChanged();
     }
 
-    uploadBodyImage(input: HTMLInputElement, sectionIndex: number, text: HTMLTextAreaElement): void {
-        if (this.bodyImages.length >= this.maxBodyImages) return;
-        const lineEnd = text.value.indexOf('\n', text.selectionEnd);
-        const afterParagraph = articleParagraphs(text.value.slice(0, lineEnd === -1 ? text.value.length : lineEnd)).length;
+    togglePlacement(section: FormControl<string>): void {
+        this.placementSection = this.placementSection === section ? null : section;
+        this.placementParagraphs = articleParagraphs(this.placementSection?.value ?? '');
+        this.placementPosition = this.placementParagraphs.length;
+    }
+
+    updatePlacement(section: FormControl<string>, text: string): void {
+        if (this.placementSection !== section) return;
+        const paragraphs = articleParagraphs(text);
+        if (paragraphs.length === this.placementParagraphs.length && paragraphs.every((text, i) => text === this.placementParagraphs[i]))
+            return;
+        this.placementParagraphs = paragraphs;
+        this.placementPosition = null;
+    }
+
+    uploadBodyImage(input: HTMLInputElement, sectionIndex: number): void {
+        const control = this.bodySections.at(sectionIndex);
+        const afterParagraph = this.placementPosition;
+        if (this.placementSection !== control || afterParagraph === null || this.bodyImages.length >= this.maxBodyImages) return;
         this.upload(input, image => {
-            const control = this.bodySections.at(sectionIndex);
             const [before, after] = splitArticleText(control.value, [afterParagraph]);
             control.setValue(before);
             this.bodySections.insert(sectionIndex + 1, this.forms.control(after));
             this.bodyImages.splice(sectionIndex, 0, { image, alt: '' });
+            this.placementSection = null;
         });
     }
 
     removeBodyImage(index: number): void {
+        this.placementSection = null;
         const before = this.bodySections.at(index);
         before.setValue(joinArticleText(before.value, this.bodySections.at(index + 1).value));
         this.bodySections.removeAt(index + 1);
@@ -208,16 +242,9 @@ export class AdminArticlesComponent implements OnInit {
 
     save(isPublished = !!this.editing?.publishedAt): void {
         if (!this.editorOpen || this.saving || this.uploading) return;
-        const { title, summary, bodySections } = this.form.getRawValue();
-        const body = bodySections.reduce(joinArticleText);
-        const input: ArticleInput = { title: title.trim(), summary: summary.trim(), body, isPublished };
+        const { title, summary, body, coverImage, bodyImages } = this.composeArticle();
+        const input: ArticleInput = { title, summary, body, isPublished };
         if (this.mediaChanged || (this.bodySections.dirty && this.bodyImages.length)) {
-            const coverImage = this.coverImage && { ...this.coverImage, alt: this.coverImage.alt.trim() };
-            let afterParagraph = 0;
-            const bodyImages = this.bodyImages.map(({ image, alt, caption }, index) => {
-                afterParagraph += articleParagraphs(bodySections[index]).length;
-                return { image, alt: alt.trim(), caption: caption?.trim() || undefined, afterParagraph };
-            });
             input.media = { coverImage, bodyImages };
         }
         if (!input.title || [...input.title].length > 160) {
@@ -264,11 +291,25 @@ export class AdminArticlesComponent implements OnInit {
         this.form.reset({ title: article?.title ?? '', summary: article?.summary ?? '', bodySections: this.bodySections.getRawValue() });
         this.coverImage = article?.coverImage ? { ...article.coverImage } : null;
         this.bodyImages = images.map(({ image, alt, caption }) => ({ image, alt, caption }));
+        this.placementSection = null;
+        this.previewArticle = null;
+        this.phonePreview = false;
         this.mediaChanged = false;
         this.editing = article;
         this.editorOpen = true;
         this.error = '';
         this.feedback = '';
+    }
+
+    private composeArticle(): Pick<Article, 'title' | 'summary' | 'body'> & ArticleMedia {
+        const { title, summary, bodySections } = this.form.getRawValue();
+        const coverImage = this.coverImage && { ...this.coverImage, alt: this.coverImage.alt.trim() };
+        let afterParagraph = 0;
+        const bodyImages = this.bodyImages.map(({ image, alt, caption }, index) => {
+            afterParagraph += articleParagraphs(bodySections[index]).length;
+            return { image, alt: alt.trim(), caption: caption?.trim() || undefined, afterParagraph };
+        });
+        return { title: title.trim(), summary: summary.trim(), body: bodySections.reduce(joinArticleText), coverImage, bodyImages };
     }
 
     private saveArticle(input: ArticleInput, message: string): void {

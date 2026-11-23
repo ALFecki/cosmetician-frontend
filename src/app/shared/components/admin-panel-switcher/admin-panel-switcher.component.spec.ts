@@ -187,10 +187,29 @@ describe('Article administration', () => {
     }
 
     function enter(label: string, value: string) {
-        const labels: NodeListOf<HTMLLabelElement> = fixture.nativeElement.querySelectorAll('label');
-        const control = Array.from(labels).find(element => element.textContent?.trim() === label)?.control as HTMLInputElement;
+        const control = labeledControl<HTMLInputElement | HTMLTextAreaElement>(label)!;
         control.value = value;
         control.dispatchEvent(new Event('input'));
+        fixture.detectChanges();
+    }
+
+    function labeledControl<T extends HTMLElement>(label: string): T | undefined {
+        const labels: NodeListOf<HTMLLabelElement> = fixture.nativeElement.querySelectorAll('label');
+        return Array.from(labels).find(element => element.textContent?.trim() === label)?.control as T | undefined;
+    }
+
+    function upload(label: string, path: string) {
+        const control = labeledControl<HTMLInputElement>(label);
+        expect(control).withContext(label).toBeDefined();
+        if (!control) return;
+        const transfer = new DataTransfer();
+        transfer.items.add(new File(['image'], 'photo.png', { type: 'image/png' }));
+        control.files = transfer.files;
+        control.dispatchEvent(new Event('change'));
+        const request = http.expectOne(environment.server_url + '/upload/image');
+        expect(request.request.method).toBe('POST');
+        expect(request.request.body.get('file').name).toBe('photo.png');
+        request.flush({ status: 'success', data: { path } });
         fixture.detectChanges();
     }
 
@@ -260,30 +279,21 @@ describe('Article administration', () => {
         http.expectOne(`${url}/${article.id}`).flush({ status: 'success', data: article });
         fixture.detectChanges();
 
-        function upload(label: string, path: string, index = 0) {
-            const labels: NodeListOf<HTMLLabelElement> = fixture.nativeElement.querySelectorAll('label');
-            const control = Array.from(labels).filter(element => element.textContent?.trim() === label)[index]?.control as HTMLInputElement;
-            expect(control).withContext(label).toBeDefined();
-            if (!control) return;
-            const transfer = new DataTransfer();
-            transfer.items.add(new File(['image'], 'photo.png', { type: 'image/png' }));
-            control.files = transfer.files;
-            control.dispatchEvent(new Event('change'));
-            const request = http.expectOne(environment.server_url + '/upload/image');
-            expect(request.request.method).toBe('POST');
-            expect(request.request.body.get('file').name).toBe('photo.png');
-            request.flush({ status: 'success', data: { path } });
-            fixture.detectChanges();
-        }
-
         upload('Загрузить обложку', coverImage.image);
         enter('Описание обложки', coverImage.alt);
         click('Удалить иллюстрацию');
         const text = fixture.nativeElement.querySelector('textarea[id="article-body"]') as HTMLTextAreaElement;
         expect(text.value).toBe('Первый абзац\n\u0085\n\uFEFF\nСледующий\nПоследний');
-        const startOfParagraph = text.value.indexOf('Следующий');
-        text.setSelectionRange(startOfParagraph, startOfParagraph);
-        upload('Добавить иллюстрацию', image);
+        click('Добавить иллюстрацию');
+        const placement = labeledControl<HTMLSelectElement>('Вставить после');
+        expect(placement).toBeDefined();
+        if (!placement) return;
+        expect(placement.options.length).toBe(5);
+        expect(placement.selectedIndex).toBe(4);
+        expect(placement.options[3].textContent).toContain('Следующий');
+        placement.selectedIndex = 3;
+        placement.dispatchEvent(new Event('change'));
+        upload('Выбрать файл', image);
         enter('Описание иллюстрации', 'Как нанести крем');
         enter('Подпись к иллюстрации', 'Дневной уход');
         enter('Текст после иллюстрации 1', 'Новый последний абзац');
@@ -312,6 +322,68 @@ describe('Article administration', () => {
         expect(removal.request.body.body).toBe(updated.body);
         removal.flush({ status: 'success', data: { ...updated, coverImage: null } });
         http.expectOne(publicUrl).flush({ status: 'success', length: 0, data: [] });
+    });
+
+    it('previews unsaved text and an inline photo in reader order and resumes editing', () => {
+        click('Статьи');
+        http.expectOne(url).flush({ status: 'success', length: 0, data: [] });
+        fixture.detectChanges();
+        click('Новая статья');
+        enter('Заголовок', 'Новый заголовок');
+        enter('Краткое описание', 'Краткое описание статьи');
+        enter('Текст статьи', 'Первый абзац\n\nВторой абзац');
+        click('Предпросмотр');
+        const reader: HTMLElement | null = fixture.nativeElement.querySelector('app-article-content article');
+        expect(reader).toBeTruthy();
+        if (!reader) return;
+        expect(reader.querySelector('h1')?.textContent).toBe('Новый заголовок');
+        expect(reader.textContent).toContain('Краткое описание статьи');
+        click('Вернуться к редактированию');
+        click('Добавить иллюстрацию');
+        const placement = labeledControl<HTMLSelectElement>('Вставить после')!;
+        placement.selectedIndex = 1;
+        placement.dispatchEvent(new Event('change'));
+        upload('Выбрать файл', '/images/00000000-0000-4000-8000-000000000004.png');
+        enter('Описание иллюстрации', 'Флакон крема');
+        enter('Подпись к иллюстрации', 'Дневной уход');
+        click('Предпросмотр');
+        const content: HTMLElement = fixture.nativeElement.querySelector('app-article-content article');
+        const paragraphs = Array.from(content.querySelectorAll('p')).slice(-2);
+        const figure = content.querySelector('figure')!;
+        expect(paragraphs.map(paragraph => paragraph.textContent)).toEqual(['Первый абзац', 'Второй абзац']);
+        expect(paragraphs[0].nextElementSibling).toBe(figure);
+        expect(figure.nextElementSibling).toBe(paragraphs[1]);
+        expect(figure.querySelector('img')?.alt).toBe('Флакон крема');
+        expect(figure.querySelector('img')?.getAttribute('src')).toContain('/images/00000000-0000-4000-8000-000000000004.png');
+        expect(figure.querySelector('figcaption')?.textContent).toBe('Дневной уход');
+        http.expectNone(() => true);
+
+        click('Редактор');
+        expect(labeledControl<HTMLInputElement>('Заголовок')?.value).toBe('Новый заголовок');
+        expect(labeledControl<HTMLTextAreaElement>('Текст после иллюстрации 1')?.value).toBe('\nВторой абзац');
+        expect(labeledControl<HTMLInputElement>('Подпись к иллюстрации')?.value).toBe('Дневной уход');
+        expect(fixture.nativeElement.querySelector('app-article-content')).toBeNull();
+    });
+
+    it('requires choosing the insertion position again when the paragraphs change', () => {
+        click('Статьи');
+        http.expectOne(url).flush({ status: 'success', length: 0, data: [] });
+        fixture.detectChanges();
+        click('Новая статья');
+        enter('Текст статьи', 'Первый\nВторой');
+        click('Добавить иллюстрацию');
+        const placement = labeledControl<HTMLSelectElement>('Вставить после')!;
+        expect(placement.selectedOptions[0].textContent).toContain('Второй');
+
+        enter('Текст статьи', 'Новый\nПервый\nВторой');
+        expect(placement.selectedOptions[0]?.textContent).toContain('Выберите позицию');
+        const file = labeledControl<HTMLInputElement>('Выбрать файл')!;
+        expect(file.disabled).toBeTrue();
+
+        placement.selectedIndex = Array.from(placement.options).findIndex(option => option.textContent?.trim() === '3. Второй');
+        placement.dispatchEvent(new Event('change'));
+        fixture.detectChanges();
+        expect(file.disabled).toBeFalse();
     });
 
     it('keeps the original body bytes when editing image metadata and removing an illustration', () => {
@@ -364,7 +436,6 @@ describe('Article administration', () => {
     for (const legacyList of [false, true]) {
         it(`hides media uploads after a legacy response from ${legacyList ? 'the list' : 'article details'}`, () => {
             const coverSelector = '#article-cover-upload';
-            const bodySelector = '#article-photo-upload-0';
             click('Статьи');
             const listItem = legacyList ? first : { ...first, coverImage: null, featuredPosition: null };
             http.expectOne(url).flush({ status: 'success', length: 1, data: [listItem] });
@@ -377,7 +448,8 @@ describe('Article administration', () => {
                 fixture.detectChanges();
             }
             expect(fixture.nativeElement.querySelector(coverSelector)).toBeNull();
-            expect(fixture.nativeElement.querySelector(bodySelector)).toBeNull();
+            const addIllustration: NodeListOf<HTMLButtonElement> = fixture.nativeElement.querySelectorAll('button');
+            expect(Array.from(addIllustration).some(button => button.textContent?.trim() === 'Добавить иллюстрацию')).toBeFalse();
         });
     }
 
