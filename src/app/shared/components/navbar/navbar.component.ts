@@ -9,6 +9,7 @@ import { IconsModule } from '../../base/icons/icons.module';
 import { BrandModel } from '../../models/brand.model';
 import { CategoryModel } from '../../models/category.model';
 import { PersonModel } from '../../models/person.model';
+import { ArticleService } from '../../services/article.service';
 import { AuthService } from '../../services/auth.service';
 import { BrandService } from '../../services/brand.service';
 import { CartService } from '../../services/cart.service';
@@ -35,6 +36,7 @@ export class NavbarComponent implements OnDestroy, OnInit, AfterViewInit {
     private navigationSubscription?: Subscription;
     categories$!: Observable<CategoryModel[]>;
     brands$!: Observable<BrandModel[]>;
+    readonly hasPublishedArticles$ = inject(ArticleService).hasPublished$;
     authService: AuthService = inject(AuthService);
     guestCheckout = inject(GuestCheckoutService);
     authSubscribtion: Subscription | null = null;

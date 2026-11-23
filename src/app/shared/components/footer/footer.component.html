@@ -33,6 +33,9 @@
                         <ul class="footer-links">
                             <li><a routerLink="/products" class="footer-link">Найти свой уход</a></li>
                             <li><a routerLink="/about" class="footer-link">О SkViDerm</a></li>
+                            @if (hasPublishedArticles$ | async) {
+                                <li><a routerLink="/articles" class="footer-link">Статьи</a></li>
+                            }
                             <li><a routerLink="/delivery" class="footer-link">Доставка и оплата</a></li>
                             <li><a routerLink="/contacts" class="footer-link">Контакты</a></li>
                         </ul>

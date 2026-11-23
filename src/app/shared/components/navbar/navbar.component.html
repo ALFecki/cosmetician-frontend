@@ -65,6 +65,9 @@
                 Бренды <span aria-hidden="true">⌄</span>
             </button>
             <a routerLink="/about" (click)="closeMenu()">О SkViDerm</a>
+            @if (hasPublishedArticles$ | async) {
+                <a routerLink="/articles" (click)="closeMenu()" routerLinkActive="active" ariaCurrentWhenActive="page">Статьи</a>
+            }
             <a routerLink="/delivery" (click)="closeMenu()">Доставка и оплата</a>
             <a routerLink="/contacts" (click)="closeMenu()">Контакты</a>
             <button class="consult-link" type="button" (click)="openFeedbackModal(); closeMenu()">Помочь с выбором? →</button>
