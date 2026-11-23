@@ -1,4 +1,6 @@
 import { GuestCheckoutService } from '../../services/guest-checkout.service';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
@@ -12,6 +14,8 @@ import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
 import { LoginModalService } from '../../services/login-modal.service';
 import { FeedbackModalService } from '../../services/feedback-modal.service';
+import { environment } from '../../../../environments/environment';
+import { FooterComponent } from '../footer/footer.component';
 
 @Component({ template: '', standalone: true })
 class EmptyPageComponent {}
@@ -23,8 +27,10 @@ describe('Rendered storefront navigation', () => {
         width = 1200;
         spyOnProperty(window, 'innerWidth').and.callFake(() => width);
         TestBed.configureTestingModule({
-            imports: [NavbarComponent],
+            imports: [NavbarComponent, FooterComponent],
             providers: [
+                provideHttpClient(),
+                provideHttpClientTesting(),
                 { provide: GuestCheckoutService, useValue: { session: null } },
                 provideRouter([
                     { path: '', component: EmptyPageComponent },
@@ -125,4 +131,42 @@ describe('Rendered storefront navigation', () => {
         )!;
         expect(link.getAttribute('href')).toBe('/about');
     });
+    it('shares the published article lookup across desktop navigation, the mobile menu and the footer', fakeAsync(() => {
+        const footer = TestBed.createComponent(FooterComponent);
+        const http = TestBed.inject(HttpTestingController);
+        const router = TestBed.inject(Router);
+        const url = environment.server_url + '/articles';
+        const navLink = () => fixture.nativeElement.querySelector('nav a[href="/articles"]');
+        const footerLink = () => footer.nativeElement.querySelector('a[href="/articles"]');
+
+        footer.detectChanges();
+        router.navigateByUrl('/');
+        tick();
+        expect(navLink()).toBeNull();
+        expect(footerLink()).toBeNull();
+        http.expectOne(url).flush({
+            status: 'success',
+            length: 1,
+            data: [{ id: 'db3f1dd6-abca-4eb3-955a-0e459607ae28', title: 'Уход', summary: '', publishedAt: '2026-11-20T10:00:00Z' }],
+        });
+        fixture.detectChanges();
+        footer.detectChanges();
+        expect(navLink()).not.toBeNull();
+        expect(footerLink()).not.toBeNull();
+
+        resize(390);
+        button('storefront-navigation').click();
+        fixture.detectChanges();
+        expect(fixture.nativeElement.querySelector('#storefront-navigation').inert).toBeFalse();
+        expect(navLink()).not.toBeNull();
+
+        router.navigateByUrl('/products');
+        tick();
+        http.expectOne(url).flush('Not found', { status: 404, statusText: 'Not Found' });
+        fixture.detectChanges();
+        footer.detectChanges();
+        expect(navLink()).toBeNull();
+        expect(footerLink()).toBeNull();
+        http.verify();
+    }));
 });

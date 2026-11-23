@@ -1,6 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
 import { homeBannerId } from '../../models/banner.model';
@@ -152,4 +153,91 @@ describe('Banner administration', () => {
             expect(component.itemForm.value.image).toBe(original);
         });
     }
+});
+
+describe('Article administration', () => {
+    const url = environment.server_url + '/admin/articles';
+    const publicUrl = environment.server_url + '/articles';
+    const first = { id: 'db3f1dd6-abca-4eb3-955a-0e459607ae28', title: 'Первая', summary: '', publishedAt: null };
+    const second = { id: 'f08b50cd-cce0-4567-9f60-f8d38dcb0f42', title: 'Вторая', summary: '', publishedAt: null };
+    let fixture: ComponentFixture<AdminPanelSwitcherComponent>;
+    let http: HttpTestingController;
+
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            imports: [AdminPanelSwitcherComponent],
+            providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+        });
+        fixture = TestBed.createComponent(AdminPanelSwitcherComponent);
+        spyOn(fixture.componentInstance, 'loadData');
+        spyOn(fixture.componentInstance, 'loadMaintenanceStatus');
+        fixture.detectChanges();
+        http = TestBed.inject(HttpTestingController);
+        http.expectOne(environment.server_url + '/admin/catalog-prices').flush({ status: 'success', data: { enabled: false } });
+    });
+
+    afterEach(() => http.verify());
+
+    function click(label: string) {
+        const buttons: NodeListOf<HTMLButtonElement> = fixture.nativeElement.querySelectorAll('button');
+        const button = Array.from(buttons).find(control => control.textContent?.trim() === label);
+        expect(button).withContext(label).toBeDefined();
+        button?.click();
+        fixture.detectChanges();
+    }
+
+    function enter(label: string, value: string) {
+        const labels: NodeListOf<HTMLLabelElement> = fixture.nativeElement.querySelectorAll('label');
+        const control = Array.from(labels).find(element => element.textContent?.trim() === label)?.control as HTMLInputElement;
+        control.value = value;
+        control.dispatchEvent(new Event('input'));
+        fixture.detectChanges();
+    }
+
+    it('publishes the selected draft and removes only its publication', () => {
+        click('Статьи');
+        http.expectOne(url).flush({ status: 'success', length: 2, data: [first, second] });
+        fixture.detectChanges();
+        click('Вторая');
+        const body = 'Абзац\nЕщё один абзац';
+        http.expectOne(`${url}/${second.id}`).flush({ status: 'success', data: { ...second, body } });
+        fixture.detectChanges();
+
+        click('Опубликовать');
+        const publishing = http.expectOne(`${url}/${second.id}`);
+        expect(publishing.request.method).toBe('PUT');
+        expect(publishing.request.body).toEqual({ title: 'Вторая', summary: '', body, isPublished: true });
+        const published = { ...second, publishedAt: '2026-11-23T10:00:00Z', body };
+        publishing.flush({ status: 'success', data: published });
+        http.expectOne(publicUrl).flush({ status: 'success', length: 1, data: [published] });
+        fixture.detectChanges();
+
+        click('Вторая');
+        http.expectOne(`${url}/${second.id}`).flush({ status: 'success', data: published });
+        fixture.detectChanges();
+        click('Снять с публикации');
+        const unpublishing = http.expectOne(`${url}/${second.id}`);
+        expect(unpublishing.request.method).toBe('PUT');
+        expect(unpublishing.request.body).toEqual({ title: 'Вторая', summary: '', body, isPublished: false });
+        unpublishing.flush({ status: 'success', data: { ...second, body } });
+        http.expectOne(publicUrl).flush({ status: 'success', length: 0, data: [] });
+    });
+
+    it('keeps a new draft in the editor if saving fails', () => {
+        click('Статьи');
+        http.expectOne(url).flush({ status: 'success', length: 0, data: [] });
+        fixture.detectChanges();
+        click('Новая статья');
+        enter('Заголовок', '  Черновик  ');
+
+        click('Сохранить черновик');
+        const saving = http.expectOne(url);
+        expect(saving.request.method).toBe('POST');
+        expect(saving.request.body).toEqual({ title: 'Черновик', summary: '', body: '', isPublished: false });
+        saving.flush('Error', { status: 500, statusText: 'API failure' });
+        fixture.detectChanges();
+        expect(fixture.nativeElement.querySelector('input').value).toBe('  Черновик  ');
+        expect(fixture.nativeElement.querySelector('[role="alert"]')).not.toBeNull();
+        http.expectNone(publicUrl);
+    });
 });

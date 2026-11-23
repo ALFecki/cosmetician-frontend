@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { IconsModule } from '../../base/icons/icons.module';
 import { BrandModel } from '../../models/brand.model';
 import { CategoryModel } from '../../models/category.model';
+import { ArticleService } from '../../services/article.service';
 import { BrandService } from '../../services/brand.service';
 import { CategoryService } from '../../services/category.service';
 
@@ -16,6 +17,7 @@ import { CategoryService } from '../../services/category.service';
     styleUrl: './footer.component.scss',
 })
 export class FooterComponent {
+    readonly hasPublishedArticles$ = inject(ArticleService).hasPublished$;
     categories$: Observable<CategoryModel[]>;
     brands$: Observable<BrandModel[]>;
     currentYear = new Date().getFullYear();

@@ -29,6 +29,7 @@ import { PromotionService } from '../../services/promotion.service';
 import { StatisticsService } from '../../services/statistics.service';
 import { ToastService } from '../../services/toast.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
+import { AdminArticlesComponent } from '../admin-articles/admin-articles.component';
 import { AdminCatalogPricesComponent } from '../admin-catalog-prices/admin-catalog-prices.component';
 import { AdminOrdersComponent } from '../admin-orders/admin-orders.component';
 import { AdminPromotionsComponent } from '../admin-promotions/admin-promotions.component';
@@ -80,6 +81,7 @@ interface ModelConfig {
         FormsModule,
         ReactiveFormsModule,
         StatisticsComponent,
+        AdminArticlesComponent,
         AdminCatalogPricesComponent,
         AdminOrdersComponent,
         AdminPromotionsComponent,
@@ -94,6 +96,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
     @ViewChild('variantModal') variantModal!: TemplateRef<any>;
     @ViewChild(AdminCatalogPricesComponent) private adminCatalogPrices?: AdminCatalogPricesComponent;
     @ViewChild(AdminPromotionsComponent) private adminPromotions?: AdminPromotionsComponent;
+    @ViewChild(AdminArticlesComponent) private adminArticles?: AdminArticlesComponent;
 
     availableModels = [
         { key: 'orders', title: 'Заказы' },
@@ -117,6 +120,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
             items: [
                 { key: 'promotions', title: 'Акции и промокоды', icon: 'tag' },
                 { key: 'banners', title: 'Баннеры', icon: 'grid' },
+                { key: 'articles', title: 'Статьи', icon: 'card-text' },
             ],
         },
         {
@@ -635,6 +639,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
     }
 
     getCurrentModelTitle(): string {
+        if (this.currentModel === 'articles') return 'Статьи';
         return this.currentModel === 'settings' ? 'Настройки' : this.currentModelConfig?.title || '';
     }
 
@@ -648,7 +653,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
     get hasList(): boolean {
         return (
-            !['statistics', 'orders', 'settings'].includes(this.currentModel) &&
+            !['statistics', 'orders', 'settings', 'articles'].includes(this.currentModel) &&
             (this.currentModel !== 'promotions' || this.legacyPromotions)
         );
     }
@@ -721,6 +726,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
     canLeave(): boolean {
         if (this.currentModel === 'promotions' && this.adminPromotions && !this.adminPromotions.canLeave()) return false;
+        if (this.currentModel === 'articles' && this.adminArticles && !this.adminArticles.canLeave()) return false;
         if (
             this.saving ||
             this.savingVariant ||
@@ -741,6 +747,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
             this.deletingVariant ||
             (this.editorOpen && this.hasUnsavedChanges) ||
             this.adminPromotions?.hasPendingChanges ||
+            this.adminArticles?.hasPendingChanges ||
             this.adminCatalogPrices?.applying
         ) {
             event.preventDefault();

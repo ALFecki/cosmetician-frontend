@@ -141,6 +141,8 @@
             } @else if (currentModel === 'promotions' && !legacyPromotions) {
                 <ng-container *ngTemplateOutlet="sectionTabs"></ng-container>
                 <app-admin-promotions (unavailable)="loadLegacyPromotions()"></app-admin-promotions>
+            } @else if (currentModel === 'articles') {
+                <app-admin-articles></app-admin-articles>
             } @else {
                 <div class="page-heading">
                     <div>
