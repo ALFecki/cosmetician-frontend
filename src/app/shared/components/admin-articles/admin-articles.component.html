@@ -1,4 +1,4 @@
-<div class="article-heading mb-4" [class.editor-width]="editorOpen">
+<div class="article-heading editor-width mb-4">
     <h1>{{ editorOpen ? (editing ? 'Редактирование статьи' : 'Новая статья') : 'Статьи' }}</h1>
     @if (editorOpen) {
         <span class="editor-status" [class.published]="editing?.publishedAt">{{ editing?.publishedAt ? 'Опубликована' : 'Черновик' }}</span>
@@ -10,10 +10,10 @@
 </div>
 
 @if (error) {
-    <p class="alert alert-danger" [class.editor-width]="editorOpen" role="alert">{{ error }}</p>
+    <p class="alert alert-danger editor-width" role="alert">{{ error }}</p>
 }
 @if (feedback) {
-    <p class="alert alert-success" role="status">{{ feedback }}</p>
+    <p class="alert alert-success editor-width" role="status">{{ feedback }}</p>
 }
 
 @if (editorOpen) {
@@ -243,13 +243,13 @@
         }
     </div>
 } @else if (loading) {
-    <p role="status">Загрузка статей…</p>
+    <p class="editor-width" role="status">Загрузка статей…</p>
 } @else if (articles?.length) {
     @if (loadingId) {
-        <p role="status">Загрузка статьи…</p>
+        <p class="editor-width" role="status">Загрузка статьи…</p>
     }
     @if (canSelectFeatured) {
-        <section class="featured-editor mb-4" aria-labelledby="admin-featured-heading">
+        <section class="featured-editor editor-width mb-4" aria-labelledby="admin-featured-heading">
             <h2 id="admin-featured-heading">Статьи на главной</h2>
             <p>Выберите до трёх опубликованных статей в порядке показа.</p>
             <fieldset [disabled]="saving || !!loadingId">
@@ -279,24 +279,44 @@
             </fieldset>
         </section>
     }
-    <ul class="article-list list-unstyled">
+    <ul class="article-list editor-width list-unstyled" aria-label="Список статей">
         @for (article of articles; track article.id) {
-            <li>
-                <button type="button" class="btn btn-link text-start p-0" [disabled]="!!loadingId || saving" (click)="edit(article.id)">
-                    {{ article.title }}
-                </button>
-                <span>
-                    @if (article.publishedAt) {
-                        Опубликована {{ article.publishedAt | date: 'dd.MM.yyyy' }}
-                    } @else {
-                        Черновик
+            <li class="article-entry">
+                <div class="article-thumbnail">
+                    <span>Без обложки</span>
+                    @if (article.coverImage; as image) {
+                        <img #thumbnail [src]="image.image | imageUrl" alt="" loading="lazy" (error)="thumbnail.hidden = true" />
                     }
-                </span>
+                </div>
+                <div class="article-overview">
+                    <h2>
+                        <button type="button" class="article-edit" [disabled]="!!loadingId || saving" (click)="edit(article.id)">
+                            {{ article.title }}
+                        </button>
+                    </h2>
+                    @if (article.summary) {
+                        <p>{{ article.summary }}</p>
+                    }
+                </div>
+                <div class="article-meta">
+                    <span class="editor-status" [class.published]="article.publishedAt">
+                        {{ article.publishedAt ? 'Опубликована' : 'Черновик' }}
+                    </span>
+                    @if (article.publishedAt) {
+                        <time [attr.datetime]="article.publishedAt">{{ article.publishedAt | date: 'dd.MM.yyyy' }}</time>
+                        @if (article.featuredPosition) {
+                            <span class="article-featured">На главной</span>
+                        }
+                    }
+                </div>
+                <span class="article-open" aria-hidden="true">→</span>
             </li>
         }
     </ul>
 } @else if (articles) {
-    <p>Статей пока нет.</p>
+    <p class="article-empty editor-width">Статей пока нет.</p>
 } @else {
-    <button type="button" class="btn btn-outline-primary" (click)="loadArticles()">Повторить</button>
+    <div class="editor-width">
+        <button type="button" class="btn btn-outline-primary" (click)="loadArticles()">Повторить</button>
+    </div>
 }
