@@ -198,6 +198,37 @@ describe('Article administration', () => {
         return Array.from(labels).find(element => element.textContent?.trim() === label)?.control as T | undefined;
     }
 
+    it('shows article covers and statuses and still opens the selected article', () => {
+        const source = '/images/00000000-0000-4000-8000-000000000001.jpg';
+        const published = {
+            ...first,
+            summary: 'Короткое описание статьи',
+            coverImage: { image: source, alt: 'Фотография средства' },
+            publishedAt: '2026-11-23T12:00:00Z',
+            featuredPosition: 1,
+        };
+        click('Статьи');
+        http.expectOne(url).flush({ status: 'success', length: 2, data: [published, second] });
+        fixture.detectChanges();
+        const rows: NodeListOf<HTMLElement> = fixture.nativeElement.querySelectorAll('.article-list > li');
+        const thumbnail = rows[0].querySelector('img');
+        expect(thumbnail?.getAttribute('src')).toBe(environment.server_url + source);
+        expect(rows[0].textContent).toContain(published.summary);
+        expect(rows[0].textContent).toContain('Опубликована');
+        expect(rows[0].textContent).toContain('23.11.2026');
+        expect(rows[0].textContent).toContain('На главной');
+        expect(rows[1].textContent).toContain('Черновик');
+        expect(rows[1].textContent).toContain('Без обложки');
+        expect(rows[1].querySelector('img')).toBeNull();
+
+        thumbnail?.dispatchEvent(new Event('error'));
+        expect(thumbnail?.hidden).toBeTrue();
+        click('Первая');
+        http.expectOne(url + '/' + first.id).flush({ status: 'success', data: { ...published, body: 'Текст' } });
+        fixture.detectChanges();
+        expect(fixture.nativeElement.querySelector('#article-title')?.value).toBe(first.title);
+    });
+
     function upload(label: string, path: string) {
         const control = labeledControl<HTMLInputElement>(label);
         expect(control).withContext(label).toBeDefined();
