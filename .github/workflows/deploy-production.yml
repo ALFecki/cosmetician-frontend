@@ -34,7 +34,7 @@ jobs:
 
     backend:
         needs: revisions
-        uses: ALFecki/cosmetician-backend-go/.github/workflows/check.yml@d9d710da7e504177886e631d82789dc6bdf2a492
+        uses: ALFecki/cosmetician-backend-go/.github/workflows/check.yml@0d5d88cec69f945f8379b70ab2184eab171c58f3
         with:
             revision: ${{ needs.revisions.outputs.backend }}
 
