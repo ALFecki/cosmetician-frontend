@@ -1,9 +1,10 @@
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { PhoneChallenge } from '../../models/checkout.model';
 import { LoginResponse } from '../../models/login.interface';
 import { AuthService } from '../../services/auth.service';
+import { GuestCheckoutService } from '../../services/guest-checkout.service';
 import { apiMessage } from '../../utils/api-message';
 
 @Component({
@@ -12,12 +13,13 @@ import { apiMessage } from '../../utils/api-message';
     templateUrl: './phone-auth.component.html',
     styleUrl: './phone-auth.component.scss',
 })
-export class PhoneAuthComponent implements OnInit, OnDestroy {
+export class PhoneAuthComponent implements OnChanges, OnInit, OnDestroy {
     @Input() purpose: 'login' | 'link' = 'login';
     @Output() authenticated = new EventEmitter<LoginResponse>();
     @Output() emailLogin = new EventEmitter<void>();
     @ViewChild('codeInput') codeInput?: ElementRef<HTMLInputElement>;
     step: 'phone' | 'code' | 'details' = 'phone';
+    reusesOrderContact = false;
     busy = false;
     error: string | null = null;
     remaining = 0;
@@ -40,9 +42,16 @@ export class PhoneAuthComponent implements OnInit, OnDestroy {
         consent: new FormControl(false, { nonNullable: true, validators: [Validators.requiredTrue] }),
     });
 
-    constructor(public authService: AuthService) {}
-    ngOnInit(): void {
+    constructor(
+        public authService: AuthService,
+        private guestCheckout: GuestCheckoutService,
+    ) {}
+    ngOnChanges(): void {
+        this.editPhone();
         if (this.purpose === 'link') this.form.controls.phone.setValue(this.authService.getCurrentUserSync()?.phone || '+375');
+    }
+
+    ngOnInit(): void {
         this.timer = setInterval(() => {
             this.remaining = Math.max(0, Math.ceil((this.retryAt - Date.now()) / 1000));
         }, 1000);
@@ -62,9 +71,10 @@ export class PhoneAuthComponent implements OnInit, OnDestroy {
         }
         this.busy = true;
         this.error = null;
+        const purpose = this.purpose;
         try {
-            const challenge = await this.authService.startPhone(phone, this.purpose);
-            if (!this.alive) return;
+            const challenge = await this.authService.startPhone(phone, purpose);
+            if (!this.alive || this.purpose !== purpose) return;
             this.challenge = challenge;
             this.form.controls.phone.setValue(phone);
             this.form.controls.code.reset();
@@ -72,6 +82,7 @@ export class PhoneAuthComponent implements OnInit, OnDestroy {
             this.step = 'code';
             setTimeout(() => this.codeInput?.nativeElement.focus(), 0);
         } catch (error) {
+            if (!this.alive || this.purpose !== purpose) return;
             this.error = apiMessage(error, 'Не удалось отправить код. Попробуйте через минуту');
             if ([429, 503, 0].includes((error as { status: number }).status)) this.setCooldown(60);
         } finally {
@@ -85,7 +96,8 @@ export class PhoneAuthComponent implements OnInit, OnDestroy {
     }
 
     async verifyCode(): Promise<void> {
-        if (this.busy || !this.challenge) return;
+        const challenge = this.challenge;
+        if (this.busy || !challenge) return;
         this.form.controls.code.markAsTouched();
         if (this.form.controls.code.invalid) {
             this.error = 'Введите 5 цифр из SMS';
@@ -93,35 +105,40 @@ export class PhoneAuthComponent implements OnInit, OnDestroy {
         }
         this.busy = true;
         this.error = null;
+        const phone = this.form.controls.phone.value;
         try {
-            const response = await this.authService.verifyPhone(this.challenge, this.form.controls.code.value);
-            if (!this.alive) return;
+            const response = await this.authService.verifyPhone(challenge, this.form.controls.code.value);
+            if (!this.alive || this.challenge !== challenge) return;
             if ('registrationRequired' in response) {
+                const guest = await this.guestCheckout.restore().catch(() => null);
+                if (!this.alive || this.challenge !== challenge) return;
+                const details = guest?.customer.checkoutDetails;
+                if (details?.phone === phone) {
+                    const { firstName, secondName, email } = details;
+                    this.form.patchValue({ firstName, secondName, email: email ?? '' });
+                    const { firstName: first, secondName: second, email: contactEmail } = this.form.controls;
+                    this.reusesOrderContact = first.valid && second.valid && contactEmail.valid;
+                    if (!this.reusesOrderContact) this.form.patchValue({ firstName: '', secondName: '', email: '' });
+                }
                 this.step = 'details';
                 this.form.controls.code.reset();
             } else this.authenticated.emit(response);
         } catch (error) {
-            this.error = apiMessage(error, 'Не удалось проверить код. Попробуйте ещё раз');
+            if (this.alive && this.challenge === challenge) this.error = apiMessage(error, 'Не удалось проверить код. Попробуйте ещё раз');
         } finally {
             this.busy = false;
         }
     }
 
     async complete(): Promise<void> {
-        if (this.busy || !this.challenge) return;
-        for (const control of [
-            this.form.controls.firstName,
-            this.form.controls.secondName,
-            this.form.controls.email,
-            this.form.controls.consent,
-        ])
-            control.markAsTouched();
-        if (
-            [this.form.controls.firstName, this.form.controls.secondName, this.form.controls.email, this.form.controls.consent].some(
-                control => control.invalid,
-            )
-        ) {
-            this.error = 'Укажите имя и фамилию, проверьте почту и согласие на обработку данных';
+        const challenge = this.challenge;
+        if (this.busy || !challenge || this.step !== 'details') return;
+        const { firstName, secondName, email, consent } = this.form.controls;
+        for (const control of [firstName, secondName, email, consent]) control.markAsTouched();
+        if ([firstName, secondName, email, consent].some(control => control.invalid)) {
+            this.error = this.reusesOrderContact
+                ? 'Подтвердите согласие на обработку данных'
+                : 'Укажите имя и фамилию, проверьте почту и согласие на обработку данных';
             return;
         }
         this.busy = true;
@@ -129,21 +146,24 @@ export class PhoneAuthComponent implements OnInit, OnDestroy {
         try {
             const value = this.form.getRawValue();
             const response = await this.authService.completePhone(
-                this.challenge,
+                challenge,
                 value.firstName.trim(),
                 value.secondName.trim(),
                 value.email.trim() || null,
             );
-            if (this.alive) this.authenticated.emit(response);
+            if (this.alive && this.challenge === challenge) this.authenticated.emit(response);
         } catch (error) {
-            this.error = apiMessage(error);
+            if (this.alive && this.challenge === challenge) this.error = apiMessage(error);
         } finally {
             this.busy = false;
         }
     }
 
     editPhone(): void {
-        if (this.busy) return;
+        if (this.reusesOrderContact) {
+            this.form.patchValue({ firstName: '', secondName: '', email: '', consent: false });
+            this.reusesOrderContact = false;
+        }
         this.step = 'phone';
         this.challenge = undefined;
         this.error = null;

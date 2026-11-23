@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../../services/auth.service';
+import { GuestCheckoutService } from '../../services/guest-checkout.service';
 import { ToastService } from '../../services/toast.service';
 import { VerifyEmailModalService } from '../../services/verify-email-modal.service';
 import { LoginComponent } from './login.component';
@@ -16,6 +17,7 @@ describe('Account login while SMS is unavailable', () => {
             providers: [
                 provideRouter([]),
                 { provide: AuthService, useValue: auth },
+                { provide: GuestCheckoutService, useValue: { restore: async () => null } },
                 { provide: NgbModal, useValue: { open: jasmine.createSpy(), dismissAll: () => undefined } },
                 { provide: ToastService, useValue: {} },
                 { provide: VerifyEmailModalService, useValue: {} },
