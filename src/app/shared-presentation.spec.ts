@@ -1,4 +1,6 @@
 import { GuestCheckoutService } from './shared/services/guest-checkout.service';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
@@ -24,6 +26,8 @@ describe('Shared customer/admin presentation boundary', () => {
         TestBed.configureTestingModule({
             imports: [AppComponent],
             providers: [
+                provideHttpClient(),
+                provideHttpClientTesting(),
                 { provide: GuestCheckoutService, useValue: { session: null } },
                 provideRouter([{ path: '**', component: PresentationPageComponent }]),
                 { provide: AuthService, useValue: { getCurrentUser: () => of(null), isLoggedIn: () => false, isAdmin: () => false } },
