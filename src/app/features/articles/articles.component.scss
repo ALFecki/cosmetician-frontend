@@ -19,31 +19,6 @@ time {
     font-size: 13px;
 }
 
-.article-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-
-    li + li {
-        border-top: 1px solid var(--sf-line);
-    }
-
-    li > a:not(.sf-text-link) {
-        display: block;
-        padding-block: 20px;
-    }
-
-    h2 {
-        font-size: clamp(24px, 3vw, 32px);
-        margin: 0;
-    }
-
-    p {
-        margin: 8px 0 0;
-        color: var(--sf-muted);
-    }
-}
-
 .article-back {
     margin-bottom: 24px;
 }
@@ -57,4 +32,21 @@ time {
 .article-body {
     margin-top: 28px;
     font-size: clamp(15px, 2vw, 18px);
+}
+
+.article-cover,
+.article-body img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.article-body figure {
+    margin: 24px 0;
+}
+
+.article-body figcaption {
+    margin-top: 8px;
+    color: var(--sf-muted);
+    font-size: 13px;
 }

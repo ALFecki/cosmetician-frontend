@@ -22,19 +22,49 @@ import {
 import { environment } from '../../../environments/environment';
 import { ListResponse, SingleResponse } from '../base/schemas/base_schema';
 import { SKIP_GLOBAL_LOADER } from '../interceptors/loader.interceptor';
+import { uploadImage } from '../utils/upload-image';
+
+export interface ArticleImage {
+    image: string;
+    alt: string;
+}
+
+export interface ArticleBodyImage extends ArticleImage {
+    caption?: string;
+    afterParagraph: number;
+}
+
+export interface ArticleMedia {
+    coverImage: ArticleImage | null;
+    bodyImages: ArticleBodyImage[];
+}
+
+export const maxFeaturedArticles = 3;
+
+export function orderedFeaturedArticles(articles: readonly ArticleSummary[]): ArticleSummary[] {
+    return articles
+        .filter(
+            article =>
+                !!article.publishedAt && (article.featuredPosition ?? 0) >= 1 && (article.featuredPosition ?? 0) <= maxFeaturedArticles,
+        )
+        .sort((left, right) => (left.featuredPosition ?? 0) - (right.featuredPosition ?? 0));
+}
 
 export interface ArticleSummary {
     id: string;
     title: string;
     summary: string;
     publishedAt: string | null;
+    coverImage?: ArticleImage | null;
+    featuredPosition?: number | null;
 }
 
 export interface Article extends ArticleSummary {
     body: string;
+    bodyImages?: ArticleBodyImage[];
 }
 
-export type ArticleInput = Pick<Article, 'title' | 'summary' | 'body'> & { isPublished: boolean };
+export type ArticleInput = Pick<Article, 'title' | 'summary' | 'body'> & { isPublished: boolean; media?: ArticleMedia };
 
 type PublishedArticles = { kind: 'loading' } | { kind: 'ready'; articles: readonly ArticleSummary[] } | { kind: 'error' };
 
@@ -111,10 +141,23 @@ export class ArticleService {
 
         return request.pipe(
             map(articleData),
-            tap(() => {
-                this.published$.pipe(take(1)).subscribe();
-                this.refreshes.next();
-            }),
+            tap(() => this.refreshPublished()),
         );
+    }
+
+    uploadImage(file: File) {
+        return uploadImage(this.http, environment.server_url, file);
+    }
+
+    setFeatured(ids: readonly string[]) {
+        return this.http.put<SingleResponse<{ ids: string[] }>>(`${this.adminUrl}/featured`, { ids }).pipe(
+            map(articleData),
+            tap(() => this.refreshPublished()),
+        );
+    }
+
+    private refreshPublished(): void {
+        this.published$.pipe(take(1)).subscribe();
+        this.refreshes.next();
     }
 }

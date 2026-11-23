@@ -68,6 +68,17 @@
 <app-brands></app-brands>
 <app-product-carousel></app-product-carousel>
 <app-about-me></app-about-me>
+@if (featuredArticles$ | async; as featured) {
+    @if (featured.length) {
+        <section class="sf-container featured-articles" aria-labelledby="featured-articles-heading">
+            <div class="sf-section-heading">
+                <h2 id="featured-articles-heading">Советы по уходу</h2>
+                <a class="sf-text-link" routerLink="/articles">Все статьи →</a>
+            </div>
+            <app-article-cards [articles]="featured" [headingLevel]="3" />
+        </section>
+    }
+}
 <app-benefits></app-benefits>
 <section class="sf-container closing-note">
     <span>Уход — это время для себя.</span><a class="sf-text-link" routerLink="/products">Найдите свой ритуал →</a>
