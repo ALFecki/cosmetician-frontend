@@ -714,6 +714,10 @@ summary:focus-visible {
     .page-heading h1 {
         font-size: 23px;
     }
+    .page-heading .heading-actions {
+        flex-shrink: 1;
+        flex-wrap: wrap;
+    }
     .product-preview {
         display: block;
     }

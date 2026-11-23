@@ -1,0 +1,141 @@
+@if (available) {
+    <button class="btn btn-light price-adjustment" type="button" (click)="open()" [disabled]="launchDisabled">
+        <i-bs name="tags"></i-bs> Изменить цены
+    </button>
+}
+
+<ng-template #priceDialog let-modal>
+    <div class="modal-header">
+        <h2 class="modal-title" id="bulk-price-dialog-title">Изменить розничные цены</h2>
+        <button type="button" class="btn-close" aria-label="Закрыть окно" [disabled]="!!pending" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+        @if (!retryApply || preview) {
+            <fieldset [disabled]="!!pending || retryApply">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label class="form-label" for="bulk-price-scope">Применить к</label>
+                        <select
+                            class="form-select"
+                            id="bulk-price-scope"
+                            [ngModel]="scope"
+                            (ngModelChange)="changeScope($event)"
+                            ngbAutofocus
+                        >
+                            <option value="products">Выбранным товарам</option>
+                            <option value="brand">Бренду</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label" for="bulk-price-percent">Изменение цены, %</label>
+                        <input
+                            class="form-control"
+                            id="bulk-price-percent"
+                            type="text"
+                            placeholder="+5,00 или −2,50"
+                            autocomplete="off"
+                            [(ngModel)]="percent"
+                            (ngModelChange)="clearPreview()"
+                            [class.is-invalid]="percent.trim() && basisPoints === null"
+                            [attr.aria-invalid]="percent.trim() && basisPoints === null ? 'true' : null"
+                            aria-describedby="bulk-price-percent-error"
+                        />
+                        <div class="invalid-feedback" id="bulk-price-percent-error">
+                            Введите ненулевой процент от −100% с точностью до двух знаков после запятой.
+                        </div>
+                    </div>
+                </div>
+                @if (scope === 'brand') {
+                    <div class="mt-3">
+                        <label class="form-label" for="bulk-price-brand">Бренд</label>
+                        <select class="form-select" id="bulk-price-brand" [(ngModel)]="brandId" (ngModelChange)="clearPreview()">
+                            <option value="">Выберите бренд</option>
+                            @for (brand of activeBrands(); track brand.id) {
+                                <option [value]="brand.id">{{ brand.title }}</option>
+                            }
+                        </select>
+                    </div>
+                } @else {
+                    <div class="mt-3">
+                        <label class="form-label" for="bulk-price-search">Поиск товаров</label>
+                        <input
+                            class="form-control"
+                            id="bulk-price-search"
+                            type="search"
+                            placeholder="Название или бренд"
+                            [ngModel]="search()"
+                            (ngModelChange)="search.set($event)"
+                        />
+                        <div class="product-picker mt-2">
+                            @for (product of matchingProducts(); track product.id) {
+                                <label class="product-option">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        [id]="'bulk-price-product-' + product.id"
+                                        [checked]="selectedProductIds.has(product.id)"
+                                        (change)="toggleProduct(product.id, $any($event.target).checked)"
+                                    />
+                                    <span>
+                                        <strong>{{ product.title }}</strong>
+                                        <small class="d-block text-muted">{{ product.brand?.title || 'Без бренда' }}</small>
+                                    </span>
+                                </label>
+                            } @empty {
+                                <p class="text-muted m-2">Товары не найдены.</p>
+                            }
+                        </div>
+                        <p class="form-text mb-0">Выбрано товаров: {{ selectedProductIds.size }}</p>
+                    </div>
+                }
+            </fieldset>
+        } @else {
+            <p class="mb-0">{{ restoredChangeLabel }}</p>
+        }
+        @if (error) {
+            <p class="alert alert-danger mt-3 mb-0" role="alert">{{ error }}</p>
+        }
+        @if (preview; as result) {
+            <section class="mt-3" aria-labelledby="bulk-price-preview">
+                <h3 class="preview-title" id="bulk-price-preview">Предпросмотр</h3>
+                <p class="mb-2" role="status">Изменятся цены у {{ result.changedCount }} из {{ result.items.length }} вариантов.</p>
+                @if (result.items.length) {
+                    <div class="preview-table" role="region" aria-labelledby="bulk-price-preview" tabindex="0">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Товар</th>
+                                    <th scope="col">Объём</th>
+                                    <th scope="col">Текущая базовая цена</th>
+                                    <th scope="col">Новая базовая цена</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (item of result.items; track item.variantId) {
+                                    <tr>
+                                        <th scope="row" class="fw-normal">{{ item.title }}</th>
+                                        <td class="text-nowrap">{{ item.volume }} мл</td>
+                                        <td class="text-nowrap">{{ formatPrice(item.oldPriceCents) }}</td>
+                                        <td class="text-nowrap" [class.fw-semibold]="item.oldPriceCents !== item.newPriceCents">
+                                            {{ formatPrice(item.newPriceCents) }}
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </section>
+        }
+        @if (pending) {
+            <p class="mt-3 mb-0" role="status">{{ pending === 'preview' ? 'Расчёт цен…' : 'Применение цен…' }}</p>
+        }
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-light" type="button" (click)="modal.dismiss()" [disabled]="!!pending">Закрыть</button>
+        <button class="btn btn-outline-secondary" type="button" (click)="calculate()" [disabled]="!canPreview">Рассчитать цены</button>
+        <button class="btn btn-primary" type="button" (click)="apply()" [disabled]="!canApply">
+            {{ retryApply ? 'Повторить подтверждение' : 'Применить цены' }}
+        </button>
+    </div>
+</ng-template>

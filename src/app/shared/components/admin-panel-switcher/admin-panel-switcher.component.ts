@@ -29,6 +29,7 @@ import { PromotionService } from '../../services/promotion.service';
 import { StatisticsService } from '../../services/statistics.service';
 import { ToastService } from '../../services/toast.service';
 import { ImageUrlPipe } from '../../utils/image-url.pipe';
+import { AdminCatalogPricesComponent } from '../admin-catalog-prices/admin-catalog-prices.component';
 import { AdminOrdersComponent } from '../admin-orders/admin-orders.component';
 import { AdminPromotionsComponent } from '../admin-promotions/admin-promotions.component';
 import { GenericTableComponent } from '../generic-table/generic-table.component';
@@ -79,6 +80,7 @@ interface ModelConfig {
         FormsModule,
         ReactiveFormsModule,
         StatisticsComponent,
+        AdminCatalogPricesComponent,
         AdminOrdersComponent,
         AdminPromotionsComponent,
         GenericTableComponent,
@@ -90,6 +92,7 @@ export class AdminPanelSwitcherComponent implements OnInit {
     @ViewChild('itemModal') itemModal!: TemplateRef<any>;
     @ViewChild('deleteModal') deleteModal!: TemplateRef<any>;
     @ViewChild('variantModal') variantModal!: TemplateRef<any>;
+    @ViewChild(AdminCatalogPricesComponent) private adminCatalogPrices?: AdminCatalogPricesComponent;
     @ViewChild(AdminPromotionsComponent) private adminPromotions?: AdminPromotionsComponent;
 
     availableModels = [
@@ -718,7 +721,15 @@ export class AdminPanelSwitcherComponent implements OnInit {
 
     canLeave(): boolean {
         if (this.currentModel === 'promotions' && this.adminPromotions && !this.adminPromotions.canLeave()) return false;
-        if (this.saving || this.savingVariant || this.deleting || this.restoring || this.deletingVariant) return false;
+        if (
+            this.saving ||
+            this.savingVariant ||
+            this.deleting ||
+            this.restoring ||
+            this.deletingVariant ||
+            this.adminCatalogPrices?.applying
+        )
+            return false;
         return !this.editorOpen || !this.hasUnsavedChanges || window.confirm('Есть несохранённые изменения. Выйти без сохранения?');
     }
 
@@ -729,7 +740,8 @@ export class AdminPanelSwitcherComponent implements OnInit {
             this.savingVariant ||
             this.deletingVariant ||
             (this.editorOpen && this.hasUnsavedChanges) ||
-            this.adminPromotions?.hasPendingChanges
+            this.adminPromotions?.hasPendingChanges ||
+            this.adminCatalogPrices?.applying
         ) {
             event.preventDefault();
             event.returnValue = '';
@@ -822,6 +834,11 @@ export class AdminPanelSwitcherComponent implements OnInit {
         } else {
             this.loadMainData();
         }
+    }
+
+    reloadCatalog(): void {
+        this.loading = true;
+        this.loadMainData();
     }
 
     loadMainData() {

@@ -105,6 +105,7 @@ describe('Admin workspace', () => {
     });
     it('keeps entered text across editor tabs and disables fields during a save', () => {
         fixture.detectChanges();
+        http.expectOne(environment.server_url + '/admin/catalog-prices').flush(null, { status: 404, statusText: 'Not Found' });
         component.editItem(product);
         fixture.detectChanges();
         const input: HTMLInputElement = fixture.nativeElement.querySelector('#title');
